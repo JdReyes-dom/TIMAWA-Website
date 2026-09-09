@@ -248,7 +248,6 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -261,14 +260,19 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
         }
 
         .modal-content {
             background: white;
             padding: 35px;
             border-radius: 30px;
-            max-width: 400px;
-            width: 90%;
+            max-width: 520px;
+            width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             box-shadow: rgba(133, 189, 215, 0.5) 0px 30px 40px -20px;
@@ -277,26 +281,88 @@
         .modal-content h2 {
             text-align: center;
             color: rgb(16, 137, 211);
-            margin-bottom: 20px;
-            font-size: 24px;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 800;
         }
 
-        .modal-content .input {
+        .modal-content .modal-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content .input-group {
+            margin-bottom: 14px;
+        }
+
+        .modal-content .input-group label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .modal-content .input-group label i {
+            color: rgb(16, 137, 211);
+            width: 18px;
+            margin-right: 4px;
+        }
+
+        .modal-content .input-group .required-star {
+            color: #ef4444;
+        }
+
+        .modal-content .input-group .input {
             width: 100%;
             background: #f8faff;
             border: 2px solid #e0e7ff;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border-radius: 15px;
-            margin-bottom: 12px;
             font-size: 14px;
             box-sizing: border-box;
             transition: all 0.3s ease;
+            font-family: inherit;
+            color: #333;
         }
 
-        .modal-content .input:focus {
+        .modal-content .input-group .input:focus {
             outline: none;
             border-color: rgb(16, 137, 211);
             box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+
+        .modal-content .input-group textarea.input {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-content .input-group .helper-text {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+            display: block;
+        }
+
+        .modal-content .input-group select.input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        .modal-content .input-group select.input option {
+            padding: 8px;
+        }
+
+        .modal-content .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
         }
 
         .modal-content .login-button {
@@ -318,6 +384,12 @@
             transform: scale(1.02);
         }
 
+        .modal-content .login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .modal-content .cancel-btn {
             display: block;
             width: 100%;
@@ -329,10 +401,57 @@
             cursor: pointer;
             font-size: 14px;
             transition: all 0.3s ease;
+            color: #666;
+            font-weight: 600;
         }
 
         .modal-content .cancel-btn:hover {
             background: #e5e7eb;
+        }
+
+        .modal-content .divider {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent);
+            margin: 15px 0;
+        }
+
+        .modal-content .optional-label {
+            font-size: 13px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-content .optional-label i {
+            color: rgb(16, 137, 211);
+        }
+
+        .custom-location-input {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .custom-location-input.active {
+            display: block;
+        }
+
+        /* Hide scrollbar on modal */
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f0f4ff;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            border-radius: 10px;
         }
 
         @media (max-width: 480px) {
@@ -342,6 +461,15 @@
             
             .heading {
                 font-size: 28px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .modal-content .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
             }
         }
     </style>
@@ -388,17 +516,133 @@
         <div class="modal-content">
             <h2>🇹🇮🇲🇦🇼🇦 Join the Squad</h2>
             <form id="signupForm">
-                <input class="input" type="text" id="signupName" placeholder="Full Name" required />
-                <input class="input" type="email" id="signupEmail" placeholder="E-mail" required />
-                <input class="input" type="password" id="signupPassword" placeholder="Password (min 6 characters)" required />
-                <button type="submit" class="login-button">Create Account</button>
+                <div class="input-group">
+                    <label>Full Name <span class="required-star">*</span></label>
+                    <input class="input" type="text" id="signupName" placeholder="Enter your full name" required />
+                </div>
+                <div class="input-group">
+                    <label>E-mail <span class="required-star">*</span></label>
+                    <input class="input" type="email" id="signupEmail" placeholder="Enter your email" required />
+                </div>
+                <div class="input-group">
+                    <label>Password <span class="required-star">*</span></label>
+                    <input class="input" type="password" id="signupPassword" placeholder="Min 6 characters" required />
+                </div>
+                <button type="submit" class="login-button" id="signupBtn">Create Account</button>
             </form>
             <button onclick="closeSignUp()" class="cancel-btn">Cancel</button>
         </div>
     </div>
 
+    <!-- Complete Profile Modal -->
+    <div id="completeProfileModal" class="modal">
+        <div class="modal-content">
+            <h2>✏️ Complete Your Profile</h2>
+            <p class="modal-subtitle">Please fill in all required fields to join the squad!</p>
+            
+            <form id="completeProfileForm">
+                <!-- Display Name -->
+                <div class="input-group">
+                    <label><i class="fas fa-user"></i> Display Name <span class="required-star">*</span></label>
+                    <input class="input" type="text" id="completeName" placeholder="Enter your display name" required />
+                </div>
+
+                <!-- Email (auto-filled, read-only) -->
+                <div class="input-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input class="input" type="email" id="completeEmail" disabled style="background:#f3f4f6;cursor:not-allowed;opacity:0.7;" />
+                    <span class="helper-text">Email cannot be changed</span>
+                </div>
+
+                <!-- Bio -->
+                <div class="input-group">
+                    <label><i class="fas fa-info-circle"></i> Bio / About Me <span class="required-star">*</span></label>
+                    <textarea class="input" id="completeBio" placeholder="Tell the squad about yourself..." required></textarea>
+                </div>
+
+                <!-- Location -->
+                <div class="input-group">
+                    <label><i class="fas fa-map-marker-alt"></i> Current Location <span class="required-star">*</span></label>
+                    <select class="input" id="locationSelect" onchange="toggleCustomLocation()" required>
+                        <option value="">Select your location</option>
+                        <option value="Alabat, Quezon">📍 Alabat, Quezon</option>
+                        <option value="Perez, Quezon">📍 Perez, Quezon</option>
+                        <option value="Atimonan, Quezon">📍 Atimonan, Quezon</option>
+                        <option value="Lucena, Quezon">📍 Lucena, Quezon</option>
+                        <option value="Lucban, Quezon">📍 Lucban, Quezon</option>
+                        <option value="San Pedro, Laguna">📍 San Pedro, Laguna</option>
+                        <option value="Santa Cruz, Laguna">📍 Santa Cruz, Laguna</option>
+                        <option value="custom">✏️ Others (Customize)</option>
+                    </select>
+                    <div class="custom-location-input" id="customLocationInput">
+                        <input class="input" type="text" id="customLocation" placeholder="Enter your location..." style="margin-top:8px;" />
+                    </div>
+                </div>
+
+                <!-- Birthday -->
+                <div class="input-group">
+                    <label><i class="fas fa-calendar-alt"></i> Birthday <span class="required-star">*</span></label>
+                    <input class="input" type="date" id="completeBirthday" required />
+                </div>
+
+                <!-- Occupation -->
+                <div class="input-group">
+                    <label><i class="fas fa-briefcase"></i> Occupation <span class="required-star">*</span></label>
+                    <input class="input" type="text" id="completeOccupation" placeholder="e.g., Software Engineer" required />
+                </div>
+
+                <!-- Interests -->
+                <div class="input-group">
+                    <label><i class="fas fa-heart"></i> Interests <span class="required-star">*</span></label>
+                    <input class="input" type="text" id="completeInterests" placeholder="e.g., Coffee, Travel, Gaming" required />
+                    <span class="helper-text">Separate interests with commas</span>
+                </div>
+
+                <!-- Status -->
+                <div class="input-group">
+                    <label><i class="fas fa-circle"></i> Status</label>
+                    <select class="input" id="completeStatus">
+                        <option value="available">🟢 Available</option>
+                        <option value="busy">🔴 Busy</option>
+                        <option value="away">🟡 Away</option>
+                        <option value="dnd">🟣 Do Not Disturb</option>
+                    </select>
+                </div>
+
+                <hr class="divider" />
+
+                <!-- Social Media - Optional -->
+                <div class="optional-label"><i class="fas fa-share-alt"></i> Social Media (Optional)</div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label><i class="fab fa-instagram"></i> Instagram</label>
+                        <input class="input" type="text" id="completeInstagram" placeholder="@username" />
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fab fa-twitter"></i> Twitter / X</label>
+                        <input class="input" type="text" id="completeTwitter" placeholder="@username" />
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="input-group">
+                        <label><i class="fab fa-tiktok"></i> TikTok</label>
+                        <input class="input" type="text" id="completeTiktok" placeholder="@username" />
+                    </div>
+                    <div class="input-group">
+                        <label><i class="fab fa-facebook"></i> Facebook Profile URL</label>
+                        <input class="input" type="url" id="completeFacebook" placeholder="https://facebook.com/username" />
+                        <span class="helper-text">Enter your full Facebook profile URL</span>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-button" id="completeProfileBtn">Join the Squad! 🚀</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // ===== FIREBASE CONFIG =====
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
             authDomain: "timawa2.firebaseapp.com",
@@ -408,15 +652,175 @@
             appId: "1:1051426551565:web:01d33631309bb9336fe244"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ===== CHECK LOGIN STATUS =====
-        auth.onAuthStateChanged(user => {
+        // ===== LOCATION FUNCTIONS =====
+        function toggleCustomLocation() {
+            const select = document.getElementById('locationSelect');
+            const customInput = document.getElementById('customLocationInput');
+            
+            if (select.value === 'custom') {
+                customInput.classList.add('active');
+                document.getElementById('customLocation').required = true;
+            } else {
+                customInput.classList.remove('active');
+                document.getElementById('customLocation').required = false;
+            }
+        }
+
+        function getLocationValue() {
+            const select = document.getElementById('locationSelect');
+            const customInput = document.getElementById('customLocation');
+            
+            if (select.value === 'custom') {
+                return customInput.value.trim() || 'Others';
+            }
+            return select.value;
+        }
+
+        // ===== CHECK LOGIN STATUS AND REDIRECT =====
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                window.location.href = 'dashboard.html';
+                try {
+                    const doc = await db.collection('users').doc(user.uid).get();
+                    const data = doc.data();
+                    
+                    // Check if user is admin
+                    const isAdmin = data?.isAdmin === true;
+                    
+                    // Check if user has completed profile (has required fields)
+                    const hasCompletedProfile = data && 
+                        data.displayName && 
+                        data.bio && 
+                        data.location && 
+                        data.birthday &&
+                        data.occupation &&
+                        data.interests;
+                    
+                    if (hasCompletedProfile) {
+                        // User has completed profile
+                        if (isAdmin) {
+                            window.location.href = 'admin.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    } else if (data && data.pendingProfile) {
+                        // User is in the middle of profile completion
+                        showCompleteProfile(user);
+                    } else {
+                        // New user or incomplete profile - show profile completion
+                        showCompleteProfile(user);
+                    }
+                } catch (error) {
+                    console.error('Error checking user profile:', error);
+                    window.location.href = 'dashboard.html';
+                }
+            }
+        });
+
+        // ===== SHOW COMPLETE PROFILE MODAL =====
+        function showCompleteProfile(user) {
+            const modal = document.getElementById('completeProfileModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // Auto-fill name and email
+            if (user.displayName) {
+                document.getElementById('completeName').value = user.displayName;
+            }
+            if (user.email) {
+                document.getElementById('completeEmail').value = user.email;
+            }
+            
+            // Store user reference
+            document.getElementById('completeProfileForm').dataset.uid = user.uid;
+        }
+
+        // ===== COMPLETE PROFILE FORM =====
+        document.getElementById('completeProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const uid = e.target.dataset.uid;
+            if (!uid) {
+                alert('User not found. Please try again.');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('completeProfileBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Saving...';
+            
+            try {
+                const name = document.getElementById('completeName').value.trim();
+                const bio = document.getElementById('completeBio').value.trim();
+                const location = getLocationValue();
+                const birthday = document.getElementById('completeBirthday').value;
+                const occupation = document.getElementById('completeOccupation').value.trim();
+                const interests = document.getElementById('completeInterests').value.trim();
+                const status = document.getElementById('completeStatus').value;
+                const instagram = document.getElementById('completeInstagram').value.trim();
+                const twitter = document.getElementById('completeTwitter').value.trim();
+                const tiktok = document.getElementById('completeTiktok').value.trim();
+                const facebook = document.getElementById('completeFacebook').value.trim();
+                
+                // Validate required fields
+                if (!name || !bio || !location || !birthday || !occupation || !interests) {
+                    alert('Please fill in all required fields (*)');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Join the Squad! 🚀';
+                    return;
+                }
+
+                // Validate Facebook URL if provided
+                if (facebook && !facebook.match(/^https?:\/\/(www\.)?facebook\.com\/.+/i)) {
+                    alert('⚠️ Please enter a valid Facebook URL (e.g., https://facebook.com/username)');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Join the Squad! 🚀';
+                    return;
+                }
+                
+                // Update auth profile with display name
+                const user = auth.currentUser;
+                if (user && user.displayName !== name) {
+                    await user.updateProfile({ displayName: name });
+                }
+                
+                // Save to Firestore
+                await db.collection('users').doc(uid).set({
+                    displayName: name,
+                    bio: bio,
+                    location: location,
+                    birthday: birthday,
+                    occupation: occupation,
+                    interests: interests,
+                    status: status || 'available',
+                    instagram: instagram || '',
+                    twitter: twitter || '',
+                    tiktok: tiktok || '',
+                    facebook: facebook || '',
+                    pendingProfile: false,
+                    completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                
+                // Check if user is admin before redirecting
+                const doc = await db.collection('users').doc(uid).get();
+                const data = doc.data();
+                const isAdmin = data?.isAdmin === true;
+                
+                if (isAdmin) {
+                    window.location.href = 'admin.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
+                
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('❌ Error saving profile: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Join the Squad! 🚀';
             }
         });
 
@@ -438,7 +842,7 @@
             
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Redirect happens automatically via onAuthStateChanged
+                // Redirect handled by onAuthStateChanged
             } catch (error) {
                 console.error('Login error:', error);
                 
@@ -465,6 +869,7 @@
             const name = document.getElementById('signupName').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
+            const btn = document.getElementById('signupBtn');
             
             hideMessages();
             
@@ -478,29 +883,26 @@
                 return;
             }
             
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Creating...';
+            
             try {
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 
-                // Update profile with display name
                 await userCredential.user.updateProfile({
                     displayName: name
                 });
                 
-                // Save user to Firestore
                 await db.collection('users').doc(userCredential.user.uid).set({
                     displayName: name,
                     email: email,
                     status: 'available',
-                    location: 'Alabat, Quezon',
+                    pendingProfile: true,
+                    isAdmin: false, // New users are not admin by default
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                showSuccess('Account created successfully! Redirecting...');
-                
-                setTimeout(() => {
-                    closeSignUp();
-                    window.location.href = 'dashboard.html';
-                }, 1500);
+                showSuccess('Account created! Please complete your profile.');
                 
             } catch (error) {
                 console.error('Signup error:', error);
@@ -515,6 +917,8 @@
                 }
                 
                 showError(errorMessage);
+                btn.disabled = false;
+                btn.innerHTML = 'Create Account';
             }
         });
 
@@ -524,20 +928,17 @@
                 const provider = new firebase.auth.GoogleAuthProvider();
                 const result = await auth.signInWithPopup(provider);
                 
-                // Check if user exists in Firestore
                 const userDoc = await db.collection('users').doc(result.user.uid).get();
                 if (!userDoc.exists) {
-                    // Create user profile for first time Google sign-in
                     await db.collection('users').doc(result.user.uid).set({
                         displayName: result.user.displayName || 'User',
                         email: result.user.email,
                         status: 'available',
-                        location: 'Alabat, Quezon',
+                        pendingProfile: true,
+                        isAdmin: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
-                
-                window.location.href = 'dashboard.html';
             } catch (error) {
                 console.error('Google sign-in error:', error);
                 showError('Google sign-in failed: ' + error.message);
@@ -556,12 +957,11 @@
                         displayName: result.user.displayName || 'User',
                         email: result.user.email || 'github-user',
                         status: 'available',
-                        location: 'Alabat, Quezon',
+                        pendingProfile: true,
+                        isAdmin: false,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 }
-                
-                window.location.href = 'dashboard.html';
             } catch (error) {
                 console.error('GitHub sign-in error:', error);
                 showError('GitHub sign-in failed: ' + error.message);
@@ -589,12 +989,12 @@
 
         // ===== UI FUNCTIONS =====
         function showSignUp() {
-            document.getElementById('signupModal').style.display = 'flex';
+            document.getElementById('signupModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeSignUp() {
-            document.getElementById('signupModal').style.display = 'none';
+            document.getElementById('signupModal').classList.remove('active');
             document.body.style.overflow = 'auto';
             document.getElementById('signupForm').reset();
         }
@@ -628,12 +1028,15 @@
             btn.disabled = false;
         }
 
-        // ===== CLOSE MODAL ON OUTSIDE CLICK =====
+        // Prevent closing modal by clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('signupModal');
-            if (event.target === modal) {
+            const signupModal = document.getElementById('signupModal');
+            const completeModal = document.getElementById('completeProfileModal');
+            
+            if (event.target === signupModal) {
                 closeSignUp();
             }
+            // Complete profile modal cannot be closed by clicking outside
         }
     </script>
 </body>

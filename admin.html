@@ -1,0 +1,1754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TIMAWA - Admin Panel</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            background: #f8faff;
+            color: #1a1a2e;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+            flex-wrap: wrap;
+        }
+
+        .navbar .logo {
+            font-size: 26px;
+            font-weight: 900;
+            color: #7c3aed;
+            letter-spacing: 2px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .navbar .logo span {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+
+        .navbar .nav-links a:hover {
+            color: #7c3aed;
+            background: rgba(139, 92, 246, 0.08);
+        }
+
+        .navbar .nav-links a.active {
+            color: #7c3aed;
+            background: rgba(139, 92, 246, 0.12);
+        }
+
+        .navbar .nav-links .admin-link {
+            color: #7c3aed;
+            font-weight: 600;
+        }
+
+        .navbar .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 4px 14px 4px 4px;
+            border-radius: 50px;
+            box-shadow: #ede9fe 0px 4px 10px -4px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .navbar .user-profile:hover {
+            border-color: #7c3aed;
+        }
+
+        .navbar .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .navbar .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .navbar .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .navbar .logout-btn {
+            background: white;
+            border: 2px solid #fee2e2;
+            color: #ef4444;
+            padding: 6px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: #ede9fe 0px 4px 8px -4px;
+            font-family: inherit;
+        }
+
+        .navbar .logout-btn:hover {
+            background: #fee2e2;
+            transform: scale(1.03);
+        }
+
+        .navbar .mobile-toggle {
+            display: none;
+            font-size: 24px;
+            color: #7c3aed;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 80px auto 40px;
+            padding: 0 40px;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border-radius: 24px;
+            padding: 40px 50px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.1);
+        }
+
+        .hero-banner .content h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+
+        .hero-banner .content h1 .highlight {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-banner .content p {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .hero-banner .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.35);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #7c3aed;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #e0e7ff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: #7c3aed;
+            background: #f8faff;
+            transform: scale(1.03);
+        }
+
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+            transform: scale(1.05);
+        }
+
+        .btn-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #dbeafe;
+            color: #2563eb;
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover {
+            background: #bfdbfe;
+            transform: scale(1.05);
+        }
+
+        .btn-success {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #dcfce7;
+            color: #16a34a;
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: #bbf7d0;
+            transform: scale(1.05);
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            border: 1px solid #eef2f7;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: #f8faff;
+            color: #555;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .admin-tab:hover {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .admin-tab.active {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            border-color: #7c3aed;
+        }
+
+        .admin-tab i {
+            margin-right: 8px;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .admin-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 30px;
+            border: 1px solid #eef2f7;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            margin-bottom: 20px;
+        }
+
+        .admin-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .admin-card .card-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-card .card-header .count {
+            font-size: 13px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .admin-card .card-header .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .item-card {
+            background: #f8faff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .item-card:hover {
+            border-color: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .item-card .item-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .item-card .item-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        }
+
+        .item-card .item-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            padding-right: 70px;
+        }
+
+        .item-card .item-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .item-card .item-description {
+            font-size: 13px;
+            color: #555;
+            margin-top: 4px;
+        }
+
+        .item-card .item-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .item-card .item-tag {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 2px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .modal-content h2 {
+            color: #7c3aed;
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-content .input-group {
+            margin-bottom: 14px;
+        }
+
+        .modal-content .input-group label {
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .modal-content .input-group label .required-star {
+            color: #ef4444;
+        }
+
+        .modal-content .input-group input,
+        .modal-content .input-group textarea,
+        .modal-content .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid #e0e7ff;
+            background: #f8faff;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .modal-content .input-group input:focus,
+        .modal-content .input-group textarea:focus,
+        .modal-content .input-group select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .modal-content .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        /* Image Upload */
+        .image-upload-area {
+            border: 2px dashed #e0e7ff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8faff;
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-upload-area:hover {
+            border-color: #7c3aed;
+            background: #ede9fe;
+        }
+
+        .image-upload-area img {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .image-upload-area .upload-placeholder {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .image-upload-area .upload-placeholder i {
+            font-size: 32px;
+            color: #7c3aed;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .image-upload-area .remove-image {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-area .remove-image:hover {
+            background: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .modal-actions .btn-primary {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
+        }
+
+        .modal-actions .btn-primary:hover {
+            transform: scale(1.02);
+        }
+
+        .modal-actions .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .modal-actions .btn-secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .modal-actions .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            font-size: 18px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .preview-container {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #eef2f7;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        }
+
+        .preview-header {
+            padding: 15px 20px;
+            background: #f8faff;
+            border-bottom: 1px solid #eef2f7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .preview-header h3 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-header .preview-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 600px;
+            border: none;
+            background: white;
+        }
+
+        .preview-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .footer {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px 40px;
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .navbar .logo {
+                font-size: 22px;
+            }
+
+            .navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 20px;
+                border-bottom: 2px solid #f0f4ff;
+                gap: 10px;
+                box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+                width: 100%;
+            }
+
+            .navbar .nav-links.active {
+                display: flex;
+            }
+
+            .navbar .mobile-toggle {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .main-container {
+                padding: 0 20px;
+                margin-top: 70px;
+            }
+
+            .hero-banner {
+                padding: 25px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-banner .content h1 {
+                font-size: 22px;
+            }
+
+            .hero-banner .actions {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .admin-tabs {
+                padding: 12px 15px;
+                justify-content: center;
+            }
+
+            .admin-tab {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+
+            .admin-card {
+                padding: 20px;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .preview-frame {
+                height: 400px;
+            }
+
+            .navbar .nav-links a {
+                font-size: 14px;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-banner .content h1 {
+                font-size: 20px;
+            }
+
+            .hero-banner .actions {
+                flex-direction: column;
+            }
+
+            .hero-banner .actions button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .admin-tab {
+                font-size: 11px;
+                padding: 6px 10px;
+            }
+
+            .admin-tab i {
+                margin-right: 4px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+
+            .preview-frame {
+                height: 300px;
+            }
+
+            .navbar .nav-links a {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f4ff;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="admin.html" class="logo">🇹🇮🇲🇦🇼🇦 <span>ADMIN</span></a>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="admin.html" class="active admin-link"><i class="fas fa-cog"></i> Admin Panel</a></li>
+            <li><a href="admin_profile.html"><i class="fas fa-user-shield"></i> Admin Profile</a></li>
+            <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+        </ul>
+    </nav>
+
+    <div class="main-container">
+        <div class="hero-banner">
+            <div class="content">
+                <h1>⚙️ Admin <span class="highlight">Control Panel</span></h1>
+                <p>Manage all content displayed on the TIMAWA HUB homepage.</p>
+            </div>
+            <div class="actions">
+                <button class="btn-primary" onclick="seedData()"><i class="fas fa-database"></i> Seed Default Data</button>
+                <button class="btn-secondary" onclick="refreshAll()"><i class="fas fa-sync"></i> Refresh</button>
+                <button class="btn-secondary" onclick="openPreview()"><i class="fas fa-eye"></i> Preview</button>
+            </div>
+        </div>
+
+        <div class="admin-tabs" id="adminTabs">
+            <button class="admin-tab active" data-tab="coffee"><i class="fas fa-coffee"></i> Coffee Shops</button>
+            <button class="admin-tab" data-tab="places"><i class="fas fa-map-marked-alt"></i> Places</button>
+            <button class="admin-tab" data-tab="activities"><i class="fas fa-gamepad"></i> Activities</button>
+            <button class="admin-tab" data-tab="members"><i class="fas fa-users"></i> Squad Members</button>
+        </div>
+
+        <div id="tab-coffee" class="tab-content active">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-coffee" style="color: #7c3aed;"></i> Favorite Coffee Shops</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <span class="count" id="coffeeCount">0 items</span>
+                        <button class="btn-primary" onclick="showAddModal('coffee')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="coffeeGrid"></div>
+            </div>
+        </div>
+
+        <div id="tab-places" class="tab-content">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-map-marked-alt" style="color: #7c3aed;"></i> Favorite Places</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <span class="count" id="placesCount">0 items</span>
+                        <button class="btn-primary" onclick="showAddModal('places')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="placesGrid"></div>
+            </div>
+        </div>
+
+        <div id="tab-activities" class="tab-content">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-gamepad" style="color: #7c3aed;"></i> Favorite Things to Do</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <span class="count" id="activitiesCount">0 items</span>
+                        <button class="btn-primary" onclick="showAddModal('activities')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="activitiesGrid"></div>
+            </div>
+        </div>
+
+        <div id="tab-members" class="tab-content">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-users" style="color: #7c3aed;"></i> Squad Members</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <span class="count" id="membersCount">0 items</span>
+                        <button class="btn-primary" onclick="showAddModal('members')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="membersGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle"><i class="fas fa-plus"></i> Add Item</h2>
+            <form id="itemForm" onsubmit="return false;">
+                <input type="hidden" id="itemId" />
+                <input type="hidden" id="itemType" />
+                <input type="hidden" id="existingImageUrl" />
+                
+                <div class="input-group">
+                    <label>Title <span class="required-star">*</span></label>
+                    <input type="text" id="itemTitle" placeholder="Enter title" required />
+                </div>
+
+                <div class="input-group" id="locationGroup">
+                    <label>Location <span class="required-star">*</span></label>
+                    <input type="text" id="itemLocation" placeholder="e.g., City, Country" required />
+                </div>
+
+                <div class="input-group" id="descriptionGroup">
+                    <label>Description <span class="required-star">*</span></label>
+                    <textarea id="itemDescription" placeholder="Enter description" required></textarea>
+                </div>
+
+                <div class="input-group" id="tagGroup">
+                    <label>Tag/Icon</label>
+                    <input type="text" id="itemTag" placeholder="e.g., ☕ Coffee, 📍 Place, 🎯 Activity" />
+                </div>
+
+                <!-- Image Upload -->
+                <div class="input-group">
+                    <label>Image</label>
+                    <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageInput').click()">
+                        <div class="upload-placeholder" id="imagePlaceholder">
+                            <i class="fas fa-image"></i>
+                            <span>Click to upload an image</span>
+                            <span style="font-size:11px;color:#aaa;display:block;margin-top:4px;">Recommended: 400x300px</span>
+                        </div>
+                        <img id="imagePreview" style="display:none;max-width:100%;max-height:150px;border-radius:8px;" />
+                        <button type="button" class="remove-image" id="removeImageBtn" style="display:none;" onclick="removeImage(event)"><i class="fas fa-times"></i> Remove</button>
+                    </div>
+                    <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(event)" />
+                    <span style="font-size:11px;color:#999;">Upload a custom image for this item</span>
+                </div>
+
+                <!-- Member-specific fields -->
+                <div id="memberFields" style="display:none;">
+                    <div class="input-group">
+                        <label>Initials <span class="required-star">*</span></label>
+                        <input type="text" id="memberInitials" placeholder="e.g., AR" maxlength="3" />
+                    </div>
+                    <div class="input-group">
+                        <label>Location <span class="required-star">*</span></label>
+                        <input type="text" id="memberLocation" placeholder="e.g., Alabat, Quezon" />
+                    </div>
+                    <div class="input-group">
+                        <label>Bio <span class="required-star">*</span></label>
+                        <textarea id="memberBio" placeholder="Tell us about this member" required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Interests (comma separated)</label>
+                        <input type="text" id="memberInterests" placeholder="e.g., Photography, Coffee, Travel" />
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-primary" id="submitBtn" onclick="saveItem()"><i class="fas fa-save"></i> Save</button>
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content" style="max-width: 95%; padding: 20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+                <h2 style="color:#7c3aed;font-size:22px;display:flex;align-items:center;gap:12px;margin:0;">
+                    <i class="fas fa-eye"></i> Live Preview
+                </h2>
+                <button onclick="closePreview()" style="background:none;border:none;font-size:28px;cursor:pointer;color:#888;">&times;</button>
+            </div>
+            <div class="preview-container">
+                <div class="preview-header">
+                    <h3><i class="fas fa-globe"></i> TIMAWA HUB - Homepage Preview</h3>
+                    <div class="preview-actions">
+                        <button class="btn-success" onclick="refreshPreview()"><i class="fas fa-sync"></i> Refresh</button>
+                        <button class="btn-secondary" onclick="openInNewTab()"><i class="fas fa-external-link-alt"></i> Open in New Tab</button>
+                    </div>
+                </div>
+                <div class="preview-frame" id="previewFrame">
+                    <iframe id="previewIframe" src="index.html"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>Made with ❤️ for the TIMAWA squad &copy; 2022</p>
+    </footer>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
+            authDomain: "timawa2.firebaseapp.com",
+            projectId: "timawa2",
+            storageBucket: "timawa2.firebasestorage.app",
+            messagingSenderId: "1051426551565",
+            appId: "1:1051426551565:web:01d33631309bb9336fe244"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const CLOUDINARY_CONFIG = {
+            cloudName: "ooq99nlw",
+            uploadPreset: "t-imawa"
+        };
+
+        let currentUser = null;
+        let editingId = null;
+        let editingType = null;
+        let selectedImageFile = null;
+        let currentImageUrl = null;
+
+        const COLLECTIONS = {
+            coffee: 'coffeeShops',
+            places: 'favoritePlaces',
+            activities: 'thingsToDo',
+            members: 'squadMembers'
+        };
+
+        const SEED_DATA = {
+            coffee: [
+                { title: 'Cafe Name Here', location: 'City, Country', description: 'A cozy spot with the best lattes in town.', tag: '☕ Coffee' },
+                { title: 'Cafe Name Here', location: 'City, Country', description: 'A hidden gem with the best pastries.', tag: '☕ Coffee' },
+                { title: 'Cafe Name Here', location: 'City, Country', description: 'Perfect for remote work and chill vibes.', tag: '☕ Coffee' },
+                { title: 'Cafe Name Here', location: 'City, Country', description: 'Known for their specialty brews.', tag: '☕ Coffee' },
+                { title: 'Cafe Name Here', location: 'City, Country', description: 'Aesthetic space with great music.', tag: '☕ Coffee' },
+                { title: 'Cafe Name Here', location: 'City, Country', description: 'Best cold brew in the city.', tag: '☕ Coffee' }
+            ],
+            places: [
+                { title: 'Place Name Here', location: 'City, Country', description: 'A beautiful spot we love to visit.', tag: '📍 Place' },
+                { title: 'Place Name Here', location: 'City, Country', description: 'Great views and even better company.', tag: '📍 Place' },
+                { title: 'Place Name Here', location: 'City, Country', description: 'A hidden gem we discovered together.', tag: '📍 Place' },
+                { title: 'Place Name Here', location: 'City, Country', description: 'Perfect for weekend getaways.', tag: '📍 Place' },
+                { title: 'Place Name Here', location: 'City, Country', description: 'The best sunset views.', tag: '📍 Place' },
+                { title: 'Place Name Here', location: 'City, Country', description: 'A place full of memories.', tag: '📍 Place' }
+            ],
+            activities: [
+                { title: 'Activity Name Here', location: 'City, Country', description: 'We love doing this together!', tag: '🎯 Activity' },
+                { title: 'Activity Name Here', location: 'City, Country', description: 'Always a great time with the squad.', tag: '🎯 Activity' },
+                { title: 'Activity Name Here', location: 'City, Country', description: 'Our go-to activity for weekends.', tag: '🎯 Activity' },
+                { title: 'Activity Name Here', location: 'City, Country', description: 'We never get tired of this.', tag: '🎯 Activity' },
+                { title: 'Activity Name Here', location: 'City, Country', description: 'A squad tradition.', tag: '🎯 Activity' },
+                { title: 'Activity Name Here', location: 'City, Country', description: 'Perfect for squad bonding.', tag: '🎯 Activity' }
+            ],
+            members: [
+                { name: 'Angela Reyes', initials: 'AR', location: 'Alabat, Quezon', bio: 'A coffee enthusiast and adventure seeker. Loves photography and exploring new places. The squad\'s official event planner.', interests: 'Photography, Coffee, Travel' },
+                { name: 'Miguel Santos', initials: 'MS', location: 'Perez, Quezon', bio: 'A music producer and gamer. Always has the best playlists for squad hangouts. Can talk about 90s hip-hop for hours.', interests: 'Music, Gaming, DJ' },
+                { name: 'Sofia Cruz', initials: 'SC', location: 'School', bio: 'A bookworm and aspiring writer. Runs the squad\'s book club and always has the best recommendations.', interests: 'Books, Writing, Coffee' },
+                { name: 'James Tan', initials: 'JT', location: 'Alabat, Quezon', bio: 'A foodie and culinary explorer. Always knows the best restaurants and hidden food spots.', interests: 'Food, Pizza, Tacos' },
+                { name: 'Paolo Rivera', initials: 'PR', location: 'Perez, Quezon', bio: 'A tech enthusiast and coder. Builds cool projects and helps the squad with all things tech.', interests: 'Tech, AI, Gaming' },
+                { name: 'Lara Dimagiba', initials: 'LD', location: 'School', bio: 'An artist and illustrator. Creates beautiful artwork and designs for the squad.', interests: 'Art, Illustration, Design' },
+                { name: 'Kyle Medina', initials: 'KM', location: 'Alabat, Quezon', bio: 'A fitness junkie and sports enthusiast. Organizes the squad\'s weekly basketball games.', interests: 'Sports, Fitness, Running' },
+                { name: 'Rica Mendoza', initials: 'RM', location: 'Perez, Quezon', bio: 'A fashionista and style icon. Always keeps the squad looking fresh and trendy.', interests: 'Fashion, Beauty, Style' },
+                { name: 'Dennis Aquino', initials: 'DA', location: 'School', bio: 'A film buff and movie critic. Hosts movie nights and always has the best recommendations.', interests: 'Movies, TV Shows, Popcorn' },
+                { name: 'Carla Bautista', initials: 'CB', location: 'Alabat, Quezon', bio: 'A nature lover and environmental advocate. Plans the squad\'s outdoor adventures.', interests: 'Nature, Hiking, Travel' },
+                { name: 'Victor Ilagan', initials: 'VI', location: 'Perez, Quezon', bio: 'A musician and songwriter. Creates the soundtrack to all squad adventures.', interests: 'Guitar, Songwriting, Piano' },
+                { name: 'Anna Flores', initials: 'AF', location: 'School', bio: 'A psychology major and wellness advocate. Always there to listen and support the squad.', interests: 'Psychology, Wellness, Mental Health' },
+                { name: 'Nico Gomez', initials: 'NG', location: 'Alabat, Quezon', bio: 'A car enthusiast and mechanic. Keeps the squad mobile and ready for road trips.', interests: 'Cars, Mechanics, Road Trips' },
+                { name: 'Bianca Santos', initials: 'BS', location: 'Perez, Quezon', bio: 'A digital marketer and social media guru. Manages the squad\'s online presence.', interests: 'Social Media, Marketing, Digital' },
+                { name: 'Erik Villanueva', initials: 'EV', location: 'School', bio: 'A history buff and storyteller. Knows the most interesting facts about everything.', interests: 'History, Reading, Storytelling' },
+                { name: 'Tina Romero', initials: 'TR', location: 'Alabat, Quezon', bio: 'A chef and baking enthusiast. Always brings the best treats to squad gatherings.', interests: 'Baking, Cooking, Desserts' },
+                { name: 'Ivan Dela Cruz', initials: 'ID', location: 'Perez, Quezon', bio: 'A gamer and esports fan. Organizes the squad\'s gaming nights and tournaments.', interests: 'Esports, Gaming, Tournaments' },
+                { name: 'Gina Marquez', initials: 'GM', location: 'School', bio: 'A photographer and content creator. Captures all the squad\'s best moments.', interests: 'Photography, Videography, Content' }
+            ]
+        };
+
+        // ===== IMAGE UPLOAD FUNCTIONS =====
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Image size should be under 5MB');
+                return;
+            }
+
+            selectedImageFile = file;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                const placeholder = document.getElementById('imagePlaceholder');
+                const removeBtn = document.getElementById('removeImageBtn');
+                
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+                removeBtn.style.display = 'block';
+                
+                // Clear existing image URL since we're uploading a new one
+                document.getElementById('existingImageUrl').value = '';
+                currentImageUrl = null;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage(event) {
+            if (event) event.stopPropagation();
+            selectedImageFile = null;
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePlaceholder').style.display = 'block';
+            document.getElementById('removeImageBtn').style.display = 'none';
+            document.getElementById('imageInput').value = '';
+        }
+
+        // ===== UPLOAD TO CLOUDINARY =====
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+            formData.append('folder', 't-imawa/items');
+
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`);
+                xhr.onload = function() {
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        resolve(response.secure_url);
+                    } else {
+                        reject(new Error('Upload failed: ' + xhr.statusText));
+                    }
+                };
+                xhr.onerror = function() {
+                    reject(new Error('Network error'));
+                };
+                xhr.send(formData);
+            });
+        }
+
+        // ===== SEED DATA =====
+        async function seedData() {
+            if (!confirm('This will add default placeholder data to all collections. Existing data will not be deleted. Continue?')) return;
+
+            try {
+                let addedCount = 0;
+
+                for (const [type, items] of Object.entries(SEED_DATA)) {
+                    const collectionName = COLLECTIONS[type];
+                    if (!collectionName) continue;
+                    
+                    for (const item of items) {
+                        try {
+                            if (type === 'members') {
+                                const existing = await db.collection(collectionName)
+                                    .where('name', '==', item.name)
+                                    .get();
+                                if (!existing.empty) continue;
+                            } else {
+                                const existing = await db.collection(collectionName)
+                                    .where('title', '==', item.title)
+                                    .where('location', '==', item.location)
+                                    .get();
+                                if (!existing.empty) continue;
+                            }
+                            
+                            await db.collection(collectionName).add({
+                                ...item,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                            addedCount++;
+                        } catch (err) {
+                            console.warn(`Error adding item ${item.title || item.name}:`, err);
+                            try {
+                                await db.collection(collectionName).add({
+                                    ...item,
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                });
+                                addedCount++;
+                            } catch (err2) {
+                                console.error(`Failed to add item:`, err2);
+                            }
+                        }
+                    }
+                }
+
+                alert(`✅ Added ${addedCount} new items!`);
+                loadAllData();
+            } catch (error) {
+                console.error('Error seeding data:', error);
+                alert('❌ Error seeding data: ' + error.message);
+            }
+        }
+
+        // ===== AUTH STATE =====
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = user;
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data();
+                const name = data?.displayName || user.displayName || user.email || 'Admin';
+                document.getElementById('userName').textContent = name;
+
+                if (data?.isAdmin !== true) {
+                    alert('⚠️ You need admin privileges to access this page.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                const avatarEl = document.getElementById('userAvatar');
+                if (data?.photoURL) {
+                    avatarEl.innerHTML = `<img src="${data.photoURL}" alt="${name}" />`;
+                } else {
+                    avatarEl.textContent = name.charAt(0).toUpperCase();
+                }
+
+                loadAllData();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        });
+
+        // ===== LOAD ALL DATA =====
+        function loadAllData() {
+            loadCollection('coffee');
+            loadCollection('places');
+            loadCollection('activities');
+            loadCollection('members');
+        }
+
+        // ===== LOAD COLLECTION =====
+        function loadCollection(type) {
+            const collectionName = COLLECTIONS[type];
+            if (!collectionName) return;
+
+            db.collection(collectionName)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    const grid = document.getElementById(`${type}Grid`);
+                    const countEl = document.getElementById(`${type}Count`);
+                    
+                    if (!grid) return;
+                    
+                    if (snapshot.empty) {
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-${type === 'coffee' ? 'coffee' : type === 'places' ? 'map-marked-alt' : type === 'activities' ? 'gamepad' : 'users'}"></i>
+                                <h3>No items yet</h3>
+                                <p>Click "Add" to create your first item, or "Seed Default Data" to add placeholders.</p>
+                            </div>
+                        `;
+                        if (countEl) countEl.textContent = '0 items';
+                        return;
+                    }
+
+                    let html = '';
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const id = doc.id;
+
+                        if (type === 'members') {
+                            html += renderMemberCard(id, data);
+                        } else {
+                            html += renderItemCard(type, id, data);
+                        }
+                    });
+
+                    grid.innerHTML = html;
+                    if (countEl) countEl.textContent = `${snapshot.size} items`;
+                }, (error) => {
+                    console.error(`Error loading ${type}:`, error);
+                });
+        }
+
+        // ===== RENDER ITEM CARD =====
+        function renderItemCard(type, id, data) {
+            const imageHtml = data.imageUrl ? 
+                `<img src="${data.imageUrl}" alt="${data.title}" class="item-image" />` : 
+                '';
+
+            return `
+                <div class="item-card">
+                    ${imageHtml}
+                    <div class="item-actions">
+                        <button class="btn-edit" onclick="editItem('${type}', '${id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-danger" onclick="deleteItem('${type}', '${id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="item-title">${data.title || 'Untitled'}</div>
+                    <div class="item-subtitle"><i class="fas fa-map-marker-alt"></i> ${data.location || 'No location'}</div>
+                    <div class="item-description">${data.description || ''}</div>
+                    ${data.tag ? `<div class="item-tags"><span class="item-tag">${data.tag}</span></div>` : ''}
+                </div>
+            `;
+        }
+
+        // ===== RENDER MEMBER CARD =====
+        function renderMemberCard(id, data) {
+            const interests = data.interests ? data.interests.split(',').map(t => t.trim()).filter(t => t) : [];
+            const imageHtml = data.imageUrl ? 
+                `<img src="${data.imageUrl}" alt="${data.name}" class="item-image" />` : 
+                '';
+
+            return `
+                <div class="item-card">
+                    ${imageHtml}
+                    <div class="item-actions">
+                        <button class="btn-edit" onclick="editItem('members', '${id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-danger" onclick="deleteItem('members', '${id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="item-title">${data.name || 'Anonymous'}</div>
+                    <div class="item-subtitle"><i class="fas fa-map-marker-alt"></i> ${data.location || 'No location'}</div>
+                    <div class="item-description">${data.bio || ''}</div>
+                    ${interests.length ? `<div class="item-tags">${interests.map(t => `<span class="item-tag">#${t}</span>`).join('')}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // ===== SHOW ADD MODAL =====
+        function showAddModal(type) {
+            console.log('📝 Opening add modal for:', type);
+            editingType = type;
+            editingId = null;
+            selectedImageFile = null;
+            currentImageUrl = null;
+            
+            document.getElementById('modalTitle').innerHTML = `<i class="fas fa-plus"></i> Add ${type.charAt(0).toUpperCase() + type.slice(1)} Item`;
+            document.getElementById('itemType').value = type;
+            document.getElementById('itemForm').reset();
+            document.getElementById('itemId').value = '';
+            document.getElementById('existingImageUrl').value = '';
+            
+            // Reset image upload
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePlaceholder').style.display = 'block';
+            document.getElementById('removeImageBtn').style.display = 'none';
+            document.getElementById('imageInput').value = '';
+
+            if (type === 'members') {
+                document.getElementById('memberFields').style.display = 'block';
+                document.getElementById('locationGroup').style.display = 'none';
+                document.getElementById('descriptionGroup').style.display = 'none';
+                document.getElementById('tagGroup').style.display = 'none';
+            } else {
+                document.getElementById('memberFields').style.display = 'none';
+                document.getElementById('locationGroup').style.display = 'block';
+                document.getElementById('descriptionGroup').style.display = 'block';
+                document.getElementById('tagGroup').style.display = 'block';
+            }
+
+            document.getElementById('itemModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ===== EDIT ITEM =====
+        async function editItem(type, id) {
+            console.log('✏️ Opening edit modal for:', type, id);
+            editingType = type;
+            editingId = id;
+            selectedImageFile = null;
+            const collectionName = COLLECTIONS[type];
+            
+            try {
+                const doc = await db.collection(collectionName).doc(id).get();
+                const data = doc.data();
+                
+                if (!data) {
+                    alert('Item not found');
+                    return;
+                }
+                
+                document.getElementById('modalTitle').innerHTML = `<i class="fas fa-edit"></i> Edit ${type.charAt(0).toUpperCase() + type.slice(1)} Item`;
+                document.getElementById('itemType').value = type;
+                document.getElementById('itemId').value = id;
+                document.getElementById('existingImageUrl').value = data.imageUrl || '';
+
+                // Set image if exists
+                if (data.imageUrl) {
+                    currentImageUrl = data.imageUrl;
+                    const preview = document.getElementById('imagePreview');
+                    const placeholder = document.getElementById('imagePlaceholder');
+                    const removeBtn = document.getElementById('removeImageBtn');
+                    
+                    preview.src = data.imageUrl;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    removeBtn.style.display = 'block';
+                } else {
+                    document.getElementById('imagePreview').style.display = 'none';
+                    document.getElementById('imagePlaceholder').style.display = 'block';
+                    document.getElementById('removeImageBtn').style.display = 'none';
+                    currentImageUrl = null;
+                }
+
+                if (type === 'members') {
+                    document.getElementById('memberFields').style.display = 'block';
+                    document.getElementById('locationGroup').style.display = 'none';
+                    document.getElementById('descriptionGroup').style.display = 'none';
+                    document.getElementById('tagGroup').style.display = 'none';
+                    
+                    document.getElementById('itemTitle').value = data.name || '';
+                    document.getElementById('memberInitials').value = data.initials || '';
+                    document.getElementById('memberLocation').value = data.location || '';
+                    document.getElementById('memberBio').value = data.bio || '';
+                    document.getElementById('memberInterests').value = data.interests || '';
+                } else {
+                    document.getElementById('memberFields').style.display = 'none';
+                    document.getElementById('locationGroup').style.display = 'block';
+                    document.getElementById('descriptionGroup').style.display = 'block';
+                    document.getElementById('tagGroup').style.display = 'block';
+                    
+                    document.getElementById('itemTitle').value = data.title || '';
+                    document.getElementById('itemLocation').value = data.location || '';
+                    document.getElementById('itemDescription').value = data.description || '';
+                    document.getElementById('itemTag').value = data.tag || '';
+                }
+
+                document.getElementById('itemModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error('Error loading item:', error);
+                alert('Error loading item: ' + error.message);
+            }
+        }
+
+        // ===== CLOSE MODAL =====
+        function closeModal() {
+            console.log('🔒 Closing modal');
+            document.getElementById('itemModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('itemForm').reset();
+            editingId = null;
+            editingType = null;
+            selectedImageFile = null;
+            currentImageUrl = null;
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePlaceholder').style.display = 'block';
+            document.getElementById('removeImageBtn').style.display = 'none';
+            document.getElementById('imageInput').value = '';
+        }
+
+        // ===== SAVE ITEM =====
+        async function saveItem() {
+            console.log('🔄 Save button clicked - starting save process');
+            
+            const type = document.getElementById('itemType').value;
+            const id = document.getElementById('itemId').value;
+            const collectionName = COLLECTIONS[type];
+            const submitBtn = document.getElementById('submitBtn');
+            
+            console.log('📝 Saving:', { type, id, collectionName });
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Saving...';
+
+            try {
+                let data = {};
+                
+                // Get the existing image URL from the hidden field
+                let imageUrl = document.getElementById('existingImageUrl').value || '';
+                console.log('📸 Existing image URL:', imageUrl);
+
+                // If a new file was selected, upload it
+                if (selectedImageFile) {
+                    console.log('📸 Uploading new image...');
+                    try {
+                        imageUrl = await uploadToCloudinary(selectedImageFile);
+                        console.log('✅ Image uploaded:', imageUrl);
+                    } catch (uploadError) {
+                        console.error('❌ Upload error:', uploadError);
+                        alert('❌ Error uploading image: ' + uploadError.message);
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+                        return;
+                    }
+                }
+
+                if (type === 'members') {
+                    const name = document.getElementById('itemTitle').value.trim();
+                    const initials = document.getElementById('memberInitials').value.trim().toUpperCase();
+                    const location = document.getElementById('memberLocation').value.trim();
+                    const bio = document.getElementById('memberBio').value.trim();
+                    const interests = document.getElementById('memberInterests').value.trim();
+
+                    console.log('📝 Member data:', { name, initials, location, bio, interests });
+
+                    if (!name || !location || !bio) {
+                        alert('Please fill in all required fields');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+                        return;
+                    }
+
+                    data = {
+                        name,
+                        initials: initials || name.charAt(0).toUpperCase(),
+                        location,
+                        bio,
+                        interests: interests || '',
+                        imageUrl: imageUrl || '',
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                } else {
+                    const title = document.getElementById('itemTitle').value.trim();
+                    const location = document.getElementById('itemLocation').value.trim();
+                    const description = document.getElementById('itemDescription').value.trim();
+                    const tag = document.getElementById('itemTag').value.trim();
+
+                    console.log('📝 Item data:', { title, location, description, tag });
+
+                    if (!title || !location || !description) {
+                        alert('Please fill in all required fields');
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+                        return;
+                    }
+
+                    data = {
+                        title,
+                        location,
+                        description,
+                        tag: tag || '',
+                        imageUrl: imageUrl || '',
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                }
+
+                console.log('📦 Data to save:', data);
+
+                if (id) {
+                    console.log('✏️ Updating existing document:', id);
+                    await db.collection(collectionName).doc(id).update(data);
+                    console.log('✅ Document updated successfully');
+                } else {
+                    console.log('➕ Creating new document');
+                    data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection(collectionName).add(data);
+                    console.log('✅ Document created successfully');
+                }
+
+                // Clear the selected file after successful save
+                selectedImageFile = null;
+                closeModal();
+                alert('✅ Item saved successfully!');
+                
+            } catch (error) {
+                console.error('❌ Error saving item:', error);
+                alert('❌ Error saving item: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+            }
+        }
+
+        // ===== DELETE ITEM =====
+        async function deleteItem(type, id) {
+            if (!confirm('Are you sure you want to delete this item?')) return;
+            
+            const collectionName = COLLECTIONS[type];
+            
+            try {
+                await db.collection(collectionName).doc(id).delete();
+                alert('✅ Item deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                alert('❌ Error deleting item: ' + error.message);
+            }
+        }
+
+        // ===== REFRESH ALL =====
+        function refreshAll() {
+            loadAllData();
+            alert('🔄 All content refreshed!');
+        }
+
+        // ===== PREVIEW FUNCTIONS =====
+        function openPreview() {
+            document.getElementById('previewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            const iframe = document.getElementById('previewIframe');
+            iframe.src = iframe.src;
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function refreshPreview() {
+            const iframe = document.getElementById('previewIframe');
+            iframe.src = iframe.src;
+        }
+
+        function openInNewTab() {
+            window.open('index.html', '_blank');
+        }
+
+        // ===== TAB SWITCHING =====
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                document.getElementById(`tab-${this.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        // ===== MOBILE MENU =====
+        function toggleMobileMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // ===== LOGOUT =====
+        async function logout() {
+            try {
+                await auth.signOut();
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert('Error signing out: ' + error.message);
+            }
+        }
+
+        // ===== CLOSE MODAL ON OUTSIDE CLICK =====
+        window.onclick = function(event) {
+            const modal = document.getElementById('itemModal');
+            const previewModal = document.getElementById('previewModal');
+            
+            if (event.target === modal) {
+                closeModal();
+            }
+            if (event.target === previewModal) {
+                closePreview();
+            }
+        }
+
+        // ===== NAVBAR SCROLL EFFECT =====
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.style.boxShadow = '0 2px 30px rgba(0,0,0,0.08)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.04)';
+            }
+        });
+    </script>
+</body>
+</html>

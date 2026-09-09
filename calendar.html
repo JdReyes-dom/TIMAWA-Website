@@ -17,6 +17,9 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     
+    <!-- rrule for recurring events -->
+    <script src="https://cdn.jsdelivr.net/npm/rrule@2.6.0/dist/es5/rrule.min.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -32,6 +35,7 @@
             line-height: 1.6;
         }
 
+        /* ===== NAVIGATION ===== */
         .navbar {
             position: fixed;
             top: 0;
@@ -47,6 +51,7 @@
             border-bottom: 1px solid rgba(16, 137, 211, 0.08);
             transition: all 0.3s ease;
             box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+            flex-wrap: wrap;
         }
 
         .navbar .logo {
@@ -55,6 +60,7 @@
             color: rgb(16, 137, 211);
             letter-spacing: 2px;
             text-decoration: none;
+            flex-shrink: 0;
         }
 
         .navbar .logo span {
@@ -69,18 +75,20 @@
         .navbar .nav-links {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             list-style: none;
+            flex-wrap: wrap;
         }
 
         .navbar .nav-links a {
             text-decoration: none;
             color: #555;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.3s ease;
             padding: 6px 12px;
             border-radius: 8px;
+            white-space: nowrap;
         }
 
         .navbar .nav-links a:hover {
@@ -166,12 +174,14 @@
             border: none;
         }
 
+        /* ===== MAIN CONTENT ===== */
         .main-content {
             max-width: 1200px;
             margin: 80px auto 40px;
             padding: 0 40px;
         }
 
+        /* ===== HERO BANNER ===== */
         .hero-banner {
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
             border-radius: 24px;
@@ -251,26 +261,7 @@
             transform: scale(1.03);
         }
 
-        .btn-danger {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 12px 24px;
-            border-radius: 50px;
-            border: 2px solid #fecaca;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-danger:hover {
-            background: #fecaca;
-            transform: scale(1.03);
-        }
-
+        /* ===== CALENDAR ===== */
         .calendar-wrapper {
             background: white;
             border-radius: 24px;
@@ -281,6 +272,20 @@
 
         .calendar-wrapper .fc {
             max-width: 100%;
+        }
+
+        .calendar-wrapper .fc .fc-toolbar {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .calendar-wrapper .fc .fc-toolbar .fc-left,
+        .calendar-wrapper .fc .fc-toolbar .fc-center,
+        .calendar-wrapper .fc .fc-toolbar .fc-right {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
         }
 
         .calendar-wrapper .fc-toolbar-title {
@@ -352,6 +357,25 @@
             content: '🎂 ';
         }
 
+        /* Year navigation buttons */
+        .fc-year-nav-btn {
+            background: white !important;
+            border: 2px solid rgb(16, 137, 211) !important;
+            color: rgb(16, 137, 211) !important;
+            padding: 6px 12px !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 13px !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .fc-year-nav-btn:hover {
+            background: rgb(16, 137, 211) !important;
+            color: white !important;
+            transform: scale(1.03);
+        }
+
+        /* ===== BIRTHDAY SECTION ===== */
         .birthday-section {
             background: white;
             border-radius: 24px;
@@ -465,6 +489,7 @@
             margin-bottom: 10px;
         }
 
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -603,6 +628,7 @@
             to { transform: rotate(360deg); }
         }
 
+        /* ===== DATE POPUP ===== */
         .date-popup .modal-content {
             max-width: 450px;
         }
@@ -674,8 +700,34 @@
             margin-bottom: 10px;
         }
 
+        /* ===== FOOTER ===== */
+        .footer {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding: 30px 40px;
+            text-align: center;
+            color: #888;
+            font-size: 13px;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .footer p {
+            color: #888;
+        }
+
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
-            .navbar { padding: 12px 20px; }
+            .navbar {
+                padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .navbar .logo {
+                font-size: 22px;
+            }
+
             .navbar .nav-links {
                 display: none;
                 flex-direction: column;
@@ -688,61 +740,199 @@
                 border-bottom: 2px solid #f0f4ff;
                 gap: 12px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+                width: 100%;
             }
-            .navbar .nav-links.active { display: flex; }
-            .navbar .mobile-toggle { display: block; }
-            .main-content { padding: 0 20px; margin-top: 70px; }
+
+            .navbar .nav-links.active {
+                display: flex;
+            }
+
+            .navbar .mobile-toggle {
+                display: block;
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            .main-content {
+                padding: 0 20px;
+                margin-top: 70px;
+            }
+
             .hero-banner {
                 padding: 25px 20px;
                 flex-direction: column;
                 text-align: center;
             }
-            .hero-banner .content h1 { font-size: 22px; }
-            .hero-banner .actions { justify-content: center; width: 100%; }
-            .calendar-wrapper { padding: 15px; }
-            .birthday-section { padding: 20px; }
-            .birthday-item { flex-wrap: wrap; gap: 10px; }
-            .birthday-item .badge { margin-left: 0; }
-            .modal-content { padding: 25px; }
-            .modal-actions { flex-direction: column; }
+
+            .hero-banner .content h1 {
+                font-size: 22px;
+            }
+
+            .hero-banner .actions {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .calendar-wrapper {
+                padding: 15px;
+            }
+
+            .calendar-wrapper .fc .fc-toolbar {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .calendar-wrapper .fc .fc-toolbar .fc-center {
+                order: -1;
+                width: 100%;
+                text-align: center;
+            }
+
+            .calendar-wrapper .fc-toolbar-title {
+                font-size: 16px !important;
+            }
+
+            .calendar-wrapper .fc .fc-button {
+                padding: 3px 8px !important;
+                font-size: 11px !important;
+            }
+
+            .calendar-wrapper .fc .fc-daygrid-day-number {
+                font-size: 12px;
+            }
+
+            .calendar-wrapper .fc .fc-event {
+                font-size: 10px !important;
+                padding: 1px 4px !important;
+            }
+
+            .calendar-wrapper .fc .fc-daygrid-day-events {
+                min-height: 16px;
+            }
+
+            .birthday-section {
+                padding: 20px;
+            }
+
+            .birthday-item {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .birthday-item .badge {
+                margin-left: 0;
+            }
+
+            .modal-content {
+                padding: 25px;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .navbar .nav-links a {
+                font-size: 14px;
+                width: 100%;
+                text-align: center;
+            }
         }
 
         @media (max-width: 480px) {
-            .hero-banner .content h1 { font-size: 20px; }
-            .hero-banner .actions { flex-direction: column; }
-            .hero-banner .actions button { width: 100%; justify-content: center; }
-            .birthday-item .info .name { font-size: 14px; }
-            .birthday-item .info .date { font-size: 12px; }
-            .birthday-section .section-header { flex-direction: column; align-items: flex-start; gap: 5px; }
-            .date-popup .modal-content { padding: 20px; }
-            .date-popup .event-list-item { padding: 10px 12px; flex-wrap: wrap; }
+            .hero-banner .content h1 {
+                font-size: 20px;
+            }
+
+            .hero-banner .actions {
+                flex-direction: column;
+            }
+
+            .hero-banner .actions button {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .calendar-wrapper .fc-toolbar-title {
+                font-size: 14px !important;
+            }
+
+            .calendar-wrapper .fc .fc-button {
+                padding: 2px 6px !important;
+                font-size: 10px !important;
+            }
+
+            .calendar-wrapper .fc .fc-daygrid-day-number {
+                font-size: 11px;
+            }
+
+            .birthday-item .info .name {
+                font-size: 14px;
+            }
+
+            .birthday-item .info .date {
+                font-size: 12px;
+            }
+
+            .birthday-section .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .date-popup .modal-content {
+                padding: 20px;
+            }
+
+            .date-popup .event-list-item {
+                padding: 10px 12px;
+                flex-wrap: wrap;
+            }
+
+            .navbar .nav-links a {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
         }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); border-radius: 10px; }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f4ff;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
+    <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="navbar">
         <a href="#" class="logo">🇹🇮🇲🇦🇼🇦 <span>HUB</span></a>
         <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         <ul class="nav-links" id="navLinks">
-            <li><a href="index.html"><i class="fas fa-home"></i></a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="index.html#highlights">Highlights</a></li>
+            <li><a href="index.html#coffee-shops">Coffee</a></li>
+            <li><a href="index.html#favorite-places">Places</a></li>
+            <li><a href="index.html#things-to-do">Activities</a></li>
+            <li><a href="index.html#members-section">Members</a></li>
             <li><a href="calendar.html" class="active"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
-            <li>
-                <a href="profile.html" class="user-profile" id="userProfileLink">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <span class="user-name" id="userName">Loading...</span>
-                </a>
-            </li>
-            <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
         </ul>
     </nav>
 
+    <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
 
+        <!-- ===== HERO BANNER ===== -->
         <div class="hero-banner">
             <div class="content">
                 <h1>📅 Squad <span class="highlight">Calendar</span></h1>
@@ -754,10 +944,12 @@
             </div>
         </div>
 
+        <!-- ===== CALENDAR ===== -->
         <div class="calendar-wrapper">
             <div id="calendar"></div>
         </div>
 
+        <!-- ===== BIRTHDAY SECTION ===== -->
         <div class="birthday-section" id="birthdaySection">
             <div class="section-header">
                 <h3><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</h3>
@@ -772,6 +964,7 @@
         </div>
     </div>
 
+    <!-- ===== ADD EVENT MODAL ===== -->
     <div id="eventModal" class="modal">
         <div class="modal-content">
             <h2><i class="fas fa-calendar-plus"></i> Create Event</h2>
@@ -823,6 +1016,7 @@
         </div>
     </div>
 
+    <!-- ===== EVENT DETAIL MODAL ===== -->
     <div id="eventDetailModal" class="modal">
         <div class="modal-content">
             <h2 id="detailType"><i class="fas fa-calendar-alt"></i> Event Details</h2>
@@ -856,6 +1050,7 @@
         </div>
     </div>
 
+    <!-- ===== DATE POPUP MODAL ===== -->
     <div id="datePopupModal" class="modal date-popup">
         <div class="modal-content">
             <h2 id="datePopupTitle"><i class="fas fa-calendar-day"></i> Events on <span id="datePopupDate">Today</span></h2>
@@ -872,7 +1067,13 @@
         </div>
     </div>
 
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <p>Made with ❤️ for the TIMAWA squad &copy; 2022</p>
+    </footer>
+
     <script>
+        // ===== FIREBASE CONFIG =====
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
             authDomain: "timawa2.firebaseapp.com",
@@ -895,6 +1096,7 @@
         let unsubscribeEvents = null;
         let unsubscribeBirthdays = null;
 
+        // ===== HELPER: CONVERT TIMESTAMP TO DATE =====
         function convertTimestampToDate(timestamp) {
             if (!timestamp) return new Date();
             if (timestamp instanceof Date) return timestamp;
@@ -911,6 +1113,7 @@
             }
         }
 
+        // ===== LOCATION FUNCTIONS =====
         document.getElementById('eventLocationSelect').addEventListener('change', function() {
             const customInput = document.getElementById('customLocationInput');
             if (this.value === 'custom') {
@@ -929,6 +1132,7 @@
             return select.value || 'No location';
         }
 
+        // ===== AUTH STATE =====
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -961,6 +1165,7 @@
             }, 500);
         });
 
+        // ===== REAL-TIME LISTENER FOR EVENTS =====
         function listenToEvents() {
             if (unsubscribeEvents) {
                 unsubscribeEvents();
@@ -987,6 +1192,7 @@
                 });
         }
 
+        // ===== REAL-TIME LISTENER FOR BIRTHDAYS =====
         function listenToBirthdays() {
             if (unsubscribeBirthdays) {
                 unsubscribeBirthdays();
@@ -996,7 +1202,6 @@
                 .where('birthday', '!=', '')
                 .onSnapshot((snapshot) => {
                     const now = new Date();
-                    const currentYear = now.getFullYear();
                     birthdayEvents = [];
 
                     snapshot.forEach(doc => {
@@ -1004,32 +1209,30 @@
                         const birthday = data.birthday;
                         if (!birthday) return;
 
-                        const parts = birthday.split('-');
-                        const month = parseInt(parts[1]) - 1;
-                        const day = parseInt(parts[2]);
-
-                        const birthdayDate = new Date(currentYear, month, day);
-                        
-                        if (birthdayDate < now) {
-                            birthdayDate.setFullYear(currentYear + 1);
-                        }
-
                         const name = data.displayName || data.email || 'Someone';
                         const photoURL = data.photoURL || '';
+                        const location = data.location || '';
+
+                        // Parse birthday (YYYY-MM-DD)
+                        const parts = birthday.split('-');
+                        const birthMonth = parseInt(parts[1]) - 1;
+                        const birthDay = parseInt(parts[2]);
 
                         birthdayEvents.push({
                             id: doc.id,
                             name: name,
                             photoURL: photoURL,
                             birthday: birthday,
-                            date: birthdayDate,
-                            displayName: data.displayName || data.email || 'Someone',
-                            location: data.location || ''
+                            birthMonth: birthMonth,
+                            birthDay: birthDay,
+                            location: location,
+                            displayName: data.displayName || data.email || 'Someone'
                         });
                     });
 
-                    birthdayEvents.sort((a, b) => a.date - b.date);
-
+                    // Sort by upcoming date
+                    sortBirthdays();
+                    
                     if (calendar) {
                         updateCalendarEvents();
                     }
@@ -1039,6 +1242,25 @@
                 });
         }
 
+        // ===== SORT BIRTHDAYS =====
+        function sortBirthdays() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            
+            birthdayEvents.forEach(item => {
+                // Create birthday date for current year
+                let birthdayDate = new Date(currentYear, item.birthMonth, item.birthDay);
+                // If birthday already passed this year, use next year
+                if (birthdayDate < now) {
+                    birthdayDate = new Date(currentYear + 1, item.birthMonth, item.birthDay);
+                }
+                item.date = birthdayDate;
+            });
+
+            birthdayEvents.sort((a, b) => a.date - b.date);
+        }
+
+        // ===== RENDER BIRTHDAY LIST =====
         function renderBirthdayList() {
             const container = document.getElementById('birthdayList');
             const countEl = document.getElementById('birthdayCount');
@@ -1055,11 +1277,11 @@
             }
 
             const now = new Date();
-            const upcoming = birthdayEvents.filter(e => e.date >= now);
-            countEl.textContent = `${upcoming.length}`;
+            const sortedBirthdays = [...birthdayEvents].sort((a, b) => a.date - b.date);
+            countEl.textContent = `${sortedBirthdays.length}`;
 
             let html = '';
-            birthdayEvents.forEach(item => {
+            sortedBirthdays.forEach(item => {
                 const daysDiff = Math.ceil((item.date - now) / (1000 * 60 * 60 * 24));
                 let badgeClass = 'upcoming';
                 let badgeText = `${daysDiff} days`;
@@ -1075,6 +1297,12 @@
                 }
 
                 const initials = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const birthdayDate = item.date;
+                const dateStr = birthdayDate.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
 
                 html += `
                     <div class="birthday-item">
@@ -1086,7 +1314,7 @@
                         </div>
                         <div class="info">
                             <div class="name">${item.name}</div>
-                            <div class="date">🎂 ${item.birthday} ${item.location ? '· ' + item.location : ''}</div>
+                            <div class="date">🎂 ${dateStr} ${item.location ? '· ' + item.location : ''}</div>
                         </div>
                         <span class="badge ${badgeClass}">${badgeText}</span>
                     </div>
@@ -1096,14 +1324,41 @@
             container.innerHTML = html;
         }
 
+        // ===== INIT CALENDAR =====
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
+            
+            // Custom button for year navigation
+            const customButtons = {
+                prevYear: {
+                    text: '<<',
+                    click: function() {
+                        calendar.incrementDate({ years: -1 });
+                    }
+                },
+                nextYear: {
+                    text: '>>',
+                    click: function() {
+                        calendar.incrementDate({ years: 1 });
+                    }
+                }
+            };
+
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 headerToolbar: {
-                    left: 'prev,next today',
+                    left: 'prevYear,prev,today,next,nextYear',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                customButtons: customButtons,
+                buttonText: {
+                    today: 'Today',
+                    month: 'Month',
+                    week: 'Week',
+                    list: 'List',
+                    prevYear: '<<',
+                    nextYear: '>>'
                 },
                 events: [],
                 dateClick: function(info) {
@@ -1116,9 +1371,17 @@
                     selectedEventId = event.id;
                     
                     if (extendedProps.isBirthday) {
+                        // Show birthday info in a nice alert
+                        const birthdayDate = event.start ? new Date(event.start) : new Date();
+                        const dateStr = birthdayDate.toLocaleDateString('en-US', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
                         alert(
                             `🎂 ${event.title}\n` +
-                            `📅 ${event.start ? new Date(event.start).toLocaleDateString() : 'Date'}\n` +
+                            `📅 ${dateStr}\n` +
                             `📍 ${extendedProps.location || 'No location'}\n\n` +
                             `🎉 Don't forget to wish ${event.title.split("'")[0]} a happy birthday!`
                         );
@@ -1130,7 +1393,13 @@
                     const tooltip = info.el.querySelector('.fc-event-title');
                     if (tooltip) {
                         if (info.event.extendedProps.isBirthday) {
-                            tooltip.title = `🎂 ${info.event.title}`;
+                            const birthdayDate = info.event.start ? new Date(info.event.start) : new Date();
+                            const dateStr = birthdayDate.toLocaleDateString('en-US', {
+                                month: 'long',
+                                day: 'numeric',
+                                year: 'numeric'
+                            });
+                            tooltip.title = `🎂 ${info.event.title} - ${dateStr}`;
                         } else {
                             tooltip.title = `${info.event.title}\n${info.event.extendedProps.location || ''}`;
                         }
@@ -1138,18 +1407,13 @@
                 },
                 height: 'auto',
                 aspectRatio: 1.6,
-                contentHeight: 'auto',
-                buttonText: {
-                    today: 'Today',
-                    month: 'Month',
-                    week: 'Week',
-                    list: 'List'
-                }
+                contentHeight: 'auto'
             });
             calendar.render();
             updateCalendarEvents();
         }
 
+        // ===== SHOW DATE POPUP =====
         function showDatePopup(date) {
             const formattedDate = date.toLocaleDateString('en-US', {
                 weekday: 'long',
@@ -1171,12 +1435,15 @@
                 }
             });
 
-            console.log('🔍 Selected date:', selectedDateStr);
-            console.log('📅 Events on this date:', eventsOnDate.length);
+            // Also check for birthdays on this date
+            const birthdayOnDate = birthdayEvents.filter(item => {
+                const birthdayDate = new Date(date.getFullYear(), item.birthMonth, item.birthDay);
+                return birthdayDate.toDateString() === selectedDateStr;
+            });
 
             const container = document.getElementById('datePopupEvents');
             
-            if (eventsOnDate.length === 0) {
+            if (eventsOnDate.length === 0 && birthdayOnDate.length === 0) {
                 container.innerHTML = `
                     <div class="no-events-date">
                         <i class="fas fa-calendar-plus"></i>
@@ -1185,6 +1452,22 @@
                 `;
             } else {
                 let html = '';
+                
+                // Show birthdays first
+                birthdayOnDate.forEach(item => {
+                    html += `
+                        <div class="event-list-item" style="border-left-color: #f5576c;">
+                            <div class="event-color" style="background: #f5576c;"></div>
+                            <div class="event-info">
+                                <div class="event-title">🎂 ${item.name}'s Birthday</div>
+                                <div class="event-time">📍 ${item.location || 'No location'}</div>
+                            </div>
+                            <span class="event-badge" style="background:#fef3c7;color:#d97706;">Birthday</span>
+                        </div>
+                    `;
+                });
+                
+                // Then show regular events
                 eventsOnDate.forEach(event => {
                     const eventDate = convertTimestampToDate(event.dateTime);
                     const time = eventDate.toLocaleTimeString('en-US', {
@@ -1210,6 +1493,7 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // ===== VIEW EVENT FROM POPUP =====
         function viewEventFromPopup(eventId) {
             const event = currentEvents.find(e => e.id === eventId);
             if (event) {
@@ -1222,11 +1506,13 @@
             }
         }
 
+        // ===== CLOSE DATE POPUP =====
         function closeDatePopup() {
             document.getElementById('datePopupModal').classList.remove('active');
             document.body.style.overflow = 'auto';
         }
 
+        // ===== CLOSE DATE POPUP AND ADD EVENT =====
         function closeDatePopupAndAddEvent() {
             closeDatePopup();
             showAddEvent();
@@ -1239,6 +1525,7 @@
             }
         }
 
+        // ===== SHOW EVENT DETAIL =====
         function showEventDetail(event) {
             const props = event.extendedProps;
             
@@ -1264,6 +1551,7 @@
             document.body.style.overflow = 'hidden';
         }
 
+        // ===== CLOSE EVENT DETAIL =====
         function closeEventDetail() {
             document.getElementById('eventDetailModal').classList.remove('active');
             document.body.style.overflow = 'auto';
@@ -1281,7 +1569,6 @@
             if (!confirmDelete) return;
 
             try {
-                // Delete from Firestore
                 await db.collection('events').doc(selectedEventId).delete();
                 closeEventDetail();
                 alert('✅ Event deleted successfully!');
@@ -1291,11 +1578,13 @@
             }
         }
 
+        // ===== UPDATE CALENDAR EVENTS (WITH RECURRING BIRTHDAYS) =====
         function updateCalendarEvents() {
             if (!calendar) return;
 
             console.log('📅 Updating calendar with events:', currentEvents.length);
 
+            // Regular events
             const events = currentEvents.map(event => {
                 const eventDate = convertTimestampToDate(event.dateTime);
                 
@@ -1318,12 +1607,30 @@
                 };
             });
 
+            // ===== RECURRING BIRTHDAY EVENTS =====
+            // Using rrule to make birthdays repeat annually
             const birthdayCalendarEvents = birthdayEvents.map(item => {
+                // Create a date for the birthday in the current year
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                let startDate = new Date(currentYear, item.birthMonth, item.birthDay);
+                
+                // If the birthday already passed this year, start from next year
+                if (startDate < now) {
+                    startDate = new Date(currentYear + 1, item.birthMonth, item.birthDay);
+                }
+                
                 return {
                     id: `birthday-${item.id}`,
                     title: `${item.name}'s Birthday 🎂`,
-                    start: item.date,
+                    start: startDate,
                     allDay: true,
+                    // RRULE: Repeat annually forever
+                    rrule: {
+                        freq: 'yearly',
+                        interval: 1
+                    },
+                    duration: '24:00:00',
                     extendedProps: {
                         isBirthday: true,
                         location: item.location || '',
@@ -1346,6 +1653,7 @@
             console.log('✅ Calendar updated!');
         }
 
+        // ===== GET EVENT COLOR =====
         function getEventColor(type) {
             const colors = {
                 'Gala': '#8b5cf6',
@@ -1357,6 +1665,7 @@
             return colors[type] || colors['Other'];
         }
 
+        // ===== REFRESH CALENDAR =====
         function refreshCalendar() {
             if (unsubscribeEvents) {
                 unsubscribeEvents();
@@ -1370,6 +1679,7 @@
             alert('🔄 Calendar refreshed!');
         }
 
+        // ===== SHOW ADD EVENT =====
         function showAddEvent() {
             const modal = document.getElementById('eventModal');
             modal.classList.add('active');
@@ -1381,6 +1691,7 @@
             document.getElementById('eventDateTime').value = formatted;
         }
 
+        // ===== CLOSE EVENT MODAL =====
         function closeEventModal() {
             const modal = document.getElementById('eventModal');
             modal.classList.remove('active');
@@ -1389,6 +1700,7 @@
             document.getElementById('customLocationInput').style.display = 'none';
         }
 
+        // ===== CREATE EVENT =====
         document.getElementById('eventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -1439,6 +1751,7 @@
             }
         });
 
+        // ===== MOBILE MENU =====
         function toggleMobileMenu() {
             const nav = document.getElementById('navLinks');
             nav.classList.toggle('active');
@@ -1450,6 +1763,7 @@
             });
         });
 
+        // ===== LOGOUT =====
         async function logout() {
             try {
                 await auth.signOut();
@@ -1459,6 +1773,7 @@
             }
         }
 
+        // ===== CLOSE MODALS ON OUTSIDE CLICK =====
         window.onclick = function(event) {
             const eventModal = document.getElementById('eventModal');
             const detailModal = document.getElementById('eventDetailModal');
@@ -1475,6 +1790,7 @@
             }
         }
 
+        // ===== NAVBAR SCROLL EFFECT =====
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
             if (window.scrollY > 20) {

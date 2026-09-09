@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TIMAWA - My Profile</title>
+    <title>TIMAWA - Admin Profile</title>
     
-    <!-- Firebase SDKs (for Auth and Firestore only) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
+    <!-- Cloudinary Upload Widget -->
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
+    
     <style>
-        /* ========== RESET & BASE ========== */
         * {
             margin: 0;
             padding: 0;
@@ -24,7 +27,7 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             min-height: 100vh;
-            background: #ffffff;
+            background: #f8faff;
             color: #1a1a2e;
             line-height: 1.6;
         }
@@ -41,7 +44,7 @@
             align-items: center;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(16, 137, 211, 0.08);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
             transition: all 0.3s ease;
             box-shadow: 0 2px 20px rgba(0,0,0,0.04);
             flex-wrap: wrap;
@@ -50,14 +53,14 @@
         .navbar .logo {
             font-size: 26px;
             font-weight: 900;
-            color: rgb(16, 137, 211);
+            color: #7c3aed;
             letter-spacing: 2px;
             text-decoration: none;
             flex-shrink: 0;
         }
 
         .navbar .logo span {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
             padding: 2px 10px;
             border-radius: 8px;
             font-size: 10px;
@@ -85,25 +88,67 @@
         }
 
         .navbar .nav-links a:hover {
-            color: rgb(16, 137, 211);
-            background: rgba(16, 137, 211, 0.06);
+            color: #7c3aed;
+            background: rgba(139, 92, 246, 0.08);
         }
 
         .navbar .nav-links a.active {
-            color: rgb(16, 137, 211);
-            background: rgba(16, 137, 211, 0.08);
+            color: #7c3aed;
+            background: rgba(139, 92, 246, 0.12);
         }
 
-        .navbar .nav-links .profile-link {
-            color: rgb(16, 137, 211);
+        .navbar .nav-links .admin-link {
+            color: #7c3aed;
             font-weight: 600;
         }
 
-        .navbar .nav-links .profile-link:hover {
-            background: rgba(16, 137, 211, 0.1);
+        .navbar .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 4px 14px 4px 4px;
+            border-radius: 50px;
+            box-shadow: #ede9fe 0px 4px 10px -4px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
         }
 
-        .navbar .nav-links .logout-btn {
+        .navbar .user-profile:hover {
+            border-color: #7c3aed;
+        }
+
+        .navbar .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .navbar .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .navbar .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .navbar .logout-btn {
             background: white;
             border: 2px solid #fee2e2;
             color: #ef4444;
@@ -113,11 +158,11 @@
             transition: all 0.3s ease;
             font-size: 12px;
             font-weight: 600;
-            box-shadow: #cff0ff 0px 4px 8px -4px;
+            box-shadow: #ede9fe 0px 4px 8px -4px;
             font-family: inherit;
         }
 
-        .navbar .nav-links .logout-btn:hover {
+        .navbar .logout-btn:hover {
             background: #fee2e2;
             transform: scale(1.03);
         }
@@ -125,111 +170,137 @@
         .navbar .mobile-toggle {
             display: none;
             font-size: 24px;
-            color: rgb(16, 137, 211);
+            color: #7c3aed;
             cursor: pointer;
             background: none;
             border: none;
         }
 
-        .hero {
-            padding: 120px 40px 60px;
+        .main-container {
             max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
+            margin: 80px auto 40px;
+            padding: 0 40px;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%);
+            border-radius: 24px;
+            padding: 40px 50px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.1);
         }
 
-        .hero-content h1 {
-            font-size: 48px;
+        .hero-banner .content h1 {
+            font-size: 28px;
             font-weight: 800;
-            line-height: 1.1;
             color: #1a1a2e;
-            margin-bottom: 10px;
         }
 
-        .hero-content .subtitle {
-            font-size: 18px;
-            color: rgb(16, 137, 211);
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-
-        .hero-content .intro-text {
-            font-size: 16px;
-            color: #555;
-            max-width: 500px;
-            margin-bottom: 20px;
-            line-height: 1.8;
-        }
-
-        .hero-content .intro-text .highlight {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+        .hero-banner .content h1 .highlight {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-weight: 600;
         }
 
-        .hero-content .bio-tags {
+        .hero-banner .content p {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .hero-banner .actions {
             display: flex;
+            gap: 12px;
             flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 25px;
         }
 
-        .hero-content .bio-tag {
-            background: #e0f2fe;
-            padding: 6px 16px;
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            padding: 12px 24px;
             border-radius: 50px;
-            font-size: 13px;
-            color: rgb(16, 137, 211);
+            border: none;
+            font-size: 14px;
             font-weight: 600;
-        }
-
-        .hero-image .profile-card {
-            width: 100%;
-            max-width: 400px;
-            background: white;
-            border-radius: 30px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: rgba(133, 189, 215, 0.15) 0px 20px 50px -15px;
-            border: 2px solid #f0f4ff;
+            cursor: pointer;
             transition: all 0.3s ease;
-            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25);
         }
 
-        .hero-image .profile-card:hover {
-            border-color: rgb(16, 137, 211);
-            transform: translateY(-5px);
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.35);
         }
 
-        .hero-image .profile-avatar {
-            width: 140px;
-            height: 140px;
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #7c3aed;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #e0e7ff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: #7c3aed;
+            background: #f8faff;
+            transform: scale(1.03);
+        }
+
+        .profile-card-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 30px 40px;
+            border: 1px solid #eef2f7;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            margin: 0 auto 15px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 60px;
-            color: rgb(16, 137, 211);
-            border: 4px solid white;
-            box-shadow: rgba(133, 189, 215, 0.2) 0px 10px 30px -10px;
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+            flex-shrink: 0;
             overflow: hidden;
             position: relative;
+            border: 4px solid #ede9fe;
         }
 
-        .hero-image .profile-avatar img {
+        .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .hero-image .profile-avatar .photo-upload-btn-overlay {
+        .profile-avatar .photo-overlay {
             position: absolute;
             bottom: 0;
             left: 0;
@@ -245,105 +316,52 @@
             cursor: pointer;
         }
 
-        .hero-image .profile-avatar:hover .photo-upload-btn-overlay {
+        .profile-avatar:hover .photo-overlay {
             opacity: 1;
         }
 
-        .hero-image .profile-avatar .photo-upload-btn-overlay i {
+        .profile-avatar .photo-overlay i {
             color: white;
             font-size: 28px;
         }
 
-        .hero-image .profile-avatar .photo-upload-btn-overlay input[type="file"] {
+        .profile-avatar .photo-overlay input[type="file"] {
             display: none;
         }
 
-        .hero-image .profile-card h3 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a2e;
-        }
-
-        .hero-image .profile-card .role {
-            color: rgb(16, 137, 211);
-            font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .hero-image .profile-card .mini-bio {
-            color: #666;
-            font-size: 13px;
-            line-height: 1.6;
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-
-        .status-badge.available {
-            background: #dcfce7;
-            color: #16a34a;
-        }
-
-        .status-badge.busy {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-badge.away {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .status-badge.dnd {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
-
-        .profile-section {
-            padding: 60px 40px;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .profile-section .section-header {
-            margin-bottom: 30px;
-        }
-
-        .profile-section .section-header .title {
+        .profile-info h2 {
             font-size: 28px;
             font-weight: 800;
             color: #1a1a2e;
         }
 
-        .profile-section .section-header .title .highlight {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .profile-info .admin-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            padding: 2px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 4px;
         }
 
-        .profile-section .section-header p {
+        .profile-info .email {
             color: #888;
             font-size: 14px;
-            margin-top: 5px;
+            margin-top: 4px;
         }
 
         .profile-form {
             display: flex;
             flex-direction: column;
             gap: 18px;
-            background: white;
-            padding: 30px;
-            border-radius: 24px;
-            box-shadow: #cff0ff 0px 8px 15px -6px;
-            border: 2px solid #f0f4ff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
         }
 
         .form-group {
@@ -362,7 +380,7 @@
         }
 
         .form-group label i {
-            color: rgb(16, 137, 211);
+            color: #7c3aed;
             width: 18px;
         }
 
@@ -383,19 +401,13 @@
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: rgb(16, 137, 211);
-            box-shadow: #cff0ff 0px 0px 0px 3px;
+            border-color: #7c3aed;
+            box-shadow: #ede9fe 0px 0px 0px 3px;
         }
 
         .form-group textarea {
-            min-height: 100px;
+            min-height: 80px;
             resize: vertical;
-        }
-
-        .form-group .helper-text {
-            font-size: 12px;
-            color: #999;
-            margin-top: 3px;
         }
 
         .form-group input:disabled {
@@ -404,10 +416,11 @@
             opacity: 0.7;
         }
 
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        .form-actions {
+            display: flex;
             gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
         }
 
         .message {
@@ -438,95 +451,6 @@
             display: block;
         }
 
-        .progress-container {
-            display: none;
-            margin: 10px 0;
-            width: 100%;
-            background: #f0f4ff;
-            border-radius: 50px;
-            overflow: hidden;
-            height: 8px;
-        }
-
-        .progress-container.active {
-            display: block;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            width: 0%;
-            border-radius: 50px;
-            transition: width 0.3s ease;
-        }
-
-        .progress-text {
-            font-size: 12px;
-            color: #888;
-            text-align: center;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .progress-text.active {
-            display: block;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            padding: 14px 35px;
-            border-radius: 50px;
-            border: none;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: rgba(133, 189, 215, 0.3) 0px 10px 20px -8px;
-            font-size: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            transform: scale(1.03);
-            box-shadow: rgba(133, 189, 215, 0.5) 0px 15px 25px -10px;
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-secondary {
-            padding: 14px 35px;
-            border-radius: 50px;
-            border: 2px solid #e0e7ff;
-            background: white;
-            color: #555;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-secondary:hover {
-            border-color: rgb(16, 137, 211);
-            color: rgb(16, 137, 211);
-            transform: scale(1.03);
-        }
-
         .spinner {
             display: inline-block;
             width: 20px;
@@ -542,41 +466,22 @@
         }
 
         .footer {
-            padding: 40px;
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding: 30px 40px;
             text-align: center;
             color: #888;
-            font-size: 14px;
-            border-top: 2px solid #f0f4ff;
-            background: white;
-            margin-top: 40px;
+            font-size: 13px;
+            border-top: 1px solid #eef2f7;
         }
 
-        .footer p {
-            color: #888;
+        .custom-location-input {
+            display: none;
+            margin-top: 8px;
         }
 
-        @media (max-width: 1024px) {
-            .hero {
-                grid-template-columns: 1fr;
-                text-align: center;
-                padding: 100px 30px 50px;
-            }
-
-            .hero-content .intro-text {
-                margin: 0 auto 20px;
-            }
-
-            .hero-content .bio-tags {
-                justify-content: center;
-            }
-
-            .hero-image .profile-card {
-                max-width: 350px;
-            }
-
-            .profile-section {
-                padding: 40px 20px;
-            }
+        .custom-location-input.active {
+            display: block;
         }
 
         @media (max-width: 768px) {
@@ -618,8 +523,34 @@
                 transform: translateY(-50%);
             }
 
-            .hero-content h1 {
-                font-size: 32px;
+            .main-container {
+                padding: 0 20px;
+                margin-top: 70px;
+            }
+
+            .hero-banner {
+                padding: 25px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .hero-banner .content h1 {
+                font-size: 22px;
+            }
+
+            .hero-banner .actions {
+                justify-content: center;
+                width: 100%;
+            }
+
+            .profile-card-wrapper {
+                padding: 20px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
             }
 
             .form-row {
@@ -635,52 +566,43 @@
                 justify-content: center;
             }
 
-            .profile-form {
-                padding: 20px;
-            }
-
             .navbar .nav-links a {
                 font-size: 14px;
                 width: 100%;
                 text-align: center;
             }
-
-            .navbar .nav-links .logout-btn {
-                width: 100%;
-                justify-content: center;
-            }
         }
 
         @media (max-width: 480px) {
-            .hero {
-                padding: 90px 20px 30px;
+            .hero-banner .content h1 {
+                font-size: 20px;
             }
 
-            .hero-content h1 {
-                font-size: 26px;
+            .hero-banner .actions {
+                flex-direction: column;
             }
 
-            .hero-image .profile-avatar {
-                width: 120px;
-                height: 120px;
-                font-size: 50px;
+            .hero-banner .actions button {
+                width: 100%;
+                justify-content: center;
             }
 
-            .hero-image .profile-card {
-                padding: 20px;
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                font-size: 40px;
             }
 
-            .profile-form {
+            .profile-info h2 {
+                font-size: 22px;
+            }
+
+            .profile-card-wrapper {
                 padding: 15px;
             }
 
             .navbar .nav-links a {
                 font-size: 16px;
-                padding: 8px 16px;
-            }
-
-            .navbar .nav-links .logout-btn {
-                font-size: 14px;
                 padding: 8px 16px;
             }
         }
@@ -695,7 +617,7 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
             border-radius: 10px;
         }
 
@@ -707,201 +629,150 @@
             padding-right: 40px;
             cursor: pointer;
         }
-
-        select option {
-            padding: 8px;
-        }
-
-        .custom-location-input {
-            display: none;
-            margin-top: 8px;
-        }
-
-        .custom-location-input.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
-    <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="navbar">
-        <a href="dashboard.html" class="logo">🇹🇮🇲🇦🇼🇦 <span>PROFILE</span></a>
+        <a href="admin.html" class="logo">🇹🇮🇲🇦🇼🇦 <span>ADMIN</span></a>
         <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         <ul class="nav-links" id="navLinks">
-            <li><a href="index.html#highlights">Highlights</a></li>
-            <li><a href="index.html#coffee-shops">Coffee</a></li>
-            <li><a href="index.html#favorite-places">Places</a></li>
-            <li><a href="index.html#things-to-do">Activities</a></li>
-            <li><a href="index.html#members-section">Members</a></li>
-            <li><a href="calendar.html">Calendar</a></li>
-            <li><a href="dashboard.html">Dashboard</a></li>
-            <li><a href="profile.html" class="profile-link active"><i class="fas fa-user"></i> Profile</a></li>
+            <li><a href="admin.html"><i class="fas fa-cog"></i> Admin Panel</a></li>
+            <li><a href="admin_profile.html" class="active admin-link"><i class="fas fa-user-shield"></i> Admin Profile</a></li>
             <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
         </ul>
     </nav>
 
-    <!-- ===== HERO SECTION ===== -->
-    <section class="hero" id="home">
-        <div class="hero-content">
-            <div class="subtitle">✏️ Edit Your Profile</div>
-            <h1>Hi, I'm <span class="highlight" id="heroNameDisplay">[Your Name]</span></h1>
-            <p class="intro-text">
-                This is your personal space. Update your profile to let the squad 
-                know more about you.
-            </p>
-            <div class="bio-tags" id="heroTags">
-                <span class="bio-tag">🌟 Edit</span>
-                <span class="bio-tag">✏️ Update</span>
-                <span class="bio-tag">📸 Photo</span>
-                <span class="bio-tag">🔗 Connect</span>
+    <div class="main-container">
+        <div class="hero-banner">
+            <div class="content">
+                <h1>🛡️ Admin <span class="highlight">Profile</span></h1>
+                <p>Manage your admin account settings and personal information.</p>
+            </div>
+            <div class="actions">
+                <button class="btn-secondary" onclick="window.location.href='admin.html'"><i class="fas fa-arrow-left"></i> Back to Panel</button>
             </div>
         </div>
-        <div class="hero-image">
-            <div class="profile-card">
-                <div class="profile-avatar" id="heroAvatar">
-                    <span id="heroAvatarText">👤</span>
-                    <label class="photo-upload-btn-overlay">
+
+        <div class="profile-card-wrapper">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">
+                    <span id="avatarText">👤</span>
+                    <label class="photo-overlay">
                         <i class="fas fa-camera"></i>
                         <input type="file" id="photoInput" accept="image/*" />
                     </label>
                 </div>
-                <h3 id="heroName">[Your Name]</h3>
-                <div class="role" id="heroRole">🌟 Community Member</div>
-                <p class="mini-bio" id="heroBio">Update your bio to tell the squad about yourself!</p>
-                <div id="heroStatus" class="status-badge available">
-                    <i class="fas fa-circle"></i> Available
+                <div class="profile-info">
+                    <h2 id="profileName">Loading...</h2>
+                    <span class="admin-badge"><i class="fas fa-shield-alt"></i> Administrator</span>
+                    <div class="email" id="profileEmail">loading@email.com</div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- ===== PROFILE FORM SECTION ===== -->
-    <section class="profile-section" id="profile">
-        <div class="section-header">
-            <div class="title">
-                <i class="fas fa-user-edit" style="color: rgb(16, 137, 211); margin-right: 10px;"></i>
-                Edit Your <span class="highlight">Profile</span>
-            </div>
-            <p>Update your information so the squad can get to know you better.</p>
-        </div>
+            <div id="message" class="message"></div>
 
-        <div id="message" class="message"></div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="progress-text" id="progressText">Uploading: 0%</div>
-
-        <form id="profileForm" class="profile-form">
-            <div class="form-group">
-                <label><i class="fas fa-user"></i> Display Name</label>
-                <input type="text" id="displayName" placeholder="Enter your display name" />
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-envelope"></i> Email</label>
-                <input type="email" id="email" disabled />
-                <span class="helper-text">Email cannot be changed</span>
-            </div>
-
-            <div class="form-group">
-                <label><i class="fas fa-info-circle"></i> Bio / About Me</label>
-                <textarea id="bio" placeholder="Tell the squad about yourself..."></textarea>
-            </div>
-
-            <div class="form-row">
+            <form id="profileForm" class="profile-form">
                 <div class="form-group">
-                    <label><i class="fas fa-map-marker-alt"></i> Current Location</label>
-                    <select id="locationSelect" onchange="toggleCustomLocation()">
-                        <option value="">Select your location</option>
-                        <option value="Alabat, Quezon">📍 Alabat, Quezon</option>
-                        <option value="Perez, Quezon">📍 Perez, Quezon</option>
-                        <option value="Atimonan, Quezon">📍 Atimonan, Quezon</option>
-                        <option value="Lucena, Quezon">📍 Lucena, Quezon</option>
-                        <option value="Lucban, Quezon">📍 Lucban, Quezon</option>
-                        <option value="San Pedro, Laguna">📍 San Pedro, Laguna</option>
-                        <option value="Santa Cruz, Laguna">📍 Santa Cruz, Laguna</option>
-                        <option value="custom">✏️ Others (Customize)</option>
-                    </select>
-                    <div class="custom-location-input" id="customLocationInput">
-                        <input type="text" id="customLocation" placeholder="Enter your location..." />
+                    <label><i class="fas fa-user"></i> Display Name</label>
+                    <input type="text" id="displayName" placeholder="Enter your display name" required />
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" id="email" disabled />
+                    <span style="font-size:12px;color:#999;">Email cannot be changed</span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-info-circle"></i> Bio / About Me</label>
+                    <textarea id="bio" placeholder="Tell the squad about yourself..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-map-marker-alt"></i> Current Location</label>
+                        <select id="locationSelect" onchange="toggleCustomLocation()">
+                            <option value="">Select your location</option>
+                            <option value="Alabat, Quezon">📍 Alabat, Quezon</option>
+                            <option value="Perez, Quezon">📍 Perez, Quezon</option>
+                            <option value="Atimonan, Quezon">📍 Atimonan, Quezon</option>
+                            <option value="Lucena, Quezon">📍 Lucena, Quezon</option>
+                            <option value="Lucban, Quezon">📍 Lucban, Quezon</option>
+                            <option value="San Pedro, Laguna">📍 San Pedro, Laguna</option>
+                            <option value="Santa Cruz, Laguna">📍 Santa Cruz, Laguna</option>
+                            <option value="custom">✏️ Others (Customize)</option>
+                        </select>
+                        <div class="custom-location-input" id="customLocationInput">
+                            <input type="text" id="customLocation" placeholder="Enter your location..." />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Birthday</label>
+                        <input type="date" id="birthday" />
                     </div>
                 </div>
-                <div class="form-group">
-                    <label><i class="fas fa-calendar-alt"></i> Birthday</label>
-                    <input type="date" id="birthday" />
-                </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fas fa-briefcase"></i> Occupation</label>
-                    <input type="text" id="occupation" placeholder="e.g., Software Engineer" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-briefcase"></i> Occupation</label>
+                        <input type="text" id="occupation" placeholder="e.g., Software Engineer" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-heart"></i> Interests</label>
+                        <input type="text" id="interests" placeholder="e.g., Gaming, Travel, Coffee" />
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label><i class="fas fa-heart"></i> Interests</label>
-                    <input type="text" id="interests" placeholder="e.g., Gaming, Travel, Coffee" />
-                </div>
-            </div>
 
-            <div class="form-group">
-                <label><i class="fas fa-circle"></i> Status</label>
-                <select id="status">
-                    <option value="available">🟢 Available</option>
-                    <option value="busy">🔴 Busy</option>
-                    <option value="away">🟡 Away</option>
-                    <option value="dnd">🟣 Do Not Disturb</option>
-                </select>
-            </div>
-
-            <div class="form-row">
                 <div class="form-group">
-                    <label><i class="fab fa-instagram"></i> Instagram</label>
-                    <input type="text" id="instagram" placeholder="@username" />
+                    <label><i class="fas fa-circle"></i> Status</label>
+                    <select id="status">
+                        <option value="available">🟢 Available</option>
+                        <option value="busy">🔴 Busy</option>
+                        <option value="away">🟡 Away</option>
+                        <option value="dnd">🟣 Do Not Disturb</option>
+                    </select>
                 </div>
-                <div class="form-group">
-                    <label><i class="fab fa-twitter"></i> Twitter / X</label>
-                    <input type="text" id="twitter" placeholder="@username" />
-                </div>
-            </div>
 
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fab fa-tiktok"></i> TikTok</label>
-                    <input type="text" id="tiktok" placeholder="@username" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fab fa-instagram"></i> Instagram</label>
+                        <input type="text" id="instagram" placeholder="@username" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-twitter"></i> Twitter / X</label>
+                        <input type="text" id="twitter" placeholder="@username" />
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label><i class="fab fa-facebook"></i> Facebook Profile URL</label>
-                    <input type="url" id="facebook" placeholder="https://facebook.com/username" />
-                    <span class="helper-text">Enter your full Facebook profile URL</span>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fab fa-tiktok"></i> TikTok</label>
+                        <input type="text" id="tiktok" placeholder="@username" />
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-facebook"></i> Facebook Profile URL</label>
+                        <input type="url" id="facebook" placeholder="https://facebook.com/username" />
+                        <span style="font-size:11px;color:#999;">Enter your full Facebook profile URL</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-actions">
-                <button type="submit" class="btn-primary" id="saveBtn">
-                    <i class="fas fa-save"></i> Save Profile
-                </button>
-                <button type="button" class="btn-secondary" onclick="resetForm()">
-                    <i class="fas fa-undo"></i> Reset
-                </button>
-            </div>
-        </form>
-    </section>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="saveBtn">
+                        <i class="fas fa-save"></i> Save Profile
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="resetForm()">
+                        <i class="fas fa-undo"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <p>Made with ❤️ for the TIMAWA squad &copy; 2022</p>
     </footer>
 
     <script>
-        // ===== CLOUDINARY CONFIG =====
-        const CLOUDINARY_CONFIG = {
-            cloudName: "ooq99nlw",
-            uploadPreset: "t-imawa"
-        };
-
-        // ===== FIREBASE CONFIG =====
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
             authDomain: "timawa2.firebaseapp.com",
@@ -915,9 +786,14 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        let selectedFile = null;
+        const CLOUDINARY_CONFIG = {
+            cloudName: "ooq99nlw",
+            uploadPreset: "t-imawa"
+        };
+
         let currentUser = null;
         let profileData = null;
+        let selectedFile = null;
         let isOffline = false;
 
         // ===== LOCATION FUNCTIONS =====
@@ -946,7 +822,6 @@
             const select = document.getElementById('locationSelect');
             const customInput = document.getElementById('customLocation');
             
-            // Check if value matches any predefined option
             const options = Array.from(select.options);
             const matchedOption = options.find(opt => opt.value === value);
             
@@ -955,7 +830,6 @@
                 customInput.value = '';
                 customInput.parentElement.classList.remove('active');
             } else if (value && value.trim() !== '') {
-                // Custom location
                 select.value = 'custom';
                 customInput.value = value;
                 customInput.parentElement.classList.add('active');
@@ -1022,14 +896,6 @@
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/upload`);
-                
-                xhr.upload.onprogress = function(event) {
-                    if (event.lengthComputable) {
-                        const percent = (event.loaded / event.total) * 100;
-                        updateProgress(percent);
-                    }
-                };
-
                 xhr.onload = function() {
                     if (xhr.status === 200) {
                         const response = JSON.parse(xhr.responseText);
@@ -1038,11 +904,9 @@
                         reject(new Error('Upload failed: ' + xhr.statusText));
                     }
                 };
-
                 xhr.onerror = function() {
                     reject(new Error('Network error'));
                 };
-
                 xhr.send(formData);
             });
         }
@@ -1053,18 +917,27 @@
                 window.location.href = 'index.html';
                 return;
             }
+
             currentUser = user;
-            document.getElementById('email').value = user.email || '';
-            
+
             try {
-                await db.collection('users').doc('test').get();
-                isOffline = false;
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data();
+                
+                // Check if user is admin
+                if (data?.isAdmin !== true) {
+                    alert('⚠️ You need admin privileges to access this page.');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+
+                document.getElementById('email').value = user.email || '';
                 await loadProfile();
             } catch (error) {
-                console.warn('⚠️ Firestore connection issue:', error);
+                console.error('Error loading user data:', error);
                 isOffline = true;
                 loadFallbackProfile(user);
-                showMessage('⚠️ Using offline mode. Please check your Firebase connection.', 'error');
+                showMessage('⚠️ Using offline mode. Please check your connection.', 'error');
             }
         });
 
@@ -1075,29 +948,19 @@
                 profileData = doc.data();
 
                 if (profileData) {
-                    const displayName = profileData.displayName || currentUser.displayName || 'User';
+                    const displayName = profileData.displayName || currentUser.displayName || 'Admin';
                     document.getElementById('displayName').value = displayName;
-                    document.getElementById('heroName').textContent = displayName;
-                    document.getElementById('heroNameDisplay').textContent = displayName;
+                    document.getElementById('profileName').textContent = displayName;
+                    document.getElementById('avatarText').textContent = displayName.charAt(0).toUpperCase();
                     
-                    const bio = profileData.bio || 'Update your bio to tell the squad about yourself!';
                     document.getElementById('bio').value = profileData.bio || '';
-                    document.getElementById('heroBio').textContent = bio;
                     
-                    // Set location
                     setLocationValue(profileData.location || '');
                     
                     document.getElementById('birthday').value = profileData.birthday || '';
                     document.getElementById('occupation').value = profileData.occupation || '';
-                    if (profileData.occupation) {
-                        document.getElementById('heroRole').textContent = '💼 ' + profileData.occupation;
-                    } else {
-                        document.getElementById('heroRole').textContent = '🌟 Community Member';
-                    }
-                    
                     document.getElementById('interests').value = profileData.interests || '';
                     document.getElementById('status').value = profileData.status || 'available';
-                    updateStatusBadge(profileData.status || 'available');
                     
                     document.getElementById('instagram').value = profileData.instagram || '';
                     document.getElementById('twitter').value = profileData.twitter || '';
@@ -1105,18 +968,22 @@
                     document.getElementById('facebook').value = profileData.facebook || '';
 
                     if (profileData.photoURL) {
-                        const avatarEl = document.getElementById('heroAvatar');
-                        avatarEl.innerHTML = `<img src="${profileData.photoURL}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
+                        const avatarEl = document.getElementById('profileAvatar');
+                        avatarEl.innerHTML = `
+                            <img src="${profileData.photoURL}" alt="Profile Photo" />
+                            <label class="photo-overlay">
+                                <i class="fas fa-camera"></i>
+                                <input type="file" id="photoInput" accept="image/*" />
+                            </label>
+                        `;
                         document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
                     }
                 } else {
-                    const displayName = currentUser.displayName || currentUser.email || 'User';
+                    const displayName = currentUser.displayName || currentUser.email || 'Admin';
                     document.getElementById('displayName').value = displayName;
-                    document.getElementById('heroName').textContent = displayName;
-                    document.getElementById('heroNameDisplay').textContent = displayName;
-                    document.getElementById('heroBio').textContent = 'Welcome to TIMAWA! Update your profile.';
+                    document.getElementById('profileName').textContent = displayName;
+                    document.getElementById('avatarText').textContent = displayName.charAt(0).toUpperCase();
                     document.getElementById('status').value = 'available';
-                    updateStatusBadge('available');
                 }
             } catch (error) {
                 console.error('Error loading profile:', error);
@@ -1126,61 +993,15 @@
 
         // ===== FALLBACK PROFILE =====
         function loadFallbackProfile(user) {
-            const displayName = user.displayName || user.email || 'User';
+            const displayName = user.displayName || user.email || 'Admin';
             document.getElementById('displayName').value = displayName;
-            document.getElementById('heroName').textContent = displayName;
-            document.getElementById('heroNameDisplay').textContent = displayName;
+            document.getElementById('profileName').textContent = displayName;
+            document.getElementById('avatarText').textContent = displayName.charAt(0).toUpperCase();
             document.getElementById('email').value = user.email || '';
-            document.getElementById('heroBio').textContent = 'Welcome to TIMAWA! Update your profile.';
-            document.getElementById('heroRole').textContent = '🌟 Community Member';
             document.getElementById('status').value = 'available';
-            updateStatusBadge('available');
         }
 
-        // ===== RESET FORM =====
-        function resetForm() {
-            if (profileData) {
-                document.getElementById('displayName').value = profileData.displayName || currentUser.displayName || '';
-                document.getElementById('bio').value = profileData.bio || '';
-                setLocationValue(profileData.location || '');
-                document.getElementById('birthday').value = profileData.birthday || '';
-                document.getElementById('occupation').value = profileData.occupation || '';
-                document.getElementById('interests').value = profileData.interests || '';
-                document.getElementById('status').value = profileData.status || 'available';
-                document.getElementById('instagram').value = profileData.instagram || '';
-                document.getElementById('twitter').value = profileData.twitter || '';
-                document.getElementById('tiktok').value = profileData.tiktok || '';
-                document.getElementById('facebook').value = profileData.facebook || '';
-                
-                if (profileData.photoURL) {
-                    const avatarEl = document.getElementById('heroAvatar');
-                    avatarEl.innerHTML = `<img src="${profileData.photoURL}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
-                    document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
-                }
-                
-                selectedFile = null;
-                showMessage('Form reset to saved values', 'info');
-                setTimeout(() => {
-                    document.getElementById('message').style.display = 'none';
-                }, 2000);
-            }
-        }
-
-        // ===== UPDATE STATUS BADGE =====
-        function updateStatusBadge(status) {
-            const badge = document.getElementById('heroStatus');
-            const statusMap = {
-                'available': { class: 'available', icon: 'fa-circle', label: 'Available' },
-                'busy': { class: 'busy', icon: 'fa-circle', label: 'Busy' },
-                'away': { class: 'away', icon: 'fa-circle', label: 'Away' },
-                'dnd': { class: 'dnd', icon: 'fa-circle', label: 'Do Not Disturb' }
-            };
-            const info = statusMap[status] || statusMap['available'];
-            badge.className = `status-badge ${info.class}`;
-            badge.innerHTML = `<i class="fas ${info.icon}"></i> ${info.label}`;
-        }
-
-        // ===== PHOTO UPLOAD WITH COMPRESSION =====
+        // ===== PHOTO UPLOAD =====
         async function handlePhotoUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1198,8 +1019,14 @@
 
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const avatarEl = document.getElementById('heroAvatar');
-                    avatarEl.innerHTML = `<img src="${event.target.result}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
+                    const avatarEl = document.getElementById('profileAvatar');
+                    avatarEl.innerHTML = `
+                        <img src="${event.target.result}" alt="Profile Photo" />
+                        <label class="photo-overlay">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" id="photoInput" accept="image/*" />
+                        </label>
+                    `;
                     document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
                     document.getElementById('message').style.display = 'none';
                     showMessage(`✅ Photo compressed (${Math.round(compressedFile.size / 1024)}KB). Click Save to upload.`, 'success');
@@ -1216,22 +1043,38 @@
 
         document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
 
-        // ===== UPDATE PROGRESS BAR =====
-        function updateProgress(percent) {
-            const container = document.getElementById('progressContainer');
-            const bar = document.getElementById('progressBar');
-            const text = document.getElementById('progressText');
-            
-            container.classList.add('active');
-            text.classList.add('active');
-            bar.style.width = percent + '%';
-            text.textContent = `Uploading: ${Math.round(percent)}%`;
-            
-            if (percent >= 100) {
+        // ===== RESET FORM =====
+        function resetForm() {
+            if (profileData) {
+                document.getElementById('displayName').value = profileData.displayName || currentUser.displayName || '';
+                document.getElementById('bio').value = profileData.bio || '';
+                setLocationValue(profileData.location || '');
+                document.getElementById('birthday').value = profileData.birthday || '';
+                document.getElementById('occupation').value = profileData.occupation || '';
+                document.getElementById('interests').value = profileData.interests || '';
+                document.getElementById('status').value = profileData.status || 'available';
+                document.getElementById('instagram').value = profileData.instagram || '';
+                document.getElementById('twitter').value = profileData.twitter || '';
+                document.getElementById('tiktok').value = profileData.tiktok || '';
+                document.getElementById('facebook').value = profileData.facebook || '';
+                
+                if (profileData.photoURL) {
+                    const avatarEl = document.getElementById('profileAvatar');
+                    avatarEl.innerHTML = `
+                        <img src="${profileData.photoURL}" alt="Profile Photo" />
+                        <label class="photo-overlay">
+                            <i class="fas fa-camera"></i>
+                            <input type="file" id="photoInput" accept="image/*" />
+                        </label>
+                    `;
+                    document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+                }
+                
+                selectedFile = null;
+                showMessage('Form reset to saved values', 'info');
                 setTimeout(() => {
-                    container.classList.remove('active');
-                    text.classList.remove('active');
-                }, 1000);
+                    document.getElementById('message').style.display = 'none';
+                }, 2000);
             }
         }
 
@@ -1253,17 +1096,10 @@
             try {
                 let photoURL = null;
 
-                // Upload photo to Cloudinary if selected
                 if (selectedFile) {
                     try {
                         showMessage('📤 Uploading to Cloudinary...', 'info');
                         photoURL = await uploadToCloudinary(selectedFile);
-                        
-                        setTimeout(() => {
-                            document.getElementById('progressContainer').classList.remove('active');
-                            document.getElementById('progressText').classList.remove('active');
-                        }, 500);
-                        
                     } catch (uploadError) {
                         console.error('Upload error:', uploadError);
                         showMessage('❌ Error uploading photo: ' + uploadError.message, 'error');
@@ -1285,7 +1121,7 @@
                 const tiktok = document.getElementById('tiktok').value.trim();
                 const facebook = document.getElementById('facebook').value.trim();
 
-                // Validate Facebook URL
+                // Validate Facebook URL if provided
                 if (facebook && !facebook.match(/^https?:\/\/(www\.)?facebook\.com\/.+/i)) {
                     showMessage('⚠️ Please enter a valid Facebook URL (e.g., https://facebook.com/username)', 'error');
                     saveBtn.disabled = false;
@@ -1294,7 +1130,7 @@
                 }
 
                 const updateData = {
-                    displayName: displayName || currentUser.displayName || 'User',
+                    displayName: displayName || currentUser.displayName || 'Admin',
                     bio: bio,
                     location: location,
                     birthday: birthday,
@@ -1324,15 +1160,8 @@
                     }
                 }
 
-                document.getElementById('heroName').textContent = displayName || currentUser.displayName || 'User';
-                document.getElementById('heroNameDisplay').textContent = displayName || currentUser.displayName || 'User';
-                document.getElementById('heroBio').textContent = bio || 'Update your bio to tell the squad about yourself!';
-                if (occupation) {
-                    document.getElementById('heroRole').textContent = '💼 ' + occupation;
-                } else {
-                    document.getElementById('heroRole').textContent = '🌟 Community Member';
-                }
-                updateStatusBadge(status);
+                document.getElementById('profileName').textContent = displayName || currentUser.displayName || 'Admin';
+                document.getElementById('avatarText').textContent = (displayName || 'A').charAt(0).toUpperCase();
 
                 profileData = updateData;
                 selectedFile = null;
@@ -1350,11 +1179,6 @@
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Profile';
             }
-        });
-
-        // ===== STATUS CHANGE =====
-        document.getElementById('status').addEventListener('change', function() {
-            updateStatusBadge(this.value);
         });
 
         // ===== SHOW MESSAGE =====

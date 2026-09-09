@@ -51,6 +51,7 @@
             border-bottom: 1px solid rgba(16, 137, 211, 0.08);
             transition: all 0.3s ease;
             box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+            flex-wrap: wrap;
         }
 
         .navbar .logo {
@@ -59,6 +60,7 @@
             color: rgb(16, 137, 211);
             letter-spacing: 2px;
             text-decoration: none;
+            flex-shrink: 0;
         }
 
         .navbar .logo span {
@@ -73,18 +75,20 @@
         .navbar .nav-links {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
             list-style: none;
+            flex-wrap: wrap;
         }
 
         .navbar .nav-links a {
             text-decoration: none;
             color: #555;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.3s ease;
             padding: 6px 12px;
             border-radius: 8px;
+            white-space: nowrap;
         }
 
         .navbar .nav-links a:hover {
@@ -92,7 +96,12 @@
             background: rgba(16, 137, 211, 0.06);
         }
 
-        .navbar .nav-links .user-profile {
+        .navbar .nav-links a.active {
+            color: rgb(16, 137, 211);
+            background: rgba(16, 137, 211, 0.08);
+        }
+
+        .navbar .user-profile {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -106,11 +115,11 @@
             text-decoration: none;
         }
 
-        .navbar .nav-links .user-profile:hover {
+        .navbar .user-profile:hover {
             border-color: rgb(16, 137, 211);
         }
 
-        .navbar .nav-links .user-avatar {
+        .navbar .user-avatar {
             width: 34px;
             height: 34px;
             border-radius: 50%;
@@ -125,20 +134,20 @@
             overflow: hidden;
         }
 
-        .navbar .nav-links .user-avatar img {
+        .navbar .user-avatar img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
         }
 
-        .navbar .nav-links .user-name {
+        .navbar .user-name {
             color: #333;
             font-weight: 600;
             font-size: 13px;
         }
 
-        .navbar .nav-links .logout-btn {
+        .navbar .logout-btn {
             background: white;
             border: 2px solid #fee2e2;
             color: #ef4444;
@@ -151,7 +160,7 @@
             box-shadow: #cff0ff 0px 4px 8px -4px;
         }
 
-        .navbar .nav-links .logout-btn:hover {
+        .navbar .logout-btn:hover {
             background: #fee2e2;
             transform: scale(1.03);
         }
@@ -378,6 +387,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             opacity: 0;
+            z-index: 2;
         }
 
         .highlight-card:hover .image-container .delete-btn {
@@ -403,6 +413,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             opacity: 0;
+            z-index: 2;
         }
 
         .highlight-card:hover .image-container .download-btn {
@@ -562,15 +573,14 @@
 
         .members-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
         }
 
         .member-card {
             display: flex;
-            align-items: center;
-            gap: 18px;
-            padding: 18px 22px;
+            flex-direction: column;
+            padding: 20px 22px;
             border-radius: 16px;
             transition: all 0.3s ease;
             border: 1px solid #f0f4ff;
@@ -580,20 +590,27 @@
         .member-card:hover {
             background: #f0f7ff;
             border-color: rgb(16, 137, 211);
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: 0 4px 15px rgba(16, 137, 211, 0.08);
         }
 
+        .member-card .card-top {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
         .member-card .avatar {
-            width: 60px;
-            height: 60px;
+            width: 64px;
+            height: 64px;
             border-radius: 50%;
             background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             flex-shrink: 0;
             overflow: hidden;
@@ -602,66 +619,50 @@
         .member-card .avatar img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
             object-fit: cover;
         }
 
-        .member-card .info {
+        .member-card .card-top .name-section {
             flex: 1;
             min-width: 0;
         }
 
-        .member-card .info .name {
-            font-size: 17px;
+        .member-card .card-top .name-section .name {
+            font-size: 18px;
             font-weight: 700;
             color: #1a1a2e;
         }
 
-        .member-card .info .location {
+        .member-card .card-top .name-section .location {
             font-size: 13px;
             color: #888;
             display: flex;
             align-items: center;
             gap: 4px;
-            margin-top: 2px;
         }
 
-        .member-card .info .location i {
+        .member-card .card-top .name-section .location i {
             color: rgb(16, 137, 211);
             font-size: 12px;
         }
 
-        .member-card .info .bio {
+        .member-card .card-top .name-section .occupation {
             font-size: 13px;
             color: #666;
-            margin-top: 4px;
-            line-height: 1.4;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 180px;
+            margin-top: 2px;
         }
 
-        .member-card .info .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 6px;
-        }
-
-        .member-card .info .tag {
-            background: #e0f2fe;
+        .member-card .card-top .name-section .occupation i {
             color: rgb(16, 137, 211);
-            padding: 1px 10px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 600;
+            margin-right: 4px;
         }
 
         .member-card .status-wrapper {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 4px;
+            gap: 3px;
             flex-shrink: 0;
         }
 
@@ -671,10 +672,11 @@
             border-radius: 50%;
         }
 
-        .status-dot.online { background: #22c55e; }
+        .status-dot.available { background: #22c55e; }
+        .status-dot.busy { background: #ef4444; }
         .status-dot.away { background: #f59e0b; }
-        .status-dot.offline { background: #9ca3af; }
         .status-dot.dnd { background: #8b5cf6; }
+        .status-dot.offline { background: #9ca3af; }
 
         .member-card .status-label {
             font-size: 11px;
@@ -682,20 +684,57 @@
             color: #888;
         }
 
+        .member-card .bio {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+            padding: 10px 0;
+            border-top: 1px solid #f0f4ff;
+            border-bottom: 1px solid #f0f4ff;
+            margin: 8px 0;
+        }
+
+        .member-card .interests {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .member-card .interests .tag {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
         .member-card .social-icons {
             display: flex;
-            gap: 6px;
-            margin-top: 4px;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f4ff;
         }
 
         .member-card .social-icons a {
-            color: #aaa;
-            font-size: 14px;
+            color: #888;
+            font-size: 16px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f8faff;
             transition: all 0.3s ease;
+            text-decoration: none;
         }
 
         .member-card .social-icons a:hover {
             color: rgb(16, 137, 211);
+            background: #e0f2fe;
             transform: scale(1.1);
         }
 
@@ -912,33 +951,20 @@
             border-top: 1px solid #eef2f7;
         }
 
-        .footer .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-
-        .footer .social-links a {
+        .footer p {
             color: #888;
-            font-size: 18px;
-            transition: all 0.3s ease;
-        }
-
-        .footer .social-links a:hover {
-            color: rgb(16, 137, 211);
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 1024px) {
-            .members-grid {
-                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            }
         }
 
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .navbar .logo {
+                font-size: 22px;
             }
 
             .navbar .nav-links {
@@ -951,8 +977,9 @@
                 background: white;
                 padding: 20px;
                 border-bottom: 2px solid #f0f4ff;
-                gap: 12px;
+                gap: 10px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+                width: 100%;
             }
 
             .navbar .nav-links.active {
@@ -961,6 +988,10 @@
 
             .navbar .mobile-toggle {
                 display: block;
+                position: absolute;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
             }
 
             .main-container {
@@ -996,14 +1027,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .member-card {
-                padding: 15px 18px;
-            }
-
-            .member-card .info .bio {
-                max-width: 140px;
-            }
-
             .modal-content {
                 padding: 25px;
             }
@@ -1012,8 +1035,15 @@
                 flex-direction: column;
             }
 
-            .highlight-card .image-container .delete-btn {
-                opacity: 1;
+            .navbar .nav-links a {
+                font-size: 14px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .navbar .nav-links .logout-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
 
@@ -1039,11 +1069,19 @@
                 height: 180px;
             }
 
+            .highlight-card .image-container .delete-btn {
+                opacity: 1;
+            }
+
+            .highlight-card .image-container .download-btn {
+                opacity: 1;
+            }
+
             .members-grid {
                 grid-template-columns: 1fr;
             }
 
-            .member-card {
+            .member-card .card-top {
                 flex-wrap: wrap;
                 justify-content: center;
                 text-align: center;
@@ -1055,26 +1093,30 @@
                 gap: 8px;
                 width: 100%;
                 justify-content: center;
-                margin-top: 8px;
-                padding-top: 8px;
-                border-top: 1px solid #f0f4ff;
-            }
-
-            .member-card .info .bio {
-                max-width: 100%;
-                white-space: normal;
-            }
-
-            .member-card .info .tags {
-                justify-content: center;
+                margin-top: 4px;
+                padding-top: 4px;
             }
 
             .member-card .social-icons {
                 justify-content: center;
             }
 
+            .member-card .interests {
+                justify-content: center;
+            }
+
             .modal-content {
                 padding: 20px;
+            }
+
+            .navbar .nav-links a {
+                font-size: 16px;
+                padding: 8px 16px;
+            }
+
+            .navbar .nav-links .logout-btn {
+                font-size: 14px;
+                padding: 8px 16px;
             }
         }
 
@@ -1098,21 +1140,19 @@
         <a href="#" class="logo">🇹🇮🇲🇦🇼🇦 <span>HUB</span></a>
         <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         <ul class="nav-links" id="navLinks">
-            <li><a href="index.html"><i class="fas fa-home"></i></a></li>
-            <li><a href="dashboard.html" style="color: rgb(16, 137, 211); background: rgba(16, 137, 211, 0.08);">Dashboard</a></li>
-            <li><a href="calendar.html"><i class="fas fa-calendar-alt"></i></a></li>
-            <li>
-                <a href="profile.html" class="user-profile" id="userProfileLink">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <span class="user-name" id="userName">Loading...</span>
-                </a>
-            </li>
-            <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></li>
+            <li><a href="index.html#highlights">Highlights</a></li>
+            <li><a href="index.html#coffee-shops">Coffee</a></li>
+            <li><a href="index.html#favorite-places">Places</a></li>
+            <li><a href="index.html#things-to-do">Activities</a></li>
+            <li><a href="index.html#members-section">Members</a></li>
+            <li><a href="calendar.html">Calendar</a></li>
+            <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+            <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
         </ul>
     </nav>
 
     <div class="main-container">
-
         <div class="hero-banner">
             <div class="content">
                 <h1>Welcome back, <span class="highlight" id="heroName">Squad!</span></h1>
@@ -1147,7 +1187,6 @@
                 <h2>👥 Squad Members</h2>
                 <span class="count" id="memberCountLabel">(0)</span>
             </div>
-
             <div class="members-grid" id="membersGrid">
                 <div class="empty-state">
                     <i class="fas fa-users"></i>
@@ -1184,13 +1223,7 @@
     </div>
 
     <footer class="footer">
-        <div class="social-links">
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-tiktok"></i></a>
-            <a href="#"><i class="fab fa-discord"></i></a>
-        </div>
-        <p>Made with ❤️ for the TIMAWA squad &copy; 2024</p>
+        <p>Made with ❤️ for the TIMAWA squad &copy; 2022</p>
     </footer>
 
     <script>
@@ -1252,40 +1285,34 @@
         // ===== DELETE FROM CLOUDINARY =====
         async function deleteFromCloudinary(imageUrl) {
             try {
-                // Extract public ID from the URL
                 const urlParts = imageUrl.split('/');
                 const filename = urlParts[urlParts.length - 1];
                 const publicId = `t-imawa/highlights/${filename.split('.')[0]}`;
                 
                 const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/destroy`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        public_id: publicId
-                    })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ public_id: publicId })
                 });
                 
                 const result = await response.json();
-                if (result.result === 'ok') {
-                    console.log('✅ Deleted from Cloudinary:', publicId);
-                    return true;
-                } else {
-                    console.warn('⚠️ Cloudinary delete response:', result);
-                    return false;
-                }
+                return result.result === 'ok';
             } catch (error) {
-                console.error('❌ Error deleting from Cloudinary:', error);
+                console.error('Error deleting from Cloudinary:', error);
                 return false;
             }
         }
 
-        // ===== DELETE HIGHLIGHT (with Cloudinary cleanup) =====
-        async function deleteHighlight(id, imageUrls) {
+        // ===== DELETE HIGHLIGHT =====
+        async function deleteHighlight(id) {
             if (!confirm('Are you sure you want to delete this highlight?')) return;
 
             try {
+                // Get the highlight data first to get image URLs
+                const doc = await db.collection('highlights').doc(id).get();
+                const data = doc.data();
+                const imageUrls = data?.imageURLs || [];
+
                 // Delete images from Cloudinary
                 for (const url of imageUrls) {
                     if (url && url.includes('cloudinary')) {
@@ -1297,10 +1324,71 @@
                 await db.collection('highlights').doc(id).delete();
                 selectedHighlights.delete(id);
                 updateSelectionUI();
-                console.log('✅ Highlight deleted successfully');
+                alert('✅ Highlight deleted successfully!');
             } catch (error) {
                 console.error('Error deleting highlight:', error);
                 alert('❌ Error deleting highlight: ' + error.message);
+            }
+        }
+
+        // ===== DOWNLOAD SINGLE IMAGE =====
+        async function downloadImage(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            } catch (error) {
+                console.error('Error downloading image:', error);
+                throw error;
+            }
+        }
+
+        // ===== DOWNLOAD SINGLE HIGHLIGHT =====
+        async function downloadHighlight(id) {
+            try {
+                // Get the highlight data
+                const doc = await db.collection('highlights').doc(id).get();
+                const data = doc.data();
+                const imageUrls = data?.imageURLs || [];
+
+                if (!imageUrls || imageUrls.length === 0) {
+                    alert('No images to download.');
+                    return;
+                }
+
+                if (imageUrls.length === 1) {
+                    // Download single image directly
+                    const url = imageUrls[0];
+                    const filename = `TIMAWA_highlight_${id}.jpg`;
+                    await downloadImage(url, filename);
+                } else {
+                    // Download multiple images as ZIP
+                    const zip = new JSZip();
+                    const folder = zip.folder(`TIMAWA_Highlight_${id}`);
+                    
+                    for (let i = 0; i < imageUrls.length; i++) {
+                        try {
+                            const response = await fetch(imageUrls[i]);
+                            const blob = await response.blob();
+                            const extension = blob.type.split('/')[1] || 'jpg';
+                            folder.file(`image_${i + 1}.${extension}`, blob);
+                        } catch (e) {
+                            console.warn('Error downloading image:', e);
+                        }
+                    }
+                    
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    saveAs(zipBlob, `TIMAWA_Highlight_${id}.zip`);
+                }
+            } catch (error) {
+                console.error('Error downloading highlight:', error);
+                alert('❌ Error downloading: ' + error.message);
             }
         }
 
@@ -1337,7 +1425,7 @@
                         const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
                         
                         if (timeLeft <= 0) {
-                            deleteHighlight(id, data.imageURLs || []);
+                            deleteHighlight(id);
                             return;
                         }
 
@@ -1356,31 +1444,17 @@
                                     ${isSelected ? '<i class="fas fa-check"></i>' : ''}
                                 </div>
                                 <div class="image-container">
-                                    ${mainImage ? 
-                                        `<img src="${mainImage}" alt="Highlight" />` :
-                                        `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`
-                                    }
-                                    ${imageUrls.length > 1 ? 
-                                        `<span class="image-count">+${imageUrls.length - 1} more</span>` : 
-                                        ''
-                                    }
+                                    ${mainImage ? `<img src="${mainImage}" alt="Highlight" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`}
+                                    ${imageUrls.length > 1 ? `<span class="image-count">+${imageUrls.length - 1} more</span>` : ''}
                                     <span class="expiry-badge"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
-                                    <button class="delete-btn" onclick="deleteHighlight('${id}', ${JSON.stringify(imageUrls)})"><i class="fas fa-trash"></i> Delete</button>
-                                    ${imageUrls.length > 0 ? 
-                                        `<button class="download-btn" onclick="downloadHighlight('${id}', ${JSON.stringify(imageUrls)})"><i class="fas fa-download"></i> Download</button>` : 
-                                        ''
-                                    }
+                                    <button class="delete-btn" onclick="deleteHighlight('${id}')"><i class="fas fa-trash"></i> Delete</button>
+                                    ${imageUrls.length > 0 ? `<button class="download-btn" onclick="downloadHighlight('${id}')"><i class="fas fa-download"></i> Download</button>` : ''}
                                 </div>
                                 <div class="card-body">
                                     ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
                                     <div class="meta">
-                                        <span class="author">
-                                            <span class="avatar-small">${initials}</span>
-                                            ${authorName}
-                                        </span>
-                                        <span class="expiry-time ${isUrgent ? 'urgent' : ''}">
-                                            <i class="fas fa-clock"></i> ${daysLeft}d left
-                                        </span>
+                                        <span class="author"><span class="avatar-small">${initials}</span> ${authorName}</span>
+                                        <span class="expiry-time ${isUrgent ? 'urgent' : ''}"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
                                     </div>
                                 </div>
                             </div>
@@ -1439,7 +1513,7 @@
                 `${selectedHighlights.size} selected` : '';
         }
 
-        // ===== BATCH DELETE (with Cloudinary cleanup) =====
+        // ===== BATCH DELETE =====
         async function batchDelete() {
             if (selectedHighlights.size === 0) {
                 alert('Please select at least one highlight to delete.');
@@ -1455,21 +1529,17 @@
                 let deletedCount = 0;
 
                 for (const id of idsToDelete) {
-                    const card = document.querySelector(`.highlight-card[data-id="${id}"]`);
-                    const imageUrls = [];
-                    const img = card.querySelector('.image-container img');
-                    if (img && img.src) {
-                        imageUrls.push(img.src);
-                    }
+                    // Get the highlight data first to get image URLs
+                    const doc = await db.collection('highlights').doc(id).get();
+                    const data = doc.data();
+                    const imageUrls = data?.imageURLs || [];
                     
-                    // Delete from Cloudinary
                     for (const url of imageUrls) {
                         if (url && url.includes('cloudinary')) {
                             await deleteFromCloudinary(url);
                         }
                     }
                     
-                    // Delete from Firestore
                     await db.collection('highlights').doc(id).delete();
                     selectedHighlights.delete(id);
                     deletedCount++;
@@ -1480,37 +1550,6 @@
             } catch (error) {
                 console.error('Error deleting highlights:', error);
                 alert('❌ Error deleting highlights: ' + error.message);
-            }
-        }
-
-        // ===== DOWNLOAD SINGLE HIGHLIGHT =====
-        async function downloadHighlight(id, imageUrls) {
-            if (!imageUrls || imageUrls.length === 0) {
-                alert('No images to download.');
-                return;
-            }
-
-            if (imageUrls.length === 1) {
-                window.open(imageUrls[0], '_blank');
-                return;
-            }
-
-            const zip = new JSZip();
-            const folder = zip.folder(`TIMAWA_Highlight_${id}`);
-            
-            try {
-                for (let i = 0; i < imageUrls.length; i++) {
-                    const response = await fetch(imageUrls[i]);
-                    const blob = await response.blob();
-                    const extension = blob.type.split('/')[1] || 'jpg';
-                    folder.file(`image_${i + 1}.${extension}`, blob);
-                }
-                
-                const zipBlob = await zip.generateAsync({ type: 'blob' });
-                saveAs(zipBlob, `TIMAWA_Highlight_${id}.zip`);
-            } catch (error) {
-                console.error('Error downloading highlight:', error);
-                alert('❌ Error downloading: ' + error.message);
             }
         }
 
@@ -1527,17 +1566,21 @@
 
             try {
                 for (const id of selectedHighlights) {
-                    const card = document.querySelector(`.highlight-card[data-id="${id}"]`);
-                    const img = card.querySelector('.image-container img');
-                    if (img && img.src) {
-                        try {
-                            const response = await fetch(img.src);
-                            const blob = await response.blob();
-                            const extension = blob.type.split('/')[1] || 'jpg';
-                            folder.file(`highlight_${id}_${downloadCount + 1}.${extension}`, blob);
-                            downloadCount++;
-                        } catch (e) {
-                            console.warn('Error downloading image:', e);
+                    const doc = await db.collection('highlights').doc(id).get();
+                    const data = doc.data();
+                    const imageUrls = data?.imageURLs || [];
+                    
+                    for (const url of imageUrls) {
+                        if (url) {
+                            try {
+                                const response = await fetch(url);
+                                const blob = await response.blob();
+                                const extension = blob.type.split('/')[1] || 'jpg';
+                                folder.file(`highlight_${id}_${downloadCount + 1}.${extension}`, blob);
+                                downloadCount++;
+                            } catch (e) {
+                                console.warn('Error downloading image:', e);
+                            }
                         }
                     }
                 }
@@ -1582,7 +1625,6 @@
             });
         }
 
-        // ===== SHOW UPLOAD MODAL =====
         function showUploadModal() {
             document.getElementById('uploadModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1729,36 +1771,44 @@
                     const location = data.location || '📍 Not set';
                     const photoUrl = data.photoURL || '';
                     const bio = data.bio || 'New to the squad! 👋';
-                    const tags = data.interests ? data.interests.split(',').map(t => t.trim()) : [];
+                    const occupation = data.occupation || '';
+                    const interests = data.interests ? data.interests.split(',').map(t => t.trim()) : [];
                     const instagram = data.instagram || '';
                     const twitter = data.twitter || '';
+                    const tiktok = data.tiktok || '';
+                    const facebook = data.facebook || '';
 
                     const statusLabels = {
-                        'available': '🟢 Online',
-                        'busy': '🔴 Busy',
-                        'away': '🟡 Away',
-                        'dnd': '🟣 DND',
-                        'offline': '⚪ Offline'
+                        'available': 'Available',
+                        'busy': 'Busy',
+                        'away': 'Away',
+                        'dnd': 'Do Not Disturb',
+                        'offline': 'Offline'
                     };
 
                     html += `
                         <div class="member-card" data-name="${name.toLowerCase()}">
-                            <div class="avatar">
-                                ${photoUrl ? `<img src="${photoUrl}" alt="${name}" />` : initials}
-                            </div>
-                            <div class="info">
-                                <div class="name">${name}</div>
-                                <div class="location"><i class="fas fa-map-marker-alt"></i> ${location}</div>
-                                ${bio ? `<div class="bio">${bio}</div>` : ''}
-                                ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : ''}
-                                <div class="social-icons">
-                                    ${instagram ? `<a href="https://instagram.com/${instagram.replace('@','')}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
-                                    ${twitter ? `<a href="https://twitter.com/${twitter.replace('@','')}" target="_blank"><i class="fab fa-twitter"></i></a>` : ''}
+                            <div class="card-top">
+                                <div class="avatar">
+                                    ${photoUrl ? `<img src="${photoUrl}" alt="${name}" />` : initials}
+                                </div>
+                                <div class="name-section">
+                                    <div class="name">${name}</div>
+                                    <div class="location"><i class="fas fa-map-marker-alt"></i> ${location}</div>
+                                    ${occupation ? `<div class="occupation"><i class="fas fa-briefcase"></i> ${occupation}</div>` : ''}
+                                </div>
+                                <div class="status-wrapper">
+                                    <span class="status-dot ${status}"></span>
+                                    <span class="status-label">${statusLabels[status] || 'Offline'}</span>
                                 </div>
                             </div>
-                            <div class="status-wrapper">
-                                <span class="status-dot ${status}"></span>
-                                <span class="status-label">${statusLabels[status] || '⚪ Offline'}</span>
+                            ${bio ? `<div class="bio">${bio}</div>` : ''}
+                            ${interests.length ? `<div class="interests">${interests.map(t => `<span class="tag">#${t}</span>`).join('')}</div>` : ''}
+                            <div class="social-icons">
+                                ${instagram ? `<a href="https://instagram.com/${instagram.replace('@','')}" target="_blank"><i class="fab fa-instagram"></i></a>` : ''}
+                                ${twitter ? `<a href="https://twitter.com/${twitter.replace('@','')}" target="_blank"><i class="fab fa-twitter"></i></a>` : ''}
+                                ${tiktok ? `<a href="https://tiktok.com/@${tiktok.replace('@','')}" target="_blank"><i class="fab fa-tiktok"></i></a>` : ''}
+                                ${facebook ? `<a href="${facebook}" target="_blank"><i class="fab fa-facebook"></i></a>` : ''}
                             </div>
                         </div>
                     `;
