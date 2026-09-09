@@ -1,0 +1,2316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TIMAWA - Friend Hub</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #ffffff;
+            color: #1a1a2e;
+            line-height: 1.6;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(16, 137, 211, 0.08);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+        }
+
+        .navbar .logo {
+            font-size: 26px;
+            font-weight: 900;
+            color: rgb(16, 137, 211);
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .navbar .logo span {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .navbar .nav-links a:hover {
+            color: rgb(16, 137, 211);
+            background: rgba(16, 137, 211, 0.06);
+        }
+
+        .navbar .nav-links .login-btn {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white !important;
+            padding: 8px 22px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.25);
+        }
+
+        .navbar .nav-links .login-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.35);
+            background: rgba(16, 137, 211, 0.06) !important;
+        }
+
+        .navbar .mobile-toggle {
+            display: none;
+            font-size: 24px;
+            color: rgb(16, 137, 211);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 100px 40px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .hero-content h1 {
+            font-size: 52px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+
+        .hero-content h1 .highlight {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            color: #666;
+            max-width: 500px;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+
+        .hero-content .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 137, 211, 0.3);
+        }
+
+        .hero-content .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 30px rgba(16, 137, 211, 0.4);
+        }
+
+        .hero-image .image-placeholder {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            color: rgb(16, 137, 211);
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.15);
+        }
+
+        .hero-image .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 30px;
+        }
+
+        /* ===== HIGHLIGHTS CAROUSEL ===== */
+        .highlights-carousel-section {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .highlights-carousel-section .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .highlights-carousel-section .section-header h2 {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .highlights-carousel-section .section-header h2 .highlight {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .highlights-carousel-section .section-header p {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .highlights-carousel-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 50px;
+        }
+
+        .highlights-carousel-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            gap: 0;
+            will-change: transform;
+        }
+
+        .highlights-carousel-slide {
+            min-width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 10px 5px;
+        }
+
+        .highlights-carousel-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6));
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .highlights-carousel-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(to left, transparent, rgba(255,255,255,0.6));
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .highlights-carousel-item {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .highlights-carousel-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08);
+            border-color: rgba(16, 137, 211, 0.2);
+        }
+
+        .highlights-carousel-item .image-container {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .highlights-carousel-item .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .highlights-carousel-item .image-container .expiry-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .highlights-carousel-item .image-container .expiry-badge i {
+            margin-right: 4px;
+        }
+
+        .highlights-carousel-item .image-container .image-count {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 10px;
+        }
+
+        .highlights-carousel-item .item-body {
+            padding: 16px 18px 18px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .highlights-carousel-item .item-body .caption {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .highlights-carousel-item .item-body .meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: auto;
+        }
+
+        .highlights-carousel-item .item-body .meta .author {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .highlights-carousel-item .item-body .meta .author .avatar-small {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .highlights-carousel-item .item-body .meta .expiry-time.urgent {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .highlights-carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgb(16, 137, 211);
+            color: rgb(16, 137, 211);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            z-index: 10;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .highlights-carousel-btn:hover {
+            background: rgb(16, 137, 211);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35);
+        }
+
+        .highlights-carousel-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .highlights-carousel-btn.prev {
+            left: 5px;
+        }
+
+        .highlights-carousel-btn.next {
+            right: 5px;
+        }
+
+        .highlights-carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .highlights-carousel-dots .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d1d5db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .highlights-carousel-dots .dot.active {
+            background: rgb(16, 137, 211);
+            width: 30px;
+            border-radius: 10px;
+        }
+
+        .highlights-carousel-dots .dot:hover {
+            background: rgb(16, 137, 211);
+        }
+
+        /* ===== CAROUSEL SECTION (Coffee, Places, Activities) ===== */
+        .carousel-section {
+            padding: 60px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .carousel-section .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .carousel-section .section-header h2 {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .carousel-section .section-header h2 .highlight {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .carousel-section .section-header p {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 50px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            gap: 0;
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 10px 5px;
+        }
+
+        .carousel-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6));
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .carousel-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60px;
+            height: 100%;
+            background: linear-gradient(to left, transparent, rgba(255,255,255,0.6));
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .carousel-item {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .carousel-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08);
+            border-color: rgba(16, 137, 211, 0.2);
+        }
+
+        .carousel-item .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: rgb(16, 137, 211);
+            flex-shrink: 0;
+        }
+
+        .carousel-item .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .carousel-item .item-body {
+            padding: 18px 20px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .carousel-item .item-body h4 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .carousel-item .item-body .location {
+            font-size: 13px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .carousel-item .item-body .location i {
+            color: rgb(16, 137, 211);
+        }
+
+        .carousel-item .item-body .description {
+            font-size: 13px;
+            color: #666;
+            margin-top: 6px;
+            flex: 1;
+        }
+
+        .carousel-item .item-body .tag {
+            display: inline-block;
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+            align-self: flex-start;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid rgb(16, 137, 211);
+            color: rgb(16, 137, 211);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+            z-index: 10;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-btn:hover {
+            background: rgb(16, 137, 211);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35);
+        }
+
+        .carousel-btn:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .carousel-btn.prev {
+            left: 5px;
+        }
+
+        .carousel-btn.next {
+            right: 5px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .carousel-dots .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #d1d5db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .carousel-dots .dot.active {
+            background: rgb(16, 137, 211);
+            width: 30px;
+            border-radius: 10px;
+        }
+
+        .carousel-dots .dot:hover {
+            background: rgb(16, 137, 211);
+        }
+
+        /* ===== CAROUSEL DIVIDER ===== */
+        .carousel-divider {
+            border: none;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent);
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+
+        /* ===== MEMBERS SECTION - FULL WIDTH RECTANGLES ===== */
+        .members-section {
+            padding: 60px 40px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .members-section .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .members-section .section-header h2 {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .members-section .section-header h2 .highlight {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .members-section .section-header p {
+            color: #888;
+            font-size: 16px;
+        }
+
+        .members-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .member-card-placeholder {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            background: white;
+            border-radius: 20px;
+            padding: 25px 30px;
+            border: 2px solid #f0f4ff;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            width: 100%;
+        }
+
+        .member-card-placeholder:hover {
+            border-color: rgb(16, 137, 211);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        }
+
+        .member-card-placeholder .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            font-weight: 700;
+            overflow: hidden;
+        }
+
+        .member-card-placeholder .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .member-card-placeholder .member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .member-card-placeholder .member-info .name {
+            font-weight: 700;
+            font-size: 20px;
+            color: #1a1a2e;
+        }
+
+        .member-card-placeholder .member-info .location {
+            font-size: 14px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 2px;
+        }
+
+        .member-card-placeholder .member-info .location i {
+            color: rgb(16, 137, 211);
+            font-size: 13px;
+        }
+
+        .member-card-placeholder .member-info .bio {
+            font-size: 14px;
+            color: #666;
+            margin-top: 6px;
+            line-height: 1.6;
+        }
+
+        .member-card-placeholder .member-info .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .member-card-placeholder .member-info .tag {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .member-card-placeholder .status-badge {
+            display: inline-block;
+            padding: 4px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+            margin-left: 10px;
+        }
+
+        .status-badge.online {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-badge.away {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-badge.busy {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-badge.dnd {
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 40px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            border-top: 1px solid #eef2f7;
+            background: white;
+        }
+
+        .footer .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .footer .social-links a {
+            color: #888;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .footer .social-links a:hover {
+            color: rgb(16, 137, 211);
+            transform: scale(1.1);
+        }
+
+        .footer .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer .footer-links a {
+            color: #888;
+            text-decoration: none;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .footer .footer-links a:hover {
+            color: rgb(16, 137, 211);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                padding: 80px 30px 40px;
+            }
+
+            .hero-content p {
+                margin: 0 auto 30px;
+            }
+
+            .hero-image .image-placeholder {
+                max-width: 400px;
+                margin: 0 auto;
+                font-size: 80px;
+            }
+
+            .carousel-section {
+                padding: 40px 20px;
+            }
+
+            .carousel-wrapper {
+                padding: 0 40px;
+            }
+
+            .carousel-slide {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .carousel-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .highlights-carousel-section {
+                padding: 40px 20px;
+            }
+
+            .highlights-carousel-slide {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .highlights-carousel-btn {
+                width: 42px;
+                height: 42px;
+                font-size: 16px;
+            }
+
+            .member-card-placeholder {
+                padding: 20px 25px;
+                gap: 20px;
+            }
+
+            .member-card-placeholder .avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 12px 20px;
+            }
+
+            .navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 20px;
+                border-bottom: 2px solid #f0f4ff;
+                gap: 12px;
+                box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+            }
+
+            .navbar .nav-links.active {
+                display: flex;
+            }
+
+            .navbar .mobile-toggle {
+                display: block;
+            }
+
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .carousel-wrapper {
+                padding: 0 30px;
+            }
+
+            .carousel-slide {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .carousel-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .highlights-carousel-wrapper {
+                padding: 0 30px;
+            }
+
+            .highlights-carousel-slide {
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+            }
+
+            .highlights-carousel-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
+
+            .members-section {
+                padding: 40px 20px;
+            }
+
+            .member-card-placeholder {
+                flex-wrap: wrap;
+                justify-content: center;
+                text-align: center;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .member-card-placeholder .avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 24px;
+            }
+
+            .member-card-placeholder .member-info .location {
+                justify-content: center;
+            }
+
+            .member-card-placeholder .member-info .tags {
+                justify-content: center;
+            }
+
+            .member-card-placeholder .status-badge {
+                margin-left: 0;
+            }
+
+            .footer .footer-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 26px;
+            }
+
+            .hero {
+                padding: 70px 20px 30px;
+            }
+
+            .carousel-wrapper {
+                padding: 0 20px;
+            }
+
+            .carousel-slide {
+                grid-template-columns: 1fr;
+            }
+
+            .carousel-item .image-placeholder {
+                height: 160px;
+            }
+
+            .carousel-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .highlights-carousel-wrapper {
+                padding: 0 20px;
+            }
+
+            .highlights-carousel-slide {
+                grid-template-columns: 1fr;
+            }
+
+            .highlights-carousel-item .image-container {
+                height: 180px;
+            }
+
+            .highlights-carousel-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 12px;
+            }
+
+            .member-card-placeholder {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .member-card-placeholder .avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 20px;
+            }
+
+            .member-card-placeholder .member-info .name {
+                font-size: 16px;
+            }
+
+            .member-card-placeholder .member-info .bio {
+                font-size: 13px;
+            }
+
+            .member-card-placeholder .status-badge {
+                font-size: 11px;
+                padding: 3px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="navbar" id="navbar">
+        <a href="#" class="logo">
+            🇹🇮🇲🇦🇼🇦
+            <span>HUB</span>
+        </a>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#highlights">Highlights</a></li>
+            <li><a href="#coffee-shops">Coffee</a></li>
+            <li><a href="#favorite-places">Places</a></li>
+            <li><a href="#things-to-do">Activities</a></li>
+            <li><a href="#members-section">Members</a></li>
+            <li><a href="login.html" class="login-btn"><i class="fas fa-user"></i> Sign In</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>
+                Welcome to the<br />
+                <span class="highlight">TIMAWA Squad</span>
+            </h1>
+            <p>
+                A place where friends stay connected, share memories, and build a 
+                community that lasts a lifetime.
+            </p>
+            <a href="login.html" class="btn-primary">
+                <i class="fas fa-user-plus"></i> Join the Squad
+            </a>
+        </div>
+        <div class="hero-image">
+            <div class="image-placeholder">
+                👥
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- ===== HIGHLIGHTS CAROUSEL ===== -->
+    <!-- ============================================================ -->
+    <section class="highlights-carousel-section" id="highlights">
+        <div class="section-header">
+            <h2>📸 Squad <span class="highlight">Highlights</span></h2>
+            <p>Recent memories shared by the squad. Expires in 7 days.</p>
+        </div>
+
+        <div class="highlights-carousel-wrapper" id="highlightsCarousel">
+            <button class="highlights-carousel-btn prev" onclick="moveHighlightsCarousel(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="highlights-carousel-btn next" onclick="moveHighlightsCarousel(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="highlights-carousel-track" id="highlightsTrack">
+                <!-- Highlights will be loaded dynamically -->
+            </div>
+
+            <div class="highlights-carousel-dots" id="highlightsDots"></div>
+        </div>
+    </section>
+
+    <hr class="carousel-divider" />
+
+    <!-- ============================================================ -->
+    <!-- ===== COFFEE SHOPS CAROUSEL ===== -->
+    <!-- ============================================================ -->
+    <section class="carousel-section" id="coffee-shops">
+        <div class="section-header">
+            <h2>☕ Favorite <span class="highlight">Coffee Shops</span></h2>
+            <p>Our go-to spots for good coffee and great conversations.</p>
+        </div>
+
+        <div class="carousel-wrapper" id="coffeeCarousel">
+            <button class="carousel-btn prev" onclick="moveCarousel('coffee', -1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn next" onclick="moveCarousel('coffee', 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="carousel-track" id="coffeeTrack">
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Cafe Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                A cozy spot with the best lattes in town.
+                            </div>
+                            <span class="tag">☕ Coffee</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Cafe Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                A hidden gem with the best pastries.
+                            </div>
+                            <span class="tag">☕ Coffee</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Cafe Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Perfect for remote work and chill vibes.
+                            </div>
+                            <span class="tag">☕ Coffee</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Cafe Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Known for their specialty brews.
+                            </div>
+                            <span class="tag">☕ Coffee</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Cafe Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Aesthetic space with great music.
+                            </div>
+                            <span class="tag">☕ Coffee</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Cafe Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Best cold brew in the city.
+                            </div>
+                            <span class="tag">☕ Coffee</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-dots" id="coffeeDots"></div>
+        </div>
+    </section>
+
+    <hr class="carousel-divider" />
+
+    <!-- ============================================================ -->
+    <!-- ===== FAVORITE PLACES CAROUSEL ===== -->
+    <!-- ============================================================ -->
+    <section class="carousel-section" id="favorite-places">
+        <div class="section-header">
+            <h2>📍 Favorite <span class="highlight">Places</span></h2>
+            <p>Our squad's favorite spots to hang out and explore.</p>
+        </div>
+
+        <div class="carousel-wrapper" id="placesCarousel">
+            <button class="carousel-btn prev" onclick="moveCarousel('places', -1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn next" onclick="moveCarousel('places', 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="carousel-track" id="placesTrack">
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Place Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                A beautiful spot we love to visit.
+                            </div>
+                            <span class="tag">📍 Place</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Place Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Great views and even better company.
+                            </div>
+                            <span class="tag">📍 Place</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Place Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                A hidden gem we discovered together.
+                            </div>
+                            <span class="tag">📍 Place</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Place Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Perfect for weekend getaways.
+                            </div>
+                            <span class="tag">📍 Place</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Place Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                The best sunset views.
+                            </div>
+                            <span class="tag">📍 Place</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-map-marked-alt"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Place Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                A place full of memories.
+                            </div>
+                            <span class="tag">📍 Place</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-dots" id="placesDots"></div>
+        </div>
+    </section>
+
+    <hr class="carousel-divider" />
+
+    <!-- ============================================================ -->
+    <!-- ===== THINGS TO DO CAROUSEL ===== -->
+    <!-- ============================================================ -->
+    <section class="carousel-section" id="things-to-do">
+        <div class="section-header">
+            <h2>🎯 Favorite <span class="highlight">Things to Do</span></h2>
+            <p>Activities we love doing together as a squad.</p>
+        </div>
+
+        <div class="carousel-wrapper" id="activitiesCarousel">
+            <button class="carousel-btn prev" onclick="moveCarousel('activities', -1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn next" onclick="moveCarousel('activities', 1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <div class="carousel-track" id="activitiesTrack">
+                <!-- Slide 1 -->
+                <div class="carousel-slide">
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Activity Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                We love doing this together!
+                            </div>
+                            <span class="tag">🎯 Activity</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Activity Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Always a great time with the squad.
+                            </div>
+                            <span class="tag">🎯 Activity</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Activity Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Our go-to activity for weekends.
+                            </div>
+                            <span class="tag">🎯 Activity</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2 -->
+                <div class="carousel-slide">
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Activity Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                We never get tired of this.
+                            </div>
+                            <span class="tag">🎯 Activity</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Activity Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                A squad tradition.
+                            </div>
+                            <span class="tag">🎯 Activity</span>
+                        </div>
+                    </div>
+
+                    <div class="carousel-item">
+                        <div class="image-placeholder">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="item-body">
+                            <h4>Activity Name Here</h4>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                City, Country
+                            </div>
+                            <div class="description">
+                                Perfect for squad bonding.
+                            </div>
+                            <span class="tag">🎯 Activity</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="carousel-dots" id="activitiesDots"></div>
+        </div>
+    </section>
+
+    <hr class="carousel-divider" />
+
+    <!-- ============================================================ -->
+    <!-- ===== MEMBERS SECTION - FULL WIDTH RECTANGLES ===== -->
+    <!-- ============================================================ -->
+    <section class="members-section" id="members-section">
+        <div class="section-header">
+            <h2>👥 Meet the <span class="highlight">Squad</span></h2>
+            <p>18 amazing members who make this community special.</p>
+        </div>
+
+        <div class="members-grid" id="membersGrid">
+            <!-- ===== MEMBER 1 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/angela.jpg" alt="Angela" /> -->
+                    A
+                </div>
+                <div class="member-info">
+                    <div class="name">Angela Reyes</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Alabat, Quezon</div>
+                    <div class="bio">A coffee enthusiast and adventure seeker. Loves photography and exploring new places. The squad's official event planner.</div>
+                    <div class="tags">
+                        <span class="tag">📸 Photography</span>
+                        <span class="tag">☕ Coffee</span>
+                        <span class="tag">✈️ Travel</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 2 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/miguel.jpg" alt="Miguel" /> -->
+                    M
+                </div>
+                <div class="member-info">
+                    <div class="name">Miguel Santos</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Perez, Quezon</div>
+                    <div class="bio">A music producer and gamer. Always has the best playlists for squad hangouts. Can talk about 90s hip-hop for hours.</div>
+                    <div class="tags">
+                        <span class="tag">🎵 Music</span>
+                        <span class="tag">🎮 Gaming</span>
+                        <span class="tag">🎧 DJ</span>
+                    </div>
+                </div>
+                <span class="status-badge away">🟡 Away</span>
+            </div>
+
+            <!-- ===== MEMBER 3 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/sofia.jpg" alt="Sofia" /> -->
+                    S
+                </div>
+                <div class="member-info">
+                    <div class="name">Sofia Cruz</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> School</div>
+                    <div class="bio">A bookworm and aspiring writer. Runs the squad's book club and always has the best recommendations.</div>
+                    <div class="tags">
+                        <span class="tag">📚 Books</span>
+                        <span class="tag">✍️ Writing</span>
+                        <span class="tag">☕ Coffee</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 4 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/james.jpg" alt="James" /> -->
+                    J
+                </div>
+                <div class="member-info">
+                    <div class="name">James Tan</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Alabat, Quezon</div>
+                    <div class="bio">A foodie and culinary explorer. Always knows the best restaurants and hidden food spots.</div>
+                    <div class="tags">
+                        <span class="tag">🍜 Food</span>
+                        <span class="tag">🍕 Pizza</span>
+                        <span class="tag">🌮 Tacos</span>
+                    </div>
+                </div>
+                <span class="status-badge busy">🔴 Busy</span>
+            </div>
+
+            <!-- ===== MEMBER 5 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/paolo.jpg" alt="Paolo" /> -->
+                    P
+                </div>
+                <div class="member-info">
+                    <div class="name">Paolo Rivera</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Perez, Quezon</div>
+                    <div class="bio">A tech enthusiast and coder. Builds cool projects and helps the squad with all things tech.</div>
+                    <div class="tags">
+                        <span class="tag">💻 Tech</span>
+                        <span class="tag">🤖 AI</span>
+                        <span class="tag">🎮 Gaming</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 6 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/lara.jpg" alt="Lara" /> -->
+                    L
+                </div>
+                <div class="member-info">
+                    <div class="name">Lara Dimagiba</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> School</div>
+                    <div class="bio">An artist and illustrator. Creates beautiful artwork and designs for the squad.</div>
+                    <div class="tags">
+                        <span class="tag">🎨 Art</span>
+                        <span class="tag">🖌️ Illustration</span>
+                        <span class="tag">📸 Design</span>
+                    </div>
+                </div>
+                <span class="status-badge away">🟡 Away</span>
+            </div>
+
+            <!-- ===== MEMBER 7 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/kyle.jpg" alt="Kyle" /> -->
+                    K
+                </div>
+                <div class="member-info">
+                    <div class="name">Kyle Medina</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Alabat, Quezon</div>
+                    <div class="bio">A fitness junkie and sports enthusiast. Organizes the squad's weekly basketball games.</div>
+                    <div class="tags">
+                        <span class="tag">🏀 Sports</span>
+                        <span class="tag">💪 Fitness</span>
+                        <span class="tag">🏃 Running</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 8 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/rica.jpg" alt="Rica" /> -->
+                    R
+                </div>
+                <div class="member-info">
+                    <div class="name">Rica Mendoza</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Perez, Quezon</div>
+                    <div class="bio">A fashionista and style icon. Always keeps the squad looking fresh and trendy.</div>
+                    <div class="tags">
+                        <span class="tag">👗 Fashion</span>
+                        <span class="tag">💄 Beauty</span>
+                        <span class="tag">📸 Style</span>
+                    </div>
+                </div>
+                <span class="status-badge dnd">🟣 DND</span>
+            </div>
+
+            <!-- ===== MEMBER 9 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/dennis.jpg" alt="Dennis" /> -->
+                    D
+                </div>
+                <div class="member-info">
+                    <div class="name">Dennis Aquino</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> School</div>
+                    <div class="bio">A film buff and movie critic. Hosts movie nights and always has the best recommendations.</div>
+                    <div class="tags">
+                        <span class="tag">🎬 Movies</span>
+                        <span class="tag">📺 TV Shows</span>
+                        <span class="tag">🍿 Popcorn</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 10 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/carla.jpg" alt="Carla" /> -->
+                    C
+                </div>
+                <div class="member-info">
+                    <div class="name">Carla Bautista</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Alabat, Quezon</div>
+                    <div class="bio">A nature lover and environmental advocate. Plans the squad's outdoor adventures.</div>
+                    <div class="tags">
+                        <span class="tag">🌿 Nature</span>
+                        <span class="tag">🏔️ Hiking</span>
+                        <span class="tag">🌍 Travel</span>
+                    </div>
+                </div>
+                <span class="status-badge away">🟡 Away</span>
+            </div>
+
+            <!-- ===== MEMBER 11 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/victor.jpg" alt="Victor" /> -->
+                    V
+                </div>
+                <div class="member-info">
+                    <div class="name">Victor Ilagan</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Perez, Quezon</div>
+                    <div class="bio">A musician and songwriter. Creates the soundtrack to all squad adventures.</div>
+                    <div class="tags">
+                        <span class="tag">🎸 Guitar</span>
+                        <span class="tag">🎵 Songwriting</span>
+                        <span class="tag">🎹 Piano</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 12 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/anna.jpg" alt="Anna" /> -->
+                    A
+                </div>
+                <div class="member-info">
+                    <div class="name">Anna Flores</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> School</div>
+                    <div class="bio">A psychology major and wellness advocate. Always there to listen and support the squad.</div>
+                    <div class="tags">
+                        <span class="tag">🧠 Psychology</span>
+                        <span class="tag">🧘 Wellness</span>
+                        <span class="tag">💬 Mental Health</span>
+                    </div>
+                </div>
+                <span class="status-badge busy">🔴 Busy</span>
+            </div>
+
+            <!-- ===== MEMBER 13 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/nico.jpg" alt="Nico" /> -->
+                    N
+                </div>
+                <div class="member-info">
+                    <div class="name">Nico Gomez</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Alabat, Quezon</div>
+                    <div class="bio">A car enthusiast and mechanic. Keeps the squad mobile and ready for road trips.</div>
+                    <div class="tags">
+                        <span class="tag">🚗 Cars</span>
+                        <span class="tag">🔧 Mechanics</span>
+                        <span class="tag">🛣️ Road Trips</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 14 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/bianca.jpg" alt="Bianca" /> -->
+                    B
+                </div>
+                <div class="member-info">
+                    <div class="name">Bianca Santos</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Perez, Quezon</div>
+                    <div class="bio">A digital marketer and social media guru. Manages the squad's online presence.</div>
+                    <div class="tags">
+                        <span class="tag">📱 Social Media</span>
+                        <span class="tag">📊 Marketing</span>
+                        <span class="tag">💻 Digital</span>
+                    </div>
+                </div>
+                <span class="status-badge away">🟡 Away</span>
+            </div>
+
+            <!-- ===== MEMBER 15 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/erik.jpg" alt="Erik" /> -->
+                    E
+                </div>
+                <div class="member-info">
+                    <div class="name">Erik Villanueva</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> School</div>
+                    <div class="bio">A history buff and storyteller. Knows the most interesting facts about everything.</div>
+                    <div class="tags">
+                        <span class="tag">📜 History</span>
+                        <span class="tag">📚 Reading</span>
+                        <span class="tag">🗣️ Storytelling</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 16 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/tina.jpg" alt="Tina" /> -->
+                    T
+                </div>
+                <div class="member-info">
+                    <div class="name">Tina Romero</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Alabat, Quezon</div>
+                    <div class="bio">A chef and baking enthusiast. Always brings the best treats to squad gatherings.</div>
+                    <div class="tags">
+                        <span class="tag">🍰 Baking</span>
+                        <span class="tag">👩‍🍳 Cooking</span>
+                        <span class="tag">🍪 Desserts</span>
+                    </div>
+                </div>
+                <span class="status-badge dnd">🟣 DND</span>
+            </div>
+
+            <!-- ===== MEMBER 17 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/ivan.jpg" alt="Ivan" /> -->
+                    I
+                </div>
+                <div class="member-info">
+                    <div class="name">Ivan Dela Cruz</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> Perez, Quezon</div>
+                    <div class="bio">A gamer and esports fan. Organizes the squad's gaming nights and tournaments.</div>
+                    <div class="tags">
+                        <span class="tag">🎮 Esports</span>
+                        <span class="tag">🕹️ Gaming</span>
+                        <span class="tag">🏆 Tournaments</span>
+                    </div>
+                </div>
+                <span class="status-badge online">🟢 Online</span>
+            </div>
+
+            <!-- ===== MEMBER 18 ===== -->
+            <div class="member-card-placeholder">
+                <div class="avatar">
+                    <!-- 📸 Place image here: <img src="assets/gina.jpg" alt="Gina" /> -->
+                    G
+                </div>
+                <div class="member-info">
+                    <div class="name">Gina Marquez</div>
+                    <div class="location"><i class="fas fa-map-marker-alt"></i> School</div>
+                    <div class="bio">A photographer and content creator. Captures all the squad's best moments.</div>
+                    <div class="tags">
+                        <span class="tag">📸 Photography</span>
+                        <span class="tag">🎥 Videography</span>
+                        <span class="tag">✨ Content</span>
+                    </div>
+                </div>
+                <span class="status-badge away">🟡 Away</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="social-links">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+            <a href="#"><i class="fab fa-discord"></i></a>
+        </div>
+        <div class="footer-links">
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <p>Made with ❤️ for the TIMAWA squad &copy; 2024</p>
+    </footer>
+
+    <script>
+        // ===== FIREBASE CONFIG =====
+        const firebaseConfig = {
+            apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
+            authDomain: "timawa2.firebaseapp.com",
+            projectId: "timawa2",
+            storageBucket: "timawa2.firebasestorage.app",
+            messagingSenderId: "1051426551565",
+            appId: "1:1051426551565:web:01d33631309bb9336fe244"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let highlightsData = [];
+        let unsubscribeHighlights = null;
+
+        // ===== CHECK LOGIN STATUS =====
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                const loginBtn = document.querySelector('.login-btn');
+                loginBtn.textContent = ' Dashboard';
+                loginBtn.href = 'dashboard.html';
+            }
+        });
+
+        // ===== HIGHLIGHTS CAROUSEL =====
+        function initHighlightsCarousel() {
+            const track = document.getElementById('highlightsTrack');
+            const dotsContainer = document.getElementById('highlightsDots');
+            let currentIndex = 0;
+            let totalSlides = 0;
+            let interval = null;
+
+            function updateCarousel() {
+                const slides = track.querySelectorAll('.highlights-carousel-slide');
+                if (slides.length === 0) return;
+                
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                const dots = dotsContainer.querySelectorAll('.dot');
+                dots.forEach((dot, i) => {
+                    dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+                });
+            }
+
+            function startAutoplay() {
+                if (interval) clearInterval(interval);
+                const slides = track.querySelectorAll('.highlights-carousel-slide');
+                if (slides.length <= 1) return;
+                
+                interval = setInterval(() => {
+                    const slidesCount = track.querySelectorAll('.highlights-carousel-slide').length;
+                    currentIndex = (currentIndex + 1) % slidesCount;
+                    updateCarousel();
+                }, 5000);
+            }
+
+            function stopAutoplay() {
+                if (interval) {
+                    clearInterval(interval);
+                    interval = null;
+                }
+            }
+
+            // Create dots
+            function createDots(count) {
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < count; i++) {
+                    const dot = document.createElement('button');
+                    dot.className = 'dot' + (i === 0 ? ' active' : '');
+                    dot.onclick = () => {
+                        currentIndex = i;
+                        updateCarousel();
+                        stopAutoplay();
+                        startAutoplay();
+                    };
+                    dotsContainer.appendChild(dot);
+                }
+            }
+
+            // Load highlights from Firestore
+            function loadHighlights() {
+                if (unsubscribeHighlights) {
+                    unsubscribeHighlights();
+                }
+
+                unsubscribeHighlights = db.collection('highlights')
+                    .orderBy('createdAt', 'desc')
+                    .onSnapshot((snapshot) => {
+                        const now = new Date();
+                        const validHighlights = [];
+
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            const expiresAt = data.expiresAt ? new Date(data.expiresAt.toDate()) : new Date();
+                            const timeLeft = expiresAt - now;
+                            
+                            if (timeLeft > 0) {
+                                validHighlights.push({
+                                    id: doc.id,
+                                    ...data
+                                });
+                            } else {
+                                // Auto-delete expired
+                                deleteHighlight(doc.id, data.imageURLs || []);
+                            }
+                        });
+
+                        highlightsData = validHighlights;
+                        renderHighlights();
+                    }, (error) => {
+                        console.error('Error loading highlights:', error);
+                    });
+            }
+
+            async function deleteHighlight(id, imageUrls) {
+                try {
+                    for (const url of imageUrls) {
+                        try {
+                            const publicId = url.split('/').pop().split('.')[0];
+                            await fetch(`https://api.cloudinary.com/v1_1/ooq99nlw/image/destroy`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    public_id: `t-imawa/highlights/${publicId}`
+                                })
+                            });
+                        } catch (e) {
+                            console.warn('Error deleting image from Cloudinary:', e);
+                        }
+                    }
+                    await db.collection('highlights').doc(id).delete();
+                } catch (error) {
+                    console.error('Error deleting highlight:', error);
+                }
+            }
+
+            function renderHighlights() {
+                if (highlightsData.length === 0) {
+                    track.innerHTML = `
+                        <div class="highlights-carousel-slide" style="display:flex;align-items:center;justify-content:center;padding:40px;min-height:300px;">
+                            <div style="text-align:center;color:#888;">
+                                <i class="fas fa-images" style="font-size:48px;color:#cff0ff;display:block;margin-bottom:15px;"></i>
+                                <h3 style="color:#333;font-size:20px;">No highlights yet</h3>
+                                <p>Be the first to share a moment with the squad!</p>
+                            </div>
+                        </div>
+                    `;
+                    createDots(1);
+                    return;
+                }
+
+                // Group highlights into slides of 3
+                const slides = [];
+                for (let i = 0; i < highlightsData.length; i += 3) {
+                    slides.push(highlightsData.slice(i, i + 3));
+                }
+
+                let html = '';
+                slides.forEach(slide => {
+                    html += `<div class="highlights-carousel-slide">`;
+                    slide.forEach(item => {
+                        const imageUrls = item.imageURLs || [];
+                        const mainImage = imageUrls.length > 0 ? imageUrls[0] : '';
+                        const authorName = item.authorName || 'Someone';
+                        const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                        const caption = item.caption || '';
+                        const expiresAt = item.expiresAt ? new Date(item.expiresAt.toDate()) : new Date();
+                        const now = new Date();
+                        const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                        const isUrgent = daysLeft <= 1;
+
+                        html += `
+                            <div class="highlights-carousel-item">
+                                <div class="image-container">
+                                    ${mainImage ? 
+                                        `<img src="${mainImage}" alt="Highlight" />` :
+                                        `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`
+                                    }
+                                    ${imageUrls.length > 1 ? 
+                                        `<span class="image-count">+${imageUrls.length - 1} more</span>` : 
+                                        ''
+                                    }
+                                    <span class="expiry-badge"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
+                                </div>
+                                <div class="item-body">
+                                    ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
+                                    <div class="meta">
+                                        <span class="author">
+                                            <span class="avatar-small">${initials}</span>
+                                            ${authorName}
+                                        </span>
+                                        <span class="expiry-time ${isUrgent ? 'urgent' : ''}">
+                                            <i class="fas fa-clock"></i> ${daysLeft}d left
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                });
+
+                track.innerHTML = html;
+                createDots(slides.length);
+                currentIndex = 0;
+                updateCarousel();
+                startAutoplay();
+            }
+
+            // Carousel controls
+            window.moveHighlightsCarousel = function(direction) {
+                const slides = track.querySelectorAll('.highlights-carousel-slide');
+                if (slides.length === 0) return;
+                stopAutoplay();
+                currentIndex = (currentIndex + direction + slides.length) % slides.length;
+                updateCarousel();
+                startAutoplay();
+            };
+
+            // Pause on hover
+            const wrapper = document.getElementById('highlightsCarousel');
+            wrapper.addEventListener('mouseenter', stopAutoplay);
+            wrapper.addEventListener('mouseleave', startAutoplay);
+
+            loadHighlights();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ===== CAROUSEL FUNCTIONALITY =====
+        const carousels = {};
+
+        function initCarousel(id, trackId, dotsId) {
+            const track = document.getElementById(trackId);
+            const slides = track.querySelectorAll('.carousel-slide');
+            const dotsContainer = document.getElementById(dotsId);
+            let currentIndex = 0;
+
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dot.onclick = () => goToSlide(id, i);
+                dotsContainer.appendChild(dot);
+            });
+
+            carousels[id] = {
+                track: track,
+                slides: slides,
+                dots: dotsContainer.querySelectorAll('.dot'),
+                currentIndex: 0,
+                totalSlides: slides.length,
+                interval: null
+            };
+
+            updateCarousel(id);
+            startAutoplay(id);
+        }
+
+        function startAutoplay(id) {
+            const carousel = carousels[id];
+            if (!carousel) return;
+
+            if (carousel.interval) {
+                clearInterval(carousel.interval);
+            }
+
+            carousel.interval = setInterval(() => {
+                moveCarousel(id, 1);
+            }, 4000);
+        }
+
+        function stopAutoplay(id) {
+            const carousel = carousels[id];
+            if (carousel && carousel.interval) {
+                clearInterval(carousel.interval);
+                carousel.interval = null;
+            }
+        }
+
+        function updateCarousel(id) {
+            const carousel = carousels[id];
+            if (!carousel) return;
+
+            const { track, dots, currentIndex } = carousel;
+            track.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+            dots.forEach((dot, i) => {
+                dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+            });
+        }
+
+        function moveCarousel(id, direction) {
+            const carousel = carousels[id];
+            if (!carousel) return;
+
+            let newIndex = carousel.currentIndex + direction;
+            if (newIndex < 0) newIndex = carousel.totalSlides - 1;
+            if (newIndex >= carousel.totalSlides) newIndex = 0;
+
+            carousel.currentIndex = newIndex;
+            updateCarousel(id);
+            resetAutoplay(id);
+        }
+
+        function resetAutoplay(id) {
+            stopAutoplay(id);
+            startAutoplay(id);
+        }
+
+        function goToSlide(id, index) {
+            const carousel = carousels[id];
+            if (!carousel) return;
+
+            carousel.currentIndex = index;
+            updateCarousel(id);
+            resetAutoplay(id);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initHighlightsCarousel();
+            initCarousel('coffee', 'coffeeTrack', 'coffeeDots');
+            initCarousel('places', 'placesTrack', 'placesDots');
+            initCarousel('activities', 'activitiesTrack', 'activitiesDots');
+
+            document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
+                wrapper.addEventListener('mouseenter', function() {
+                    const id = this.id.replace('Carousel', '').toLowerCase();
+                    stopAutoplay(id);
+                });
+                wrapper.addEventListener('mouseleave', function() {
+                    const id = this.id.replace('Carousel', '').toLowerCase();
+                    startAutoplay(id);
+                });
+            });
+        });
+
+        // ===== MOBILE MENU =====
+        function toggleMobileMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // ===== SMOOTH SCROLL =====
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ===== NAVBAR SCROLL EFFECT =====
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.style.boxShadow = '0 2px 30px rgba(0,0,0,0.08)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.04)';
+            }
+        });
+    </script>
+</body>
+</html>

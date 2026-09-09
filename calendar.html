@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TIMAWA - Calendar</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            min-height: 100vh;
+            background: #f8faff;
+            color: #1a1a2e;
+            line-height: 1.6;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 14px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(16, 137, 211, 0.08);
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+        }
+
+        .navbar .logo {
+            font-size: 26px;
+            font-weight: 900;
+            color: rgb(16, 137, 211);
+            letter-spacing: 2px;
+            text-decoration: none;
+        }
+
+        .navbar .logo span {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            padding: 2px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            color: white;
+            margin-left: 8px;
+        }
+
+        .navbar .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .navbar .nav-links a {
+            text-decoration: none;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .navbar .nav-links a:hover {
+            color: rgb(16, 137, 211);
+            background: rgba(16, 137, 211, 0.06);
+        }
+
+        .navbar .nav-links a.active {
+            color: rgb(16, 137, 211);
+            background: rgba(16, 137, 211, 0.08);
+        }
+
+        .navbar .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            padding: 4px 14px 4px 4px;
+            border-radius: 50px;
+            box-shadow: #cff0ff 0px 4px 10px -4px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .navbar .user-profile:hover {
+            border-color: rgb(16, 137, 211);
+        }
+
+        .navbar .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .navbar .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .navbar .user-name {
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .navbar .logout-btn {
+            background: white;
+            border: 2px solid #fee2e2;
+            color: #ef4444;
+            padding: 6px 14px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: #cff0ff 0px 4px 8px -4px;
+        }
+
+        .navbar .logout-btn:hover {
+            background: #fee2e2;
+            transform: scale(1.03);
+        }
+
+        .navbar .mobile-toggle {
+            display: none;
+            font-size: 24px;
+            color: rgb(16, 137, 211);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 80px auto 40px;
+            padding: 0 40px;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 24px;
+            padding: 40px 50px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            box-shadow: 0 4px 30px rgba(16, 137, 211, 0.1);
+        }
+
+        .hero-banner .content h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+
+        .hero-banner .content h1 .highlight {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-banner .content p {
+            color: #555;
+            font-size: 15px;
+        }
+
+        .hero-banner .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.35);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: rgb(16, 137, 211);
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #e0e7ff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgb(16, 137, 211);
+            background: #f8faff;
+            transform: scale(1.03);
+        }
+
+        .btn-danger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: 2px solid #fecaca;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
+            transform: scale(1.03);
+        }
+
+        .calendar-wrapper {
+            background: white;
+            border-radius: 24px;
+            padding: 30px;
+            border: 1px solid #eef2f7;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+
+        .calendar-wrapper .fc {
+            max-width: 100%;
+        }
+
+        .calendar-wrapper .fc-toolbar-title {
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            color: #1a1a2e !important;
+        }
+
+        .calendar-wrapper .fc-button-primary {
+            background: rgb(16, 137, 211) !important;
+            border-color: rgb(16, 137, 211) !important;
+        }
+
+        .calendar-wrapper .fc-button-primary:hover {
+            background: #0d6b9e !important;
+            border-color: #0d6b9e !important;
+        }
+
+        .calendar-wrapper .fc-day-today {
+            background: rgba(16, 137, 211, 0.05) !important;
+        }
+
+        .calendar-wrapper .fc-daygrid-day-number {
+            color: #1a1a2e;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .calendar-wrapper .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
+            background: rgb(16, 137, 211);
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 4px;
+        }
+
+        .calendar-wrapper .fc-event {
+            border-radius: 8px !important;
+            border: none !important;
+            padding: 2px 8px !important;
+            font-size: 12px !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-wrapper .fc-event:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        .calendar-wrapper .fc-event-title {
+            font-weight: 600 !important;
+        }
+
+        .fc-event.birthday-event {
+            background: linear-gradient(135deg, #f093fb, #f5576c) !important;
+            border-color: #f5576c !important;
+        }
+
+        .fc-event.birthday-event .fc-event-title {
+            font-weight: 700 !important;
+        }
+
+        .fc-event.birthday-event .fc-event-title:before {
+            content: '🎂 ';
+        }
+
+        .birthday-section {
+            background: white;
+            border-radius: 24px;
+            padding: 25px 30px;
+            margin-top: 30px;
+            border: 1px solid #eef2f7;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+
+        .birthday-section .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .birthday-section .section-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .birthday-section .section-header h3 i {
+            color: #f5576c;
+        }
+
+        .birthday-section .section-header .count {
+            font-size: 13px;
+            color: #888;
+            font-weight: 400;
+        }
+
+        .birthday-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .birthday-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #f8faff;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .birthday-item:hover {
+            border-color: #f5576c;
+            background: #fef3f7;
+        }
+
+        .birthday-item .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .birthday-item .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .birthday-item .info .name {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .birthday-item .info .date {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .birthday-item .badge {
+            margin-left: auto;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .badge.today { background: #fef3c7; color: #d97706; }
+        .badge.upcoming { background: #dcfce7; color: #16a34a; }
+        .badge.past { background: #f3f4f6; color: #9ca3af; }
+
+        .no-birthdays {
+            text-align: center;
+            color: #888;
+            padding: 20px 0;
+        }
+
+        .no-birthdays i {
+            font-size: 32px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 520px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .modal-content h2 {
+            color: rgb(16, 137, 211);
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-content .input-group {
+            margin-bottom: 16px;
+        }
+
+        .modal-content .input-group label {
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .modal-content .input-group input,
+        .modal-content .input-group textarea,
+        .modal-content .input-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 2px solid #e0e7ff;
+            background: #f8faff;
+            color: #333;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .modal-content .input-group input:focus,
+        .modal-content .input-group textarea:focus,
+        .modal-content .input-group select:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+
+        .modal-content .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .modal-actions .btn-primary {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.25);
+        }
+
+        .modal-actions .btn-primary:hover {
+            transform: scale(1.02);
+        }
+
+        .modal-actions .btn-secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .modal-actions .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .modal-actions .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .modal-actions .btn-danger:hover {
+            background: #fecaca;
+            transform: scale(1.02);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .date-popup .modal-content {
+            max-width: 450px;
+        }
+
+        .date-popup .event-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .date-popup .event-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #f8faff;
+            border-left: 4px solid rgb(16, 137, 211);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .date-popup .event-list-item:hover {
+            background: #eef6ff;
+            transform: translateX(4px);
+        }
+
+        .date-popup .event-list-item .event-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .date-popup .event-list-item .event-info {
+            flex: 1;
+        }
+
+        .date-popup .event-list-item .event-info .event-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .date-popup .event-list-item .event-info .event-time {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .date-popup .event-list-item .event-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 50px;
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+        }
+
+        .date-popup .no-events-date {
+            text-align: center;
+            color: #888;
+            padding: 20px 0;
+        }
+
+        .date-popup .no-events-date i {
+            font-size: 32px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 20px; }
+            .navbar .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 20px;
+                border-bottom: 2px solid #f0f4ff;
+                gap: 12px;
+                box-shadow: 0 20px 30px rgba(0,0,0,0.05);
+            }
+            .navbar .nav-links.active { display: flex; }
+            .navbar .mobile-toggle { display: block; }
+            .main-content { padding: 0 20px; margin-top: 70px; }
+            .hero-banner {
+                padding: 25px 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-banner .content h1 { font-size: 22px; }
+            .hero-banner .actions { justify-content: center; width: 100%; }
+            .calendar-wrapper { padding: 15px; }
+            .birthday-section { padding: 20px; }
+            .birthday-item { flex-wrap: wrap; gap: 10px; }
+            .birthday-item .badge { margin-left: 0; }
+            .modal-content { padding: 25px; }
+            .modal-actions { flex-direction: column; }
+        }
+
+        @media (max-width: 480px) {
+            .hero-banner .content h1 { font-size: 20px; }
+            .hero-banner .actions { flex-direction: column; }
+            .hero-banner .actions button { width: 100%; justify-content: center; }
+            .birthday-item .info .name { font-size: 14px; }
+            .birthday-item .info .date { font-size: 12px; }
+            .birthday-section .section-header { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .date-popup .modal-content { padding: 20px; }
+            .date-popup .event-list-item { padding: 10px 12px; flex-wrap: wrap; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar" id="navbar">
+        <a href="#" class="logo">🇹🇮🇲🇦🇼🇦 <span>HUB</span></a>
+        <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        <ul class="nav-links" id="navLinks">
+            <li><a href="index.html"><i class="fas fa-home"></i></a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="calendar.html" class="active"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
+            <li>
+                <a href="profile.html" class="user-profile" id="userProfileLink">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <span class="user-name" id="userName">Loading...</span>
+                </a>
+            </li>
+            <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></li>
+        </ul>
+    </nav>
+
+    <div class="main-content">
+
+        <div class="hero-banner">
+            <div class="content">
+                <h1>📅 Squad <span class="highlight">Calendar</span></h1>
+                <p>Plan events, track Gala nights, and never miss a squad gathering or birthday!</p>
+            </div>
+            <div class="actions">
+                <button class="btn-primary" onclick="showAddEvent()"><i class="fas fa-plus"></i> New Event</button>
+                <button class="btn-secondary" onclick="refreshCalendar()"><i class="fas fa-sync"></i> Refresh</button>
+            </div>
+        </div>
+
+        <div class="calendar-wrapper">
+            <div id="calendar"></div>
+        </div>
+
+        <div class="birthday-section" id="birthdaySection">
+            <div class="section-header">
+                <h3><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</h3>
+                <span class="count" id="birthdayCount">0</span>
+            </div>
+            <div class="birthday-list" id="birthdayList">
+                <div class="no-birthdays">
+                    <i class="fas fa-birthday-cake"></i>
+                    <p>No birthdays scheduled. Update your profile to show your birthday!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <h2><i class="fas fa-calendar-plus"></i> Create Event</h2>
+            <form id="eventForm">
+                <div class="input-group">
+                    <label>Event Title *</label>
+                    <input type="text" id="eventTitle" placeholder="e.g., Beach Trip, Gala Night" required />
+                </div>
+                <div class="input-group">
+                    <label>Type</label>
+                    <select id="eventType">
+                        <option value="Gala">🎭 Gala</option>
+                        <option value="Trip">✈️ Trip</option>
+                        <option value="Party">🎉 Party</option>
+                        <option value="Meeting">🤝 Meeting</option>
+                        <option value="Other">📌 Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Date & Time *</label>
+                    <input type="datetime-local" id="eventDateTime" required />
+                </div>
+                <div class="input-group">
+                    <label>Location</label>
+                    <select id="eventLocationSelect">
+                        <option value="">Select a location</option>
+                        <option value="Alabat, Quezon">📍 Alabat, Quezon</option>
+                        <option value="Perez, Quezon">📍 Perez, Quezon</option>
+                        <option value="Atimonan, Quezon">📍 Atimonan, Quezon</option>
+                        <option value="Lucena, Quezon">📍 Lucena, Quezon</option>
+                        <option value="Lucban, Quezon">📍 Lucban, Quezon</option>
+                        <option value="San Pedro, Laguna">📍 San Pedro, Laguna</option>
+                        <option value="Santa Cruz, Laguna">📍 Santa Cruz, Laguna</option>
+                        <option value="custom">✏️ Others (Customize)</option>
+                    </select>
+                    <div id="customLocationInput" style="display: none; margin-top: 8px;">
+                        <input type="text" id="customEventLocation" placeholder="Enter custom location..." />
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Description</label>
+                    <textarea id="eventDescription" placeholder="What's this event about?"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary" id="submitEventBtn"><i class="fas fa-save"></i> Create Event</button>
+                    <button type="button" class="btn-secondary" onclick="closeEventModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="eventDetailModal" class="modal">
+        <div class="modal-content">
+            <h2 id="detailType"><i class="fas fa-calendar-alt"></i> Event Details</h2>
+            <div style="margin-bottom: 15px;">
+                <div style="font-size: 22px; font-weight: 700; color: #1a1a2e;" id="detailTitle">Event Title</div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-calendar-day" style="color: rgb(16, 137, 211); width: 20px;"></i>
+                    <span id="detailDate">Date</span>
+                </div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-clock" style="color: rgb(16, 137, 211); width: 20px;"></i>
+                    <span id="detailTime">Time</span>
+                </div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-map-marker-alt" style="color: rgb(16, 137, 211); width: 20px;"></i>
+                    <span id="detailLocation">Location</span>
+                </div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;">
+                    <i class="fas fa-user" style="color: rgb(16, 137, 211); width: 20px;"></i>
+                    Created by <span id="detailCreator">Someone</span>
+                </div>
+            </div>
+            <div style="padding: 15px 0; border-top: 1px solid #f0f4ff; border-bottom: 1px solid #f0f4ff; margin: 10px 0;">
+                <div style="font-weight: 600; font-size: 14px; color: #1a1a2e;">Description</div>
+                <div style="color: #666; font-size: 14px; margin-top: 5px;" id="detailDescription">No description provided.</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-danger" onclick="deleteEvent()"><i class="fas fa-trash"></i> Delete Event</button>
+                <button class="btn-secondary" onclick="closeEventDetail()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="datePopupModal" class="modal date-popup">
+        <div class="modal-content">
+            <h2 id="datePopupTitle"><i class="fas fa-calendar-day"></i> Events on <span id="datePopupDate">Today</span></h2>
+            <div class="event-list" id="datePopupEvents">
+                <div class="no-events-date">
+                    <i class="fas fa-calendar-plus"></i>
+                    <p>No events on this day.</p>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-primary" onclick="closeDatePopupAndAddEvent()"><i class="fas fa-plus"></i> Add Event</button>
+                <button class="btn-secondary" onclick="closeDatePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
+            authDomain: "timawa2.firebaseapp.com",
+            projectId: "timawa2",
+            storageBucket: "timawa2.firebasestorage.app",
+            messagingSenderId: "1051426551565",
+            appId: "1:1051426551565:web:01d33631309bb9336fe244"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let calendar = null;
+        let currentEvents = [];
+        let birthdayEvents = [];
+        let currentUser = null;
+        let selectedEventId = null;
+        let selectedDate = null;
+        let unsubscribeEvents = null;
+        let unsubscribeBirthdays = null;
+
+        function convertTimestampToDate(timestamp) {
+            if (!timestamp) return new Date();
+            if (timestamp instanceof Date) return timestamp;
+            if (timestamp.seconds !== undefined) {
+                return new Date(timestamp.seconds * 1000);
+            }
+            if (timestamp.toDate) {
+                return timestamp.toDate();
+            }
+            try {
+                return new Date(timestamp);
+            } catch (e) {
+                return new Date();
+            }
+        }
+
+        document.getElementById('eventLocationSelect').addEventListener('change', function() {
+            const customInput = document.getElementById('customLocationInput');
+            if (this.value === 'custom') {
+                customInput.style.display = 'block';
+            } else {
+                customInput.style.display = 'none';
+            }
+        });
+
+        function getEventLocation() {
+            const select = document.getElementById('eventLocationSelect');
+            const customInput = document.getElementById('customEventLocation');
+            if (select.value === 'custom') {
+                return customInput.value.trim() || 'Custom Location';
+            }
+            return select.value || 'No location';
+        }
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUser = user;
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data();
+                const name = data?.displayName || user.displayName || user.email || 'User';
+                document.getElementById('userName').textContent = name;
+
+                const avatarEl = document.getElementById('userAvatar');
+                if (data?.photoURL) {
+                    avatarEl.innerHTML = `<img src="${data.photoURL}" alt="${name}" />`;
+                } else {
+                    avatarEl.textContent = name.charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+
+            listenToEvents();
+            listenToBirthdays();
+            
+            setTimeout(() => {
+                initCalendar();
+            }, 500);
+        });
+
+        function listenToEvents() {
+            if (unsubscribeEvents) {
+                unsubscribeEvents();
+            }
+
+            unsubscribeEvents = db.collection('events')
+                .orderBy('dateTime', 'asc')
+                .onSnapshot((snapshot) => {
+                    currentEvents = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        currentEvents.push({
+                            id: doc.id,
+                            ...data
+                        });
+                    });
+                    console.log('🔄 Events updated in real-time:', currentEvents.length);
+                    
+                    if (calendar) {
+                        updateCalendarEvents();
+                    }
+                }, (error) => {
+                    console.error('Error listening to events:', error);
+                });
+        }
+
+        function listenToBirthdays() {
+            if (unsubscribeBirthdays) {
+                unsubscribeBirthdays();
+            }
+
+            unsubscribeBirthdays = db.collection('users')
+                .where('birthday', '!=', '')
+                .onSnapshot((snapshot) => {
+                    const now = new Date();
+                    const currentYear = now.getFullYear();
+                    birthdayEvents = [];
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const birthday = data.birthday;
+                        if (!birthday) return;
+
+                        const parts = birthday.split('-');
+                        const month = parseInt(parts[1]) - 1;
+                        const day = parseInt(parts[2]);
+
+                        const birthdayDate = new Date(currentYear, month, day);
+                        
+                        if (birthdayDate < now) {
+                            birthdayDate.setFullYear(currentYear + 1);
+                        }
+
+                        const name = data.displayName || data.email || 'Someone';
+                        const photoURL = data.photoURL || '';
+
+                        birthdayEvents.push({
+                            id: doc.id,
+                            name: name,
+                            photoURL: photoURL,
+                            birthday: birthday,
+                            date: birthdayDate,
+                            displayName: data.displayName || data.email || 'Someone',
+                            location: data.location || ''
+                        });
+                    });
+
+                    birthdayEvents.sort((a, b) => a.date - b.date);
+
+                    if (calendar) {
+                        updateCalendarEvents();
+                    }
+                    renderBirthdayList();
+                }, (error) => {
+                    console.error('Error listening to birthdays:', error);
+                });
+        }
+
+        function renderBirthdayList() {
+            const container = document.getElementById('birthdayList');
+            const countEl = document.getElementById('birthdayCount');
+
+            if (birthdayEvents.length === 0) {
+                container.innerHTML = `
+                    <div class="no-birthdays">
+                        <i class="fas fa-birthday-cake"></i>
+                        <p>No birthdays scheduled. Update your profile to show your birthday!</p>
+                    </div>
+                `;
+                countEl.textContent = '0';
+                return;
+            }
+
+            const now = new Date();
+            const upcoming = birthdayEvents.filter(e => e.date >= now);
+            countEl.textContent = `${upcoming.length}`;
+
+            let html = '';
+            birthdayEvents.forEach(item => {
+                const daysDiff = Math.ceil((item.date - now) / (1000 * 60 * 60 * 24));
+                let badgeClass = 'upcoming';
+                let badgeText = `${daysDiff} days`;
+
+                if (daysDiff === 0) {
+                    badgeClass = 'today';
+                    badgeText = '🎉 Today!';
+                } else if (daysDiff < 0) {
+                    badgeClass = 'past';
+                    badgeText = 'Passed';
+                } else if (daysDiff === 1) {
+                    badgeText = 'Tomorrow!';
+                }
+
+                const initials = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+                html += `
+                    <div class="birthday-item">
+                        <div class="avatar">
+                            ${item.photoURL ? 
+                                `<img src="${item.photoURL}" alt="${item.name}" />` :
+                                initials
+                            }
+                        </div>
+                        <div class="info">
+                            <div class="name">${item.name}</div>
+                            <div class="date">🎂 ${item.birthday} ${item.location ? '· ' + item.location : ''}</div>
+                        </div>
+                        <span class="badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function initCalendar() {
+            const calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                events: [],
+                dateClick: function(info) {
+                    selectedDate = info.date;
+                    showDatePopup(info.date);
+                },
+                eventClick: function(info) {
+                    const event = info.event;
+                    const extendedProps = event.extendedProps;
+                    selectedEventId = event.id;
+                    
+                    if (extendedProps.isBirthday) {
+                        alert(
+                            `🎂 ${event.title}\n` +
+                            `📅 ${event.start ? new Date(event.start).toLocaleDateString() : 'Date'}\n` +
+                            `📍 ${extendedProps.location || 'No location'}\n\n` +
+                            `🎉 Don't forget to wish ${event.title.split("'")[0]} a happy birthday!`
+                        );
+                    } else {
+                        showEventDetail(event);
+                    }
+                },
+                eventDidMount: function(info) {
+                    const tooltip = info.el.querySelector('.fc-event-title');
+                    if (tooltip) {
+                        if (info.event.extendedProps.isBirthday) {
+                            tooltip.title = `🎂 ${info.event.title}`;
+                        } else {
+                            tooltip.title = `${info.event.title}\n${info.event.extendedProps.location || ''}`;
+                        }
+                    }
+                },
+                height: 'auto',
+                aspectRatio: 1.6,
+                contentHeight: 'auto',
+                buttonText: {
+                    today: 'Today',
+                    month: 'Month',
+                    week: 'Week',
+                    list: 'List'
+                }
+            });
+            calendar.render();
+            updateCalendarEvents();
+        }
+
+        function showDatePopup(date) {
+            const formattedDate = date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('datePopupDate').textContent = formattedDate;
+            
+            const selectedDateStr = date.toDateString();
+            
+            const eventsOnDate = currentEvents.filter(event => {
+                if (!event.dateTime) return false;
+                try {
+                    const eventDate = convertTimestampToDate(event.dateTime);
+                    return eventDate.toDateString() === selectedDateStr;
+                } catch (e) {
+                    return false;
+                }
+            });
+
+            console.log('🔍 Selected date:', selectedDateStr);
+            console.log('📅 Events on this date:', eventsOnDate.length);
+
+            const container = document.getElementById('datePopupEvents');
+            
+            if (eventsOnDate.length === 0) {
+                container.innerHTML = `
+                    <div class="no-events-date">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>No events on this day.</p>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                eventsOnDate.forEach(event => {
+                    const eventDate = convertTimestampToDate(event.dateTime);
+                    const time = eventDate.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const color = getEventColor(event.type || 'Other');
+                    html += `
+                        <div class="event-list-item" onclick="viewEventFromPopup('${event.id}')">
+                            <div class="event-color" style="background: ${color};"></div>
+                            <div class="event-info">
+                                <div class="event-title">${event.title || 'Untitled'}</div>
+                                <div class="event-time">🕐 ${time} · ${event.location || 'No location'}</div>
+                            </div>
+                            <span class="event-badge">${event.type || 'Event'}</span>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            document.getElementById('datePopupModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function viewEventFromPopup(eventId) {
+            const event = currentEvents.find(e => e.id === eventId);
+            if (event) {
+                closeDatePopup();
+                const calendarEvent = calendar.getEventById(eventId);
+                if (calendarEvent) {
+                    selectedEventId = eventId;
+                    showEventDetail(calendarEvent);
+                }
+            }
+        }
+
+        function closeDatePopup() {
+            document.getElementById('datePopupModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeDatePopupAndAddEvent() {
+            closeDatePopup();
+            showAddEvent();
+            if (selectedDate) {
+                const year = selectedDate.getFullYear();
+                const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                const day = String(selectedDate.getDate()).padStart(2, '0');
+                const dateStr = `${year}-${month}-${day}`;
+                document.getElementById('eventDateTime').value = `${dateStr}T09:00`;
+            }
+        }
+
+        function showEventDetail(event) {
+            const props = event.extendedProps;
+            
+            document.getElementById('detailTitle').textContent = event.title;
+            document.getElementById('detailType').innerHTML = `<i class="fas fa-${props.type === 'Gala' ? 'crown' : props.type === 'Trip' ? 'plane' : props.type === 'Party' ? 'glass-cheers' : 'calendar-alt'}"></i> ${props.type || 'Event'} Details`;
+            
+            const date = event.start ? new Date(event.start) : new Date();
+            document.getElementById('detailDate').textContent = date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('detailTime').textContent = date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('detailLocation').textContent = props.location || 'No location set';
+            document.getElementById('detailCreator').textContent = props.createdBy || 'Unknown';
+            document.getElementById('detailDescription').textContent = props.description || 'No description provided.';
+            
+            document.getElementById('eventDetailModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeEventDetail() {
+            document.getElementById('eventDetailModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            selectedEventId = null;
+        }
+
+        // ===== DELETE EVENT =====
+        async function deleteEvent() {
+            if (!selectedEventId) {
+                alert('No event selected');
+                return;
+            }
+
+            const confirmDelete = confirm('Are you sure you want to delete this event? This action cannot be undone.');
+            if (!confirmDelete) return;
+
+            try {
+                // Delete from Firestore
+                await db.collection('events').doc(selectedEventId).delete();
+                closeEventDetail();
+                alert('✅ Event deleted successfully!');
+            } catch (error) {
+                console.error('Error deleting event:', error);
+                alert('❌ Error deleting event: ' + error.message);
+            }
+        }
+
+        function updateCalendarEvents() {
+            if (!calendar) return;
+
+            console.log('📅 Updating calendar with events:', currentEvents.length);
+
+            const events = currentEvents.map(event => {
+                const eventDate = convertTimestampToDate(event.dateTime);
+                
+                return {
+                    id: event.id,
+                    title: event.title || 'Untitled Event',
+                    start: eventDate,
+                    allDay: false,
+                    extendedProps: {
+                        type: event.type || 'Other',
+                        location: event.location || '',
+                        description: event.description || '',
+                        createdBy: event.createdBy || 'Unknown',
+                        createdByUid: event.createdByUid || '',
+                        isBirthday: false
+                    },
+                    backgroundColor: getEventColor(event.type),
+                    borderColor: getEventColor(event.type),
+                    textColor: '#ffffff'
+                };
+            });
+
+            const birthdayCalendarEvents = birthdayEvents.map(item => {
+                return {
+                    id: `birthday-${item.id}`,
+                    title: `${item.name}'s Birthday 🎂`,
+                    start: item.date,
+                    allDay: true,
+                    extendedProps: {
+                        isBirthday: true,
+                        location: item.location || '',
+                        userId: item.id
+                    },
+                    backgroundColor: '#f5576c',
+                    borderColor: '#f5576c',
+                    textColor: '#ffffff',
+                    classNames: ['birthday-event']
+                };
+            });
+
+            const allEvents = [...events, ...birthdayCalendarEvents];
+            console.log('📅 Total events to display:', allEvents.length);
+
+            calendar.removeAllEvents();
+            calendar.addEventSource(allEvents);
+            calendar.render();
+            
+            console.log('✅ Calendar updated!');
+        }
+
+        function getEventColor(type) {
+            const colors = {
+                'Gala': '#8b5cf6',
+                'Trip': '#3b82f6',
+                'Party': '#ef4444',
+                'Meeting': '#22c55e',
+                'Other': '#6b7280'
+            };
+            return colors[type] || colors['Other'];
+        }
+
+        function refreshCalendar() {
+            if (unsubscribeEvents) {
+                unsubscribeEvents();
+                listenToEvents();
+            }
+            if (unsubscribeBirthdays) {
+                unsubscribeBirthdays();
+                listenToBirthdays();
+            }
+            updateCalendarEvents();
+            alert('🔄 Calendar refreshed!');
+        }
+
+        function showAddEvent() {
+            const modal = document.getElementById('eventModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            const now = new Date();
+            now.setHours(now.getHours() + 1);
+            const formatted = now.toISOString().slice(0, 16);
+            document.getElementById('eventDateTime').value = formatted;
+        }
+
+        function closeEventModal() {
+            const modal = document.getElementById('eventModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.getElementById('eventForm').reset();
+            document.getElementById('customLocationInput').style.display = 'none';
+        }
+
+        document.getElementById('eventForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitEventBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner"></span> Creating...';
+
+            const title = document.getElementById('eventTitle').value.trim();
+            const type = document.getElementById('eventType').value;
+            const dateTime = document.getElementById('eventDateTime').value;
+            const location = getEventLocation();
+            const description = document.getElementById('eventDescription').value.trim();
+
+            if (!title || !dateTime) {
+                alert('Please fill in the required fields');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Event';
+                return;
+            }
+
+            try {
+                const user = auth.currentUser;
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                const authorName = userData?.displayName || user.displayName || user.email || 'Someone';
+
+                await db.collection('events').add({
+                    title: title,
+                    type: type,
+                    dateTime: new Date(dateTime),
+                    location: location,
+                    description: description,
+                    createdBy: authorName,
+                    createdByUid: user.uid,
+                    rsvps: {},
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                closeEventModal();
+                alert('✅ Event created successfully!');
+
+            } catch (error) {
+                console.error('Error creating event:', error);
+                alert('❌ Error creating event: ' + error.message);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Event';
+            }
+        });
+
+        function toggleMobileMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        async function logout() {
+            try {
+                await auth.signOut();
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert('Error signing out: ' + error.message);
+            }
+        }
+
+        window.onclick = function(event) {
+            const eventModal = document.getElementById('eventModal');
+            const detailModal = document.getElementById('eventDetailModal');
+            const datePopup = document.getElementById('datePopupModal');
+            
+            if (event.target === eventModal) {
+                closeEventModal();
+            }
+            if (event.target === detailModal) {
+                closeEventDetail();
+            }
+            if (event.target === datePopup) {
+                closeDatePopup();
+            }
+        }
+
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.style.boxShadow = '0 2px 30px rgba(0,0,0,0.08)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.04)';
+            }
+        });
+    </script>
+</body>
+</html>
