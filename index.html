@@ -13,12 +13,12 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
+    <!-- JSZip for ZIP downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
@@ -28,1063 +28,666 @@
         }
 
         .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            position: fixed; top: 0; left: 0; right: 0;
             z-index: 1000;
             padding: 14px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(16, 137, 211, 0.08);
             transition: all 0.3s ease;
             box-shadow: 0 2px 20px rgba(0,0,0,0.04);
         }
+        .navbar .logo { font-size: 26px; font-weight: 900; color: rgb(16, 137, 211); letter-spacing: 2px; text-decoration: none; flex-shrink: 0; }
+        .navbar .logo span { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); padding: 2px 10px; border-radius: 8px; font-size: 10px; color: white; margin-left: 8px; }
+        .navbar .nav-links { display: flex; align-items: center; gap: 12px; list-style: none; flex-wrap: wrap; }
+        .navbar .nav-links a { text-decoration: none; color: #555; font-weight: 500; font-size: 13px; transition: all 0.3s ease; padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
+        .navbar .nav-links a:hover { color: rgb(16, 137, 211); background: rgba(16, 137, 211, 0.06); }
+        .navbar .mobile-toggle { display: none; font-size: 24px; color: rgb(16, 137, 211); cursor: pointer; background: none; border: none; }
 
-        .navbar .logo {
-            font-size: 26px;
-            font-weight: 900;
-            color: rgb(16, 137, 211);
-            letter-spacing: 2px;
-            text-decoration: none;
-            flex-shrink: 0;
-        }
+        .auth-links-wrapper { display: flex; align-items: center; gap: 12px; list-style: none; flex-wrap: wrap; }
+        .auth-links-wrapper > a, .auth-links-wrapper > button { text-decoration: none; color: #555; font-weight: 500; font-size: 13px; transition: all 0.3s ease; padding: 6px 12px; border-radius: 8px; white-space: nowrap; background: none; border: none; font-family: inherit; cursor: pointer; }
+        .auth-links-wrapper > a:hover { color: rgb(16, 137, 211); background: rgba(16, 137, 211, 0.06); }
+        .auth-links-wrapper > a.profile-link { color: rgb(16, 137, 211); font-weight: 600; }
+        .auth-links-wrapper > a.login-btn { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); color: white !important; padding: 8px 22px; border-radius: 50px; font-weight: 600; box-shadow: 0 4px 15px rgba(16, 137, 211, 0.25); }
+        .auth-links-wrapper > a.login-btn:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(16, 137, 211, 0.35); }
+        .auth-links-wrapper > button.logout-link { color: #ef4444; font-weight: 600; }
+        .auth-links-wrapper > button.logout-link:hover { background: #fee2e2; }
 
-        .navbar .logo span {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            padding: 2px 10px;
-            border-radius: 8px;
-            font-size: 10px;
+        .hero { padding: 100px 40px 60px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: 80vh; }
+        .hero-content h1 { font-size: 52px; font-weight: 800; line-height: 1.1; margin-bottom: 15px; }
+        .hero-content h1 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-content p { font-size: 18px; color: #666; max-width: 500px; margin-bottom: 30px; line-height: 1.8; }
+        .hero-content .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); color: white; padding: 14px 32px; border-radius: 50px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(16, 137, 211, 0.3); }
+        .hero-content .btn-primary:hover { transform: scale(1.05); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.4); }
+        .hero-image .image-placeholder { width: 100%; max-width: 500px; aspect-ratio: 1; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 120px; color: rgb(16, 137, 211); box-shadow: 0 20px 60px rgba(16, 137, 211, 0.15); }
+        .hero-image .image-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 30px; }
+
+        /* ===== HIGHLIGHTS CAROUSEL ===== */
+        .highlights-carousel-section { padding: 60px 40px; max-width: 1200px; margin: 0 auto; }
+        .highlights-carousel-section .section-header { text-align: center; margin-bottom: 30px; }
+        .highlights-carousel-section .section-header h2 { font-size: 32px; font-weight: 800; }
+        .highlights-carousel-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .highlights-carousel-section .section-header p { color: #888; font-size: 16px; }
+
+        .highlights-carousel-wrapper { position: relative; overflow: hidden; border-radius: 20px; max-width: 1100px; margin: 0 auto; padding: 0 50px; }
+        .highlights-carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); gap: 0; will-change: transform; }
+        .highlights-carousel-slide { min-width: 100%; display: grid; gap: 25px; padding: 10px 5px; grid-template-columns: repeat(3, 1fr); }
+        .highlights-carousel-slide.single-item { grid-template-columns: 1fr; }
+        .highlights-carousel-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
+        .highlights-carousel-wrapper::before { content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to left, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
+
+        .highlights-carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; cursor: pointer; position: relative; }
+        .highlights-carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
+        .highlights-carousel-item .image-container { width: 100%; height: 220px; overflow: hidden; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); position: relative; flex-shrink: 0; }
+        .highlights-carousel-item .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .highlights-carousel-item .image-container .expiry-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
+        .highlights-carousel-item .image-container .expiry-badge i { margin-right: 4px; }
+        .highlights-carousel-item .image-container .image-count { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
+        .highlights-carousel-item .image-container .hl-actions { position: absolute; bottom: 10px; left: 10px; right: 10px; display: flex; gap: 6px; z-index: 3; opacity: 0; transition: opacity 0.25s ease; }
+        .highlights-carousel-item:hover .image-container .hl-actions { opacity: 1; }
+        .highlights-carousel-item .image-container .hl-actions button { background: rgba(0,0,0,0.75); color: white; border: none; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
+        .highlights-carousel-item .image-container .hl-actions button:hover { transform: scale(1.05); }
+        .highlights-carousel-item .image-container .hl-actions .hl-view { background: rgba(16, 137, 211, 0.95); }
+        .highlights-carousel-item .image-container .hl-actions .hl-download { background: rgba(0,0,0,0.75); }
+        .highlights-carousel-item .image-container .hl-actions .hl-download:hover { background: rgb(16, 137, 211); }
+
+        .highlights-carousel-item .item-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+        .highlights-carousel-item .item-body .caption { font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 8px; }
+        .highlights-carousel-item .item-body .meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #888; margin-top: auto; }
+        .highlights-carousel-item .item-body .meta .author { display: flex; align-items: center; gap: 6px; }
+        .highlights-carousel-item .item-body .meta .author .avatar-small { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; overflow: hidden; }
+        .highlights-carousel-item .item-body .meta .author .avatar-small img { width: 100%; height: 100%; object-fit: cover; }
+        .highlights-carousel-item .item-body .meta .expiry-time.urgent { color: #ef4444; font-weight: 600; }
+
+        .highlights-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); border: 2px solid rgb(16, 137, 211); color: rgb(16, 137, 211); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .highlights-carousel-btn:hover { background: rgb(16, 137, 211); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35); }
+        .highlights-carousel-btn:active { transform: translateY(-50%) scale(0.95); }
+        .highlights-carousel-btn.prev { left: 5px; }
+        .highlights-carousel-btn.next { right: 5px; }
+
+        .highlights-carousel-dots, .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .highlights-carousel-dots .dot, .carousel-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; cursor: pointer; transition: all 0.3s ease; border: none; }
+        .highlights-carousel-dots .dot.active, .carousel-dots .dot.active { background: rgb(16, 137, 211); width: 30px; border-radius: 10px; }
+        .highlights-carousel-dots .dot:hover, .carousel-dots .dot:hover { background: rgb(16, 137, 211); }
+
+        /* ===== OTHER CAROUSELS ===== */
+        .carousel-section { padding: 60px 40px; max-width: 1200px; margin: 0 auto; }
+        .carousel-section .section-header { text-align: center; margin-bottom: 30px; }
+        .carousel-section .section-header h2 { font-size: 32px; font-weight: 800; }
+        .carousel-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .carousel-section .section-header p { color: #888; font-size: 16px; }
+
+        .carousel-wrapper { position: relative; overflow: hidden; border-radius: 20px; max-width: 1100px; margin: 0 auto; padding: 0 50px; }
+        .carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); gap: 0; will-change: transform; }
+        .carousel-slide { min-width: 100%; display: grid; gap: 25px; padding: 10px 5px; grid-template-columns: repeat(3, 1fr); }
+        .carousel-slide.single-item { grid-template-columns: 1fr; }
+        .carousel-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
+        .carousel-wrapper::before { content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to left, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
+
+        .carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; position: relative; cursor: pointer; }
+        .carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
+        .carousel-item .image-placeholder { width: 100%; height: 200px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; color: rgb(16, 137, 211); flex-shrink: 0; overflow: hidden; position: relative; }
+        .carousel-item .image-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .carousel-item .item-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.25s ease; z-index: 3; }
+        .carousel-item:hover .item-actions { opacity: 1; }
+        .carousel-item .item-actions button { width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .carousel-item .item-actions .item-view { background: rgba(16, 137, 211, 0.95); }
+        .carousel-item .item-actions .item-view:hover { background: rgb(13, 107, 158); transform: scale(1.1); }
+        .carousel-item .item-actions .item-download { background: rgba(0,0,0,0.75); }
+        .carousel-item .item-actions .item-download:hover { background: rgb(16, 137, 211); transform: scale(1.1); }
+        .carousel-item .item-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+        .carousel-item .item-body h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .carousel-item .item-body .location { font-size: 13px; color: #888; display: flex; align-items: center; gap: 5px; }
+        .carousel-item .item-body .location i { color: rgb(16, 137, 211); }
+        .carousel-item .item-body .description { font-size: 13px; color: #666; margin-top: 6px; flex: 1; }
+        .carousel-item .item-body .tag { display: inline-block; background: #e0f2fe; color: rgb(16, 137, 211); padding: 2px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; margin-top: 10px; align-self: flex-start; }
+
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); border: 2px solid rgb(16, 137, 211); color: rgb(16, 137, 211); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .carousel-btn:hover { background: rgb(16, 137, 211); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35); }
+        .carousel-btn:active { transform: translateY(-50%) scale(0.95); }
+        .carousel-btn.prev { left: 5px; }
+        .carousel-btn.next { right: 5px; }
+
+        .carousel-divider { border: none; height: 2px; background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent); margin: 20px auto; max-width: 1200px; }
+
+        /* ===== MEMBERS SECTION ===== */
+        .members-section { padding: 60px 40px 80px; max-width: 1200px; margin: 0 auto; }
+        .members-section .section-header { text-align: center; margin-bottom: 40px; }
+        .members-section .section-header h2 { font-size: 32px; font-weight: 800; }
+        .members-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .members-section .section-header p { color: #888; font-size: 16px; }
+        .members-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .member-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; cursor: pointer; position: relative; }
+        .member-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
+        .member-card .avatar-container { width: 100%; height: 200px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; }
+        .member-card .avatar-container .avatar-text { font-size: 64px; font-weight: 700; color: rgb(16, 137, 211); }
+        .member-card .avatar-container img { width: 100%; height: 100%; object-fit: cover; }
+        .member-card .avatar-container .member-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.25s ease; z-index: 3; }
+        .member-card:hover .avatar-container .member-actions { opacity: 1; }
+        .member-card .avatar-container .member-actions button { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .member-card .avatar-container .member-actions .member-view { background: rgba(16, 137, 211, 0.95); }
+        .member-card .avatar-container .member-actions .member-download { background: rgba(0,0,0,0.75); }
+        .member-card .avatar-container .member-actions .member-download:hover { background: rgb(16, 137, 211); transform: scale(1.1); }
+        .member-card .member-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
+        .member-card .member-body .member-name { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+        .member-card .member-body .member-location { font-size: 13px; color: #888; display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+        .member-card .member-body .member-location i { color: rgb(16, 137, 211); }
+        .member-card .member-body .member-bio { font-size: 14px; color: #666; line-height: 1.5; flex: 1; margin-bottom: 10px; }
+        .member-card .member-body .member-interests { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+        .member-card .member-body .member-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #888; grid-column: 1 / -1; }
+        .empty-state i { font-size: 40px; color: #cff0ff; display: block; margin-bottom: 10px; }
+        .empty-state h3 { color: #333; font-size: 18px; }
+        .empty-state p { color: #999; font-size: 14px; }
+
+        .footer { padding: 40px; text-align: center; color: #888; font-size: 14px; border-top: 1px solid #eef2f7; background: white; }
+        .footer p { color: #888; }
+
+        /* ===== MODALS ===== */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px); z-index: 2000; justify-content: center; align-items: center; padding: 20px; }
+        .modal.active { display: flex; }
+
+        .item-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .item-modal .modal-header { position: relative; width: 100%; height: 340px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; }
+        .item-modal .modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .modal-close { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.55); color: white; border: none; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; z-index: 3; }
+        .modal-close:hover { background: rgba(0,0,0,0.8); transform: rotate(90deg); }
+        .item-modal .modal-body { padding: 28px 32px 32px; }
+        .item-modal .modal-body .modal-title { font-size: 26px; font-weight: 800; color: #1a1a2e; margin-bottom: 8px; }
+        .item-modal .modal-body .modal-location { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; margin-bottom: 16px; }
+        .item-modal .modal-body .modal-location i { color: rgb(16, 137, 211); font-size: 15px; }
+        .item-modal .modal-body .modal-description { font-size: 15px; color: #555; line-height: 1.7; padding: 16px 0; border-top: 1px solid #f0f4ff; border-bottom: 1px solid #f0f4ff; margin-bottom: 18px; white-space: pre-wrap; }
+        .item-modal .modal-body .modal-tag { display: inline-block; background: #e0f2fe; color: rgb(16, 137, 211); padding: 5px 16px; border-radius: 50px; font-size: 12px; font-weight: 600; margin-bottom: 20px; }
+
+        .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .modal-actions button { flex: 1; min-width: 140px; padding: 13px 22px; border-radius: 12px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; }
+        .modal-actions .modal-download { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); color: white; box-shadow: 0 4px 15px rgba(16, 137, 211, 0.25); }
+        .modal-actions .modal-download:hover { transform: scale(1.02); box-shadow: 0 6px 25px rgba(16, 137, 211, 0.4); }
+        .modal-actions .modal-download:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .modal-actions .modal-secondary { background: #f3f4f6; color: #555; }
+        .modal-actions .modal-secondary:hover { background: #e5e7eb; transform: scale(1.02); }
+
+        .member-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .member-modal .member-modal-header { position: relative; width: 100%; height: 280px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; }
+        .member-modal .member-modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .member-modal .member-modal-header .member-modal-initials { font-size: 96px; font-weight: 700; color: rgb(16, 137, 211); }
+        .member-modal .member-modal-body { padding: 26px 30px 30px; }
+        .member-modal .member-modal-body .member-modal-name { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; }
+        .member-modal .member-modal-body .member-modal-location { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; margin-bottom: 18px; }
+        .member-modal .member-modal-body .member-modal-location i { color: rgb(16, 137, 211); font-size: 15px; }
+        .member-modal .member-modal-body .member-modal-section-label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+        .member-modal .member-modal-body .member-modal-bio { font-size: 15px; color: #555; line-height: 1.7; padding-bottom: 16px; border-bottom: 1px solid #f0f4ff; margin-bottom: 16px; white-space: pre-wrap; }
+        .member-modal .member-modal-body .member-modal-interests { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+        .member-modal .member-modal-body .member-modal-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; }
+
+        /* ===== HIGHLIGHT DETAIL MODAL ===== */
+        .highlight-detail-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .highlight-detail-modal .modal-header { position: relative; width: 100%; height: 360px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; }
+        .highlight-detail-modal .modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .highlight-detail-modal .modal-header .hl-multi-badge { position: absolute; bottom: 14px; left: 14px; background: rgba(0,0,0,0.7); color: white; padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .highlight-detail-modal .modal-body { padding: 26px 30px 30px; }
+        .highlight-detail-modal .hl-author-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .highlight-detail-modal .hl-author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; overflow: hidden; flex-shrink: 0; }
+        .highlight-detail-modal .hl-author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .highlight-detail-modal .hl-author-info { display: flex; flex-direction: column; gap: 2px; }
+        .highlight-detail-modal .hl-author-name { font-size: 17px; font-weight: 700; color: #1a1a2e; }
+        .highlight-detail-modal .hl-author-time { font-size: 12px; color: #888; }
+        .highlight-detail-modal .hl-caption { font-size: 15px; color: #444; line-height: 1.7; padding: 16px 0; border-top: 1px solid #f0f4ff; border-bottom: 1px solid #f0f4ff; margin-bottom: 18px; white-space: pre-wrap; }
+        .highlight-detail-modal .hl-stats { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: #888; margin-bottom: 18px; }
+        .highlight-detail-modal .hl-stats .stat { display: flex; align-items: center; gap: 6px; }
+        .highlight-detail-modal .hl-stats .stat i { color: rgb(16, 137, 211); }
+        .highlight-detail-modal .hl-stats .stat.urgent { color: #ef4444; }
+        .highlight-detail-modal .hl-stats .stat.urgent i { color: #ef4444; }
+
+        /* ===== HIGHLIGHT GALLERY MODAL ===== */
+        .gallery-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 1000px; width: 95%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .gallery-modal .gallery-header { padding: 22px 28px; background: white; border-bottom: 1px solid #f0f4ff; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; flex-shrink: 0; }
+        .gallery-modal .gallery-header-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+        .gallery-modal .gallery-title { font-size: 20px; font-weight: 800; color: rgb(16, 137, 211); display: flex; align-items: center; gap: 10px; }
+        .gallery-modal .gallery-subtitle { font-size: 13px; color: #888; }
+        .gallery-modal .gallery-header-right { display: flex; gap: 10px; align-items: center; }
+        .gallery-modal .gallery-header-right button { padding: 10px 18px; border-radius: 12px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; }
+        .gallery-modal .gallery-header-right .gallery-download-all { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); color: white; box-shadow: 0 4px 12px rgba(16, 137, 211, 0.25); }
+        .gallery-modal .gallery-header-right .gallery-download-all:hover { transform: scale(1.03); }
+        .gallery-modal .gallery-header-right .gallery-download-all:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .gallery-modal .gallery-close { width: 40px; height: 40px; border-radius: 50%; background: #f3f4f6; border: none; cursor: pointer; color: #666; font-size: 18px; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; }
+        .gallery-modal .gallery-close:hover { background: #e5e7eb; transform: rotate(90deg); }
+        .gallery-modal .gallery-caption { padding: 14px 28px; background: #f8faff; border-bottom: 1px solid #f0f4ff; font-size: 14px; color: #555; line-height: 1.5; flex-shrink: 0; display: none; }
+        .gallery-modal .gallery-caption.show { display: block; }
+        .gallery-modal .gallery-caption strong { color: rgb(16, 137, 211); }
+        .gallery-modal .gallery-body { padding: 22px 28px 28px; overflow-y: auto; flex: 1; }
+        .gallery-modal .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+        .gallery-modal .gallery-item { position: relative; border-radius: 14px; overflow: hidden; background: #f0f4ff; aspect-ratio: 1; border: 1px solid #eef2f7; transition: all 0.25s ease; }
+        .gallery-modal .gallery-item:hover { transform: scale(1.02); border-color: rgb(16, 137, 211); box-shadow: 0 6px 20px rgba(16, 137, 211, 0.15); }
+        .gallery-modal .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .gallery-modal .gallery-item .gallery-download-btn { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(16, 137, 211, 0.95); color: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .gallery-modal .gallery-item .gallery-download-btn:hover { background: rgb(13, 107, 158); transform: scale(1.1); }
+        .gallery-modal .gallery-item .image-index { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.65); color: white; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; }
+
+        /* ================================================================
+           ===== TITA TIMA AI ASSISTANT (FLOATING) =====
+           ================================================================ */
+
+        /* Floating launcher button */
+        .tita-launcher {
+            position: fixed;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            right: 24px;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             color: white;
-            margin-left: 8px;
+            font-size: 24px;
+            display: none; /* shown by JS when logged in */
+            align-items: center;
+            justify-content: center;
+            /* Higher than modals (2000) so the launcher is always clickable */
+            z-index: 2500;
+            box-shadow: 0 8px 30px rgba(16, 137, 211, 0.45);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .navbar .nav-links {
+        .tita-launcher.visible {
+            display: flex;
+        }
+
+        .tita-launcher:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.6);
+        }
+
+        .tita-launcher .tita-pulse {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid rgba(16, 137, 211, 0.5);
+            animation: titaPulse 2.4s ease-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes titaPulse {
+            0%   { transform: scale(0.9); opacity: 0.9; }
+            100% { transform: scale(1.35); opacity: 0; }
+        }
+
+        .tita-launcher .tita-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
+        }
+
+        .tita-launcher .tita-badge.show {
+            display: block;
+        }
+
+        /* Chat panel */
+        .tita-panel {
+            position: fixed;
+            bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+            right: 24px;
+            width: 380px;
+            max-width: calc(100vw - 40px);
+            max-height: calc(100vh - 140px);
+            background: white;
+            border-radius: 22px;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
+            border: 1px solid #eef2f7;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* Below launcher, above page content */
+            z-index: 2499;
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .tita-panel.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tita-header {
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            padding: 16px 18px;
             display: flex;
             align-items: center;
             gap: 12px;
-            list-style: none;
-            flex-wrap: wrap;
+            flex-shrink: 0;
         }
 
-        .navbar .nav-links a {
-            text-decoration: none;
-            color: #555;
-            font-weight: 500;
-            font-size: 13px;
-            transition: all 0.3s ease;
-            padding: 6px 12px;
-            border-radius: 8px;
-            white-space: nowrap;
-        }
-
-        .navbar .nav-links a:hover {
+        .tita-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: rgb(16, 137, 211);
-            background: rgba(16, 137, 211, 0.06);
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .navbar .nav-links .login-btn {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white !important;
-            padding: 8px 22px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.25);
+        .tita-header-info {
+            flex: 1;
+            min-width: 0;
         }
 
-        .navbar .nav-links .login-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.35);
-            background: rgba(16, 137, 211, 0.06) !important;
+        .tita-name {
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .navbar .nav-links .profile-link {
-            color: rgb(16, 137, 211);
-            font-weight: 600;
+        .tita-name .tita-online {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #86efac;
+            box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.35);
         }
 
-        .navbar .nav-links .profile-link:hover {
-            background: rgba(16, 137, 211, 0.1);
+        .tita-tagline {
+            font-size: 11px;
+            opacity: 0.9;
+            font-style: italic;
         }
 
-        .navbar .nav-links .logout-link {
-            color: #ef4444;
-            font-weight: 600;
-            cursor: pointer;
-            background: none;
+        .tita-close {
+            background: rgba(255,255,255,0.2);
             border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .tita-close:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
+        }
+
+        .tita-body {
+            padding: 16px 18px 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .tita-greeting {
+            background: #f0f9ff;
+            border-left: 3px solid rgb(16, 137, 211);
+            padding: 10px 14px;
+            border-radius: 10px;
             font-size: 13px;
-            padding: 6px 12px;
-            border-radius: 8px;
+            color: #555;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .tita-greeting strong {
+            color: rgb(16, 137, 211);
+        }
+
+        .tita-field {
+            margin-bottom: 12px;
+        }
+
+        .tita-field label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .tita-field label i {
+            color: rgb(16, 137, 211);
+            font-size: 11px;
+        }
+
+        .tita-field input,
+        .tita-field textarea,
+        .tita-field select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #e0e7ff;
+            background: #f8faff;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            transition: all 0.25s ease;
+        }
+
+        .tita-field input:focus,
+        .tita-field textarea:focus,
+        .tita-field select:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+
+        .tita-field textarea {
+            min-height: 62px;
+            resize: vertical;
+        }
+
+        .tita-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .tita-save {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
+        }
+
+        .tita-save:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(16, 137, 211, 0.45);
+        }
+
+        .tita-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tita-cancel {
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 2px solid #e0e7ff;
+            background: white;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
             font-family: inherit;
         }
 
-        .navbar .nav-links .logout-link:hover {
-            background: #fee2e2;
-        }
-
-        .navbar .mobile-toggle {
-            display: none;
-            font-size: 24px;
+        .tita-cancel:hover {
+            border-color: rgb(16, 137, 211);
             color: rgb(16, 137, 211);
-            cursor: pointer;
-            background: none;
-            border: none;
         }
 
-        .hero {
-            padding: 100px 40px 60px;
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 60px;
-            align-items: center;
-            min-height: 80vh;
-        }
-
-        .hero-content h1 {
-            font-size: 52px;
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 15px;
-        }
-
-        .hero-content h1 .highlight {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero-content p {
-            font-size: 18px;
-            color: #666;
-            max-width: 500px;
-            margin-bottom: 30px;
-            line-height: 1.8;
-        }
-
-        .hero-content .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            padding: 14px 32px;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(16, 137, 211, 0.3);
-        }
-
-        .hero-content .btn-primary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 6px 30px rgba(16, 137, 211, 0.4);
-        }
-
-        .hero-image .image-placeholder {
-            width: 100%;
-            max-width: 500px;
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 120px;
-            color: rgb(16, 137, 211);
-            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.15);
-        }
-
-        .hero-image .image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 30px;
-        }
-
-        /* ===== HIGHLIGHTS CAROUSEL ===== */
-        .highlights-carousel-section {
-            padding: 60px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .highlights-carousel-section .section-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .highlights-carousel-section .section-header h2 {
-            font-size: 32px;
-            font-weight: 800;
-        }
-
-        .highlights-carousel-section .section-header h2 .highlight {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .highlights-carousel-section .section-header p {
-            color: #888;
-            font-size: 16px;
-        }
-
-        .highlights-carousel-wrapper {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 50px;
-        }
-
-        .highlights-carousel-track {
-            display: flex;
-            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            gap: 0;
-            will-change: transform;
-        }
-
-        .highlights-carousel-slide {
-            min-width: 100%;
-            display: grid;
-            gap: 25px;
-            padding: 10px 5px;
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .highlights-carousel-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6));
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .highlights-carousel-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(to left, transparent, rgba(255,255,255,0.6));
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .highlights-carousel-item {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-            border: 1px solid #eef2f7;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .highlights-carousel-item:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08);
-            border-color: rgba(16, 137, 211, 0.2);
-        }
-
-        .highlights-carousel-item .image-container {
-            width: 100%;
-            height: 220px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .highlights-carousel-item .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .highlights-carousel-item .image-container .expiry-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .highlights-carousel-item .image-container .expiry-badge i {
-            margin-right: 4px;
-        }
-
-        .highlights-carousel-item .image-container .image-count {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 10px;
-        }
-
-        .highlights-carousel-item .item-body {
-            padding: 16px 18px 18px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .highlights-carousel-item .item-body .caption {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 8px;
-        }
-
-        .highlights-carousel-item .item-body .meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .tita-status-msg {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
             font-size: 12px;
-            color: #888;
-            margin-top: auto;
-        }
-
-        .highlights-carousel-item .item-body .meta .author {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .highlights-carousel-item .item-body .meta .author .avatar-small {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 10px;
-            font-weight: 700;
-        }
-
-        .highlights-carousel-item .item-body .meta .expiry-time.urgent {
-            color: #ef4444;
             font-weight: 600;
-        }
-
-        .highlights-carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid rgb(16, 137, 211);
-            color: rgb(16, 137, 211);
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-            z-index: 10;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .highlights-carousel-btn:hover {
-            background: rgb(16, 137, 211);
-            color: white;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35);
-        }
-
-        .highlights-carousel-btn:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
-        .highlights-carousel-btn.prev {
-            left: 5px;
-        }
-
-        .highlights-carousel-btn.next {
-            right: 5px;
-        }
-
-        .highlights-carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
-        }
-
-        .highlights-carousel-dots .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #d1d5db;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .highlights-carousel-dots .dot.active {
-            background: rgb(16, 137, 211);
-            width: 30px;
-            border-radius: 10px;
-        }
-
-        .highlights-carousel-dots .dot:hover {
-            background: rgb(16, 137, 211);
-        }
-
-        .carousel-section {
-            padding: 60px 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .carousel-section .section-header {
+            display: none;
             text-align: center;
-            margin-bottom: 30px;
         }
 
-        .carousel-section .section-header h2 {
-            font-size: 32px;
-            font-weight: 800;
-        }
+        .tita-status-msg.show { display: block; }
+        .tita-status-msg.success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        .tita-status-msg.error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .tita-status-msg.info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
 
-        .carousel-section .section-header h2 .highlight {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .carousel-section .section-header p {
-            color: #888;
-            font-size: 16px;
-        }
-
-        .carousel-wrapper {
-            position: relative;
-            overflow: hidden;
-            border-radius: 20px;
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 50px;
-        }
-
-        .carousel-track {
-            display: flex;
-            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            gap: 0;
-            will-change: transform;
-        }
-
-        .carousel-slide {
-            min-width: 100%;
-            display: grid;
-            gap: 25px;
-            padding: 10px 5px;
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .carousel-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6));
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .carousel-wrapper::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(to left, transparent, rgba(255,255,255,0.6));
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .carousel-item {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-            border: 1px solid #eef2f7;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .carousel-item:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08);
-            border-color: rgba(16, 137, 211, 0.2);
-        }
-
-        .carousel-item .image-placeholder {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: rgb(16, 137, 211);
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-
-        .carousel-item .image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .carousel-item .item-body {
-            padding: 18px 20px 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .carousel-item .item-body h4 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .carousel-item .item-body .location {
-            font-size: 13px;
-            color: #888;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .carousel-item .item-body .location i {
-            color: rgb(16, 137, 211);
-        }
-
-        .carousel-item .item-body .description {
-            font-size: 13px;
-            color: #666;
-            margin-top: 6px;
-            flex: 1;
-        }
-
-        .carousel-item .item-body .tag {
-            display: inline-block;
-            background: #e0f2fe;
-            color: rgb(16, 137, 211);
-            padding: 2px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-top: 10px;
-            align-self: flex-start;
-        }
-
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.95);
-            border: 2px solid rgb(16, 137, 211);
-            color: rgb(16, 137, 211);
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-            z-index: 10;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .carousel-btn:hover {
-            background: rgb(16, 137, 211);
-            color: white;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35);
-        }
-
-        .carousel-btn:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
-        .carousel-btn.prev {
-            left: 5px;
-        }
-
-        .carousel-btn.next {
-            right: 5px;
-        }
-
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 20px;
-        }
-
-        .carousel-dots .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #d1d5db;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-        }
-
-        .carousel-dots .dot.active {
-            background: rgb(16, 137, 211);
-            width: 30px;
-            border-radius: 10px;
-        }
-
-        .carousel-dots .dot:hover {
-            background: rgb(16, 137, 211);
-        }
-
-        .carousel-divider {
-            border: none;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent);
-            margin: 20px auto;
-            max-width: 1200px;
-        }
-
-        /* ===== MEMBERS SECTION - 3 COLUMN CARDS ===== */
-        .members-section {
-            padding: 60px 40px 80px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .members-section .section-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .members-section .section-header h2 {
-            font-size: 32px;
-            font-weight: 800;
-        }
-
-        .members-section .section-header h2 .highlight {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .members-section .section-header p {
-            color: #888;
-            font-size: 16px;
-        }
-
-        .members-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-        }
-
-        .member-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-            border: 1px solid #eef2f7;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .member-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08);
-            border-color: rgba(16, 137, 211, 0.2);
-        }
-
-        .member-card .avatar-container {
-            width: 100%;
-            height: 200px;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .member-card .avatar-container .avatar-text {
-            font-size: 64px;
-            font-weight: 700;
-            color: rgb(16, 137, 211);
-        }
-
-        .member-card .avatar-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .member-card .member-body {
-            padding: 18px 20px 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .member-card .member-body .member-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 4px;
-        }
-
-        .member-card .member-body .member-location {
-            font-size: 13px;
-            color: #888;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            margin-bottom: 6px;
-        }
-
-        .member-card .member-body .member-location i {
-            color: rgb(16, 137, 211);
-        }
-
-        .member-card .member-body .member-bio {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.5;
-            flex: 1;
-            margin-bottom: 10px;
-        }
-
-        .member-card .member-body .member-interests {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: auto;
-        }
-
-        .member-card .member-body .member-interests .interest-tag {
-            background: #e0f2fe;
-            color: rgb(16, 137, 211);
-            padding: 3px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-            grid-column: 1 / -1;
-        }
-
-        .empty-state i {
-            font-size: 40px;
-            color: #cff0ff;
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        .empty-state h3 {
-            color: #333;
-            font-size: 18px;
-        }
-
-        .empty-state p {
-            color: #999;
-            font-size: 14px;
-        }
-
-        .footer {
-            padding: 40px;
-            text-align: center;
-            color: #888;
-            font-size: 14px;
-            border-top: 1px solid #eef2f7;
-            background: white;
-        }
-
-        .footer p {
-            color: #888;
-        }
-
-        /* ===== RESPONSIVE - Mobile First ===== */
+        /* ===== RESPONSIVE (main page) ===== */
         @media (max-width: 1024px) {
-            .hero {
-                grid-template-columns: 1fr;
-                text-align: center;
-                padding: 80px 30px 40px;
-            }
-
-            .hero-content p {
-                margin: 0 auto 30px;
-            }
-
-            .hero-image .image-placeholder {
-                max-width: 400px;
-                margin: 0 auto;
-                font-size: 80px;
-            }
-
-            .carousel-section {
-                padding: 40px 20px;
-            }
-
-            .carousel-wrapper {
-                padding: 0 40px;
-            }
-
-            .carousel-btn {
-                width: 42px;
-                height: 42px;
-                font-size: 16px;
-            }
-
-            .highlights-carousel-section {
-                padding: 40px 20px;
-            }
-
-            .highlights-carousel-btn {
-                width: 42px;
-                height: 42px;
-                font-size: 16px;
-            }
-
-            .members-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
+            .hero { grid-template-columns: 1fr; text-align: center; padding: 80px 30px 40px; }
+            .hero-content p { margin: 0 auto 30px; }
+            .hero-image .image-placeholder { max-width: 400px; margin: 0 auto; font-size: 80px; }
+            .carousel-section { padding: 40px 20px; }
+            .carousel-wrapper { padding: 0 40px; }
+            .carousel-btn { width: 42px; height: 42px; font-size: 16px; }
+            .highlights-carousel-section { padding: 40px 20px; }
+            .highlights-carousel-btn { width: 42px; height: 42px; font-size: 16px; }
+            .members-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
         }
 
         @media (max-width: 768px) {
-            .navbar {
-                padding: 12px 20px;
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
+            .navbar { padding: 12px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+            .navbar .logo { font-size: 22px; }
+            .navbar .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: white; padding: 20px; border-bottom: 2px solid #f0f4ff; gap: 10px; box-shadow: 0 20px 30px rgba(0,0,0,0.05); width: 100%; }
+            .navbar .nav-links.active { display: flex; }
+            .navbar .mobile-toggle { display: block; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
+            .navbar .nav-links > li { width: 100%; }
+            .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
+            .auth-links-wrapper { flex-direction: column; width: 100%; gap: 10px; }
+            .auth-links-wrapper > a, .auth-links-wrapper > button { width: 100%; text-align: center; font-size: 14px; padding: 8px 16px; display: block; }
+            .hero-content h1 { font-size: 32px; }
+            .carousel-slide, .highlights-carousel-slide { gap: 0 !important; }
+            .carousel-item .image-placeholder { height: 220px; }
+            .highlights-carousel-item .image-container { height: 220px; }
+            .carousel-wrapper { padding: 0 44px; }
+            .highlights-carousel-wrapper { padding: 0 44px; }
+            .carousel-btn { width: 36px; height: 36px; font-size: 14px; }
+            .highlights-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
+            .members-section { padding: 40px 20px; }
+            .members-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+            .member-card .avatar-container { height: 150px; }
+            .member-card .avatar-container .avatar-text { font-size: 48px; }
+            .item-modal .modal-header { height: 240px; }
+            .item-modal .modal-body { padding: 22px; }
+            .member-modal .member-modal-header { height: 220px; }
+            .member-modal .member-modal-header .member-modal-initials { font-size: 72px; }
+            .member-modal .member-modal-body { padding: 20px 22px 24px; }
+            .highlight-detail-modal .modal-header { height: 260px; }
+            .highlight-detail-modal .modal-body { padding: 20px 22px 24px; }
+            .carousel-item .item-actions { opacity: 1; }
+            .highlights-carousel-item .image-container .hl-actions { opacity: 1; }
+            .member-card .avatar-container .member-actions { opacity: 1; }
+            .gallery-modal .modal-content { width: 96%; max-height: 94vh; }
+            .gallery-modal .gallery-header { padding: 16px 18px; }
+            .gallery-modal .gallery-body { padding: 16px 18px 22px; }
+            .gallery-modal .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 
-            .navbar .logo {
+            /* ===== TITA TIMA — mobile/tablet adjustments ===== */
+            .tita-launcher {
+                bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+                right: 18px;
+                width: 58px;
+                height: 58px;
                 font-size: 22px;
+                z-index: 2500;
             }
-
-            .navbar .nav-links {
-                display: none;
-                flex-direction: column;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: white;
-                padding: 20px;
-                border-bottom: 2px solid #f0f4ff;
-                gap: 10px;
-                box-shadow: 0 20px 30px rgba(0,0,0,0.05);
-                width: 100%;
-            }
-
-            .navbar .nav-links.active {
-                display: flex;
-            }
-
-            .navbar .mobile-toggle {
-                display: block;
-                position: absolute;
-                right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
-            .hero-content h1 {
-                font-size: 32px;
-            }
-
-            .carousel-slide {
-                grid-template-columns: 1fr !important;
-                gap: 15px !important;
-            }
-
-            .highlights-carousel-slide {
-                grid-template-columns: 1fr !important;
-                gap: 15px !important;
-            }
-
-            .carousel-item .image-placeholder {
-                height: 160px;
-            }
-
-            .highlights-carousel-item .image-container {
-                height: 180px;
-            }
-
-            .carousel-wrapper {
-                padding: 0 30px;
-            }
-
-            .highlights-carousel-wrapper {
-                padding: 0 30px;
-            }
-
-            .carousel-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .highlights-carousel-btn {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .members-section {
-                padding: 40px 20px;
-            }
-
-            .members-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
-            }
-
-            .member-card .avatar-container {
-                height: 150px;
-            }
-
-            .member-card .avatar-container .avatar-text {
-                font-size: 48px;
-            }
-
-            .navbar .nav-links a {
-                font-size: 14px;
-                width: 100%;
-                text-align: center;
-            }
-
-            .navbar .nav-links .login-btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .navbar .nav-links .logout-link {
-                width: 100%;
-                text-align: center;
+            .tita-panel {
+                bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+                right: 14px;
+                left: 14px;
+                width: auto;
+                max-width: none;
+                max-height: calc(100vh - 130px);
+                z-index: 2499;
             }
         }
 
         @media (max-width: 480px) {
-            .hero-content h1 {
-                font-size: 26px;
-            }
+            .hero-content h1 { font-size: 26px; }
+            .hero { padding: 70px 20px 30px; }
+            .carousel-wrapper { padding: 0 38px; }
+            .carousel-item .image-placeholder { height: 200px; }
+            .highlights-carousel-item .image-container { height: 200px; }
+            .carousel-btn { width: 32px; height: 32px; font-size: 12px; }
+            .highlights-carousel-btn { width: 32px; height: 32px; font-size: 12px; }
+            .highlights-carousel-wrapper { padding: 0 38px; }
+            .members-grid { grid-template-columns: 1fr; gap: 15px; }
+            .member-card .avatar-container { height: 180px; }
+            .member-card .avatar-container .avatar-text { font-size: 56px; }
+            .item-modal .modal-header { height: 200px; }
+            .item-modal .modal-body { padding: 18px; }
+            .item-modal .modal-actions { flex-direction: column; }
+            .member-modal .member-modal-header { height: 200px; }
+            .member-modal .member-modal-header .member-modal-initials { font-size: 64px; }
+            .member-modal .member-modal-body { padding: 18px; }
+            .member-modal .member-modal-actions { flex-direction: column; }
+            .highlight-detail-modal .modal-header { height: 220px; }
+            .highlight-detail-modal .modal-body { padding: 18px; }
+            .highlight-detail-modal .modal-actions { flex-direction: column; }
+            .gallery-modal .gallery-header { padding: 14px; flex-direction: column; align-items: stretch; }
+            .gallery-modal .gallery-header-right { justify-content: space-between; }
+            .gallery-modal .gallery-body { padding: 12px 14px 18px; }
+            .gallery-modal .gallery-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
 
-            .hero {
-                padding: 70px 20px 30px;
+            /* ===== TITA TIMA — small phone adjustments ===== */
+            .tita-launcher {
+                bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+                right: 16px;
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
             }
-
-            .carousel-wrapper {
-                padding: 0 20px;
-            }
-
-            .carousel-slide {
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
-            }
-
-            .carousel-item .image-placeholder {
-                height: 140px;
-            }
-
-            .carousel-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 12px;
-            }
-
-            .highlights-carousel-wrapper {
-                padding: 0 20px;
-            }
-
-            .highlights-carousel-slide {
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
-            }
-
-            .highlights-carousel-item .image-container {
-                height: 160px;
-            }
-
-            .highlights-carousel-btn {
-                width: 32px;
-                height: 32px;
-                font-size: 12px;
-            }
-
-            .members-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .member-card .avatar-container {
-                height: 180px;
-            }
-
-            .member-card .avatar-container .avatar-text {
-                font-size: 56px;
-            }
-
-            .member-card .member-body .member-name {
-                font-size: 16px;
-            }
-
-            .navbar .nav-links a {
-                font-size: 16px;
-                padding: 8px 16px;
+            .tita-panel {
+                bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+                right: 10px;
+                left: 10px;
+                max-height: calc(100vh - 120px);
             }
         }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -1092,17 +695,12 @@
         <a href="index.html" class="logo">TIMAWA <span>HUB</span></a>
         <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
         <ul class="nav-links" id="navLinks">
-            <!-- These links are always visible -->
             <li><a href="#highlights">Highlights</a></li>
             <li><a href="#coffee-shops">Coffee</a></li>
             <li><a href="#favorite-places">Places</a></li>
             <li><a href="#things-to-do">Activities</a></li>
             <li><a href="#members-section">Members</a></li>
-            
-            <!-- These links change based on login status -->
-            <div id="authLinks" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-                <!-- Will be populated by JavaScript -->
-            </div>
+            <li class="auth-links-wrapper" id="authLinks"></li>
         </ul>
     </nav>
 
@@ -1113,14 +711,14 @@
             <a href="login.html" class="btn-primary" id="heroCta"><i class="fas fa-user-plus"></i> Join the Squad</a>
         </div>
         <div class="hero-image">
-            <div class="image-placeholder"><img src="images/Group_pic.jpeg" alt=""></div>
+            <div class="image-placeholder"><img src="images/Group_pic.jpeg" alt="" /></div>
         </div>
     </section>
 
     <section class="highlights-carousel-section" id="highlights">
         <div class="section-header">
             <h2>📸 Squad <span class="highlight">Highlights</span></h2>
-            <p>Recent memories shared by the squad. Expires in 7 days.</p>
+            <p>Recent memories shared by the squad. Expires in 3 days.</p>
         </div>
         <div class="highlights-carousel-wrapper" id="highlightsCarousel">
             <button class="highlights-carousel-btn prev" onclick="moveHighlightsCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
@@ -1177,7 +775,6 @@
 
     <hr class="carousel-divider" />
 
-    <!-- ===== MEMBERS SECTION - 3 COLUMN CARDS ===== -->
     <section class="members-section" id="members-section">
         <div class="section-header">
             <h2>👥 Meet the <span class="highlight">Squad</span></h2>
@@ -1195,6 +792,192 @@
         <p>Made with ❤️ for the TIMAWA squad &copy; 2022</p>
     </footer>
 
+    <!-- ===== ITEM DETAIL MODAL ===== -->
+    <div id="itemModal" class="modal item-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeItemModal()" title="Close"><i class="fas fa-times"></i></button>
+                <img id="itemModalImage" src="" alt="Item" />
+            </div>
+            <div class="modal-body">
+                <div class="modal-title" id="itemModalTitle">Title</div>
+                <div class="modal-location" id="itemModalLocation"><i class="fas fa-map-marker-alt"></i><span>Location</span></div>
+                <div class="modal-description" id="itemModalDescription">Description</div>
+                <div class="modal-tag" id="itemModalTag">Tag</div>
+                <div class="modal-actions">
+                    <button class="modal-download" id="itemModalDownloadBtn" onclick="downloadCurrentItem()"><i class="fas fa-download"></i> Download Image</button>
+                    <button class="modal-secondary" onclick="closeItemModal()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MEMBER MODAL ===== -->
+    <div id="memberModal" class="modal member-modal">
+        <div class="modal-content">
+            <div class="member-modal-header">
+                <button class="modal-close" onclick="closeMemberModal()" title="Close"><i class="fas fa-times"></i></button>
+                <img id="memberModalImage" src="" alt="Member" style="display:none;" />
+                <div class="member-modal-initials" id="memberModalInitials"></div>
+            </div>
+            <div class="member-modal-body">
+                <div class="member-modal-name" id="memberModalName">Name</div>
+                <div class="member-modal-location" id="memberModalLocation"><i class="fas fa-map-marker-alt"></i><span>Location</span></div>
+                <div id="memberModalBioSection">
+                    <div class="member-modal-section-label">About</div>
+                    <div class="member-modal-bio" id="memberModalBio">Bio</div>
+                </div>
+                <div id="memberModalInterestsSection">
+                    <div class="member-modal-section-label">Interests</div>
+                    <div class="member-modal-interests" id="memberModalInterests"></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="modal-download" id="memberModalDownloadBtn" onclick="downloadCurrentMemberAvatar()"><i class="fas fa-download"></i> Download Profile Picture</button>
+                    <button class="modal-secondary" onclick="closeMemberModal()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HIGHLIGHT DETAIL MODAL ===== -->
+    <div id="highlightDetailModal" class="modal highlight-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeHighlightDetail()" title="Close"><i class="fas fa-times"></i></button>
+                <img id="hlDetailImage" src="" alt="Highlight" />
+                <div class="hl-multi-badge" id="hlDetailMultiBadge" style="display:none;">
+                    <i class="fas fa-images"></i> <span id="hlDetailMultiCount">0</span> photos
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="hl-author-row">
+                    <div class="hl-author-avatar" id="hlDetailAvatar"></div>
+                    <div class="hl-author-info">
+                        <div class="hl-author-name" id="hlDetailAuthor">Author</div>
+                        <div class="hl-author-time" id="hlDetailTime">Posted</div>
+                    </div>
+                </div>
+                <div class="hl-caption" id="hlDetailCaption">No caption</div>
+                <div class="hl-stats">
+                    <div class="stat" id="hlDetailPhotoCount"><i class="fas fa-images"></i> <span>1 photo</span></div>
+                    <div class="stat" id="hlDetailExpiry"><i class="fas fa-clock"></i> <span>X days left</span></div>
+                </div>
+                <div class="modal-actions" id="hlDetailActions">
+                    <button class="modal-download" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="modal-download" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
+                        <i class="fas fa-expand"></i> View All Photos
+                    </button>
+                    <button class="modal-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HIGHLIGHT GALLERY MODAL ===== -->
+    <div id="galleryModal" class="modal gallery-modal">
+        <div class="modal-content">
+            <div class="gallery-header">
+                <div class="gallery-header-left">
+                    <div class="gallery-title"><i class="fas fa-images"></i><span id="galleryTitleText">Highlight Photos</span></div>
+                    <div class="gallery-subtitle" id="gallerySubtitle"></div>
+                </div>
+                <div class="gallery-header-right">
+                    <button class="gallery-download-all" id="galleryDownloadAllBtn" onclick="downloadAllGalleryImages()"><i class="fas fa-file-zipper"></i> Download All</button>
+                    <button class="gallery-close" onclick="closeGallery()" title="Close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div class="gallery-caption" id="galleryCaption"></div>
+            <div class="gallery-body">
+                <div class="gallery-grid" id="galleryGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TITA TIMA AI ASSISTANT ===== -->
+    <button id="titaLauncher" class="tita-launcher" onclick="toggleTitaPanel()" aria-label="Open Tita Tima assistant">
+        <span class="tita-pulse"></span>
+        <i class="fas fa-robot"></i>
+        <span class="tita-badge" id="titaBadge"></span>
+    </button>
+
+    <div id="titaPanel" class="tita-panel" role="dialog" aria-labelledby="titaTitle">
+        <div class="tita-header">
+            <div class="tita-avatar"><i class="fas fa-robot"></i></div>
+            <div class="tita-header-info">
+                <div class="tita-name" id="titaTitle">Tita Tima <span class="tita-online"></span></div>
+                <div class="tita-tagline">"Anong update mo today, 'nak?"</div>
+            </div>
+            <button class="tita-close" onclick="closeTitaPanel()" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="tita-body">
+            <div class="tita-greeting" id="titaGreeting">
+                Kumusta, <strong id="titaGreetName">ka-TIMAWA</strong>! Gusto mo ba mag-update ng status? Fill out lang dito, save agad. 😊
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="titaUsername" placeholder="Your display name" />
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-circle"></i> Status</label>
+                <select id="titaStatus">
+                    <option value="available">🟢 Available</option>
+                    <option value="busy">🔴 Busy</option>
+                    <option value="away">🟡 Away</option>
+                    <option value="dnd">🟣 Do Not Disturb</option>
+                </select>
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-heart-broken"></i> Love Life</label>
+                <select id="titaLoveLife">
+                    <option value="">— Not set —</option>
+                    <option value="Single">💔 Single</option>
+                    <option value="MU">💞 MU (Mutual Understanding)</option>
+                    <option value="Married">💍 Married</option>
+                </select>
+            </div>
+
+            <div class="tita-field" id="titaLocationField">
+                <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                <select id="titaLocationSelect" onchange="titaToggleCustomLocation()">
+                    <option value="">Select your location</option>
+                    <option value="Alabat, Quezon">📍 Alabat, Quezon</option>
+                    <option value="Perez, Quezon">📍 Perez, Quezon</option>
+                    <option value="Atimonan, Quezon">📍 Atimonan, Quezon</option>
+                    <option value="Lucena, Quezon">📍 Lucena, Quezon</option>
+                    <option value="Lucban, Quezon">📍 Lucban, Quezon</option>
+                    <option value="San Pedro, Laguna">📍 San Pedro, Laguna</option>
+                    <option value="Santa Cruz, Laguna">📍 Santa Cruz, Laguna</option>
+                    <option value="custom">✏️ Others (Customize)</option>
+                </select>
+                <input type="text" id="titaCustomLocation" placeholder="Enter your location..." style="display:none; margin-top:6px;" />
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-info-circle"></i> Bio</label>
+                <textarea id="titaBio" placeholder="Short bio / about me..."></textarea>
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-heart"></i> Interests</label>
+                <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
+            </div>
+
+            <div class="tita-actions">
+                <button class="tita-save" id="titaSaveBtn" onclick="titaSaveProfile()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="tita-cancel" onclick="closeTitaPanel()">Close</button>
+            </div>
+
+            <div class="tita-status-msg" id="titaStatusMsg"></div>
+        </div>
+    </div>
+
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
@@ -1209,45 +992,125 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        const CLOUDINARY_CONFIG = { cloudName: "ooq99nlw" };
+        const CAROUSEL_AUTOPLAY_MS = 10000;
+        const MOBILE_BREAKPOINT = 768;
+
+        function isMobile() { return window.innerWidth <= MOBILE_BREAKPOINT; }
+        function getItemsPerSlide() { return isMobile() ? 1 : 3; }
+
         let highlightsData = [];
         let unsubscribeHighlights = null;
         const carousels = {};
+        const userProfileCache = {};
+        const carouselItemCache = {};
 
-        // ===== UPDATE NAVIGATION BASED ON LOGIN STATUS =====
+        let currentItem = null;
+        let currentMember = null;
+        let currentGalleryImages = [];
+        let currentGalleryCaption = '';
+        let currentGalleryAuthor = '';
+
+        let currentHighlightDetailId = null;
+        let currentHighlightDetailImageIndex = 0;
+
+        // Tita Tima state
+        let titaCurrentUser = null;
+        let titaUserData = null;
+
+        // ===== CLOUDINARY THUMBNAIL HELPER =====
+        function cloudinaryThumb(url, width = 500) {
+            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+            const afterUpload = url.split('/upload/')[1];
+            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
+            return url.replace('/upload/', `/upload/w_${width},q_auto,f_auto/`);
+        }
+
+        // ===== HELPERS =====
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            return String(text)
+                .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function sanitizeFilename(name) {
+            return String(name || 'item')
+                .replace(/[^a-z0-9_\-\s]+/gi, '').trim()
+                .replace(/\s+/g, '_').slice(0, 40) || 'item';
+        }
+
+        function extFromUrl(url) {
+            if (!url) return 'jpg';
+            const match = url.match(/\.([a-z0-9]+)(?:\?|$)/i);
+            return match ? match[1].toLowerCase() : 'jpg';
+        }
+
+        function formatRelativeTime(date) {
+            if (!date) return 'Just now';
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMin = Math.floor(diffMs / 60000);
+            if (diffMin < 1) return 'Just now';
+            if (diffMin < 60) return `${diffMin}m ago`;
+            const diffHr = Math.floor(diffMin / 60);
+            if (diffHr < 24) return `${diffHr}h ago`;
+            const diffDay = Math.floor(diffHr / 24);
+            if (diffDay < 7) return `${diffDay}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // ===== NAV =====
         function updateNavigation(user) {
             const authLinks = document.getElementById('authLinks');
             const heroCta = document.getElementById('heroCta');
-            
+
             if (user) {
-                // Check if user is admin
                 db.collection('users').doc(user.uid).get().then((doc) => {
-                    const isAdmin = doc.data()?.isAdmin === true;
-                    let adminLink = '';
-                    if (isAdmin) {
-                        adminLink = `<li><a href="admin.html" class="profile-link"><i class="fas fa-cog"></i> Admin</a></li>`;
-                    }
+                    const data = doc.data() || {};
+                    titaUserData = data;
+                    titaCurrentUser = user;
+
+                    // Show Tita Tima launcher for logged-in users
+                    document.getElementById('titaLauncher').classList.add('visible');
+
+                    const isAdmin = data?.isAdmin === true;
+                    const adminLink = isAdmin
+                        ? `<a href="admin.html" class="profile-link"><i class="fas fa-cog"></i> Admin</a>`
+                        : '';
+
                     authLinks.innerHTML = `
-                        <li><a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
-                        <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                        <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+                        <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
                         ${adminLink}
-                        <li><a href="profile.html" class="profile-link"><i class="fas fa-user"></i> Profile</a></li>
-                        <li><button class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
+                        <a href="profile.html" class="profile-link"><i class="fas fa-user"></i> Profile</a>
+                        <button class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     `;
-                });
+                }).catch(err => console.error('Error checking admin status:', err));
                 heroCta.textContent = ' Go to Dashboard';
                 heroCta.href = 'dashboard.html';
             } else {
+                titaCurrentUser = null;
+                titaUserData = null;
+
+                // Hide Tita Tima and close her panel
+                document.getElementById('titaLauncher').classList.remove('visible');
+                closeTitaPanel();
+
                 authLinks.innerHTML = `
-                    <li><a href="login.html" class="login-btn"><i class="fas fa-user"></i> Sign In</a></li>
+                    <a href="login.html" class="login-btn"><i class="fas fa-user"></i> Sign In</a>
                 `;
                 heroCta.textContent = ' Join the Squad';
                 heroCta.href = 'login.html';
             }
         }
 
-        auth.onAuthStateChanged(user => {
-            updateNavigation(user);
-        });
+        auth.onAuthStateChanged(user => updateNavigation(user));
 
         async function logout() {
             try {
@@ -1258,106 +1121,513 @@
             }
         }
 
-        // ===== LOAD CAROUSEL DATA FROM FIRESTORE =====
+        // ===== DOWNLOAD HELPERS =====
+        async function downloadImage(url, filename) {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Network error');
+            const blob = await response.blob();
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        }
+
+        // ===== ITEM MODAL =====
+        function openItemModal(item, type) {
+            currentItem = { ...item, _type: type };
+
+            const imageEl = document.getElementById('itemModalImage');
+            const titleEl = document.getElementById('itemModalTitle');
+            const locEl = document.getElementById('itemModalLocation');
+            const descEl = document.getElementById('itemModalDescription');
+            const tagEl = document.getElementById('itemModalTag');
+            const downloadBtn = document.getElementById('itemModalDownloadBtn');
+
+            if (item.imageUrl) {
+                imageEl.src = item.imageUrl;
+                imageEl.style.display = 'block';
+            } else {
+                imageEl.src = '';
+                imageEl.style.display = 'none';
+            }
+
+            titleEl.textContent = item.title || 'Untitled';
+            locEl.querySelector('span').textContent = item.location || 'No location';
+            descEl.textContent = item.description || 'No description provided.';
+            tagEl.textContent = item.tag || defaultTagFor(type);
+
+            if (item.imageUrl) {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Image';
+            } else {
+                downloadBtn.disabled = true;
+                downloadBtn.innerHTML = '<i class="fas fa-ban"></i> No image';
+            }
+
+            document.getElementById('itemModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function defaultTagFor(type) {
+            if (type === 'coffeeShops') return '☕ Coffee';
+            if (type === 'favoritePlaces') return '📍 Place';
+            if (type === 'thingsToDo') return '🎯 Activity';
+            return 'Item';
+        }
+
+        function closeItemModal() {
+            document.getElementById('itemModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            document.getElementById('itemModalImage').src = '';
+            currentItem = null;
+        }
+
+        async function downloadCurrentItem() {
+            if (!currentItem || !currentItem.imageUrl) {
+                alert('No image available to download.');
+                return;
+            }
+            const safeTitle = sanitizeFilename(currentItem.title);
+            const ext = extFromUrl(currentItem.imageUrl);
+            const filename = `TIMAWA_${safeTitle}.${ext}`;
+            try {
+                await downloadImage(currentItem.imageUrl, filename);
+            } catch (err) {
+                window.open(currentItem.imageUrl, '_blank', 'noopener');
+            }
+        }
+
+        // ===== CAROUSEL DATA + RENDERING =====
+        const carouselDataStore = {};
+
         function loadCarouselData(collection, trackId, dotsId, carouselId) {
             const track = document.getElementById(trackId);
             if (!track) return;
-            
+
             db.collection(collection)
                 .orderBy('createdAt', 'desc')
                 .onSnapshot((snapshot) => {
-                    if (snapshot.empty) {
-                        const iconMap = {
-                            'coffeeShops': 'coffee',
-                            'favoritePlaces': 'map-marked-alt',
-                            'thingsToDo': 'gamepad'
-                        };
-                        const icon = iconMap[collection] || 'coffee';
-                        track.innerHTML = `
-                            <div class="carousel-slide" style="display:flex;align-items:center;justify-content:center;padding:40px;min-height:200px;">
-                                <div style="text-align:center;color:#888;">
-                                    <i class="fas fa-${icon}" style="font-size:40px;color:#cff0ff;display:block;margin-bottom:10px;"></i>
-                                    <h3 style="color:#333;font-size:18px;">No items yet</h3>
-                                    <p>Admin can add items in the control panel.</p>
-                                </div>
-                            </div>
-                        `;
-                        const dotsContainer = document.getElementById(dotsId);
-                        if (dotsContainer) {
-                            dotsContainer.innerHTML = '';
-                            const dot = document.createElement('button');
-                            dot.className = 'dot active';
-                            dotsContainer.appendChild(dot);
-                        }
-                        return;
-                    }
-
                     const items = [];
                     snapshot.forEach(doc => {
-                        items.push({ id: doc.id, ...doc.data() });
+                        const data = { id: doc.id, ...doc.data() };
+                        items.push(data);
+                        carouselItemCache[`${collection}:${doc.id}`] = data;
                     });
 
-                    const slides = [];
-                    for (let i = 0; i < items.length; i += 3) {
-                        slides.push(items.slice(i, i + 3));
-                    }
-
-                    let html = '';
-                    const iconMap = {
-                        'coffeeShops': 'coffee',
-                        'favoritePlaces': 'map-marked-alt',
-                        'thingsToDo': 'gamepad'
-                    };
-                    const icon = iconMap[collection] || 'coffee';
-                    
-                    slides.forEach(slide => {
-                        html += `<div class="carousel-slide">`;
-                        slide.forEach(item => {
-                            const tag = item.tag || (collection === 'coffeeShops' ? '☕ Coffee' : collection === 'favoritePlaces' ? '📍 Place' : '🎯 Activity');
-                            const imageHtml = item.imageUrl ? 
-                                `<img src="${item.imageUrl}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;" />` : 
-                                `<i class="fas fa-${icon}"></i>`;
-                            
-                            html += `
-                                <div class="carousel-item">
-                                    <div class="image-placeholder">${imageHtml}</div>
-                                    <div class="item-body">
-                                        <h4>${item.title || 'Untitled'}</h4>
-                                        <div class="location"><i class="fas fa-map-marker-alt"></i> ${item.location || 'No location'}</div>
-                                        <div class="description">${item.description || ''}</div>
-                                        <span class="tag">${tag}</span>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        html += `</div>`;
-                    });
-
-                    track.innerHTML = html;
-
-                    const dotsContainer = document.getElementById(dotsId);
-                    if (dotsContainer) {
-                        dotsContainer.innerHTML = '';
-                        slides.forEach((_, i) => {
-                            const dot = document.createElement('button');
-                            dot.className = 'dot' + (i === 0 ? ' active' : '');
-                            dot.onclick = () => goToSlide(carouselId, i);
-                            dotsContainer.appendChild(dot);
-                        });
-                    }
-
-                    if (carousels[carouselId]) {
-                        const carousel = carousels[carouselId];
-                        carousel.slides = track.querySelectorAll('.carousel-slide');
-                        carousel.totalSlides = carousel.slides.length;
-                        carousel.currentIndex = 0;
-                        updateCarousel(carouselId);
-                        startAutoplay(carouselId);
-                    }
+                    carouselDataStore[carouselId] = { items, trackId, dotsId, collection, track };
+                    renderCarousel(carouselId, false);
                 });
         }
 
-        // ===== LOAD MEMBERS - 3 COLUMN CARDS =====
+        function renderCarousel(carouselId, preserveAutoplayState) {
+            const store = carouselDataStore[carouselId];
+            if (!store) return;
+
+            const { items, track, dotsId, collection } = store;
+            const existingCarousel = carousels[carouselId];
+            const wasRunning = preserveAutoplayState && existingCarousel && existingCarousel.interval !== null;
+            if (existingCarousel) stopAutoplay(carouselId);
+
+            if (!items || items.length === 0) {
+                const iconMap = { 'coffeeShops': 'coffee', 'favoritePlaces': 'map-marked-alt', 'thingsToDo': 'gamepad' };
+                const icon = iconMap[collection] || 'coffee';
+                track.innerHTML = `
+                    <div class="carousel-slide single-item" style="display:flex;align-items:center;justify-content:center;padding:40px;min-height:200px;">
+                        <div style="text-align:center;color:#888;">
+                            <i class="fas fa-${icon}" style="font-size:40px;color:#cff0ff;display:block;margin-bottom:10px;"></i>
+                            <h3 style="color:#333;font-size:18px;">No items yet</h3>
+                            <p>Admin can add items in the control panel.</p>
+                        </div>
+                    </div>
+                `;
+                const dotsContainer = document.getElementById(dotsId);
+                if (dotsContainer) {
+                    dotsContainer.innerHTML = '';
+                    const dot = document.createElement('button');
+                    dot.className = 'dot active';
+                    dotsContainer.appendChild(dot);
+                }
+                delete carousels[carouselId];
+                return;
+            }
+
+            const perSlide = getItemsPerSlide();
+            const slides = [];
+            for (let i = 0; i < items.length; i += perSlide) slides.push(items.slice(i, i + perSlide));
+
+            const iconMap = { 'coffeeShops': 'coffee', 'favoritePlaces': 'map-marked-alt', 'thingsToDo': 'gamepad' };
+            const icon = iconMap[collection] || 'coffee';
+
+            let html = '';
+            slides.forEach(slide => {
+                const slideClass = perSlide === 1 ? 'carousel-slide single-item' : 'carousel-slide';
+                html += `<div class="${slideClass}">`;
+                slide.forEach(item => {
+                    const tag = item.tag || defaultTagFor(collection);
+                    const imageHtml = item.imageUrl
+                        ? `<img src="${cloudinaryThumb(item.imageUrl, 500)}" alt="${escapeAttr(item.title || 'Item')}" loading="lazy" decoding="async" />`
+                        : `<i class="fas fa-${icon}"></i>`;
+                    const hasImage = !!item.imageUrl;
+                    const itemIdSafe = escapeAttr(item.id);
+                    const collSafe = escapeAttr(collection);
+
+                    html += `
+                        <div class="carousel-item" data-item-id="${itemIdSafe}" data-item-collection="${collSafe}">
+                            <div class="image-placeholder">
+                                ${imageHtml}
+                                <div class="item-actions">
+                                    <button class="item-view" title="View details" onclick="event.stopPropagation(); openItemFromCarousel('${collSafe}', '${itemIdSafe}')"><i class="fas fa-expand"></i></button>
+                                    ${hasImage ? `<button class="item-download" title="Download image" onclick="event.stopPropagation(); quickDownloadItem('${collSafe}', '${itemIdSafe}')"><i class="fas fa-download"></i></button>` : ''}
+                                </div>
+                            </div>
+                            <div class="item-body">
+                                <h4>${escapeHtml(item.title || 'Untitled')}</h4>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(item.location || 'No location')}</div>
+                                <div class="description">${escapeHtml(item.description || '')}</div>
+                                <span class="tag">${escapeHtml(tag)}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            });
+
+            track.innerHTML = html;
+
+            track.querySelectorAll('.carousel-item').forEach(card => {
+                card.addEventListener('click', function() {
+                    openItemFromCarousel(this.dataset.itemCollection, this.dataset.itemId);
+                });
+            });
+
+            const dotsContainer = document.getElementById(dotsId);
+            if (dotsContainer) {
+                dotsContainer.innerHTML = '';
+                slides.forEach((_, i) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'dot' + (i === 0 ? ' active' : '');
+                    dot.onclick = () => goToSlide(carouselId, i);
+                    dotsContainer.appendChild(dot);
+                });
+            }
+
+            carousels[carouselId] = {
+                track,
+                slides: track.querySelectorAll('.carousel-slide'),
+                dots: dotsContainer ? dotsContainer.querySelectorAll('.dot') : [],
+                currentIndex: 0,
+                totalSlides: slides.length,
+                interval: null
+            };
+
+            updateCarousel(carouselId);
+            if (wasRunning || !preserveAutoplayState) startAutoplay(carouselId);
+        }
+
+        function openItemFromCarousel(collection, itemId) {
+            const item = carouselItemCache[`${collection}:${itemId}`];
+            if (!item) return;
+            openItemModal(item, collection);
+        }
+
+        async function quickDownloadItem(collection, itemId) {
+            const item = carouselItemCache[`${collection}:${itemId}`];
+            if (!item || !item.imageUrl) return;
+            const prev = currentItem;
+            currentItem = { ...item, _type: collection };
+            await downloadCurrentItem();
+            currentItem = prev;
+        }
+
+        // ===== MEMBER MODAL =====
+        function openMemberModal(memberId) {
+            const member = carouselItemCache[`squadMembers:${memberId}`];
+            if (!member) return;
+            currentMember = member;
+
+            const imgEl = document.getElementById('memberModalImage');
+            const initialsEl = document.getElementById('memberModalInitials');
+
+            if (member.imageUrl) {
+                imgEl.src = member.imageUrl;
+                imgEl.style.display = 'block';
+                initialsEl.style.display = 'none';
+            } else {
+                imgEl.src = '';
+                imgEl.style.display = 'none';
+                const name = member.name || 'Anonymous';
+                const initials = member.initials || name.charAt(0).toUpperCase();
+                initialsEl.textContent = initials;
+                initialsEl.style.display = 'block';
+            }
+
+            document.getElementById('memberModalName').textContent = member.name || 'Anonymous';
+            document.getElementById('memberModalLocation').querySelector('span').textContent = member.location || 'Not set';
+            document.getElementById('memberModalBio').textContent = member.bio || 'No bio provided.';
+
+            const interests = member.interests
+                ? member.interests.split(',').map(t => t.trim()).filter(t => t)
+                : [];
+            const interestsSection = document.getElementById('memberModalInterestsSection');
+            const interestsEl = document.getElementById('memberModalInterests');
+            if (interests.length) {
+                interestsEl.innerHTML = interests.map(t => `<span class="interest-tag">#${escapeHtml(t)}</span>`).join('');
+                interestsSection.style.display = 'block';
+            } else {
+                interestsSection.style.display = 'none';
+            }
+
+            const dlBtn = document.getElementById('memberModalDownloadBtn');
+            if (member.imageUrl) {
+                dlBtn.disabled = false;
+                dlBtn.innerHTML = '<i class="fas fa-download"></i> Download Profile Picture';
+            } else {
+                dlBtn.disabled = true;
+                dlBtn.innerHTML = '<i class="fas fa-ban"></i> No profile picture';
+            }
+
+            document.getElementById('memberModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMemberModal() {
+            document.getElementById('memberModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            document.getElementById('memberModalImage').src = '';
+            currentMember = null;
+        }
+
+        async function downloadCurrentMemberAvatar() {
+            if (!currentMember || !currentMember.imageUrl) {
+                alert('No profile picture available.');
+                return;
+            }
+            const safeName = sanitizeFilename(currentMember.name);
+            const ext = extFromUrl(currentMember.imageUrl);
+            const filename = `TIMAWA_${safeName}_avatar.${ext}`;
+            try {
+                await downloadImage(currentMember.imageUrl, filename);
+            } catch (err) {
+                window.open(currentMember.imageUrl, '_blank', 'noopener');
+            }
+        }
+
+        // ===== HIGHLIGHT DETAIL MODAL =====
+        function openHighlightDetail(highlightId) {
+            const item = highlightsData.find(h => h.id === highlightId);
+            if (!item) return;
+
+            currentHighlightDetailId = highlightId;
+            currentHighlightDetailImageIndex = 0;
+
+            const imageUrls = item.imageURLs || [];
+            const mainImage = imageUrls[0] || '';
+            const authorName = item.authorName || 'Someone';
+            const authorUid = item.authorUid || '';
+            const authorProfile = userProfileCache[authorUid] || {};
+            const authorPhoto = authorProfile.photoURL || '';
+            const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const caption = item.caption || '';
+            const expiresAt = item.expiresAt ? new Date(item.expiresAt.toDate()) : new Date();
+            const createdAt = item.createdAt ? new Date(item.createdAt.toDate()) : null;
+            const now = new Date();
+            const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+            const isUrgent = daysLeft <= 1;
+            const hasMulti = imageUrls.length > 1;
+
+            const imgEl = document.getElementById('hlDetailImage');
+            if (mainImage) {
+                imgEl.src = mainImage;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.src = '';
+                imgEl.style.display = 'none';
+            }
+
+            const multiBadge = document.getElementById('hlDetailMultiBadge');
+            if (hasMulti) {
+                document.getElementById('hlDetailMultiCount').textContent = imageUrls.length;
+                multiBadge.style.display = 'inline-flex';
+            } else {
+                multiBadge.style.display = 'none';
+            }
+
+            const avatarEl = document.getElementById('hlDetailAvatar');
+            if (authorPhoto) {
+                avatarEl.innerHTML = `<img src="${cloudinaryThumb(authorPhoto, 120)}" alt="${escapeAttr(authorName)}" />`;
+            } else {
+                avatarEl.textContent = initials;
+            }
+
+            document.getElementById('hlDetailAuthor').textContent = authorName;
+            document.getElementById('hlDetailTime').textContent = createdAt ? `Posted ${formatRelativeTime(createdAt)}` : 'Posted recently';
+            document.getElementById('hlDetailCaption').textContent = caption || 'No caption';
+
+            document.getElementById('hlDetailPhotoCount').innerHTML =
+                `<i class="fas fa-images"></i> <span>${imageUrls.length} photo${imageUrls.length !== 1 ? 's' : ''}</span>`;
+            const expiryEl = document.getElementById('hlDetailExpiry');
+            expiryEl.innerHTML = `<i class="fas fa-clock"></i> <span>${daysLeft} day${daysLeft !== 1 ? 's' : ''} left</span>`;
+            expiryEl.classList.toggle('urgent', isUrgent);
+
+            const downloadBtn = document.getElementById('hlDetailDownloadBtn');
+            const viewAllBtn = document.getElementById('hlDetailViewAllBtn');
+
+            if (imageUrls.length > 0) {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = hasMulti ? '<i class="fas fa-download"></i> Download This' : '<i class="fas fa-download"></i> Download';
+            } else {
+                downloadBtn.disabled = true;
+                downloadBtn.innerHTML = '<i class="fas fa-ban"></i> No photo';
+            }
+
+            if (hasMulti) {
+                viewAllBtn.style.display = 'inline-flex';
+            } else {
+                viewAllBtn.style.display = 'none';
+            }
+
+            document.getElementById('highlightDetailModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeHighlightDetail() {
+            document.getElementById('highlightDetailModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            document.getElementById('hlDetailImage').src = '';
+            currentHighlightDetailId = null;
+            currentHighlightDetailImageIndex = 0;
+        }
+
+        async function downloadCurrentHighlightDetail() {
+            if (!currentHighlightDetailId) return;
+            const item = highlightsData.find(h => h.id === currentHighlightDetailId);
+            if (!item || !item.imageURLs || !item.imageURLs.length) return;
+
+            const url = item.imageURLs[currentHighlightDetailImageIndex] || item.imageURLs[0];
+            const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+            const ext = extFromUrl(url);
+            const filename = `TIMAWA_${safeAuthor}_photo_${currentHighlightDetailImageIndex + 1}.${ext}`;
+            try {
+                await downloadImage(url, filename);
+            } catch (err) {
+                window.open(url, '_blank', 'noopener');
+            }
+        }
+
+        function viewAllFromHighlightDetail() {
+            const id = currentHighlightDetailId;
+            if (!id) return;
+            closeHighlightDetail();
+            setTimeout(() => openGallery(id), 180);
+        }
+
+        // ===== HIGHLIGHT GALLERY MODAL =====
+        function openGallery(highlightId) {
+            const item = highlightsData.find(h => h.id === highlightId);
+            if (!item) return;
+
+            currentGalleryImages = item.imageURLs || [];
+            currentGalleryCaption = item.caption || '';
+            currentGalleryAuthor = item.authorName || 'Someone';
+
+            const titleText = document.getElementById('galleryTitleText');
+            const subtitle = document.getElementById('gallerySubtitle');
+            const captionEl = document.getElementById('galleryCaption');
+            const grid = document.getElementById('galleryGrid');
+
+            titleText.textContent = `${currentGalleryAuthor}'s Highlight`;
+            subtitle.textContent = `${currentGalleryImages.length} photo${currentGalleryImages.length !== 1 ? 's' : ''}`;
+
+            if (currentGalleryCaption) {
+                captionEl.classList.add('show');
+                captionEl.innerHTML = `<strong>${escapeHtml(currentGalleryAuthor)}:</strong> ${escapeHtml(currentGalleryCaption)}`;
+            } else {
+                captionEl.classList.remove('show');
+                captionEl.innerHTML = '';
+            }
+
+            let html = '';
+            currentGalleryImages.forEach((url, index) => {
+                html += `
+                    <div class="gallery-item">
+                        <img src="${cloudinaryThumb(url, 600)}" alt="Photo ${index + 1}" loading="lazy" decoding="async" />
+                        <button class="gallery-download-btn" title="Download this photo" onclick="downloadGalleryImage(${index})"><i class="fas fa-download"></i></button>
+                        <span class="image-index">${index + 1}</span>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+
+            const dlAllBtn = document.getElementById('galleryDownloadAllBtn');
+            dlAllBtn.style.display = currentGalleryImages.length > 1 ? 'inline-flex' : 'none';
+
+            document.getElementById('galleryModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeGallery() {
+            document.getElementById('galleryModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentGalleryImages = [];
+            currentGalleryCaption = '';
+            currentGalleryAuthor = '';
+            document.getElementById('galleryGrid').innerHTML = '';
+        }
+
+        async function downloadGalleryImage(index) {
+            const url = currentGalleryImages[index];
+            if (!url) return;
+            const safeAuthor = sanitizeFilename(currentGalleryAuthor);
+            const ext = extFromUrl(url);
+            const filename = `TIMAWA_${safeAuthor}_photo_${index + 1}.${ext}`;
+            try {
+                await downloadImage(url, filename);
+            } catch (err) {
+                window.open(url, '_blank', 'noopener');
+            }
+        }
+
+        async function downloadAllGalleryImages() {
+            if (currentGalleryImages.length === 0) return;
+
+            const btn = document.getElementById('galleryDownloadAllBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zipping...';
+
+            try {
+                const zip = new JSZip();
+                const safeAuthor = sanitizeFilename(currentGalleryAuthor);
+                const folder = zip.folder(`TIMAWA_${safeAuthor}`);
+
+                for (let i = 0; i < currentGalleryImages.length; i++) {
+                    const url = currentGalleryImages[i];
+                    try {
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+                        const ext = (blob.type.split('/')[1] || extFromUrl(url)).split('+')[0];
+                        folder.file(`photo_${i + 1}.${ext}`, blob);
+                    } catch (e) {
+                        console.warn('Failed to fetch image for zip:', e);
+                    }
+                }
+
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const date = new Date().toISOString().slice(0, 10);
+                saveAs(zipBlob, `TIMAWA_${safeAuthor}_${date}.zip`);
+            } catch (err) {
+                console.error('ZIP error:', err);
+                alert('❌ Error creating ZIP: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ===== MEMBERS =====
         function loadMembersFromFirestore() {
             const grid = document.getElementById('membersGrid');
             const countDisplay = document.getElementById('memberCountDisplay');
@@ -1383,79 +1653,67 @@
                     let html = '';
                     snapshot.forEach(doc => {
                         const data = doc.data();
+                        carouselItemCache[`squadMembers:${doc.id}`] = { id: doc.id, ...data };
+
                         const name = data.name || 'Anonymous';
                         const initials = data.initials || name.charAt(0).toUpperCase();
                         const location = data.location || '📍 Not set';
                         const bio = data.bio || 'New to the squad! 👋';
-                        const interests = data.interests ? data.interests.split(',').map(t => t.trim()) : [];
+                        const interests = data.interests
+                            ? data.interests.split(',').map(t => t.trim()).filter(t => t)
+                            : [];
 
-                        // Member avatar image
-                        const avatarContent = data.imageUrl ? 
-                            `<img src="${data.imageUrl}" alt="${name}" />` : 
-                            `<span class="avatar-text">${initials}</span>`;
+                        const avatarContent = data.imageUrl
+                            ? `<img src="${cloudinaryThumb(data.imageUrl, 400)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" />`
+                            : `<span class="avatar-text">${escapeHtml(initials)}</span>`;
+
+                        const hasImage = !!data.imageUrl;
+                        const memberIdSafe = escapeAttr(doc.id);
 
                         html += `
-                            <div class="member-card">
+                            <div class="member-card" data-member-id="${memberIdSafe}">
                                 <div class="avatar-container">
                                     ${avatarContent}
+                                    <div class="member-actions">
+                                        <button class="member-view" title="View profile" onclick="event.stopPropagation(); openMemberModal('${memberIdSafe}')"><i class="fas fa-expand"></i></button>
+                                        ${hasImage ? `<button class="member-download" title="Download profile picture" onclick="event.stopPropagation(); quickDownloadMemberAvatar('${memberIdSafe}')"><i class="fas fa-download"></i></button>` : ''}
+                                    </div>
                                 </div>
                                 <div class="member-body">
-                                    <div class="member-name">${name}</div>
-                                    <div class="member-location"><i class="fas fa-map-marker-alt"></i> ${location}</div>
-                                    <div class="member-bio">${bio}</div>
-                                    ${interests.length ? `
-                                        <div class="member-interests">
-                                            ${interests.map(t => `<span class="interest-tag">#${t}</span>`).join('')}
-                                        </div>
-                                    ` : ''}
+                                    <div class="member-name">${escapeHtml(name)}</div>
+                                    <div class="member-location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(location)}</div>
+                                    <div class="member-bio">${escapeHtml(bio)}</div>
+                                    ${interests.length ? `<div class="member-interests">${interests.map(t => `<span class="interest-tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
                                 </div>
                             </div>
                         `;
                     });
 
                     grid.innerHTML = html;
+
+                    grid.querySelectorAll('.member-card').forEach(card => {
+                        card.addEventListener('click', function() {
+                            openMemberModal(this.dataset.memberId);
+                        });
+                    });
                 });
         }
 
-        // ===== CAROUSEL FUNCTIONS =====
-        function initCarousel(id, trackId, dotsId) {
-            const track = document.getElementById(trackId);
-            if (!track) return;
-            
-            const slides = track.querySelectorAll('.carousel-slide');
-            const dotsContainer = document.getElementById(dotsId);
-            if (!dotsContainer) return;
-            
-            let currentIndex = 0;
-
-            dotsContainer.innerHTML = '';
-            slides.forEach((_, i) => {
-                const dot = document.createElement('button');
-                dot.className = 'dot' + (i === 0 ? ' active' : '');
-                dot.onclick = () => goToSlide(id, i);
-                dotsContainer.appendChild(dot);
-            });
-
-            carousels[id] = {
-                track: track,
-                slides: slides,
-                dots: dotsContainer.querySelectorAll('.dot'),
-                currentIndex: 0,
-                totalSlides: slides.length,
-                interval: null
-            };
-
-            updateCarousel(id);
-            startAutoplay(id);
+        async function quickDownloadMemberAvatar(memberId) {
+            const member = carouselItemCache[`squadMembers:${memberId}`];
+            if (!member || !member.imageUrl) return;
+            const prev = currentMember;
+            currentMember = member;
+            await downloadCurrentMemberAvatar();
+            currentMember = prev;
         }
 
+        // ===== CAROUSEL CONTROL =====
         function startAutoplay(id) {
             const carousel = carousels[id];
             if (!carousel || carousel.totalSlides <= 1) return;
             if (carousel.interval) clearInterval(carousel.interval);
-            carousel.interval = setInterval(() => {
-                moveCarousel(id, 1);
-            }, 4000);
+            carousel.interval = setInterval(() => moveCarousel(id, 1), CAROUSEL_AUTOPLAY_MS);
         }
 
         function stopAutoplay(id) {
@@ -1487,10 +1745,7 @@
             resetAutoplay(id);
         }
 
-        function resetAutoplay(id) {
-            stopAutoplay(id);
-            startAutoplay(id);
-        }
+        function resetAutoplay(id) { stopAutoplay(id); startAutoplay(id); }
 
         function goToSlide(id, index) {
             const carousel = carousels[id];
@@ -1506,35 +1761,32 @@
         function initHighlightsCarousel() {
             const track = document.getElementById('highlightsTrack');
             const dotsContainer = document.getElementById('highlightsDots');
-            let currentIndex = 0;
-            let interval = null;
+
+            const state = { currentIndex: 0, interval: null, highlights: [] };
 
             function updateCarousel() {
                 const slides = track.querySelectorAll('.highlights-carousel-slide');
                 if (slides.length === 0) return;
-                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                track.style.transform = `translateX(-${state.currentIndex * 100}%)`;
                 const dots = dotsContainer.querySelectorAll('.dot');
                 dots.forEach((dot, i) => {
-                    dot.className = 'dot' + (i === currentIndex ? ' active' : '');
+                    dot.className = 'dot' + (i === state.currentIndex ? ' active' : '');
                 });
             }
 
             function startAutoplay() {
-                if (interval) clearInterval(interval);
+                if (state.interval) clearInterval(state.interval);
                 const slides = track.querySelectorAll('.highlights-carousel-slide');
                 if (slides.length <= 1) return;
-                interval = setInterval(() => {
+                state.interval = setInterval(() => {
                     const slidesCount = track.querySelectorAll('.highlights-carousel-slide').length;
-                    currentIndex = (currentIndex + 1) % slidesCount;
+                    state.currentIndex = (state.currentIndex + 1) % slidesCount;
                     updateCarousel();
-                }, 5000);
+                }, CAROUSEL_AUTOPLAY_MS);
             }
 
             function stopAutoplay() {
-                if (interval) {
-                    clearInterval(interval);
-                    interval = null;
-                }
+                if (state.interval) { clearInterval(state.interval); state.interval = null; }
             }
 
             function createDots(count) {
@@ -1543,7 +1795,7 @@
                     const dot = document.createElement('button');
                     dot.className = 'dot' + (i === 0 ? ' active' : '');
                     dot.onclick = () => {
-                        currentIndex = i;
+                        state.currentIndex = i;
                         updateCarousel();
                         stopAutoplay();
                         startAutoplay();
@@ -1553,15 +1805,14 @@
             }
 
             function loadHighlights() {
-                if (unsubscribeHighlights) {
-                    unsubscribeHighlights();
-                }
+                if (unsubscribeHighlights) unsubscribeHighlights();
 
                 unsubscribeHighlights = db.collection('highlights')
                     .orderBy('createdAt', 'desc')
-                    .onSnapshot((snapshot) => {
+                    .onSnapshot(async (snapshot) => {
                         const now = new Date();
                         const validHighlights = [];
+                        const expiredIds = [];
 
                         snapshot.forEach(doc => {
                             const data = doc.data();
@@ -1570,12 +1821,33 @@
                             if (timeLeft > 0) {
                                 validHighlights.push({ id: doc.id, ...data });
                             } else {
-                                deleteHighlight(doc.id, data.imageURLs || []);
+                                expiredIds.push({ id: doc.id, imageURLs: data.imageURLs || [] });
                             }
                         });
 
+                        const authorUids = new Set();
+                        validHighlights.forEach(h => { if (h.authorUid) authorUids.add(h.authorUid); });
+                        const missingUids = [...authorUids].filter(uid => !userProfileCache[uid]);
+                        await Promise.all(missingUids.map(async uid => {
+                            try {
+                                const uDoc = await db.collection('users').doc(uid).get();
+                                if (uDoc.exists) userProfileCache[uid] = uDoc.data();
+                            } catch (e) {
+                                console.warn('Could not fetch user:', uid, e);
+                            }
+                        }));
+
                         highlightsData = validHighlights;
+                        state.highlights = validHighlights;
                         renderHighlights();
+
+                        if (expiredIds.length) {
+                            setTimeout(() => {
+                                expiredIds.forEach(({ id, imageURLs }) => {
+                                    deleteHighlight(id, imageURLs);
+                                });
+                            }, 0);
+                        }
                     }, (error) => {
                         console.error('Error loading highlights:', error);
                     });
@@ -1586,7 +1858,7 @@
                     for (const url of imageUrls) {
                         try {
                             const publicId = url.split('/').pop().split('.')[0];
-                            await fetch(`https://api.cloudinary.com/v1_1/ooq99nlw/image/destroy`, {
+                            await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/destroy`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ public_id: `t-imawa/highlights/${publicId}` })
@@ -1602,9 +1874,12 @@
             }
 
             function renderHighlights() {
-                if (highlightsData.length === 0) {
+                const wasRunning = state.interval !== null;
+                stopAutoplay();
+
+                if (state.highlights.length === 0) {
                     track.innerHTML = `
-                        <div class="highlights-carousel-slide" style="display:flex;align-items:center;justify-content:center;padding:40px;min-height:300px;">
+                        <div class="highlights-carousel-slide single-item" style="display:flex;align-items:center;justify-content:center;padding:40px;min-height:300px;">
                             <div style="text-align:center;color:#888;">
                                 <i class="fas fa-images" style="font-size:48px;color:#cff0ff;display:block;margin-bottom:15px;"></i>
                                 <h3 style="color:#333;font-size:20px;">No highlights yet</h3>
@@ -1616,36 +1891,68 @@
                     return;
                 }
 
+                const perSlide = getItemsPerSlide();
                 const slides = [];
-                for (let i = 0; i < highlightsData.length; i += 3) {
-                    slides.push(highlightsData.slice(i, i + 3));
+                for (let i = 0; i < state.highlights.length; i += perSlide) {
+                    slides.push(state.highlights.slice(i, i + perSlide));
                 }
 
                 let html = '';
                 slides.forEach(slide => {
-                    html += `<div class="highlights-carousel-slide">`;
+                    const slideClass = perSlide === 1 ? 'highlights-carousel-slide single-item' : 'highlights-carousel-slide';
+                    html += `<div class="${slideClass}">`;
                     slide.forEach(item => {
                         const imageUrls = item.imageURLs || [];
                         const mainImage = imageUrls.length > 0 ? imageUrls[0] : '';
+                        const thumbImage = mainImage ? cloudinaryThumb(mainImage, 500) : '';
                         const authorName = item.authorName || 'Someone';
+                        const authorUid = item.authorUid || '';
+                        const authorProfile = userProfileCache[authorUid] || {};
+                        const authorPhoto = authorProfile.photoURL || '';
                         const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                         const caption = item.caption || '';
                         const expiresAt = item.expiresAt ? new Date(item.expiresAt.toDate()) : new Date();
                         const now = new Date();
                         const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
                         const isUrgent = daysLeft <= 1;
+                        const hasMulti = imageUrls.length > 1;
+                        const hasImages = imageUrls.length > 0;
+
+                        const avatarContent = authorPhoto
+                            ? `<img src="${cloudinaryThumb(authorPhoto, 60)}" alt="${escapeAttr(authorName)}" loading="lazy" decoding="async" />`
+                            : initials;
+
+                        const safeId = escapeAttr(item.id);
 
                         html += `
-                            <div class="highlights-carousel-item">
+                            <div class="highlights-carousel-item" data-highlight-id="${safeId}">
                                 <div class="image-container">
-                                    ${mainImage ? `<img src="${mainImage}" alt="Highlight" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`}
-                                    ${imageUrls.length > 1 ? `<span class="image-count">+${imageUrls.length - 1} more</span>` : ''}
+                                    ${thumbImage
+                                        ? `<img src="${thumbImage}" alt="Highlight" loading="lazy" decoding="async" />`
+                                        : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`}
+                                    ${hasMulti ? `<span class="image-count"><i class="fas fa-images"></i> ${imageUrls.length}</span>` : ''}
                                     <span class="expiry-badge"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
+                                    ${hasImages ? `
+                                        <div class="hl-actions">
+                                            ${hasMulti ? `
+                                                <button class="hl-view" onclick="event.stopPropagation(); openGallery('${safeId}')">
+                                                    <i class="fas fa-expand"></i> View All
+                                                </button>
+                                                <button class="hl-download" onclick="event.stopPropagation(); downloadAllHighlightImages('${safeId}')">
+                                                    <i class="fas fa-file-zipper"></i> Zip
+                                                </button>
+                                            ` : `
+                                                <button class="hl-download" onclick="event.stopPropagation(); downloadSingleHighlightImage('${safeId}')">
+                                                    <i class="fas fa-download"></i> Download
+                                                </button>
+                                            `}
+                                        </div>
+                                    ` : ''}
                                 </div>
                                 <div class="item-body">
                                     ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
                                     <div class="meta">
-                                        <span class="author"><span class="avatar-small">${initials}</span> ${authorName}</span>
+                                        <span class="author"><span class="avatar-small">${avatarContent}</span> ${escapeHtml(authorName)}</span>
                                         <span class="expiry-time ${isUrgent ? 'urgent' : ''}"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
                                     </div>
                                 </div>
@@ -1656,20 +1963,32 @@
                 });
 
                 track.innerHTML = html;
+
+                // Click on the highlight card opens the detail popup
+                track.querySelectorAll('.highlights-carousel-item').forEach(card => {
+                    card.addEventListener('click', function(e) {
+                        if (e.target.closest('.hl-actions')) return;
+                        const id = this.dataset.highlightId;
+                        openHighlightDetail(id);
+                    });
+                });
+
                 createDots(slides.length);
-                currentIndex = 0;
+                state.currentIndex = 0;
                 updateCarousel();
-                startAutoplay();
+                if (wasRunning || state.highlights.length > 0) startAutoplay();
             }
 
             window.moveHighlightsCarousel = function(direction) {
                 const slides = track.querySelectorAll('.highlights-carousel-slide');
                 if (slides.length === 0) return;
                 stopAutoplay();
-                currentIndex = (currentIndex + direction + slides.length) % slides.length;
+                state.currentIndex = (state.currentIndex + direction + slides.length) % slides.length;
                 updateCarousel();
                 startAutoplay();
             };
+
+            window.__rerenderHighlights = function() { renderHighlights(); };
 
             const wrapper = document.getElementById('highlightsCarousel');
             wrapper.addEventListener('mouseenter', stopAutoplay);
@@ -1678,25 +1997,251 @@
             loadHighlights();
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
+        async function downloadSingleHighlightImage(id) {
+            const item = highlightsData.find(h => h.id === id);
+            if (!item || !item.imageURLs || !item.imageURLs.length) return;
+            const url = item.imageURLs[0];
+            const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+            const ext = extFromUrl(url);
+            const filename = `TIMAWA_${safeAuthor}_photo_1.${ext}`;
+            try {
+                await downloadImage(url, filename);
+            } catch (err) {
+                window.open(url, '_blank', 'noopener');
+            }
         }
 
-        // ===== INITIALIZE EVERYTHING =====
+        async function downloadAllHighlightImages(id) {
+            const item = highlightsData.find(h => h.id === id);
+            if (!item || !item.imageURLs || !item.imageURLs.length) return;
+
+            const zip = new JSZip();
+            const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+            const folder = zip.folder(`TIMAWA_${safeAuthor}`);
+            const urls = item.imageURLs;
+
+            try {
+                for (let i = 0; i < urls.length; i++) {
+                    try {
+                        const response = await fetch(urls[i]);
+                        const blob = await response.blob();
+                        const ext = (blob.type.split('/')[1] || extFromUrl(urls[i])).split('+')[0];
+                        folder.file(`photo_${i + 1}.${ext}`, blob);
+                    } catch (e) {
+                        console.warn('Failed to fetch image for zip:', e);
+                    }
+                }
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const date = new Date().toISOString().slice(0, 10);
+                saveAs(zipBlob, `TIMAWA_${safeAuthor}_${date}.zip`);
+            } catch (err) {
+                console.error('ZIP error:', err);
+                alert('❌ Error creating ZIP: ' + err.message);
+            }
+        }
+
+        // ===== MODAL STATE HELPER =====
+        function anyModalOpen() {
+            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal'].some(id =>
+                document.getElementById(id).classList.contains('active')
+            );
+        }
+
+        // ================================================================
+        // ===== TITA TIMA AI ASSISTANT =====
+        // ================================================================
+
+        function toggleTitaPanel() {
+            const panel = document.getElementById('titaPanel');
+            if (panel.classList.contains('open')) {
+                closeTitaPanel();
+            } else {
+                openTitaPanel();
+            }
+        }
+
+        function openTitaPanel() {
+            if (!titaCurrentUser) {
+                alert('Please sign in to use Tita Tima 😊');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const panel = document.getElementById('titaPanel');
+            panel.classList.add('open');
+
+            populateTitaFields();
+
+            document.getElementById('titaBadge').classList.remove('show');
+
+            setTimeout(() => {
+                document.getElementById('titaUsername').focus();
+            }, 200);
+        }
+
+        function closeTitaPanel() {
+            const panel = document.getElementById('titaPanel');
+            if (panel) panel.classList.remove('open');
+        }
+
+        function populateTitaFields() {
+            if (!titaUserData) return;
+
+            const name = titaUserData.displayName || titaCurrentUser.displayName || titaCurrentUser.email || '';
+            const status = titaUserData.status || 'available';
+            const loveLife = titaUserData.loveLife || '';
+            const location = titaUserData.location || '';
+            const bio = titaUserData.bio || '';
+            const interests = titaUserData.interests || '';
+
+            document.getElementById('titaGreetName').textContent = name.split(' ')[0] || 'ka-TIMAWA';
+            document.getElementById('titaUsername').value = name;
+            document.getElementById('titaStatus').value = status;
+            document.getElementById('titaLoveLife').value = loveLife;
+            document.getElementById('titaBio').value = bio;
+            document.getElementById('titaInterests').value = interests;
+
+            const presetLocations = [
+                'Alabat, Quezon', 'Perez, Quezon', 'Atimonan, Quezon',
+                'Lucena, Quezon', 'Lucban, Quezon', 'San Pedro, Laguna', 'Santa Cruz, Laguna'
+            ];
+            const selectEl = document.getElementById('titaLocationSelect');
+            const customEl = document.getElementById('titaCustomLocation');
+
+            if (!location) {
+                selectEl.value = '';
+                customEl.value = '';
+                customEl.style.display = 'none';
+            } else if (presetLocations.includes(location)) {
+                selectEl.value = location;
+                customEl.value = '';
+                customEl.style.display = 'none';
+            } else {
+                selectEl.value = 'custom';
+                customEl.value = location;
+                customEl.style.display = 'block';
+            }
+
+            const msg = document.getElementById('titaStatusMsg');
+            msg.classList.remove('show');
+            msg.textContent = '';
+        }
+
+        function titaToggleCustomLocation() {
+            const select = document.getElementById('titaLocationSelect');
+            const custom = document.getElementById('titaCustomLocation');
+            if (select.value === 'custom') {
+                custom.style.display = 'block';
+                custom.focus();
+            } else {
+                custom.style.display = 'none';
+                custom.value = '';
+            }
+        }
+
+        function titaShowStatus(text, type) {
+            const msg = document.getElementById('titaStatusMsg');
+            msg.textContent = text;
+            msg.className = `tita-status-msg show ${type}`;
+        }
+
+        async function titaSaveProfile() {
+            if (!titaCurrentUser) return;
+
+            const btn = document.getElementById('titaSaveBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const displayName = document.getElementById('titaUsername').value.trim();
+                const status = document.getElementById('titaStatus').value;
+                const loveLife = document.getElementById('titaLoveLife').value;
+                const locationSelect = document.getElementById('titaLocationSelect').value;
+                const customLocation = document.getElementById('titaCustomLocation').value.trim();
+                const bio = document.getElementById('titaBio').value.trim();
+                const interests = document.getElementById('titaInterests').value.trim();
+
+                let location = '';
+                if (locationSelect === 'custom') {
+                    location = customLocation;
+                } else {
+                    location = locationSelect;
+                }
+
+                if (!displayName) {
+                    titaShowStatus('⚠️ Username cannot be empty', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    return;
+                }
+
+                titaShowStatus('📝 Saving changes...', 'info');
+
+                const updateData = {
+                    displayName,
+                    status,
+                    loveLife,
+                    location,
+                    bio,
+                    interests,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
+
+                titaUserData = { ...titaUserData, ...updateData };
+
+                if (displayName !== titaCurrentUser.displayName) {
+                    try {
+                        await titaCurrentUser.updateProfile({ displayName });
+                    } catch (authErr) {
+                        console.warn('Could not update auth display name:', authErr);
+                    }
+                }
+
+                titaShowStatus('✅ Saved! Anong susunod, \'nak?', 'success');
+
+                setTimeout(() => {
+                    const msg = document.getElementById('titaStatusMsg');
+                    msg.classList.remove('show');
+                }, 3000);
+
+            } catch (err) {
+                console.error('Tita save error:', err);
+                titaShowStatus('❌ Error: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ===== VIEWPORT CHANGE HANDLER =====
+        let lastIsMobile = isMobile();
+        let resizeDebounceTimer = null;
+
+        window.addEventListener('resize', function() {
+            if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
+            resizeDebounceTimer = setTimeout(function() {
+                const nowMobile = isMobile();
+                if (nowMobile !== lastIsMobile) {
+                    lastIsMobile = nowMobile;
+                    Object.keys(carouselDataStore).forEach(id => renderCarousel(id, true));
+                    if (typeof window.__rerenderHighlights === 'function') {
+                        window.__rerenderHighlights();
+                    }
+                }
+            }, 150);
+        });
+
+        // ===== INIT =====
         document.addEventListener('DOMContentLoaded', function() {
             loadCarouselData('coffeeShops', 'coffeeTrack', 'coffeeDots', 'coffee');
             loadCarouselData('favoritePlaces', 'placesTrack', 'placesDots', 'places');
             loadCarouselData('thingsToDo', 'activitiesTrack', 'activitiesDots', 'activities');
             loadMembersFromFirestore();
-            
-            setTimeout(() => {
-                initHighlightsCarousel();
-                initCarousel('coffee', 'coffeeTrack', 'coffeeDots');
-                initCarousel('places', 'placesTrack', 'placesDots');
-                initCarousel('activities', 'activitiesTrack', 'activitiesDots');
-            }, 500);
+
+            setTimeout(() => { initHighlightsCarousel(); }, 500);
 
             document.querySelectorAll('.carousel-wrapper').forEach(wrapper => {
                 wrapper.addEventListener('mouseenter', function() {
@@ -1711,11 +2256,10 @@
         });
 
         function toggleMobileMenu() {
-            const nav = document.getElementById('navLinks');
-            nav.classList.toggle('active');
+            document.getElementById('navLinks').classList.toggle('active');
         }
 
-        document.querySelectorAll('.nav-links a').forEach(link => {
+        document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
             link.addEventListener('click', () => {
                 document.getElementById('navLinks').classList.remove('active');
             });
@@ -1725,20 +2269,45 @@
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
         });
 
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
-            if (window.scrollY > 20) {
-                navbar.style.boxShadow = '0 2px 30px rgba(0,0,0,0.08)';
-            } else {
-                navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.04)';
+            navbar.style.boxShadow = window.scrollY > 20
+                ? '0 2px 30px rgba(0,0,0,0.08)'
+                : '0 2px 20px rgba(0,0,0,0.04)';
+        });
+
+        window.addEventListener('click', function(event) {
+            const itemModal = document.getElementById('itemModal');
+            const memberModal = document.getElementById('memberModal');
+            const galleryModal = document.getElementById('galleryModal');
+            const highlightDetailModal = document.getElementById('highlightDetailModal');
+            const titaPanel = document.getElementById('titaPanel');
+
+            if (event.target === itemModal) closeItemModal();
+            if (event.target === memberModal) closeMemberModal();
+            if (event.target === galleryModal) closeGallery();
+            if (event.target === highlightDetailModal) closeHighlightDetail();
+            if (titaPanel && titaPanel.classList.contains('open') &&
+                !titaPanel.contains(event.target) &&
+                !event.target.closest('#titaLauncher')) {
+                closeTitaPanel();
             }
         });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key !== 'Escape') return;
+            if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
+            else if (document.getElementById('highlightDetailModal').classList.contains('active')) closeHighlightDetail();
+            else if (document.getElementById('memberModal').classList.contains('active')) closeMemberModal();
+            else if (document.getElementById('itemModal').classList.contains('active')) closeItemModal();
+            else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
+        });
     </script>
+
+    <script src="idle-logout.js"></script>
 </body>
 </html>

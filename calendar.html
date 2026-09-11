@@ -13,12 +13,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     
-    <!-- FullCalendar -->
+    <!-- FullCalendar (no rrule plugin needed anymore) -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    
-    <!-- rrule for recurring events -->
-    <script src="https://cdn.jsdelivr.net/npm/rrule@2.6.0/dist/es5/rrule.min.js"></script>
     
     <style>
         * {
@@ -715,6 +712,297 @@
             color: #888;
         }
 
+        /* ================================================================
+           ===== TITA TIMA AI ASSISTANT (FLOATING) =====
+           ================================================================ */
+
+        .tita-launcher {
+            position: fixed;
+            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            right: 24px;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            font-size: 24px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2500;
+            box-shadow: 0 8px 30px rgba(16, 137, 211, 0.45);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tita-launcher.visible { display: flex; }
+
+        .tita-launcher:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.6);
+        }
+
+        .tita-launcher .tita-pulse {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid rgba(16, 137, 211, 0.5);
+            animation: titaPulse 2.4s ease-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes titaPulse {
+            0%   { transform: scale(0.9); opacity: 0.9; }
+            100% { transform: scale(1.35); opacity: 0; }
+        }
+
+        .tita-launcher .tita-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: #ef4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            display: none;
+        }
+
+        .tita-launcher .tita-badge.show { display: block; }
+
+        .tita-panel {
+            position: fixed;
+            bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+            right: 24px;
+            width: 380px;
+            max-width: calc(100vw - 40px);
+            max-height: calc(100vh - 140px);
+            background: white;
+            border-radius: 22px;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
+            border: 1px solid #eef2f7;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 2499;
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .tita-panel.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .tita-header {
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .tita-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgb(16, 137, 211);
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .tita-header-info { flex: 1; min-width: 0; }
+
+        .tita-name {
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tita-name .tita-online {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #86efac;
+            box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.35);
+        }
+
+        .tita-tagline {
+            font-size: 11px;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .tita-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .tita-close:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
+        }
+
+        .tita-body {
+            padding: 16px 18px 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .tita-greeting {
+            background: #f0f9ff;
+            border-left: 3px solid rgb(16, 137, 211);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .tita-greeting strong { color: rgb(16, 137, 211); }
+
+        .tita-field { margin-bottom: 12px; }
+
+        .tita-field label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .tita-field label i {
+            color: rgb(16, 137, 211);
+            font-size: 11px;
+        }
+
+        .tita-field input,
+        .tita-field textarea,
+        .tita-field select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 2px solid #e0e7ff;
+            background: #f8faff;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            transition: all 0.25s ease;
+        }
+
+        .tita-field input:focus,
+        .tita-field textarea:focus,
+        .tita-field select:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+
+        .tita-field textarea {
+            min-height: 62px;
+            resize: vertical;
+        }
+
+        .tita-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .tita-save {
+            flex: 1;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
+        }
+
+        .tita-save:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(16, 137, 211, 0.45);
+        }
+
+        .tita-save:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tita-cancel {
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 2px solid #e0e7ff;
+            background: white;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .tita-cancel:hover {
+            border-color: rgb(16, 137, 211);
+            color: rgb(16, 137, 211);
+        }
+
+        .tita-status-msg {
+            margin-top: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+            text-align: center;
+        }
+
+        .tita-status-msg.show { display: block; }
+        .tita-status-msg.success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
+        .tita-status-msg.error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
+        .tita-status-msg.info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .navbar {
@@ -838,6 +1126,25 @@
                 width: 100%;
                 text-align: center;
             }
+
+            /* Tita Tima mobile/tablet */
+            .tita-launcher {
+                bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+                right: 18px;
+                width: 58px;
+                height: 58px;
+                font-size: 22px;
+                z-index: 2500;
+            }
+            .tita-panel {
+                bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+                right: 14px;
+                left: 14px;
+                width: auto;
+                max-width: none;
+                max-height: calc(100vh - 130px);
+                z-index: 2499;
+            }
         }
 
         @media (max-width: 480px) {
@@ -893,6 +1200,21 @@
             .navbar .nav-links a {
                 font-size: 16px;
                 padding: 8px 16px;
+            }
+
+            /* Tita Tima small phone */
+            .tita-launcher {
+                bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+                right: 16px;
+                width: 56px;
+                height: 56px;
+                font-size: 22px;
+            }
+            .tita-panel {
+                bottom: calc(86px + env(safe-area-inset-bottom, 0px));
+                right: 10px;
+                left: 10px;
+                max-height: calc(100vh - 120px);
             }
         }
 
@@ -1067,6 +1389,89 @@
         </div>
     </div>
 
+    <!-- ===== TITA TIMA AI ASSISTANT ===== -->
+    <button id="titaLauncher" class="tita-launcher" onclick="toggleTitaPanel()" aria-label="Open Tita Tima assistant">
+        <span class="tita-pulse"></span>
+        <i class="fas fa-robot"></i>
+        <span class="tita-badge" id="titaBadge"></span>
+    </button>
+
+    <div id="titaPanel" class="tita-panel" role="dialog" aria-labelledby="titaTitle">
+        <div class="tita-header">
+            <div class="tita-avatar"><i class="fas fa-robot"></i></div>
+            <div class="tita-header-info">
+                <div class="tita-name" id="titaTitle">Tita Tima <span class="tita-online"></span></div>
+                <div class="tita-tagline">"Anong update mo today, 'nak?"</div>
+            </div>
+            <button class="tita-close" onclick="closeTitaPanel()" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="tita-body">
+            <div class="tita-greeting" id="titaGreeting">
+                Kumusta, <strong id="titaGreetName">ka-TIMAWA</strong>! Gusto mo ba mag-update ng status? Fill out lang dito, save agad. 😊
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="titaUsername" placeholder="Your display name" />
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-circle"></i> Status</label>
+                <select id="titaStatus">
+                    <option value="available">🟢 Available</option>
+                    <option value="busy">🔴 Busy</option>
+                    <option value="away">🟡 Away</option>
+                    <option value="dnd">🟣 Do Not Disturb</option>
+                </select>
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-heart-broken"></i> Love Life</label>
+                <select id="titaLoveLife">
+                    <option value="">— Not set —</option>
+                    <option value="Single">💔 Single</option>
+                    <option value="MU">💞 MU (Mutual Understanding)</option>
+                    <option value="Married">💍 Married</option>
+                </select>
+            </div>
+
+            <div class="tita-field" id="titaLocationField">
+                <label><i class="fas fa-map-marker-alt"></i> Location</label>
+                <select id="titaLocationSelect" onchange="titaToggleCustomLocation()">
+                    <option value="">Select your location</option>
+                    <option value="Alabat, Quezon">📍 Alabat, Quezon</option>
+                    <option value="Perez, Quezon">📍 Perez, Quezon</option>
+                    <option value="Atimonan, Quezon">📍 Atimonan, Quezon</option>
+                    <option value="Lucena, Quezon">📍 Lucena, Quezon</option>
+                    <option value="Lucban, Quezon">📍 Lucban, Quezon</option>
+                    <option value="San Pedro, Laguna">📍 San Pedro, Laguna</option>
+                    <option value="Santa Cruz, Laguna">📍 Santa Cruz, Laguna</option>
+                    <option value="custom">✏️ Others (Customize)</option>
+                </select>
+                <input type="text" id="titaCustomLocation" placeholder="Enter your location..." style="display:none; margin-top:6px;" />
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-info-circle"></i> Bio</label>
+                <textarea id="titaBio" placeholder="Short bio / about me..."></textarea>
+            </div>
+
+            <div class="tita-field">
+                <label><i class="fas fa-heart"></i> Interests</label>
+                <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
+            </div>
+
+            <div class="tita-actions">
+                <button class="tita-save" id="titaSaveBtn" onclick="titaSaveProfile()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <button class="tita-cancel" onclick="closeTitaPanel()">Close</button>
+            </div>
+
+            <div class="tita-status-msg" id="titaStatusMsg"></div>
+        </div>
+    </div>
+
     <!-- ===== FOOTER ===== -->
     <footer class="footer">
         <p>Made with ❤️ for the TIMAWA squad &copy; 2022</p>
@@ -1095,6 +1500,13 @@
         let selectedDate = null;
         let unsubscribeEvents = null;
         let unsubscribeBirthdays = null;
+
+        // Tita Tima state
+        let titaCurrentUser = null;
+        let titaUserData = null;
+
+        // How many years ahead to pre-generate birthday instances.
+        const BIRTHDAY_YEARS_AHEAD = 20;
 
         // ===== HELPER: CONVERT TIMESTAMP TO DATE =====
         function convertTimestampToDate(timestamp) {
@@ -1140,19 +1552,28 @@
             }
 
             currentUser = user;
+            titaCurrentUser = user;
 
             try {
                 const doc = await db.collection('users').doc(user.uid).get();
                 const data = doc.data();
+                titaUserData = data;
                 const name = data?.displayName || user.displayName || user.email || 'User';
-                document.getElementById('userName').textContent = name;
+
+                const userNameEl = document.getElementById('userName');
+                if (userNameEl) userNameEl.textContent = name;
 
                 const avatarEl = document.getElementById('userAvatar');
-                if (data?.photoURL) {
-                    avatarEl.innerHTML = `<img src="${data.photoURL}" alt="${name}" />`;
-                } else {
-                    avatarEl.textContent = name.charAt(0).toUpperCase();
+                if (avatarEl) {
+                    if (data?.photoURL) {
+                        avatarEl.innerHTML = `<img src="${data.photoURL}" alt="${name}" />`;
+                    } else {
+                        avatarEl.textContent = name.charAt(0).toUpperCase();
+                    }
                 }
+
+                // Show Tita Tima launcher
+                document.getElementById('titaLauncher').classList.add('visible');
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
@@ -1199,30 +1620,33 @@
             }
 
             unsubscribeBirthdays = db.collection('users')
-                .where('birthday', '!=', '')
                 .onSnapshot((snapshot) => {
-                    const now = new Date();
                     birthdayEvents = [];
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         const birthday = data.birthday;
-                        if (!birthday) return;
+
+                        if (!birthday || typeof birthday !== 'string' || !birthday.trim()) return;
+
+                        const parts = birthday.split('-');
+                        if (parts.length !== 3) return;
+
+                        const birthYear = parseInt(parts[0], 10);
+                        const birthMonth = parseInt(parts[1], 10) - 1;
+                        const birthDay = parseInt(parts[2], 10);
+                        if (isNaN(birthMonth) || isNaN(birthDay)) return;
 
                         const name = data.displayName || data.email || 'Someone';
                         const photoURL = data.photoURL || '';
                         const location = data.location || '';
-
-                        // Parse birthday (YYYY-MM-DD)
-                        const parts = birthday.split('-');
-                        const birthMonth = parseInt(parts[1]) - 1;
-                        const birthDay = parseInt(parts[2]);
 
                         birthdayEvents.push({
                             id: doc.id,
                             name: name,
                             photoURL: photoURL,
                             birthday: birthday,
+                            birthYear: isNaN(birthYear) ? 2000 : birthYear,
                             birthMonth: birthMonth,
                             birthDay: birthDay,
                             location: location,
@@ -1230,7 +1654,6 @@
                         });
                     });
 
-                    // Sort by upcoming date
                     sortBirthdays();
                     
                     if (calendar) {
@@ -1248,9 +1671,7 @@
             const currentYear = now.getFullYear();
             
             birthdayEvents.forEach(item => {
-                // Create birthday date for current year
                 let birthdayDate = new Date(currentYear, item.birthMonth, item.birthDay);
-                // If birthday already passed this year, use next year
                 if (birthdayDate < now) {
                     birthdayDate = new Date(currentYear + 1, item.birthMonth, item.birthDay);
                 }
@@ -1328,7 +1749,6 @@
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
             
-            // Custom button for year navigation
             const customButtons = {
                 prevYear: {
                     text: '<<',
@@ -1371,7 +1791,6 @@
                     selectedEventId = event.id;
                     
                     if (extendedProps.isBirthday) {
-                        // Show birthday info in a nice alert
                         const birthdayDate = event.start ? new Date(event.start) : new Date();
                         const dateStr = birthdayDate.toLocaleDateString('en-US', {
                             weekday: 'long',
@@ -1435,7 +1854,6 @@
                 }
             });
 
-            // Also check for birthdays on this date
             const birthdayOnDate = birthdayEvents.filter(item => {
                 const birthdayDate = new Date(date.getFullYear(), item.birthMonth, item.birthDay);
                 return birthdayDate.toDateString() === selectedDateStr;
@@ -1453,7 +1871,6 @@
             } else {
                 let html = '';
                 
-                // Show birthdays first
                 birthdayOnDate.forEach(item => {
                     html += `
                         <div class="event-list-item" style="border-left-color: #f5576c;">
@@ -1467,7 +1884,6 @@
                     `;
                 });
                 
-                // Then show regular events
                 eventsOnDate.forEach(event => {
                     const eventDate = convertTimestampToDate(event.dateTime);
                     const time = eventDate.toLocaleTimeString('en-US', {
@@ -1578,7 +1994,7 @@
             }
         }
 
-        // ===== UPDATE CALENDAR EVENTS (WITH RECURRING BIRTHDAYS) =====
+        // ===== UPDATE CALENDAR EVENTS =====
         function updateCalendarEvents() {
             if (!calendar) return;
 
@@ -1607,40 +2023,33 @@
                 };
             });
 
-            // ===== RECURRING BIRTHDAY EVENTS =====
-            // Using rrule to make birthdays repeat annually
-            const birthdayCalendarEvents = birthdayEvents.map(item => {
-                // Create a date for the birthday in the current year
-                const now = new Date();
-                const currentYear = now.getFullYear();
-                let startDate = new Date(currentYear, item.birthMonth, item.birthDay);
-                
-                // If the birthday already passed this year, start from next year
-                if (startDate < now) {
-                    startDate = new Date(currentYear + 1, item.birthMonth, item.birthDay);
+            // ===== BIRTHDAYS (manually expanded, no rrule plugin needed) =====
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const startYear = currentYear - 1;
+            const endYear = currentYear + BIRTHDAY_YEARS_AHEAD;
+
+            const birthdayCalendarEvents = [];
+            birthdayEvents.forEach(item => {
+                for (let y = startYear; y <= endYear; y++) {
+                    const d = new Date(y, item.birthMonth, item.birthDay);
+                    birthdayCalendarEvents.push({
+                        id: `birthday-${item.id}-${y}`,
+                        title: `${item.name}'s Birthday 🎂`,
+                        start: d,
+                        allDay: true,
+                        extendedProps: {
+                            isBirthday: true,
+                            location: item.location || '',
+                            userId: item.id,
+                            year: y
+                        },
+                        backgroundColor: '#f5576c',
+                        borderColor: '#f5576c',
+                        textColor: '#ffffff',
+                        classNames: ['birthday-event']
+                    });
                 }
-                
-                return {
-                    id: `birthday-${item.id}`,
-                    title: `${item.name}'s Birthday 🎂`,
-                    start: startDate,
-                    allDay: true,
-                    // RRULE: Repeat annually forever
-                    rrule: {
-                        freq: 'yearly',
-                        interval: 1
-                    },
-                    duration: '24:00:00',
-                    extendedProps: {
-                        isBirthday: true,
-                        location: item.location || '',
-                        userId: item.id
-                    },
-                    backgroundColor: '#f5576c',
-                    borderColor: '#f5576c',
-                    textColor: '#ffffff',
-                    classNames: ['birthday-event']
-                };
             });
 
             const allEvents = [...events, ...birthdayCalendarEvents];
@@ -1648,9 +2057,6 @@
 
             calendar.removeAllEvents();
             calendar.addEventSource(allEvents);
-            calendar.render();
-            
-            console.log('✅ Calendar updated!');
         }
 
         // ===== GET EVENT COLOR =====
@@ -1778,6 +2184,7 @@
             const eventModal = document.getElementById('eventModal');
             const detailModal = document.getElementById('eventDetailModal');
             const datePopup = document.getElementById('datePopupModal');
+            const titaPanel = document.getElementById('titaPanel');
             
             if (event.target === eventModal) {
                 closeEventModal();
@@ -1787,6 +2194,11 @@
             }
             if (event.target === datePopup) {
                 closeDatePopup();
+            }
+            if (titaPanel && titaPanel.classList.contains('open') &&
+                !titaPanel.contains(event.target) &&
+                !event.target.closest('#titaLauncher')) {
+                closeTitaPanel();
             }
         }
 
@@ -1799,6 +2211,186 @@
                 navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.04)';
             }
         });
+
+        // ================================================================
+        // ===== TITA TIMA AI ASSISTANT =====
+        // ================================================================
+
+        function toggleTitaPanel() {
+            const panel = document.getElementById('titaPanel');
+            if (panel.classList.contains('open')) {
+                closeTitaPanel();
+            } else {
+                openTitaPanel();
+            }
+        }
+
+        function openTitaPanel() {
+            if (!titaCurrentUser) {
+                alert('Please sign in to use Tita Tima 😊');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const panel = document.getElementById('titaPanel');
+            panel.classList.add('open');
+
+            populateTitaFields();
+
+            document.getElementById('titaBadge').classList.remove('show');
+
+            setTimeout(() => {
+                document.getElementById('titaUsername').focus();
+            }, 200);
+        }
+
+        function closeTitaPanel() {
+            const panel = document.getElementById('titaPanel');
+            if (panel) panel.classList.remove('open');
+        }
+
+        function populateTitaFields() {
+            if (!titaUserData) return;
+
+            const name = titaUserData.displayName || titaCurrentUser.displayName || titaCurrentUser.email || '';
+            const status = titaUserData.status || 'available';
+            const loveLife = titaUserData.loveLife || '';
+            const location = titaUserData.location || '';
+            const bio = titaUserData.bio || '';
+            const interests = titaUserData.interests || '';
+
+            document.getElementById('titaGreetName').textContent = name.split(' ')[0] || 'ka-TIMAWA';
+            document.getElementById('titaUsername').value = name;
+            document.getElementById('titaStatus').value = status;
+            document.getElementById('titaLoveLife').value = loveLife;
+            document.getElementById('titaBio').value = bio;
+            document.getElementById('titaInterests').value = interests;
+
+            const presetLocations = [
+                'Alabat, Quezon', 'Perez, Quezon', 'Atimonan, Quezon',
+                'Lucena, Quezon', 'Lucban, Quezon', 'San Pedro, Laguna', 'Santa Cruz, Laguna'
+            ];
+            const selectEl = document.getElementById('titaLocationSelect');
+            const customEl = document.getElementById('titaCustomLocation');
+
+            if (!location) {
+                selectEl.value = '';
+                customEl.value = '';
+                customEl.style.display = 'none';
+            } else if (presetLocations.includes(location)) {
+                selectEl.value = location;
+                customEl.value = '';
+                customEl.style.display = 'none';
+            } else {
+                selectEl.value = 'custom';
+                customEl.value = location;
+                customEl.style.display = 'block';
+            }
+
+            const msg = document.getElementById('titaStatusMsg');
+            msg.classList.remove('show');
+            msg.textContent = '';
+        }
+
+        function titaToggleCustomLocation() {
+            const select = document.getElementById('titaLocationSelect');
+            const custom = document.getElementById('titaCustomLocation');
+            if (select.value === 'custom') {
+                custom.style.display = 'block';
+                custom.focus();
+            } else {
+                custom.style.display = 'none';
+                custom.value = '';
+            }
+        }
+
+        function titaShowStatus(text, type) {
+            const msg = document.getElementById('titaStatusMsg');
+            msg.textContent = text;
+            msg.className = `tita-status-msg show ${type}`;
+        }
+
+        async function titaSaveProfile() {
+            if (!titaCurrentUser) return;
+
+            const btn = document.getElementById('titaSaveBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const displayName = document.getElementById('titaUsername').value.trim();
+                const status = document.getElementById('titaStatus').value;
+                const loveLife = document.getElementById('titaLoveLife').value;
+                const locationSelect = document.getElementById('titaLocationSelect').value;
+                const customLocation = document.getElementById('titaCustomLocation').value.trim();
+                const bio = document.getElementById('titaBio').value.trim();
+                const interests = document.getElementById('titaInterests').value.trim();
+
+                let location = '';
+                if (locationSelect === 'custom') {
+                    location = customLocation;
+                } else {
+                    location = locationSelect;
+                }
+
+                if (!displayName) {
+                    titaShowStatus('⚠️ Username cannot be empty', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = originalHtml;
+                    return;
+                }
+
+                titaShowStatus('📝 Saving changes...', 'info');
+
+                const updateData = {
+                    displayName,
+                    status,
+                    loveLife,
+                    location,
+                    bio,
+                    interests,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
+
+                titaUserData = { ...titaUserData, ...updateData };
+
+                if (displayName !== titaCurrentUser.displayName) {
+                    try {
+                        await titaCurrentUser.updateProfile({ displayName });
+                    } catch (authErr) {
+                        console.warn('Could not update auth display name:', authErr);
+                    }
+                }
+
+                titaShowStatus('✅ Saved! Anong susunod, \'nak?', 'success');
+
+                setTimeout(() => {
+                    const msg = document.getElementById('titaStatusMsg');
+                    msg.classList.remove('show');
+                }, 3000);
+
+            } catch (err) {
+                console.error('Tita save error:', err);
+                titaShowStatus('❌ Error: ' + err.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ===== ESCAPE KEY HANDLER =====
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('titaPanel').classList.contains('open')) {
+                    closeTitaPanel();
+                }
+            }
+        });
     </script>
+
+    <script src="idle-logout.js"></script>
 </body>
 </html>

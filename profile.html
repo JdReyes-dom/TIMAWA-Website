@@ -286,25 +286,28 @@
             margin-top: 8px;
         }
 
-        .status-badge.available {
-            background: #dcfce7;
-            color: #16a34a;
+        .status-badge.available { background: #dcfce7; color: #16a34a; }
+        .status-badge.busy { background: #fee2e2; color: #dc2626; }
+        .status-badge.away { background: #fef3c7; color: #d97706; }
+        .status-badge.dnd { background: #f3e8ff; color: #7c3aed; }
+
+        /* ===== LOVE LIFE BADGE (NEW) ===== */
+        .lovelife-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 6px;
+            margin-left: 6px;
         }
 
-        .status-badge.busy {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .status-badge.away {
-            background: #fef3c7;
-            color: #d97706;
-        }
-
-        .status-badge.dnd {
-            background: #f3e8ff;
-            color: #7c3aed;
-        }
+        .lovelife-badge.single { background: #fee2e2; color: #dc2626; }
+        .lovelife-badge.mu { background: #fce7f3; color: #db2777; }
+        .lovelife-badge.married { background: #dcfce7; color: #16a34a; }
+        .lovelife-badge.notset { background: #f3f4f6; color: #9ca3af; }
 
         .profile-section {
             padding: 60px 40px;
@@ -417,26 +420,9 @@
             display: none;
         }
 
-        .message.success {
-            background: #dcfce7;
-            color: #16a34a;
-            border: 1px solid #bbf7d0;
-            display: block;
-        }
-
-        .message.error {
-            background: #fee2e2;
-            color: #dc2626;
-            border: 1px solid #fecaca;
-            display: block;
-        }
-
-        .message.info {
-            background: #dbeafe;
-            color: #2563eb;
-            border: 1px solid #bfdbfe;
-            display: block;
-        }
+        .message.success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; display: block; }
+        .message.error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; display: block; }
+        .message.info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; display: block; }
 
         .progress-container {
             display: none;
@@ -448,9 +434,7 @@
             height: 8px;
         }
 
-        .progress-container.active {
-            display: block;
-        }
+        .progress-container.active { display: block; }
 
         .progress-bar {
             height: 100%;
@@ -468,9 +452,7 @@
             display: none;
         }
 
-        .progress-text.active {
-            display: block;
-        }
+        .progress-text.active { display: block; }
 
         .form-actions {
             display: flex;
@@ -562,21 +544,10 @@
                 padding: 100px 30px 50px;
             }
 
-            .hero-content .intro-text {
-                margin: 0 auto 20px;
-            }
-
-            .hero-content .bio-tags {
-                justify-content: center;
-            }
-
-            .hero-image .profile-card {
-                max-width: 350px;
-            }
-
-            .profile-section {
-                padding: 40px 20px;
-            }
+            .hero-content .intro-text { margin: 0 auto 20px; }
+            .hero-content .bio-tags { justify-content: center; }
+            .hero-image .profile-card { max-width: 350px; }
+            .profile-section { padding: 40px 20px; }
         }
 
         @media (max-width: 768px) {
@@ -587,17 +558,13 @@
                 align-items: flex-start;
             }
 
-            .navbar .logo {
-                font-size: 22px;
-            }
+            .navbar .logo { font-size: 22px; }
 
             .navbar .nav-links {
                 display: none;
                 flex-direction: column;
                 position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
+                top: 100%; left: 0; right: 0;
                 background: white;
                 padding: 20px;
                 border-bottom: 2px solid #f0f4ff;
@@ -606,38 +573,20 @@
                 width: 100%;
             }
 
-            .navbar .nav-links.active {
-                display: flex;
-            }
+            .navbar .nav-links.active { display: flex; }
 
             .navbar .mobile-toggle {
                 display: block;
                 position: absolute;
-                right: 20px;
-                top: 50%;
+                right: 20px; top: 50%;
                 transform: translateY(-50%);
             }
 
-            .hero-content h1 {
-                font-size: 32px;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .form-actions {
-                flex-direction: column;
-            }
-
-            .form-actions button {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .profile-form {
-                padding: 20px;
-            }
+            .hero-content h1 { font-size: 32px; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-actions { flex-direction: column; }
+            .form-actions button { width: 100%; justify-content: center; }
+            .profile-form { padding: 20px; }
 
             .navbar .nav-links a {
                 font-size: 14px;
@@ -652,48 +601,18 @@
         }
 
         @media (max-width: 480px) {
-            .hero {
-                padding: 90px 20px 30px;
-            }
+            .hero { padding: 90px 20px 30px; }
+            .hero-content h1 { font-size: 26px; }
+            .hero-image .profile-avatar { width: 120px; height: 120px; font-size: 50px; }
+            .hero-image .profile-card { padding: 20px; }
+            .profile-form { padding: 15px; }
 
-            .hero-content h1 {
-                font-size: 26px;
-            }
-
-            .hero-image .profile-avatar {
-                width: 120px;
-                height: 120px;
-                font-size: 50px;
-            }
-
-            .hero-image .profile-card {
-                padding: 20px;
-            }
-
-            .profile-form {
-                padding: 15px;
-            }
-
-            .navbar .nav-links a {
-                font-size: 16px;
-                padding: 8px 16px;
-            }
-
-            .navbar .nav-links .logout-btn {
-                font-size: 14px;
-                padding: 8px 16px;
-            }
+            .navbar .nav-links a { font-size: 16px; padding: 8px 16px; }
+            .navbar .nav-links .logout-btn { font-size: 14px; padding: 8px 16px; }
         }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f0f4ff;
-            border-radius: 10px;
-        }
-
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             border-radius: 10px;
@@ -708,18 +627,14 @@
             cursor: pointer;
         }
 
-        select option {
-            padding: 8px;
-        }
+        select option { padding: 8px; }
 
         .custom-location-input {
             display: none;
             margin-top: 8px;
         }
 
-        .custom-location-input.active {
-            display: block;
-        }
+        .custom-location-input.active { display: block; }
     </style>
 </head>
 <body>
@@ -768,8 +683,13 @@
                 <h3 id="heroName">[Your Name]</h3>
                 <div class="role" id="heroRole">🌟 Community Member</div>
                 <p class="mini-bio" id="heroBio">Update your bio to tell the squad about yourself!</p>
-                <div id="heroStatus" class="status-badge available">
-                    <i class="fas fa-circle"></i> Available
+                <div>
+                    <div id="heroStatus" class="status-badge available">
+                        <i class="fas fa-circle"></i> Available
+                    </div>
+                    <div id="heroLoveLife" class="lovelife-badge notset" style="display:none;">
+                        <i class="fas fa-heart-broken"></i> Single
+                    </div>
                 </div>
             </div>
         </div>
@@ -845,14 +765,25 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label><i class="fas fa-circle"></i> Status</label>
-                <select id="status">
-                    <option value="available">🟢 Available</option>
-                    <option value="busy">🔴 Busy</option>
-                    <option value="away">🟡 Away</option>
-                    <option value="dnd">🟣 Do Not Disturb</option>
-                </select>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-circle"></i> Status</label>
+                    <select id="status">
+                        <option value="available">🟢 Available</option>
+                        <option value="busy">🔴 Busy</option>
+                        <option value="away">🟡 Away</option>
+                        <option value="dnd">🟣 Do Not Disturb</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-heart-broken"></i> Love Life</label>
+                    <select id="loveLife">
+                        <option value="">Select your love life status</option>
+                        <option value="Single">💔 Single</option>
+                        <option value="MU">💞 MU (Mutual Understanding)</option>
+                        <option value="Married">💍 Married</option>
+                    </select>
+                </div>
             </div>
 
             <div class="form-row">
@@ -924,11 +855,14 @@
         function toggleCustomLocation() {
             const select = document.getElementById('locationSelect');
             const customInput = document.getElementById('customLocationInput');
-            
+            const customField = document.getElementById('customLocation');
+
             if (select.value === 'custom') {
                 customInput.classList.add('active');
             } else {
                 customInput.classList.remove('active');
+                // Clear value so a stale custom location doesn't linger
+                customField.value = '';
             }
         }
 
@@ -967,7 +901,7 @@
         }
 
         // ===== COMPRESS IMAGE =====
-        function compressImage(file, maxWidth = 300, maxHeight = 300, quality = 0.6) {
+        function compressImage(file, maxWidth = 400, maxHeight = 400, quality = 0.7) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -979,7 +913,7 @@
                         let width = img.width;
                         let height = img.height;
 
-                        const MAX_SIZE = 300;
+                        const MAX_SIZE = 400;
                         if (width > MAX_SIZE || height > MAX_SIZE) {
                             const ratio = Math.min(MAX_SIZE / width, MAX_SIZE / height);
                             width = Math.round(width * ratio);
@@ -1048,6 +982,7 @@
         }
 
         // ===== AUTH STATE =====
+        // FIX #7: Use navigator.onLine instead of dummy doc read
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -1055,17 +990,32 @@
             }
             currentUser = user;
             document.getElementById('email').value = user.email || '';
-            
+
+            isOffline = !navigator.onLine;
+
             try {
-                await db.collection('users').doc('test').get();
-                isOffline = false;
+                if (isOffline) throw new Error('Browser reports offline');
                 await loadProfile();
             } catch (error) {
                 console.warn('⚠️ Firestore connection issue:', error);
                 isOffline = true;
                 loadFallbackProfile(user);
-                showMessage('⚠️ Using offline mode. Please check your Firebase connection.', 'error');
+                showMessage('⚠️ Using offline mode. Please check your connection.', 'error');
             }
+        });
+
+        // Listen for online/offline changes
+        window.addEventListener('online', () => {
+            isOffline = false;
+            showMessage('✅ Back online!', 'success');
+            setTimeout(() => {
+                document.getElementById('message').style.display = 'none';
+            }, 3000);
+        });
+
+        window.addEventListener('offline', () => {
+            isOffline = true;
+            showMessage('⚠️ You are offline. Changes cannot be saved.', 'error');
         });
 
         // ===== LOAD PROFILE =====
@@ -1098,6 +1048,10 @@
                     document.getElementById('interests').value = profileData.interests || '';
                     document.getElementById('status').value = profileData.status || 'available';
                     updateStatusBadge(profileData.status || 'available');
+
+                    // Love Life
+                    document.getElementById('loveLife').value = profileData.loveLife || '';
+                    updateLoveLifeBadge(profileData.loveLife || '');
                     
                     document.getElementById('instagram').value = profileData.instagram || '';
                     document.getElementById('twitter').value = profileData.twitter || '';
@@ -1117,6 +1071,7 @@
                     document.getElementById('heroBio').textContent = 'Welcome to TIMAWA! Update your profile.';
                     document.getElementById('status').value = 'available';
                     updateStatusBadge('available');
+                    updateLoveLifeBadge('');
                 }
             } catch (error) {
                 console.error('Error loading profile:', error);
@@ -1135,6 +1090,7 @@
             document.getElementById('heroRole').textContent = '🌟 Community Member';
             document.getElementById('status').value = 'available';
             updateStatusBadge('available');
+            updateLoveLifeBadge('');
         }
 
         // ===== RESET FORM =====
@@ -1147,6 +1103,7 @@
                 document.getElementById('occupation').value = profileData.occupation || '';
                 document.getElementById('interests').value = profileData.interests || '';
                 document.getElementById('status').value = profileData.status || 'available';
+                document.getElementById('loveLife').value = profileData.loveLife || '';
                 document.getElementById('instagram').value = profileData.instagram || '';
                 document.getElementById('twitter').value = profileData.twitter || '';
                 document.getElementById('tiktok').value = profileData.tiktok || '';
@@ -1158,6 +1115,7 @@
                     document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
                 }
                 
+                updateLoveLifeBadge(profileData.loveLife || '');
                 selectedFile = null;
                 showMessage('Form reset to saved values', 'info');
                 setTimeout(() => {
@@ -1180,6 +1138,24 @@
             badge.innerHTML = `<i class="fas ${info.icon}"></i> ${info.label}`;
         }
 
+        // ===== UPDATE LOVE LIFE BADGE (NEW) =====
+        function updateLoveLifeBadge(value) {
+            const badge = document.getElementById('heroLoveLife');
+            const map = {
+                'Single': { cls: 'single', icon: 'fa-heart-broken', label: 'Single' },
+                'MU': { cls: 'mu', icon: 'fa-heart', label: 'MU' },
+                'Married': { cls: 'married', icon: 'fa-ring', label: 'Married' }
+            };
+            const info = map[value];
+            if (!info) {
+                badge.style.display = 'none';
+                return;
+            }
+            badge.className = `lovelife-badge ${info.cls}`;
+            badge.innerHTML = `<i class="fas ${info.icon}"></i> ${info.label}`;
+            badge.style.display = 'inline-flex';
+        }
+
         // ===== PHOTO UPLOAD WITH COMPRESSION =====
         async function handlePhotoUpload(e) {
             const file = e.target.files[0];
@@ -1193,7 +1169,7 @@
             showMessage('📸 Compressing image...', 'info');
 
             try {
-                const compressedFile = await compressImage(file, 300, 300, 0.5);
+                const compressedFile = await compressImage(file, 400, 400, 0.7);
                 selectedFile = compressedFile;
 
                 const reader = new FileReader();
@@ -1280,6 +1256,7 @@
                 const occupation = document.getElementById('occupation').value.trim();
                 const interests = document.getElementById('interests').value.trim();
                 const status = document.getElementById('status').value;
+                const loveLife = document.getElementById('loveLife').value;
                 const instagram = document.getElementById('instagram').value.trim();
                 const twitter = document.getElementById('twitter').value.trim();
                 const tiktok = document.getElementById('tiktok').value.trim();
@@ -1301,6 +1278,7 @@
                     occupation: occupation,
                     interests: interests,
                     status: status,
+                    loveLife: loveLife || '',
                     instagram: instagram,
                     twitter: twitter,
                     tiktok: tiktok,
@@ -1333,8 +1311,9 @@
                     document.getElementById('heroRole').textContent = '🌟 Community Member';
                 }
                 updateStatusBadge(status);
+                updateLoveLifeBadge(loveLife);
 
-                profileData = updateData;
+                profileData = { ...profileData, ...updateData };
                 selectedFile = null;
                 document.getElementById('photoInput').value = '';
 
@@ -1352,9 +1331,13 @@
             }
         });
 
-        // ===== STATUS CHANGE =====
+        // ===== STATUS / LOVE LIFE CHANGE =====
         document.getElementById('status').addEventListener('change', function() {
             updateStatusBadge(this.value);
+        });
+
+        document.getElementById('loveLife').addEventListener('change', function() {
+            updateLoveLifeBadge(this.value);
         });
 
         // ===== SHOW MESSAGE =====
@@ -1396,4 +1379,6 @@
         }
     </script>
 </body>
+
+<script src="idle-logout.js"></script>
 </html>
