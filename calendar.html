@@ -4,19 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TIMAWA - Calendar</title>
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
-    <!-- FullCalendar (no rrule plugin needed anymore) -->
+
+    <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    
+
     <style>
         * {
             margin: 0;
@@ -169,6 +169,286 @@
             cursor: pointer;
             background: none;
             border: none;
+        }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT BELL =====
+           ================================================================ */
+        .announcement-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .announcement-bell {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f7ff;
+            color: rgb(16, 137, 211);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+
+        .announcement-bell:hover {
+            background: #e0f2fe;
+            transform: scale(1.05);
+        }
+
+        .announcement-bell.active {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+        }
+
+        .announcement-bell.has-new {
+            animation: bellPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes bellPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        }
+
+        .announcement-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+        }
+
+        .announcement-badge.show { display: flex; }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT POPUP =====
+           ================================================================ */
+        .announcement-popup {
+            position: fixed;
+            width: 380px;
+            max-width: calc(100vw - 40px);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.22), 0 0 0 1px rgba(16, 137, 211, 0.06);
+            overflow: hidden;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.97);
+            pointer-events: none;
+            transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: top right;
+        }
+
+        .announcement-popup.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .announcement-popup::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 22px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: -1px -1px 2px rgba(16, 137, 211, 0.06);
+        }
+
+        .announcement-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .announcement-popup-header h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .announcement-popup-header h4 i {
+            color: rgb(16, 137, 211);
+        }
+
+        .announcement-mark-all {
+            background: none;
+            border: none;
+            color: rgb(16, 137, 211);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .announcement-mark-all:hover {
+            background: rgba(16, 137, 211, 0.1);
+        }
+
+        .announcement-list {
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .announcement-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            margin-bottom: 4px;
+            background: white;
+        }
+
+        .announcement-item:hover {
+            background: #f0f7ff;
+            transform: translateX(2px);
+        }
+
+        .announcement-item.unread {
+            background: #f0f9ff;
+        }
+
+        .announcement-item.unread:hover {
+            background: #e0f2fe;
+        }
+
+        .announcement-item.unread .announcement-title {
+            font-weight: 700;
+        }
+
+        .announcement-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            background: #e0f2fe;
+        }
+
+        .announcement-icon.type-admin { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+        .announcement-icon.type-birthday { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); }
+        .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+        .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
+        .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+
+        .announcement-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .announcement-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            line-height: 1.35;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .announcement-priority-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 50px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .announcement-priority-badge.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-priority-badge.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-message {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .announcement-time {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        .announcement-unread-dot {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgb(16, 137, 211);
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.15);
+        }
+
+        .announcement-popup-footer {
+            padding: 10px 18px;
+            background: #f8faff;
+            border-top: 1px solid #eef2f7;
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .announcement-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .announcement-empty i {
+            font-size: 36px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .announcement-empty p {
+            font-size: 13px;
         }
 
         /* ===== MAIN CONTENT ===== */
@@ -354,7 +634,6 @@
             content: '🎂 ';
         }
 
-        /* Year navigation buttons */
         .fc-year-nav-btn {
             background: white !important;
             border: 2px solid rgb(16, 137, 211) !important;
@@ -1029,6 +1308,8 @@
                 gap: 12px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
                 width: 100%;
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
             }
 
             .navbar .nav-links.active {
@@ -1042,6 +1323,38 @@
                 top: 50%;
                 transform: translateY(-50%);
             }
+
+            .navbar .nav-links > li { width: 100%; justify-content: center; }
+            .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
+
+            /* Bell on mobile: full-width row, icon centered */
+            .navbar .nav-links > li.announcement-li {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                padding: 4px 0;
+            }
+            .announcement-bell {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .announcement-badge {
+                top: -2px;
+                right: -2px;
+            }
+
+            /* Popup on mobile: fixed below navbar, full-width */
+            .announcement-popup {
+                position: fixed !important;
+                top: 70px !important;
+                left: 14px !important;
+                right: 14px !important;
+                width: auto !important;
+                max-width: none !important;
+            }
+            .announcement-popup::before { display: none; }
+            .announcement-list { max-height: 60vh; }
 
             .main-content {
                 padding: 0 20px;
@@ -1127,7 +1440,11 @@
                 text-align: center;
             }
 
-            /* Tita Tima mobile/tablet */
+            .navbar .nav-links .logout-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
             .tita-launcher {
                 bottom: calc(20px + env(safe-area-inset-bottom, 0px));
                 right: 18px;
@@ -1202,7 +1519,12 @@
                 padding: 8px 16px;
             }
 
-            /* Tita Tima small phone */
+            .announcement-popup {
+                top: 65px !important;
+                left: 10px !important;
+                right: 10px !important;
+            }
+
             .tita-launcher {
                 bottom: calc(18px + env(safe-area-inset-bottom, 0px));
                 right: 16px;
@@ -1247,9 +1569,34 @@
             <li><a href="calendar.html" class="active"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
             <li><a href="dashboard.html">Dashboard</a></li>
             <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li class="announcement-li">
+                <div class="announcement-wrapper">
+                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                        <i class="fas fa-bell"></i>
+                        <span class="announcement-badge" id="announcementBadge">0</span>
+                    </button>
+                </div>
+            </li>
             <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
         </ul>
     </nav>
+
+    <!-- Announcement popup (only rendered when logged in) -->
+    <div class="announcement-popup" id="announcementPopup" role="dialog" aria-labelledby="announcementTitle" style="display:none;">
+        <div class="announcement-popup-header">
+            <h4 id="announcementTitle"><i class="fas fa-bullhorn"></i> Announcements</h4>
+            <button class="announcement-mark-all" onclick="markAllAnnouncementsRead()">Mark all read</button>
+        </div>
+        <div class="announcement-list" id="announcementList">
+            <div class="announcement-empty">
+                <i class="fas fa-inbox"></i>
+                <p>Loading announcements...</p>
+            </div>
+        </div>
+        <div class="announcement-popup-footer" id="announcementFooter">
+            No new announcements
+        </div>
+    </div>
 
     <!-- ===== MAIN CONTENT ===== -->
     <div class="main-content">
@@ -1461,6 +1808,21 @@
                 <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
             </div>
 
+            <!-- ===== QUICK NOTE FIELD (added to calendar) ===== -->
+            <div class="tita-field">
+                <label>
+                    <i class="fas fa-comment-dots"></i> Quick Note
+                    <span style="color:#888;font-weight:500;text-transform:none;letter-spacing:0;font-size:11px;">(60 chars · expires in 24h)</span>
+                </label>
+                <input type="text" id="titaNote" placeholder="Coffee later? ☕" maxlength="60" />
+                <div style="font-size:11px;color:#888;margin-top:4px;text-align:right;">
+                    <span id="titaNoteCount">0</span>/60
+                </div>
+                <div id="titaNoteStatus" style="font-size:11px;color:#888;margin-top:4px;display:none;">
+                    <i class="fas fa-clock"></i> <span></span>
+                </div>
+            </div>
+
             <div class="tita-actions">
                 <button class="tita-save" id="titaSaveBtn" onclick="titaSaveProfile()">
                     <i class="fas fa-save"></i> Save Changes
@@ -1492,6 +1854,14 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+            if (err.code === 'failed-precondition') {
+                console.warn('Firestore persistence: multiple tabs open, cache disabled for this tab.');
+            } else if (err.code === 'unimplemented') {
+                console.warn('Firestore persistence: not supported in this browser.');
+            }
+        });
+
         let calendar = null;
         let currentEvents = [];
         let birthdayEvents = [];
@@ -1505,8 +1875,28 @@
         let titaCurrentUser = null;
         let titaUserData = null;
 
-        // How many years ahead to pre-generate birthday instances.
+        // ===== NOTES STATE (added for quick note on calendar) =====
+        let notesCache = {};
+        let unsubscribeNotes = null;
+
         const BIRTHDAY_YEARS_AHEAD = 20;
+
+        const EVENTS_LIMIT = 50;
+        const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
+
+        // ================================================================
+        // ===== ANNOUNCEMENTS — OPTIMIZED STATE =====
+        // ================================================================
+        let announcementUser = null;
+        let announcementUnsubscribe = null;
+        let announcementItems = [];
+        let announcementReadIds = new Set();
+
+        const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
+        const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
+        const ANNOUNCEMENT_CACHE_KEY = 'timawa_ann_cache_';
+        const ANNOUNCEMENT_LIMIT = 30;
+        const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
 
         // ===== HELPER: CONVERT TIMESTAMP TO DATE =====
         function convertTimestampToDate(timestamp) {
@@ -1522,6 +1912,640 @@
                 return new Date(timestamp);
             } catch (e) {
                 return new Date();
+            }
+        }
+
+        // ===== HELPERS =====
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            return String(text)
+                .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatRelativeTime(date) {
+            if (!date) return 'Just now';
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMin = Math.floor(diffMs / 60000);
+            if (diffMin < 1) return 'Just now';
+            if (diffMin < 60) return `${diffMin}m ago`;
+            const diffHr = Math.floor(diffMin / 60);
+            if (diffHr < 24) return `${diffHr}h ago`;
+            const diffDay = Math.floor(diffHr / 24);
+            if (diffDay < 7) return `${diffDay}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        // ===== CACHED CURRENT-USER PROFILE =====
+        async function getCurrentUserProfileCached(user) {
+            const CACHE_KEY = 'timawa_me_' + user.uid;
+            try {
+                const raw = sessionStorage.getItem(CACHE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.uid === user.uid && (Date.now() - parsed.t) < USER_PROFILE_CACHE_TTL) {
+                        return parsed.data;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data() || {};
+                try {
+                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                        uid: user.uid,
+                        t: Date.now(),
+                        data
+                    }));
+                } catch (e) { /* ignore */ }
+                return data;
+            } catch (e) {
+                console.warn('getCurrentUserProfileCached failed:', e);
+                return {};
+            }
+        }
+
+        // ================================================================
+        // ===== NOTES SYSTEM (added for quick note on calendar) =====
+        // ================================================================
+        function loadNotes() {
+            if (unsubscribeNotes) unsubscribeNotes();
+
+            const now = new Date();
+
+            unsubscribeNotes = db.collection('notes')
+                .where('expireAt', '>', now)
+                .onSnapshot((snapshot) => {
+                    const newCache = {};
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const expireAt = data.expireAt
+                            ? (data.expireAt.seconds ? new Date(data.expireAt.seconds * 1000) : new Date(data.expireAt))
+                            : null;
+                        if (!expireAt || expireAt > now) {
+                            newCache[doc.id] = { id: doc.id, ...data };
+                        }
+                    });
+                    notesCache = newCache;
+                    // If tita panel is open, update the note field
+                    if (titaCurrentUser) {
+                        const note = notesCache[titaCurrentUser.uid];
+                        const noteInput = document.getElementById('titaNote');
+                        const noteCount = document.getElementById('titaNoteCount');
+                        const noteStatus = document.getElementById('titaNoteStatus');
+                        if (noteInput) {
+                            if (note && note.text) {
+                                noteInput.value = note.text;
+                                noteCount.textContent = note.text.length;
+                                const expireAt = note.expireAt
+                                    ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                                    : null;
+                                if (expireAt) {
+                                    const hoursLeft = Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60)));
+                                    noteStatus.style.display = 'block';
+                                    noteStatus.querySelector('span').textContent = `Current note expires in ${hoursLeft}h`;
+                                } else {
+                                    noteStatus.style.display = 'none';
+                                }
+                            } else {
+                                noteInput.value = '';
+                                noteCount.textContent = '0';
+                                noteStatus.style.display = 'none';
+                            }
+                        }
+                    }
+                }, (error) => {
+                    console.warn('Notes listener error:', error.message);
+                    notesCache = {};
+                });
+        }
+
+        // ================================================================
+        // ===== ANNOUNCEMENT SYSTEM (OPTIMIZED) =====
+        // ================================================================
+
+        const ANNOUNCEMENT_TYPE_META = {
+            'admin':     { icon: '📢', cls: 'type-admin',     label: 'Announcement' },
+            'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
+            'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
+            'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+        };
+
+        function getAnnouncementMeta(type) {
+            return ANNOUNCEMENT_TYPE_META[type] || ANNOUNCEMENT_TYPE_META['admin'];
+        }
+
+        function loadAnnouncementReadCache(uid) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_READ_CACHE_PREFIX + uid);
+                if (raw) {
+                    const arr = JSON.parse(raw);
+                    if (Array.isArray(arr)) return new Set(arr);
+                }
+            } catch (e) { /* ignore */ }
+            return new Set();
+        }
+
+        function saveAnnouncementReadCache(uid, idSet) {
+            try {
+                localStorage.setItem(
+                    ANNOUNCEMENT_READ_CACHE_PREFIX + uid,
+                    JSON.stringify([...idSet])
+                );
+            } catch (e) { /* ignore */ }
+        }
+
+        function loadAnnouncementSnapshotCache(uid) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_CACHE_KEY + uid);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.uid === uid && (Date.now() - parsed.t) < ANNOUNCEMENT_CACHE_TTL) {
+                    return parsed.items;
+                }
+            } catch (e) { /* ignore */ }
+            return null;
+        }
+
+        function saveAnnouncementSnapshotCache(uid, items) {
+            try {
+                localStorage.setItem(ANNOUNCEMENT_CACHE_KEY + uid, JSON.stringify({
+                    uid,
+                    t: Date.now(),
+                    items
+                }));
+            } catch (e) { /* ignore */ }
+        }
+
+        function hasAutogenRunToday(uid, kind) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                const today = new Date().toISOString().slice(0, 10);
+                return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
+            } catch (e) { return false; }
+        }
+
+        function markAutogenRunToday(uid, kind) {
+            try {
+                const today = new Date().toISOString().slice(0, 10);
+                let parsed = { date: today, kinds: {} };
+                const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
+                if (raw) {
+                    try { parsed = JSON.parse(raw); } catch (e) {}
+                }
+                if (parsed.date !== today) parsed = { date: today, kinds: {} };
+                parsed.kinds[kind] = true;
+                localStorage.setItem(ANNOUNCEMENT_AUTOGEN_KEY + uid, JSON.stringify(parsed));
+            } catch (e) { /* ignore */ }
+        }
+
+        // ===== POPUP TOGGLE =====
+        function toggleAnnouncementPopup(event) {
+            if (event) event.stopPropagation();
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (!popup || !bell) return;
+
+            const isOpen = popup.classList.toggle('open');
+            bell.classList.toggle('active', isOpen);
+
+            if (isOpen) {
+                positionAnnouncementPopup();
+            }
+        }
+
+        function positionAnnouncementPopup() {
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (!popup || !bell) return;
+
+            if (window.innerWidth > 768) {
+                const rect = bell.getBoundingClientRect();
+                popup.style.position = 'fixed';
+                popup.style.top = (rect.bottom + 14) + 'px';
+                popup.style.right = (window.innerWidth - rect.right - 8) + 'px';
+                popup.style.left = 'auto';
+            } else {
+                popup.style.position = 'fixed';
+                popup.style.top = '70px';
+                popup.style.left = '14px';
+                popup.style.right = '14px';
+            }
+        }
+
+        function closeAnnouncementPopup() {
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (popup) popup.classList.remove('open');
+            if (bell) bell.classList.remove('active');
+        }
+
+        // ===== RENDER =====
+        function renderAnnouncements() {
+            const list = document.getElementById('announcementList');
+            const footer = document.getElementById('announcementFooter');
+            const badge = document.getElementById('announcementBadge');
+            if (!list) return;
+
+            const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
+
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+            }
+
+            const bell = document.getElementById('announcementBell');
+            if (bell) {
+                bell.classList.toggle('has-new', unreadCount > 0);
+            }
+
+            if (announcementItems.length === 0) {
+                list.innerHTML = `
+                    <div class="announcement-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>No announcements yet</p>
+                    </div>
+                `;
+                if (footer) footer.textContent = 'You\'re all caught up ✨';
+                return;
+            }
+
+            let html = '';
+            announcementItems.forEach(item => {
+                const meta = getAnnouncementMeta(item.type);
+                const isUnread = !announcementReadIds.has(item.id);
+                const createdDate = item.createdAt
+                    ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                    : new Date();
+                const priorityBadge = item.priority === 'urgent'
+                    ? '<span class="announcement-priority-badge urgent">Urgent</span>'
+                    : item.priority === 'info'
+                        ? '<span class="announcement-priority-badge info">Info</span>'
+                        : '';
+
+                html += `
+                    <div class="announcement-item ${isUnread ? 'unread' : ''}" data-announcement-id="${escapeAttr(item.id)}" onclick="handleAnnouncementClick('${escapeAttr(item.id)}')">
+                        <div class="announcement-icon ${meta.cls}">${meta.icon}</div>
+                        <div class="announcement-body">
+                            <div class="announcement-title">
+                                ${escapeHtml(item.title || 'Announcement')}
+                                ${priorityBadge}
+                            </div>
+                            <div class="announcement-message">${escapeHtml(item.message || '')}</div>
+                            <div class="announcement-time">${formatRelativeTime(createdDate)}</div>
+                        </div>
+                        ${isUnread ? '<span class="announcement-unread-dot"></span>' : ''}
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+
+            if (footer) {
+                footer.textContent = unreadCount > 0
+                    ? `${unreadCount} unread announcement${unreadCount !== 1 ? 's' : ''}`
+                    : 'You\'re all caught up ✨';
+            }
+        }
+
+        // ================================================================
+        // ===== READ STATE =====
+        // ================================================================
+        async function markAnnouncementRead(id) {
+            if (!announcementUser || announcementReadIds.has(id)) return;
+            announcementReadIds.add(id);
+            saveAnnouncementReadCache(announcementUser.uid, announcementReadIds);
+            renderAnnouncements();
+
+            try {
+                await db.collection('announcements').doc(id).update({
+                    readBy: firebase.firestore.FieldValue.arrayUnion(announcementUser.uid)
+                });
+            } catch (err) {
+                console.warn('Could not persist read state:', err);
+            }
+        }
+
+        async function markAllAnnouncementsRead() {
+            if (!announcementUser) return;
+
+            const unreadIds = announcementItems
+                .filter(a => !announcementReadIds.has(a.id))
+                .map(a => a.id);
+
+            if (unreadIds.length === 0) return;
+
+            unreadIds.forEach(id => announcementReadIds.add(id));
+            saveAnnouncementReadCache(announcementUser.uid, announcementReadIds);
+            renderAnnouncements();
+
+            try {
+                const batch = db.batch();
+                unreadIds.forEach(id => {
+                    batch.update(db.collection('announcements').doc(id), {
+                        readBy: firebase.firestore.FieldValue.arrayUnion(announcementUser.uid)
+                    });
+                });
+                await batch.commit();
+            } catch (err) {
+                console.warn('Could not persist read states:', err);
+            }
+        }
+
+        // ===== CLICK HANDLER =====
+        async function handleAnnouncementClick(id) {
+            const item = announcementItems.find(a => a.id === id);
+            if (!item) return;
+
+            markAnnouncementRead(id);
+
+            if (item.link) {
+                setTimeout(() => {
+                    window.location.href = item.link;
+                }, 200);
+            }
+        }
+
+        // ================================================================
+        // ===== LOAD ANNOUNCEMENTS =====
+        // ================================================================
+        function loadAnnouncements(user) {
+            if (!user) return;
+            if (announcementUnsubscribe) announcementUnsubscribe();
+
+            announcementUser = user;
+            announcementReadIds = loadAnnouncementReadCache(user.uid);
+
+            const popup = document.getElementById('announcementPopup');
+            if (popup) popup.style.display = 'block';
+
+            const cached = loadAnnouncementSnapshotCache(user.uid);
+            if (cached && cached.length > 0) {
+                announcementItems = cached;
+                renderAnnouncements();
+            }
+
+            announcementUnsubscribe = db.collection('announcements')
+                .orderBy('createdAt', 'desc')
+                .limit(ANNOUNCEMENT_LIMIT)
+                .onSnapshot((snapshot) => {
+                    const now = new Date();
+                    const items = [];
+                    const firestoreReadIds = new Set();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+
+                        if (data.expiresAt) {
+                            const exp = data.expiresAt.seconds
+                                ? new Date(data.expiresAt.seconds * 1000)
+                                : new Date(data.expiresAt);
+                            if (exp < now) return;
+                        }
+
+                        if (data.targetUid && data.targetUid !== '' && data.targetUid !== user.uid) return;
+
+                        items.push({ id: doc.id, ...data });
+
+                        if (Array.isArray(data.readBy) && data.readBy.includes(user.uid)) {
+                            firestoreReadIds.add(doc.id);
+                        }
+                    });
+
+                    let changed = false;
+                    firestoreReadIds.forEach(id => {
+                        if (!announcementReadIds.has(id)) {
+                            announcementReadIds.add(id);
+                            changed = true;
+                        }
+                    });
+                    if (changed) saveAnnouncementReadCache(user.uid, announcementReadIds);
+
+                    announcementItems = items;
+                    saveAnnouncementSnapshotCache(user.uid, items);
+                    renderAnnouncements();
+                }, (error) => {
+                    console.warn('Announcements listener error:', error.message);
+                    if (!announcementItems.length) {
+                        announcementItems = [];
+                        renderAnnouncements();
+                    }
+                });
+        }
+
+        // ================================================================
+        // ===== AUTO-GENERATION =====
+        // ================================================================
+        function needsAnyAutogen(uid) {
+            return (
+                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'events') ||
+                !hasAutogenRunToday(uid, 'highlights')
+            );
+        }
+
+        async function autoGenerateBirthdayAnnouncement(user, userData) {
+            if (!userData || !userData.birthday) return;
+            if (hasAutogenRunToday(user.uid, 'birthday')) return;
+
+            const parts = userData.birthday.split('-');
+            if (parts.length !== 3) {
+                markAutogenRunToday(user.uid, 'birthday');
+                return;
+            }
+
+            const today = new Date();
+            const bMonth = parseInt(parts[1], 10) - 1;
+            const bDay = parseInt(parts[2], 10);
+
+            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
+                markAutogenRunToday(user.uid, 'birthday');
+                return;
+            }
+
+            const name = userData.displayName || user.displayName || user.email || 'Someone';
+
+            try {
+                await db.collection('announcements').add({
+                    type: 'birthday',
+                    title: `🎂 It's ${name}'s Birthday Today!`,
+                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
+                    icon: '🎂',
+                    priority: 'urgent',
+                    link: 'calendar.html',
+                    linkLabel: 'View Calendar',
+                    targetUid: user.uid,
+                    referenceId: user.uid,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                });
+            } catch (e) {
+                console.warn('birthday gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'birthday');
+        }
+
+        async function autoGenerateEventReminders(user) {
+            if (hasAutogenRunToday(user.uid, 'events')) return;
+
+            try {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const dayAfter = new Date(tomorrow);
+                dayAfter.setDate(dayAfter.getDate() + 1);
+
+                const snap = await db.collection('events')
+                    .where('dateTime', '>=', tomorrow)
+                    .where('dateTime', '<', dayAfter)
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
+
+                const batch = db.batch();
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const eventRef = db.collection('announcements').doc();
+                    const title = data.title || 'Upcoming Event';
+                    const loc = data.location ? ` at ${data.location}` : '';
+                    batch.set(eventRef, {
+                        type: 'event',
+                        title: `⏰ Reminder: ${title} is tomorrow!`,
+                        message: `${title}${loc} — happening tomorrow. Don't miss it!`,
+                        icon: '📅',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Event',
+                        targetUid: '',
+                        referenceId: doc.id,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                });
+                await batch.commit();
+            } catch (e) {
+                console.warn('event gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'events');
+        }
+
+        async function autoGenerateHighlightAnnouncements(user) {
+            if (hasAutogenRunToday(user.uid, 'highlights')) return;
+
+            try {
+                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+                const snap = await db.collection('highlights')
+                    .where('createdAt', '>=', yesterday)
+                    .orderBy('createdAt', 'desc')
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
+
+                const photoCount = snap.size;
+                const firstDoc = snap.docs[0].data();
+                const author = firstDoc.authorName || 'Someone';
+                const latestHighlightId = snap.docs[0].id;
+
+                const titleText = photoCount === 1
+                    ? `📸 ${author} shared a new highlight!`
+                    : `📸 ${photoCount} new highlights shared!`;
+
+                await db.collection('announcements').add({
+                    type: 'highlight',
+                    title: titleText,
+                    message: photoCount === 1
+                        ? `${author} just shared a new moment with the squad.`
+                        : `Fresh moments from the squad — check them out!`,
+                    icon: '📸',
+                    priority: 'info',
+                    link: 'index.html#highlights',
+                    linkLabel: 'View Highlights',
+                    targetUid: '',
+                    referenceId: latestHighlightId,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                });
+            } catch (e) {
+                console.warn('highlight gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'highlights');
+        }
+
+        async function runAutoGeneration(user, userData) {
+            if (!needsAnyAutogen(user.uid)) return;
+
+            setTimeout(async () => {
+                try {
+                    await autoGenerateBirthdayAnnouncement(user, userData);
+                } catch (e) { console.warn('birthday gen:', e.message); }
+
+                try {
+                    await autoGenerateEventReminders(user);
+                } catch (e) { console.warn('event gen:', e.message); }
+
+                try {
+                    await autoGenerateHighlightAnnouncements(user);
+                } catch (e) { console.warn('highlight gen:', e.message); }
+            }, 1500);
+        }
+
+        async function autoGenerateMemberAnnouncement(newUser, newUserData) {
+            if (!newUser || !newUserData) return;
+            if (hasAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid)) return;
+
+            const name = newUserData.displayName || newUserData.email || 'A new member';
+            try {
+                await db.collection('announcements').add({
+                    type: 'member',
+                    title: `Welcome ${name}! 🎉`,
+                    message: `${name} just joined the TIMAWA squad. Say hi!`,
+                    icon: '👥',
+                    priority: 'info',
+                    link: 'index.html#members-section',
+                    linkLabel: 'View Members',
+                    targetUid: '',
+                    referenceId: newUser.uid,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                });
+                markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
+            } catch (e) {
+                console.warn('welcome gen:', e.message);
             }
         }
 
@@ -1555,8 +2579,7 @@
             titaCurrentUser = user;
 
             try {
-                const doc = await db.collection('users').doc(user.uid).get();
-                const data = doc.data();
+                const data = await getCurrentUserProfileCached(user);
                 titaUserData = data;
                 const name = data?.displayName || user.displayName || user.email || 'User';
 
@@ -1572,15 +2595,37 @@
                     }
                 }
 
-                // Show Tita Tima launcher
                 document.getElementById('titaLauncher').classList.add('visible');
+
+                // ============================================================
+                // ===== ANNOUNCEMENTS: LOAD + AUTOGEN =====
+                // ============================================================
+                loadAnnouncements(user);
+                runAutoGeneration(user, data);
+
+                if (data?.createdAt) {
+                    try {
+                        const created = data.createdAt.seconds
+                            ? new Date(data.createdAt.seconds * 1000)
+                            : new Date(data.createdAt);
+                        const ageMin = (Date.now() - created.getTime()) / 60000;
+                        if (ageMin < 5) {
+                            autoGenerateMemberAnnouncement(user, data);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
 
+            // ============================================================
+            // ===== NOTES LISTENER =====
+            // ============================================================
+            loadNotes();
+
             listenToEvents();
             listenToBirthdays();
-            
+
             setTimeout(() => {
                 initCalendar();
             }, 500);
@@ -1594,6 +2639,7 @@
 
             unsubscribeEvents = db.collection('events')
                 .orderBy('dateTime', 'asc')
+                .limit(EVENTS_LIMIT)
                 .onSnapshot((snapshot) => {
                     currentEvents = [];
                     snapshot.forEach(doc => {
@@ -1604,7 +2650,7 @@
                         });
                     });
                     console.log('🔄 Events updated in real-time:', currentEvents.length);
-                    
+
                     if (calendar) {
                         updateCalendarEvents();
                     }
@@ -1655,7 +2701,7 @@
                     });
 
                     sortBirthdays();
-                    
+
                     if (calendar) {
                         updateCalendarEvents();
                     }
@@ -1669,7 +2715,7 @@
         function sortBirthdays() {
             const now = new Date();
             const currentYear = now.getFullYear();
-            
+
             birthdayEvents.forEach(item => {
                 let birthdayDate = new Date(currentYear, item.birthMonth, item.birthDay);
                 if (birthdayDate < now) {
@@ -1728,7 +2774,7 @@
                 html += `
                     <div class="birthday-item">
                         <div class="avatar">
-                            ${item.photoURL ? 
+                            ${item.photoURL ?
                                 `<img src="${item.photoURL}" alt="${item.name}" />` :
                                 initials
                             }
@@ -1748,7 +2794,7 @@
         // ===== INIT CALENDAR =====
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
-            
+
             const customButtons = {
                 prevYear: {
                     text: '<<',
@@ -1789,7 +2835,7 @@
                     const event = info.event;
                     const extendedProps = event.extendedProps;
                     selectedEventId = event.id;
-                    
+
                     if (extendedProps.isBirthday) {
                         const birthdayDate = event.start ? new Date(event.start) : new Date();
                         const dateStr = birthdayDate.toLocaleDateString('en-US', {
@@ -1841,9 +2887,9 @@
                 day: 'numeric'
             });
             document.getElementById('datePopupDate').textContent = formattedDate;
-            
+
             const selectedDateStr = date.toDateString();
-            
+
             const eventsOnDate = currentEvents.filter(event => {
                 if (!event.dateTime) return false;
                 try {
@@ -1860,7 +2906,7 @@
             });
 
             const container = document.getElementById('datePopupEvents');
-            
+
             if (eventsOnDate.length === 0 && birthdayOnDate.length === 0) {
                 container.innerHTML = `
                     <div class="no-events-date">
@@ -1870,7 +2916,7 @@
                 `;
             } else {
                 let html = '';
-                
+
                 birthdayOnDate.forEach(item => {
                     html += `
                         <div class="event-list-item" style="border-left-color: #f5576c;">
@@ -1883,7 +2929,7 @@
                         </div>
                     `;
                 });
-                
+
                 eventsOnDate.forEach(event => {
                     const eventDate = convertTimestampToDate(event.dateTime);
                     const time = eventDate.toLocaleTimeString('en-US', {
@@ -1944,10 +2990,10 @@
         // ===== SHOW EVENT DETAIL =====
         function showEventDetail(event) {
             const props = event.extendedProps;
-            
+
             document.getElementById('detailTitle').textContent = event.title;
             document.getElementById('detailType').innerHTML = `<i class="fas fa-${props.type === 'Gala' ? 'crown' : props.type === 'Trip' ? 'plane' : props.type === 'Party' ? 'glass-cheers' : 'calendar-alt'}"></i> ${props.type || 'Event'} Details`;
-            
+
             const date = event.start ? new Date(event.start) : new Date();
             document.getElementById('detailDate').textContent = date.toLocaleDateString('en-US', {
                 weekday: 'long',
@@ -1962,7 +3008,7 @@
             document.getElementById('detailLocation').textContent = props.location || 'No location set';
             document.getElementById('detailCreator').textContent = props.createdBy || 'Unknown';
             document.getElementById('detailDescription').textContent = props.description || 'No description provided.';
-            
+
             document.getElementById('eventDetailModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
@@ -2000,10 +3046,9 @@
 
             console.log('📅 Updating calendar with events:', currentEvents.length);
 
-            // Regular events
             const events = currentEvents.map(event => {
                 const eventDate = convertTimestampToDate(event.dateTime);
-                
+
                 return {
                     id: event.id,
                     title: event.title || 'Untitled Event',
@@ -2023,7 +3068,6 @@
                 };
             });
 
-            // ===== BIRTHDAYS (manually expanded, no rrule plugin needed) =====
             const now = new Date();
             const currentYear = now.getFullYear();
             const startYear = currentYear - 1;
@@ -2109,7 +3153,7 @@
         // ===== CREATE EVENT =====
         document.getElementById('eventForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitEventBtn');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner"></span> Creating...';
@@ -2172,6 +3216,9 @@
         // ===== LOGOUT =====
         async function logout() {
             try {
+                if (auth.currentUser) {
+                    try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                }
                 await auth.signOut();
                 window.location.href = 'index.html';
             } catch (error) {
@@ -2185,7 +3232,8 @@
             const detailModal = document.getElementById('eventDetailModal');
             const datePopup = document.getElementById('datePopupModal');
             const titaPanel = document.getElementById('titaPanel');
-            
+            const announcementPopup = document.getElementById('announcementPopup');
+
             if (event.target === eventModal) {
                 closeEventModal();
             }
@@ -2199,6 +3247,14 @@
                 !titaPanel.contains(event.target) &&
                 !event.target.closest('#titaLauncher')) {
                 closeTitaPanel();
+            }
+
+            if (announcementPopup && announcementPopup.classList.contains('open')) {
+                if (!announcementPopup.contains(event.target) &&
+                    !event.target.closest('#announcementBell') &&
+                    !event.target.closest('.announcement-wrapper')) {
+                    closeAnnouncementPopup();
+                }
             }
         }
 
@@ -2287,10 +3343,46 @@
                 customEl.style.display = 'block';
             }
 
+            // ===== Load existing note =====
+            const note = notesCache[titaCurrentUser.uid];
+            const noteInput = document.getElementById('titaNote');
+            const noteCount = document.getElementById('titaNoteCount');
+            const noteStatus = document.getElementById('titaNoteStatus');
+
+            if (note && note.text) {
+                noteInput.value = note.text;
+                noteCount.textContent = note.text.length;
+
+                const expireAt = note.expireAt
+                    ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                    : null;
+                if (expireAt) {
+                    const hoursLeft = Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60)));
+                    noteStatus.style.display = 'block';
+                    noteStatus.querySelector('span').textContent = `Current note expires in ${hoursLeft}h`;
+                } else {
+                    noteStatus.style.display = 'none';
+                }
+            } else {
+                noteInput.value = '';
+                noteCount.textContent = '0';
+                noteStatus.style.display = 'none';
+            }
+
             const msg = document.getElementById('titaStatusMsg');
             msg.classList.remove('show');
             msg.textContent = '';
         }
+
+        // Live character counter for note field (added)
+        document.addEventListener('DOMContentLoaded', function() {
+            const noteInput = document.getElementById('titaNote');
+            if (noteInput) {
+                noteInput.addEventListener('input', function() {
+                    document.getElementById('titaNoteCount').textContent = this.value.length;
+                });
+            }
+        });
 
         function titaToggleCustomLocation() {
             const select = document.getElementById('titaLocationSelect');
@@ -2355,7 +3447,34 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
+                // ===== Save or delete note =====
+                const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
+                const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
+
+                if (noteText) {
+                    const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                    await noteRef.set({
+                        uid: titaCurrentUser.uid,
+                        displayName: displayName,
+                        photoURL: titaUserData.photoURL || '',
+                        text: noteText,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    try { await noteRef.delete(); } catch (e) { /* ignore */ }
+                }
+
                 titaUserData = { ...titaUserData, ...updateData };
+
+                try {
+                    sessionStorage.setItem('timawa_me_' + titaCurrentUser.uid, JSON.stringify({
+                        uid: titaCurrentUser.uid,
+                        t: Date.now(),
+                        data: titaUserData
+                    }));
+                } catch (e) { /* ignore */ }
 
                 if (displayName !== titaCurrentUser.displayName) {
                     try {
@@ -2386,7 +3505,17 @@
             if (e.key === 'Escape') {
                 if (document.getElementById('titaPanel').classList.contains('open')) {
                     closeTitaPanel();
+                } else if (document.getElementById('announcementPopup').classList.contains('open')) {
+                    closeAnnouncementPopup();
                 }
+            }
+        });
+
+        // Reposition announcement popup on resize
+        window.addEventListener('resize', function() {
+            const popup = document.getElementById('announcementPopup');
+            if (popup && popup.classList.contains('open')) {
+                positionAnnouncementPopup();
             }
         });
     </script>

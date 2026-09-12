@@ -4,23 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TIMAWA - Dashboard</title>
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
+
     <!-- Cloudinary Upload Widget -->
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
-    
+
     <!-- JSZip for batch download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    
+
     <style>
         * {
             margin: 0;
@@ -172,6 +172,286 @@
             cursor: pointer;
             background: none;
             border: none;
+        }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT BELL =====
+           ================================================================ */
+        .announcement-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .announcement-bell {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f7ff;
+            color: rgb(16, 137, 211);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+
+        .announcement-bell:hover {
+            background: #e0f2fe;
+            transform: scale(1.05);
+        }
+
+        .announcement-bell.active {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+        }
+
+        .announcement-bell.has-new {
+            animation: bellPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes bellPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        }
+
+        .announcement-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+        }
+
+        .announcement-badge.show { display: flex; }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT POPUP =====
+           ================================================================ */
+        .announcement-popup {
+            position: fixed;
+            width: 380px;
+            max-width: calc(100vw - 40px);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.22), 0 0 0 1px rgba(16, 137, 211, 0.06);
+            overflow: hidden;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.97);
+            pointer-events: none;
+            transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: top right;
+        }
+
+        .announcement-popup.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .announcement-popup::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 22px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: -1px -1px 2px rgba(16, 137, 211, 0.06);
+        }
+
+        .announcement-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .announcement-popup-header h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .announcement-popup-header h4 i {
+            color: rgb(16, 137, 211);
+        }
+
+        .announcement-mark-all {
+            background: none;
+            border: none;
+            color: rgb(16, 137, 211);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .announcement-mark-all:hover {
+            background: rgba(16, 137, 211, 0.1);
+        }
+
+        .announcement-list {
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .announcement-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            margin-bottom: 4px;
+            background: white;
+        }
+
+        .announcement-item:hover {
+            background: #f0f7ff;
+            transform: translateX(2px);
+        }
+
+        .announcement-item.unread {
+            background: #f0f9ff;
+        }
+
+        .announcement-item.unread:hover {
+            background: #e0f2fe;
+        }
+
+        .announcement-item.unread .announcement-title {
+            font-weight: 700;
+        }
+
+        .announcement-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            background: #e0f2fe;
+        }
+
+        .announcement-icon.type-admin { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+        .announcement-icon.type-birthday { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); }
+        .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+        .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
+        .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+
+        .announcement-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .announcement-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            line-height: 1.35;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .announcement-priority-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 50px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .announcement-priority-badge.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-priority-badge.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-message {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .announcement-time {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        .announcement-unread-dot {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgb(16, 137, 211);
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.15);
+        }
+
+        .announcement-popup-footer {
+            padding: 10px 18px;
+            background: #f8faff;
+            border-top: 1px solid #eef2f7;
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .announcement-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .announcement-empty i {
+            font-size: 36px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .announcement-empty p {
+            font-size: 13px;
         }
 
         .main-container {
@@ -363,261 +643,51 @@
             margin-bottom: 0;
         }
 
-        .highlights-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding-top: 4px;
-        }
+        .highlights-carousel-wrapper { position: relative; overflow: hidden; border-radius: 20px; padding: 0 50px; }
+        .highlights-carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); gap: 0; will-change: transform; }
+        .highlights-carousel-slide { min-width: 100%; display: grid; gap: 25px; padding: 10px 5px; grid-template-columns: repeat(3, 1fr); }
+        .highlights-carousel-slide.single-item { grid-template-columns: 1fr; }
+        .highlights-carousel-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to right, transparent, rgba(248,250,255,0.7)); pointer-events: none; z-index: 5; }
+        .highlights-carousel-wrapper::before { content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to left, transparent, rgba(248,250,255,0.7)); pointer-events: none; z-index: 5; }
 
-        .highlight-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid #eef2f7;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
-            transition: all 0.3s ease;
-            position: relative;
-            contain: content;
-        }
+        .highlights-carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; cursor: pointer; position: relative; }
+        .highlights-carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
+        .highlights-carousel-item .image-container { width: 100%; height: 220px; overflow: hidden; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); position: relative; flex-shrink: 0; }
+        .highlights-carousel-item .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .highlights-carousel-item .image-container .expiry-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
+        .highlights-carousel-item .image-container .expiry-badge i { margin-right: 4px; }
+        .highlights-carousel-item .image-container .image-count { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
+        .highlights-carousel-item .image-container .hl-actions { position: absolute; bottom: 10px; left: 10px; right: 10px; display: flex; gap: 6px; z-index: 3; opacity: 0; transition: opacity 0.25s ease; }
+        .highlights-carousel-item:hover .image-container .hl-actions { opacity: 1; }
+        .highlights-carousel-item .image-container .hl-actions button { background: rgba(0,0,0,0.75); color: white; border: none; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
+        .highlights-carousel-item .image-container .hl-actions button:hover { transform: scale(1.05); }
+        .highlights-carousel-item .image-container .hl-actions .hl-view { background: rgba(16, 137, 211, 0.95); }
+        .highlights-carousel-item .image-container .hl-actions .hl-download { background: rgba(0,0,0,0.75); }
+        .highlights-carousel-item .image-container .hl-actions .hl-download:hover { background: rgb(16, 137, 211); }
 
-        .highlight-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(16, 137, 211, 0.08);
-            border-color: rgba(16, 137, 211, 0.15);
-        }
+        .highlights-carousel-item .item-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
+        .highlights-carousel-item .item-body .caption { font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 8px; }
+        .highlights-carousel-item .item-body .meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #888; margin-top: auto; }
+        .highlights-carousel-item .item-body .meta .author { display: flex; align-items: center; gap: 6px; }
+        .highlights-carousel-item .item-body .meta .author .avatar-small { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 700; overflow: hidden; }
+        .highlights-carousel-item .item-body .meta .author .avatar-small img { width: 100%; height: 100%; object-fit: cover; }
+        .highlights-carousel-item .item-body .meta .expiry-time.urgent { color: #ef4444; font-weight: 600; }
 
-        .highlight-card .image-container {
-            width: 100%;
-            height: 200px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            position: relative;
-        }
+        .highlights-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); border: 2px solid rgb(16, 137, 211); color: rgb(16, 137, 211); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .highlights-carousel-btn:hover { background: rgb(16, 137, 211); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35); }
+        .highlights-carousel-btn:active { transform: translateY(-50%) scale(0.95); }
+        .highlights-carousel-btn.prev { left: 5px; }
+        .highlights-carousel-btn.next { right: 5px; }
 
-        .highlight-card .image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .highlight-card .image-container .expiry-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .highlight-card .image-container .expiry-badge i {
-            margin-right: 4px;
-        }
-
-        .highlight-card .image-container .image-count {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 10px;
-        }
-
-        .highlight-card .image-container .delete-btn {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(239, 68, 68, 0.9);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0;
-            z-index: 2;
-        }
-
-        .highlight-card:hover .image-container .delete-btn {
-            opacity: 1;
-        }
-
-        .highlight-card .image-container .delete-btn:hover {
-            background: #dc2626;
-            transform: scale(1.05);
-        }
-
-        .highlight-card .image-container .view-btn {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(16, 137, 211, 0.95);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0;
-            z-index: 2;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .highlight-card:hover .image-container .view-btn {
-            opacity: 1;
-        }
-
-        .highlight-card .image-container .view-btn:hover {
-            background: rgb(13, 107, 158);
-            transform: scale(1.05);
-        }
-
-        .highlight-card .image-container .download-btn {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            opacity: 0;
-            z-index: 2;
-        }
-
-        .highlight-card:hover .image-container .download-btn {
-            opacity: 1;
-        }
-
-        .highlight-card .image-container .download-btn:hover {
-            background: rgb(16, 137, 211);
-            transform: scale(1.05);
-        }
-
-        .highlight-card .card-body {
-            padding: 15px 18px;
-        }
-
-        .highlight-card .card-body .caption {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.5;
-            margin-bottom: 8px;
-        }
-
-        .highlight-card .card-body .meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: #888;
-        }
-
-        .highlight-card .card-body .meta .author {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .highlight-card .card-body .meta .author .avatar-small {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 9px;
-            font-weight: 700;
-            overflow: hidden;
-        }
-
-        .highlight-card .card-body .meta .author .avatar-small img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .highlight-card .card-body .meta .expiry-time.urgent {
-            color: #ef4444;
-            font-weight: 600;
-        }
-
-        .highlight-card.selected {
-            border-color: rgb(16, 137, 211);
-            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.3);
-        }
-
-        .highlight-card .selection-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.9);
-            border: 2px solid #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 5;
-            opacity: 0;
-        }
-
-        .highlight-card:hover .selection-checkbox,
-        .highlight-card.selected .selection-checkbox {
-            opacity: 1;
-        }
-
-        .highlight-card.selected .selection-checkbox {
-            background: rgb(16, 137, 211);
-            border-color: rgb(16, 137, 211);
-            color: white;
-        }
-
-        .highlight-card.selected .selection-checkbox i {
-            color: white;
-            font-size: 12px;
-        }
-
-        .highlight-card .selection-checkbox i {
-            font-size: 12px;
-        }
-
-        .selection-mode-active .highlight-card .selection-checkbox {
-            opacity: 1 !important;
-        }
-
-        .selection-mode-active .highlight-card .delete-btn,
-        .selection-mode-active .highlight-card .download-btn,
-        .selection-mode-active .highlight-card .view-btn {
-            display: none !important;
-        }
+        .highlights-carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+        .highlights-carousel-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; cursor: pointer; transition: all 0.3s ease; border: none; }
+        .highlights-carousel-dots .dot.active { background: rgb(16, 137, 211); width: 30px; border-radius: 10px; }
+        .highlights-carousel-dots .dot:hover { background: rgb(16, 137, 211); }
 
         .empty-highlights {
             text-align: center;
             padding: 40px 20px;
             color: #888;
-            grid-column: 1 / -1;
         }
 
         .empty-highlights i {
@@ -676,6 +746,8 @@
             border: 1px solid #f0f4ff;
             background: #fafcff;
             contain: content;
+            cursor: pointer;
+            position: relative;
         }
 
         .member-card:hover {
@@ -705,6 +777,7 @@
             font-weight: 700;
             flex-shrink: 0;
             overflow: hidden;
+            position: relative;
         }
 
         .member-card .avatar img {
@@ -712,6 +785,42 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+        }
+
+        /* ===== NOTE BUBBLE ===== */
+        .member-card .note-bubble {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff7ed;
+            border: 1.5px solid #fed7aa;
+            color: #9a3412;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+            max-width: 100%;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+
+        .member-card .note-bubble:hover {
+            background: #ffedd5;
+            transform: scale(1.02);
+        }
+
+        .member-card .note-bubble i {
+            color: #ea580c;
+            font-size: 11px;
+            flex-shrink: 0;
+        }
+
+        .member-card .note-bubble span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .member-card .card-top .name-section {
@@ -972,10 +1081,12 @@
             display: flex;
             gap: 12px;
             margin-top: 20px;
+            flex-wrap: wrap;
         }
 
         .modal-actions button {
             flex: 1;
+            min-width: 140px;
             padding: 12px;
             border-radius: 12px;
             border: none;
@@ -1008,6 +1119,15 @@
 
         .modal-actions .btn-secondary:hover {
             background: #e5e7eb;
+        }
+
+        .modal-actions .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .modal-actions .btn-danger:hover {
+            background: #fecaca;
         }
 
         .spinner {
@@ -1062,7 +1182,6 @@
             color: #888;
         }
 
-        /* ===== PHOTO GALLERY MODAL ===== */
         .gallery-modal .modal-content {
             max-width: 1000px;
             width: 95%;
@@ -1212,11 +1331,6 @@
             transform: scale(1.1);
         }
 
-        .gallery-item .item-actions button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .gallery-item .image-index {
             position: absolute;
             bottom: 8px;
@@ -1235,67 +1349,537 @@
             color: #888;
         }
 
-        .gallery-loading .spinner {
-            width: 32px;
-            height: 32px;
-            border-width: 3px;
-            border-top-color: rgb(16, 137, 211);
-            border-color: #e0e7ff;
-            border-top-color: rgb(16, 137, 211);
-        }
+        .highlight-detail-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .highlight-detail-modal .modal-header { position: relative; width: 100%; height: 360px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; }
+        .highlight-detail-modal .modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .highlight-detail-modal .modal-header .hl-multi-badge { position: absolute; bottom: 14px; left: 14px; background: rgba(0,0,0,0.7); color: white; padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+        .highlight-detail-modal .modal-body { padding: 26px 30px 30px; }
+        .highlight-detail-modal .hl-author-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .highlight-detail-modal .hl-author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; overflow: hidden; flex-shrink: 0; }
+        .highlight-detail-modal .hl-author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .highlight-detail-modal .hl-author-info { display: flex; flex-direction: column; gap: 2px; }
+        .highlight-detail-modal .hl-author-name { font-size: 17px; font-weight: 700; color: #1a1a2e; }
+        .highlight-detail-modal .hl-author-time { font-size: 12px; color: #888; }
+        .highlight-detail-modal .hl-caption { font-size: 15px; color: #444; line-height: 1.7; padding: 16px 0; border-top: 1px solid #f0f4ff; border-bottom: 1px solid #f0f4ff; margin-bottom: 18px; white-space: pre-wrap; }
+        .highlight-detail-modal .hl-stats { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: #888; margin-bottom: 18px; }
+        .highlight-detail-modal .hl-stats .stat { display: flex; align-items: center; gap: 6px; }
+        .highlight-detail-modal .hl-stats .stat i { color: rgb(16, 137, 211); }
+        .highlight-detail-modal .hl-stats .stat.urgent { color: #ef4444; }
+        .highlight-detail-modal .hl-stats .stat.urgent i { color: #ef4444; }
 
-        /* ===== LIGHTBOX ===== */
-        .lightbox-modal {
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(12px);
-            z-index: 3000;
-        }
-
-        .lightbox-modal .lightbox-content {
-            position: relative;
-            max-width: 90vw;
-            max-height: 90vh;
+        .highlight-detail-modal .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #555;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10;
+            box-shadow: 0 4px 14px rgba(16, 137, 211, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06);
         }
 
-        .lightbox-modal img {
-            max-width: 90vw;
-            max-height: 78vh;
-            object-fit: contain;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        .highlight-detail-modal .modal-close:hover {
+            background: #f0f7ff;
+            color: rgb(16, 137, 211);
+            transform: scale(1.08) rotate(90deg);
+            box-shadow: 0 6px 20px rgba(16, 137, 211, 0.28);
         }
 
-        .lightbox-modal .lightbox-actions {
+        .highlight-detail-modal .modal-close:active {
+            transform: scale(0.95) rotate(90deg);
+        }
+
+        .member-detail-modal .modal-content {
+            background: white;
+            border-radius: 28px;
+            padding: 0;
+            max-width: 480px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.28);
+            position: relative;
+        }
+
+        .member-detail-modal .member-hero {
+            position: relative;
+            padding: 45px 30px 30px;
+            text-align: center;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            border-radius: 28px 28px 0 0;
+            overflow: hidden;
+        }
+
+        .member-detail-modal .member-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            pointer-events: none;
+        }
+
+        .member-detail-modal .member-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -60px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            pointer-events: none;
+        }
+
+        .member-detail-modal .member-avatar-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             display: flex;
-            gap: 12px;
-            margin-top: 16px;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 56px;
+            font-weight: 700;
+            overflow: hidden;
+            border: 5px solid white;
+            box-shadow: 0 12px 30px rgba(16, 137, 211, 0.25);
+            position: relative;
+            z-index: 1;
         }
 
-        .lightbox-modal .lightbox-actions button {
-            padding: 10px 22px;
+        .member-detail-modal .member-avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .member-detail-modal .member-hero-name {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.2;
+        }
+
+        .member-detail-modal .member-hero-location {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #555;
+            background: rgba(255, 255, 255, 0.75);
+            padding: 4px 12px;
             border-radius: 50px;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+            margin-top: 4px;
+        }
+
+        .member-detail-modal .member-hero-location i {
+            color: rgb(16, 137, 211);
+            font-size: 12px;
+        }
+
+        .member-detail-modal .member-modal-body {
+            padding: 22px 26px 26px;
+        }
+
+        .member-detail-modal .member-badges-row {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            margin-top: -34px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .member-detail-modal .member-badges-row .status-badge,
+        .member-detail-modal .member-badges-row .lovelife-badge {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 5px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .member-detail-modal .member-badges-row .status-badge .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .member-detail-modal .member-badges-row .status-badge.available { color: #16a34a; }
+        .member-detail-modal .member-badges-row .status-badge.busy { color: #dc2626; }
+        .member-detail-modal .member-badges-row .status-badge.away { color: #d97706; }
+        .member-detail-modal .member-badges-row .status-badge.dnd { color: #7c3aed; }
+        .member-detail-modal .member-badges-row .status-badge.offline { color: #6b7280; }
+
+        /* ===== NOTE DISPLAY IN MEMBER MODAL ===== */
+        .member-detail-modal .member-note-block {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border: 1.5px solid #fed7aa;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .member-detail-modal .member-note-block::before {
+            content: '💬';
+            position: absolute;
+            top: -10px;
+            left: 14px;
+            background: white;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .member-detail-modal .member-note-block .note-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #9a3412;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
+
+        .member-detail-modal .member-note-block .note-text {
+            font-size: 15px;
+            color: #7c2d12;
+            font-weight: 600;
+            line-height: 1.55;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .member-detail-modal .member-note-block .note-expiry {
+            font-size: 11px;
+            color: #c2410c;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+        }
+
+        .member-detail-modal .member-note-block .note-expiry.urgent {
+            color: #dc2626;
+        }
+
+        .member-detail-modal .member-section {
+            margin-bottom: 18px;
+        }
+
+        .member-detail-modal .member-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .member-detail-modal .member-section-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .member-detail-modal .member-section-label i {
+            color: rgb(16, 137, 211);
+            font-size: 11px;
+        }
+
+        .member-detail-modal .member-bio-text {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            background: #f8faff;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border-left: 3px solid rgb(16, 137, 211);
+            white-space: pre-wrap;
+        }
+
+        .member-detail-modal .member-occupation-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #555;
+            background: #f8faff;
+            padding: 10px 14px;
+            border-radius: 12px;
+        }
+
+        .member-detail-modal .member-occupation-row i {
+            color: rgb(16, 137, 211);
+            width: 18px;
+            text-align: center;
+        }
+
+        .member-detail-modal .member-interests-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .member-detail-modal .member-interests-wrap .interest-tag {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .member-detail-modal .member-socials-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .member-detail-modal .member-socials-wrap a {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f8faff;
+            color: #666;
+            font-size: 17px;
+            transition: all 0.25s ease;
+            text-decoration: none;
+            border: 1px solid #eef2f7;
+        }
+
+        .member-detail-modal .member-socials-wrap a:hover {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            transform: scale(1.08);
+            border-color: rgb(16, 137, 211);
+        }
+
+        .member-detail-modal .member-modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .member-detail-modal .member-modal-actions button {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px 16px;
+            border-radius: 14px;
             border: none;
             font-weight: 600;
-            cursor: pointer;
             font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .member-detail-modal .member-modal-actions .btn-primary {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+        }
+
+        .member-detail-modal .member-modal-actions .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.4);
+        }
+
+        .member-detail-modal .member-modal-actions .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .member-detail-modal .member-modal-actions .btn-secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .member-detail-modal .member-modal-actions .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .member-detail-modal .member-modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #555;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10;
+            box-shadow: 0 4px 14px rgba(16, 137, 211, 0.18), 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+
+        .member-detail-modal .member-modal-close:hover {
+            background: #f0f7ff;
+            color: rgb(16, 137, 211);
+            transform: scale(1.08) rotate(90deg);
+            box-shadow: 0 6px 20px rgba(16, 137, 211, 0.28);
+        }
+
+        .member-detail-modal .member-modal-close:active {
+            transform: scale(0.95) rotate(90deg);
+        }
+
+        /* ================================================================
+           ===== NOTE POPUP MODAL =====
+           ================================================================ */
+        .note-modal .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            max-width: 420px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
+        }
+        .note-modal .note-modal-header {
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            padding: 22px 24px 18px;
+            text-align: center;
+            position: relative;
+        }
+        .note-modal .note-modal-header .note-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.2s ease;
         }
-
-        .lightbox-modal .lightbox-actions .lb-download {
-            background: rgb(16, 137, 211);
+        .note-modal .note-modal-header .note-modal-close:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
         }
-
-        .lightbox-modal .lightbox-actions .lb-close {
-            background: rgba(255,255,255,0.15);
+        .note-modal .note-modal-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 800;
+            color: rgb(16, 137, 211);
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .note-modal .note-modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .note-modal .note-modal-name {
+            font-size: 17px;
+            font-weight: 800;
             color: white;
+            margin-bottom: 2px;
         }
-
-        .lightbox-modal .lightbox-actions button:hover {
-            transform: scale(1.05);
+        .note-modal .note-modal-time {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+        .note-modal .note-modal-body {
+            padding: 24px 26px 26px;
+            text-align: center;
+        }
+        .note-modal .note-modal-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            line-height: 1.55;
+            padding: 16px 18px;
+            background: #f8faff;
+            border-radius: 16px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 16px;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .note-modal .note-modal-expiry {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+        .note-modal .note-modal-expiry i {
+            color: rgb(16, 137, 211);
+        }
+        .note-modal .note-modal-expiry.urgent {
+            color: #ef4444;
+        }
+        .note-modal .note-modal-expiry.urgent i {
+            color: #ef4444;
         }
 
         /* ================================================================
@@ -1589,6 +2173,12 @@
         .tita-status-msg.error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
         .tita-status-msg.info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
 
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .highlights-carousel-wrapper { padding: 0 40px; }
+            .highlights-carousel-btn { width: 42px; height: 42px; font-size: 16px; }
+        }
+
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
@@ -1612,6 +2202,8 @@
                 gap: 10px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
                 width: 100%;
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
             }
 
             .navbar .nav-links.active { display: flex; }
@@ -1623,6 +2215,38 @@
                 top: 50%;
                 transform: translateY(-50%);
             }
+
+            .navbar .nav-links > li { width: 100%; justify-content: center; }
+            .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
+
+            /* Bell on mobile: full-width row, icon centered */
+            .navbar .nav-links > li.announcement-li {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                padding: 4px 0;
+            }
+            .announcement-bell {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .announcement-badge {
+                top: -2px;
+                right: -2px;
+            }
+
+            /* Popup on mobile: fixed below navbar, full-width */
+            .announcement-popup {
+                position: fixed !important;
+                top: 70px !important;
+                left: 14px !important;
+                right: 14px !important;
+                width: auto !important;
+                max-width: none !important;
+            }
+            .announcement-popup::before { display: none; }
+            .announcement-list { max-height: 60vh; }
 
             .main-container {
                 padding: 0 20px;
@@ -1642,10 +2266,10 @@
                 width: 100%;
             }
 
-            .highlights-grid {
-                grid-template-columns: 1fr 1fr;
-                gap: 15px;
-            }
+            .highlights-carousel-slide { gap: 0 !important; }
+            .highlights-carousel-item .image-container { height: 220px; }
+            .highlights-carousel-wrapper { padding: 0 44px; }
+            .highlights-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
 
             .gallery-grid {
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
@@ -1659,18 +2283,20 @@
 
             .modal-actions { flex-direction: column; }
 
-            .navbar .nav-links a {
-                font-size: 14px;
-                width: 100%;
-                text-align: center;
-            }
-
             .navbar .nav-links .logout-btn {
                 width: 100%;
                 justify-content: center;
             }
 
-            /* Tita Tima mobile/tablet */
+            .highlight-detail-modal .modal-header { height: 260px; }
+            .highlight-detail-modal .modal-body { padding: 20px 22px 24px; }
+
+            .member-detail-modal .member-avatar-circle { width: 120px; height: 120px; font-size: 46px; }
+            .member-detail-modal .member-hero { padding: 38px 22px 26px; }
+            .member-detail-modal .member-hero-name { font-size: 21px; }
+            .member-detail-modal .member-modal-body { padding: 20px 20px 22px; }
+            .member-detail-modal .member-modal-actions { flex-direction: column; }
+
             .tita-launcher {
                 bottom: calc(20px + env(safe-area-inset-bottom, 0px));
                 right: 18px;
@@ -1700,15 +2326,11 @@
                 justify-content: center;
             }
 
-            .highlights-grid { grid-template-columns: 1fr; }
-
-            .highlight-card .image-container { height: 180px; }
-
-            .highlight-card .image-container .delete-btn,
-            .highlight-card .image-container .download-btn,
-            .highlight-card .image-container .view-btn {
-                opacity: 1;
-            }
+            .highlights-carousel-slide { grid-template-columns: 1fr; }
+            .highlights-carousel-item .image-container { height: 200px; }
+            .highlights-carousel-wrapper { padding: 0 38px; }
+            .highlights-carousel-btn { width: 32px; height: 32px; font-size: 12px; }
+            .highlights-carousel-item .image-container .hl-actions { opacity: 1; }
 
             .members-grid { grid-template-columns: 1fr; }
 
@@ -1751,7 +2373,17 @@
                 padding: 8px 16px;
             }
 
-            /* Tita Tima small phone */
+            .member-detail-modal .member-avatar-circle { width: 110px; height: 110px; font-size: 40px; }
+            .member-detail-modal .member-hero { padding: 32px 18px 22px; }
+            .member-detail-modal .member-hero-name { font-size: 19px; }
+            .member-detail-modal .member-modal-body { padding: 18px 16px 20px; }
+
+            .announcement-popup {
+                top: 65px !important;
+                left: 10px !important;
+                right: 10px !important;
+            }
+
             .tita-launcher {
                 bottom: calc(18px + env(safe-area-inset-bottom, 0px));
                 right: 16px;
@@ -1795,9 +2427,34 @@
             <li><a href="calendar.html">Calendar</a></li>
             <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+            <li class="announcement-li">
+                <div class="announcement-wrapper">
+                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                        <i class="fas fa-bell"></i>
+                        <span class="announcement-badge" id="announcementBadge">0</span>
+                    </button>
+                </div>
+            </li>
             <li><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
         </ul>
     </nav>
+
+    <!-- Announcement popup (only rendered when logged in) -->
+    <div class="announcement-popup" id="announcementPopup" role="dialog" aria-labelledby="announcementTitle" style="display:none;">
+        <div class="announcement-popup-header">
+            <h4 id="announcementTitle"><i class="fas fa-bullhorn"></i> Announcements</h4>
+            <button class="announcement-mark-all" onclick="markAllAnnouncementsRead()">Mark all read</button>
+        </div>
+        <div class="announcement-list" id="announcementList">
+            <div class="announcement-empty">
+                <i class="fas fa-inbox"></i>
+                <p>Loading announcements...</p>
+            </div>
+        </div>
+        <div class="announcement-popup-footer" id="announcementFooter">
+            No new announcements
+        </div>
+    </div>
 
     <div class="main-container">
         <div class="hero-banner">
@@ -1827,12 +2484,11 @@
                 </div>
             </div>
             <div class="highlights-content" id="highlightsContent">
-                <div class="highlights-grid" id="highlightsGrid">
-                    <div class="empty-highlights">
-                        <i class="fas fa-images"></i>
-                        <h3>No highlights yet</h3>
-                        <p>Share your favorite moments with the squad!</p>
-                    </div>
+                <div class="highlights-carousel-wrapper" id="highlightsCarousel">
+                    <button class="highlights-carousel-btn prev" onclick="moveHighlightsCarousel(-1)"><i class="fas fa-chevron-left"></i></button>
+                    <button class="highlights-carousel-btn next" onclick="moveHighlightsCarousel(1)"><i class="fas fa-chevron-right"></i></button>
+                    <div class="highlights-carousel-track" id="highlightsTrack"></div>
+                    <div class="highlights-carousel-dots" id="highlightsDots"></div>
                 </div>
             </div>
         </section>
@@ -1878,6 +2534,136 @@
         </div>
     </div>
 
+    <!-- Highlight Detail Modal -->
+    <div id="highlightDetailModal" class="modal highlight-detail-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeHighlightDetail()" title="Close" aria-label="Close"><i class="fas fa-times"></i></button>
+                <img id="hlDetailImage" src="" alt="Highlight" />
+                <div class="hl-multi-badge" id="hlDetailMultiBadge" style="display:none;">
+                    <i class="fas fa-images"></i> <span id="hlDetailMultiCount">0</span> photos
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="hl-author-row">
+                    <div class="hl-author-avatar" id="hlDetailAvatar"></div>
+                    <div class="hl-author-info">
+                        <div class="hl-author-name" id="hlDetailAuthor">Author</div>
+                        <div class="hl-author-time" id="hlDetailTime">Posted</div>
+                    </div>
+                </div>
+                <div class="hl-caption" id="hlDetailCaption">No caption</div>
+                <div class="hl-stats">
+                    <div class="stat" id="hlDetailPhotoCount"><i class="fas fa-images"></i> <span>1 photo</span></div>
+                    <div class="stat" id="hlDetailExpiry"><i class="fas fa-clock"></i> <span>X days left</span></div>
+                </div>
+                <div class="modal-actions" id="hlDetailActions">
+                    <button class="btn-primary" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button class="btn-primary" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
+                        <i class="fas fa-expand"></i> View All Photos
+                    </button>
+                    <button class="btn-danger" id="hlDetailDeleteBtn" onclick="deleteCurrentHighlightDetail()">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button class="btn-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Detail Modal -->
+    <div id="memberDetailModal" class="modal member-detail-modal">
+        <div class="modal-content">
+            <button class="member-modal-close" onclick="closeMemberDetail()" title="Close" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="member-hero">
+                <div class="member-avatar-circle" id="memberDetailAvatar">
+                    <span id="memberDetailInitials"></span>
+                </div>
+                <div class="member-hero-name" id="memberDetailName">Name</div>
+                <div class="member-hero-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="memberDetailLocation">Location</span>
+                </div>
+            </div>
+
+            <div class="member-modal-body">
+                <div class="member-badges-row" id="memberDetailBadges"></div>
+
+                <!-- ===== NOTE BLOCK ===== -->
+                <div class="member-note-block" id="memberDetailNoteBlock" style="display:none;">
+                    <div class="note-label">💬 Current Note</div>
+                    <div class="note-text" id="memberDetailNoteText"></div>
+                    <div class="note-expiry" id="memberDetailNoteExpiry">
+                        <i class="fas fa-clock"></i> <span></span>
+                    </div>
+                </div>
+
+                <div class="member-section" id="memberDetailOccupationSection" style="display:none;">
+                    <div class="member-section-label">
+                        <i class="fas fa-briefcase"></i> Occupation
+                    </div>
+                    <div class="member-occupation-row">
+                        <i class="fas fa-briefcase"></i>
+                        <span id="memberDetailOccupation">Occupation</span>
+                    </div>
+                </div>
+
+                <div class="member-section" id="memberDetailBioSection">
+                    <div class="member-section-label">
+                        <i class="fas fa-info-circle"></i> About
+                    </div>
+                    <div class="member-bio-text" id="memberDetailBio">Bio</div>
+                </div>
+
+                <div class="member-section" id="memberDetailInterestsSection" style="display:none;">
+                    <div class="member-section-label">
+                        <i class="fas fa-heart"></i> Interests
+                    </div>
+                    <div class="member-interests-wrap" id="memberDetailInterests"></div>
+                </div>
+
+                <div class="member-section" id="memberDetailSocialsSection" style="display:none;">
+                    <div class="member-section-label">
+                        <i class="fas fa-share-alt"></i> Connect
+                    </div>
+                    <div class="member-socials-wrap" id="memberDetailSocials"></div>
+                </div>
+
+                <div class="member-modal-actions">
+                    <button class="btn-primary" id="memberDetailDownloadBtn" onclick="downloadCurrentMemberDetail()">
+                        <i class="fas fa-download"></i> Download Avatar
+                    </button>
+                    <button class="btn-secondary" onclick="closeMemberDetail()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Note Popup Modal -->
+    <div id="noteModal" class="modal note-modal">
+        <div class="modal-content">
+            <div class="note-modal-header">
+                <button class="note-modal-close" onclick="closeNoteModal()"><i class="fas fa-times"></i></button>
+                <div class="note-modal-avatar" id="noteModalAvatar"></div>
+                <div class="note-modal-name" id="noteModalName">Name</div>
+                <div class="note-modal-time" id="noteModalTime"></div>
+            </div>
+            <div class="note-modal-body">
+                <div class="note-modal-text" id="noteModalText"></div>
+                <div class="note-modal-expiry" id="noteModalExpiry">
+                    <i class="fas fa-clock"></i> <span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Gallery Modal -->
     <div id="galleryModal" class="modal gallery-modal">
         <div class="modal-content">
@@ -1887,7 +2673,10 @@
                     <span>Photos</span>
                     <span class="gallery-subtitle" id="gallerySubtitle"></span>
                 </div>
-                <button class="gallery-close" onclick="closeGallery()" title="Close">&times;</button>
+                <div class="gallery-actions">
+                    <button class="btn-primary" id="galleryDownloadAllBtn" onclick="downloadAllGalleryImages()" style="padding:8px 16px;font-size:13px;"><i class="fas fa-file-zipper"></i> Download All</button>
+                    <button class="gallery-close" onclick="closeGallery()" title="Close">&times;</button>
+                </div>
             </div>
             <div class="gallery-caption" id="galleryCaption" style="display:none;"></div>
             <div class="gallery-grid" id="galleryGrid"></div>
@@ -1981,6 +2770,21 @@
                 <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
             </div>
 
+            <!-- ===== QUICK NOTE FIELD ===== -->
+            <div class="tita-field">
+                <label>
+                    <i class="fas fa-comment-dots"></i> Quick Note
+                    <span style="color:#888;font-weight:500;text-transform:none;letter-spacing:0;font-size:11px;">(60 chars · expires in 24h)</span>
+                </label>
+                <input type="text" id="titaNote" placeholder="Coffee later? ☕" maxlength="60" />
+                <div style="font-size:11px;color:#888;margin-top:4px;text-align:right;">
+                    <span id="titaNoteCount">0</span>/60
+                </div>
+                <div id="titaNoteStatus" style="font-size:11px;color:#888;margin-top:4px;display:none;">
+                    <i class="fas fa-clock"></i> <span></span>
+                </div>
+            </div>
+
             <div class="tita-actions">
                 <button class="tita-save" id="titaSaveBtn" onclick="titaSaveProfile()">
                     <i class="fas fa-save"></i> Save Changes
@@ -2010,6 +2814,14 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+            if (err.code === 'failed-precondition') {
+                console.warn('Firestore persistence: multiple tabs open, cache disabled for this tab.');
+            } else if (err.code === 'unimplemented') {
+                console.warn('Firestore persistence: not supported in this browser.');
+            }
+        });
+
         const CLOUDINARY_CONFIG = {
             cloudName: "ooq99nlw",
             uploadPreset: "t-imawa"
@@ -2017,6 +2829,16 @@
 
         const HIGHLIGHT_EXPIRY_DAYS = 3;
         const COLLAPSE_KEY = 'timawa_highlights_collapsed';
+
+        // ===== AUTO-CLEANUP CONFIG =====
+        const AUTO_CLEANUP_INTERVAL_MS = 5 * 60 * 1000; // every 5 minutes
+        const AUTO_CLEANUP_INITIAL_DELAY_MS = 3 * 1000; // 3 seconds after load
+
+        const HIGHLIGHTS_LIMIT = 20;
+        const MEMBERS_LIMIT = 50;
+        const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
+        const CAROUSEL_AUTOPLAY_MS = 10000;
+        const MOBILE_BREAKPOINT = 768;
 
         let currentUser = null;
         let currentUserData = null;
@@ -2033,11 +2855,44 @@
         let currentLightboxUrl = '';
         let currentLightboxIndex = 0;
 
+        let currentHighlightDetailId = null;
+        let currentHighlightDetailImageIndex = 0;
+
+        let currentMemberDetail = null;
+
         const userProfileCache = {};
 
-        // Tita Tima state
         let titaCurrentUser = null;
         let titaUserData = null;
+
+        let highlightsCarouselState = { currentIndex: 0, interval: null, slides: [] };
+
+        // ===== AUTO-CLEANUP TIMER =====
+        let autoCleanupTimer = null;
+
+        // ================================================================
+        // ===== NOTES STATE =====
+        // ================================================================
+        let notesCache = {};
+        let unsubscribeNotes = null;
+        let currentNoteUid = null;
+
+        // ================================================================
+        // ===== ANNOUNCEMENTS — OPTIMIZED STATE =====
+        // ================================================================
+        let announcementUser = null;
+        let announcementUnsubscribe = null;
+        let announcementItems = [];
+        let announcementReadIds = new Set();
+
+        const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
+        const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
+        const ANNOUNCEMENT_CACHE_KEY = 'timawa_ann_cache_';
+        const ANNOUNCEMENT_LIMIT = 30;
+        const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
+
+        function isMobile() { return window.innerWidth <= MOBILE_BREAKPOINT; }
+        function getItemsPerSlide() { return isMobile() ? 1 : 3; }
 
         // ===== CLOUDINARY THUMBNAIL =====
         function cloudinaryThumb(url, width = 500) {
@@ -2047,11 +2902,24 @@
             return url.replace('/upload/', `/upload/w_${width},q_auto,f_auto/`);
         }
 
+        function cloudinaryAvatar(url, size = 320) {
+            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+            const afterUpload = url.split('/upload/')[1];
+            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
+            return url.replace('/upload/', `/upload/w_${size},h_${size},c_fill,g_face,q_auto:good,f_auto/`);
+        }
+
         // ===== HELPERS =====
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = String(text);
             return div.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            return String(text)
+                .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         function escapeJs(str) {
@@ -2075,6 +2943,742 @@
             return match ? match[1].toLowerCase() : 'jpg';
         }
 
+        function formatRelativeTime(date) {
+            if (!date) return 'Just now';
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMin = Math.floor(diffMs / 60000);
+            if (diffMin < 1) return 'Just now';
+            if (diffMin < 60) return `${diffMin}m ago`;
+            const diffHr = Math.floor(diffMin / 60);
+            if (diffHr < 24) return `${diffHr}h ago`;
+            const diffDay = Math.floor(diffHr / 24);
+            if (diffDay < 7) return `${diffDay}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        async function getCurrentUserProfileCached(user) {
+            const CACHE_KEY = 'timawa_me_' + user.uid;
+            try {
+                const raw = sessionStorage.getItem(CACHE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.uid === user.uid && (Date.now() - parsed.t) < USER_PROFILE_CACHE_TTL) {
+                        return parsed.data;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data() || {};
+                try {
+                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                        uid: user.uid,
+                        t: Date.now(),
+                        data
+                    }));
+                } catch (e) { /* ignore */ }
+                return data;
+            } catch (e) {
+                console.warn('getCurrentUserProfileCached failed:', e);
+                return {};
+            }
+        }
+
+        // ================================================================
+        // ===== NOTES SYSTEM =====
+        // ================================================================
+        function loadNotes() {
+            if (unsubscribeNotes) unsubscribeNotes();
+
+            const now = new Date();
+
+            unsubscribeNotes = db.collection('notes')
+                .where('expireAt', '>', now)
+                .onSnapshot((snapshot) => {
+                    const newCache = {};
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const expireAt = data.expireAt
+                            ? (data.expireAt.seconds ? new Date(data.expireAt.seconds * 1000) : new Date(data.expireAt))
+                            : null;
+                        if (!expireAt || expireAt > now) {
+                            newCache[doc.id] = { id: doc.id, ...data };
+                        }
+                    });
+                    notesCache = newCache;
+                    if (document.getElementById('membersGrid')) {
+                        renderMembersGridFromCache();
+                    }
+                }, (error) => {
+                    console.warn('Notes listener error:', error.message);
+                    notesCache = {};
+                });
+        }
+
+        function openNoteModal(uid) {
+            const note = notesCache[uid];
+            if (!note) return;
+
+            currentNoteUid = uid;
+
+            const member = userProfileCache[uid] || {};
+            const name = member.displayName || member.email || 'Anonymous';
+            const photoUrl = member.photoURL || '';
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            const avatarEl = document.getElementById('noteModalAvatar');
+            if (photoUrl) {
+                avatarEl.innerHTML = `<img src="${cloudinaryAvatar(photoUrl, 120)}" alt="${escapeAttr(name)}" />`;
+            } else {
+                avatarEl.textContent = initials;
+            }
+
+            document.getElementById('noteModalName').textContent = name;
+
+            const expireAt = note.expireAt
+                ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                : null;
+            const hoursLeft = expireAt ? Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60))) : 0;
+            const minutesLeft = expireAt ? Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60))) : 0;
+
+            const timeEl = document.getElementById('noteModalTime');
+            if (expireAt && hoursLeft > 1) {
+                timeEl.textContent = `⏳ ${hoursLeft}h left`;
+            } else if (expireAt && minutesLeft > 1) {
+                timeEl.textContent = `⏳ ${minutesLeft}m left`;
+            } else if (expireAt) {
+                timeEl.textContent = `⏳ Expiring soon`;
+            } else {
+                timeEl.textContent = '';
+            }
+
+            document.getElementById('noteModalText').textContent = note.text || '';
+
+            const expiryEl = document.getElementById('noteModalExpiry');
+            const expirySpan = expiryEl.querySelector('span');
+            if (expireAt) {
+                if (hoursLeft <= 2) {
+                    expiryEl.classList.add('urgent');
+                    expirySpan.textContent = hoursLeft <= 1 ? 'Expiring very soon!' : `${hoursLeft} hours left`;
+                } else {
+                    expiryEl.classList.remove('urgent');
+                    expirySpan.textContent = `${hoursLeft} hours left`;
+                }
+            } else {
+                expiryEl.classList.remove('urgent');
+                expirySpan.textContent = '';
+            }
+
+            document.getElementById('noteModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentNoteUid = null;
+        }
+
+        // ================================================================
+        // ===== ANNOUNCEMENT SYSTEM (OPTIMIZED) =====
+        // ================================================================
+
+        const ANNOUNCEMENT_TYPE_META = {
+            'admin':     { icon: '📢', cls: 'type-admin',     label: 'Announcement' },
+            'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
+            'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
+            'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+        };
+
+        function getAnnouncementMeta(type) {
+            return ANNOUNCEMENT_TYPE_META[type] || ANNOUNCEMENT_TYPE_META['admin'];
+        }
+
+        function loadAnnouncementReadCache(uid) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_READ_CACHE_PREFIX + uid);
+                if (raw) {
+                    const arr = JSON.parse(raw);
+                    if (Array.isArray(arr)) return new Set(arr);
+                }
+            } catch (e) { /* ignore */ }
+            return new Set();
+        }
+
+        function saveAnnouncementReadCache(uid, idSet) {
+            try {
+                localStorage.setItem(
+                    ANNOUNCEMENT_READ_CACHE_PREFIX + uid,
+                    JSON.stringify([...idSet])
+                );
+            } catch (e) { /* ignore */ }
+        }
+
+        function loadAnnouncementSnapshotCache(uid) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_CACHE_KEY + uid);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.uid === uid && (Date.now() - parsed.t) < ANNOUNCEMENT_CACHE_TTL) {
+                    return parsed.items;
+                }
+            } catch (e) { /* ignore */ }
+            return null;
+        }
+
+        function saveAnnouncementSnapshotCache(uid, items) {
+            try {
+                localStorage.setItem(ANNOUNCEMENT_CACHE_KEY + uid, JSON.stringify({
+                    uid,
+                    t: Date.now(),
+                    items
+                }));
+            } catch (e) { /* ignore */ }
+        }
+
+        function hasAutogenRunToday(uid, kind) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                const today = new Date().toISOString().slice(0, 10);
+                return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
+            } catch (e) { return false; }
+        }
+
+        function markAutogenRunToday(uid, kind) {
+            try {
+                const today = new Date().toISOString().slice(0, 10);
+                let parsed = { date: today, kinds: {} };
+                const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
+                if (raw) {
+                    try { parsed = JSON.parse(raw); } catch (e) {}
+                }
+                if (parsed.date !== today) parsed = { date: today, kinds: {} };
+                parsed.kinds[kind] = true;
+                localStorage.setItem(ANNOUNCEMENT_AUTOGEN_KEY + uid, JSON.stringify(parsed));
+            } catch (e) { /* ignore */ }
+        }
+
+        // ===== POPUP TOGGLE =====
+        function toggleAnnouncementPopup(event) {
+            if (event) event.stopPropagation();
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (!popup || !bell) return;
+
+            const isOpen = popup.classList.toggle('open');
+            bell.classList.toggle('active', isOpen);
+
+            if (isOpen) {
+                positionAnnouncementPopup();
+            }
+        }
+
+        function positionAnnouncementPopup() {
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (!popup || !bell) return;
+
+            if (window.innerWidth > 768) {
+                const rect = bell.getBoundingClientRect();
+                popup.style.position = 'fixed';
+                popup.style.top = (rect.bottom + 14) + 'px';
+                popup.style.right = (window.innerWidth - rect.right - 8) + 'px';
+                popup.style.left = 'auto';
+            } else {
+                popup.style.position = 'fixed';
+                popup.style.top = '70px';
+                popup.style.left = '14px';
+                popup.style.right = '14px';
+            }
+        }
+
+        function closeAnnouncementPopup() {
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (popup) popup.classList.remove('open');
+            if (bell) bell.classList.remove('active');
+        }
+
+        // ===== RENDER =====
+        function renderAnnouncements() {
+            const list = document.getElementById('announcementList');
+            const footer = document.getElementById('announcementFooter');
+            const badge = document.getElementById('announcementBadge');
+            if (!list) return;
+
+            const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
+
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+            }
+
+            const bell = document.getElementById('announcementBell');
+            if (bell) {
+                bell.classList.toggle('has-new', unreadCount > 0);
+            }
+
+            if (announcementItems.length === 0) {
+                list.innerHTML = `
+                    <div class="announcement-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>No announcements yet</p>
+                    </div>
+                `;
+                if (footer) footer.textContent = 'You\'re all caught up ✨';
+                return;
+            }
+
+            let html = '';
+            announcementItems.forEach(item => {
+                const meta = getAnnouncementMeta(item.type);
+                const isUnread = !announcementReadIds.has(item.id);
+                const createdDate = item.createdAt
+                    ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                    : new Date();
+                const priorityBadge = item.priority === 'urgent'
+                    ? '<span class="announcement-priority-badge urgent">Urgent</span>'
+                    : item.priority === 'info'
+                        ? '<span class="announcement-priority-badge info">Info</span>'
+                        : '';
+
+                html += `
+                    <div class="announcement-item ${isUnread ? 'unread' : ''}" data-announcement-id="${escapeAttr(item.id)}" onclick="handleAnnouncementClick('${escapeAttr(item.id)}')">
+                        <div class="announcement-icon ${meta.cls}">${meta.icon}</div>
+                        <div class="announcement-body">
+                            <div class="announcement-title">
+                                ${escapeHtml(item.title || 'Announcement')}
+                                ${priorityBadge}
+                            </div>
+                            <div class="announcement-message">${escapeHtml(item.message || '')}</div>
+                            <div class="announcement-time">${formatRelativeTime(createdDate)}</div>
+                        </div>
+                        ${isUnread ? '<span class="announcement-unread-dot"></span>' : ''}
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+
+            if (footer) {
+                footer.textContent = unreadCount > 0
+                    ? `${unreadCount} unread announcement${unreadCount !== 1 ? 's' : ''}`
+                    : 'You\'re all caught up ✨';
+            }
+        }
+
+        // ================================================================
+        // ===== READ STATE =====
+        // ================================================================
+        async function markAnnouncementRead(id) {
+            if (!announcementUser || announcementReadIds.has(id)) return;
+            announcementReadIds.add(id);
+            saveAnnouncementReadCache(announcementUser.uid, announcementReadIds);
+            renderAnnouncements();
+
+            try {
+                await db.collection('announcements').doc(id).update({
+                    readBy: firebase.firestore.FieldValue.arrayUnion(announcementUser.uid)
+                });
+            } catch (err) {
+                console.warn('Could not persist read state:', err);
+            }
+        }
+
+        async function markAllAnnouncementsRead() {
+            if (!announcementUser) return;
+
+            const unreadIds = announcementItems
+                .filter(a => !announcementReadIds.has(a.id))
+                .map(a => a.id);
+
+            if (unreadIds.length === 0) return;
+
+            unreadIds.forEach(id => announcementReadIds.add(id));
+            saveAnnouncementReadCache(announcementUser.uid, announcementReadIds);
+            renderAnnouncements();
+
+            try {
+                const batch = db.batch();
+                unreadIds.forEach(id => {
+                    batch.update(db.collection('announcements').doc(id), {
+                        readBy: firebase.firestore.FieldValue.arrayUnion(announcementUser.uid)
+                    });
+                });
+                await batch.commit();
+            } catch (err) {
+                console.warn('Could not persist read states:', err);
+            }
+        }
+
+        // ===== CLICK HANDLER =====
+        async function handleAnnouncementClick(id) {
+            const item = announcementItems.find(a => a.id === id);
+            if (!item) return;
+
+            markAnnouncementRead(id);
+
+            if (item.link) {
+                setTimeout(() => {
+                    window.location.href = item.link;
+                }, 200);
+            }
+        }
+
+        // ================================================================
+        // ===== LOAD ANNOUNCEMENTS =====
+        // ================================================================
+        function loadAnnouncements(user) {
+            if (!user) return;
+            if (announcementUnsubscribe) announcementUnsubscribe();
+
+            announcementUser = user;
+            announcementReadIds = loadAnnouncementReadCache(user.uid);
+
+            const popup = document.getElementById('announcementPopup');
+            if (popup) popup.style.display = 'block';
+
+            const cached = loadAnnouncementSnapshotCache(user.uid);
+            if (cached && cached.length > 0) {
+                announcementItems = cached;
+                renderAnnouncements();
+            }
+
+            announcementUnsubscribe = db.collection('announcements')
+                .orderBy('createdAt', 'desc')
+                .limit(ANNOUNCEMENT_LIMIT)
+                .onSnapshot((snapshot) => {
+                    const now = new Date();
+                    const items = [];
+                    const firestoreReadIds = new Set();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+
+                        if (data.expiresAt) {
+                            const exp = data.expiresAt.seconds
+                                ? new Date(data.expiresAt.seconds * 1000)
+                                : new Date(data.expiresAt);
+                            if (exp < now) return;
+                        }
+
+                        if (data.targetUid && data.targetUid !== '' && data.targetUid !== user.uid) return;
+
+                        items.push({ id: doc.id, ...data });
+
+                        if (Array.isArray(data.readBy) && data.readBy.includes(user.uid)) {
+                            firestoreReadIds.add(doc.id);
+                        }
+                    });
+
+                    let changed = false;
+                    firestoreReadIds.forEach(id => {
+                        if (!announcementReadIds.has(id)) {
+                            announcementReadIds.add(id);
+                            changed = true;
+                        }
+                    });
+                    if (changed) saveAnnouncementReadCache(user.uid, announcementReadIds);
+
+                    announcementItems = items;
+                    saveAnnouncementSnapshotCache(user.uid, items);
+                    renderAnnouncements();
+                }, (error) => {
+                    console.warn('Announcements listener error:', error.message);
+                    if (!announcementItems.length) {
+                        announcementItems = [];
+                        renderAnnouncements();
+                    }
+                });
+        }
+
+        // ================================================================
+        // ===== AUTO-GENERATION =====
+        // ================================================================
+        function needsAnyAutogen(uid) {
+            return (
+                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'events') ||
+                !hasAutogenRunToday(uid, 'highlights')
+            );
+        }
+
+        async function autoGenerateBirthdayAnnouncement(user, userData) {
+            if (!userData || !userData.birthday) return;
+            if (hasAutogenRunToday(user.uid, 'birthday')) return;
+
+            const parts = userData.birthday.split('-');
+            if (parts.length !== 3) {
+                markAutogenRunToday(user.uid, 'birthday');
+                return;
+            }
+
+            const today = new Date();
+            const bMonth = parseInt(parts[1], 10) - 1;
+            const bDay = parseInt(parts[2], 10);
+
+            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
+                markAutogenRunToday(user.uid, 'birthday');
+                return;
+            }
+
+            const name = userData.displayName || user.displayName || user.email || 'Someone';
+
+            try {
+                await db.collection('announcements').add({
+                    type: 'birthday',
+                    title: `🎂 It's ${name}'s Birthday Today!`,
+                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
+                    icon: '🎂',
+                    priority: 'urgent',
+                    link: 'calendar.html',
+                    linkLabel: 'View Calendar',
+                    targetUid: user.uid,
+                    referenceId: user.uid,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                });
+            } catch (e) {
+                console.warn('birthday gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'birthday');
+        }
+
+        async function autoGenerateEventReminders(user) {
+            if (hasAutogenRunToday(user.uid, 'events')) return;
+
+            try {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const dayAfter = new Date(tomorrow);
+                dayAfter.setDate(dayAfter.getDate() + 1);
+
+                const snap = await db.collection('events')
+                    .where('dateTime', '>=', tomorrow)
+                    .where('dateTime', '<', dayAfter)
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
+
+                const batch = db.batch();
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const eventRef = db.collection('announcements').doc();
+                    const title = data.title || 'Upcoming Event';
+                    const loc = data.location ? ` at ${data.location}` : '';
+                    batch.set(eventRef, {
+                        type: 'event',
+                        title: `⏰ Reminder: ${title} is tomorrow!`,
+                        message: `${title}${loc} — happening tomorrow. Don't miss it!`,
+                        icon: '📅',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Event',
+                        targetUid: '',
+                        referenceId: doc.id,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                });
+                await batch.commit();
+            } catch (e) {
+                console.warn('event gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'events');
+        }
+
+        async function autoGenerateHighlightAnnouncements(user) {
+            if (hasAutogenRunToday(user.uid, 'highlights')) return;
+
+            try {
+                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+                const snap = await db.collection('highlights')
+                    .where('createdAt', '>=', yesterday)
+                    .orderBy('createdAt', 'desc')
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
+
+                const photoCount = snap.size;
+                const firstDoc = snap.docs[0].data();
+                const author = firstDoc.authorName || 'Someone';
+                const latestHighlightId = snap.docs[0].id;
+
+                const titleText = photoCount === 1
+                    ? `📸 ${author} shared a new highlight!`
+                    : `📸 ${photoCount} new highlights shared!`;
+
+                await db.collection('announcements').add({
+                    type: 'highlight',
+                    title: titleText,
+                    message: photoCount === 1
+                        ? `${author} just shared a new moment with the squad.`
+                        : `Fresh moments from the squad — check them out!`,
+                    icon: '📸',
+                    priority: 'info',
+                    link: 'index.html#highlights',
+                    linkLabel: 'View Highlights',
+                    targetUid: '',
+                    referenceId: latestHighlightId,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                });
+            } catch (e) {
+                console.warn('highlight gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'highlights');
+        }
+
+        async function runAutoGeneration(user, userData) {
+            if (!needsAnyAutogen(user.uid)) return;
+
+            setTimeout(async () => {
+                try {
+                    await autoGenerateBirthdayAnnouncement(user, userData);
+                } catch (e) { console.warn('birthday gen:', e.message); }
+
+                try {
+                    await autoGenerateEventReminders(user);
+                } catch (e) { console.warn('event gen:', e.message); }
+
+                try {
+                    await autoGenerateHighlightAnnouncements(user);
+                } catch (e) { console.warn('highlight gen:', e.message); }
+            }, 1500);
+        }
+
+        async function autoGenerateMemberAnnouncement(newUser, newUserData) {
+            if (!newUser || !newUserData) return;
+            if (hasAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid)) return;
+
+            const name = newUserData.displayName || newUserData.email || 'A new member';
+            try {
+                await db.collection('announcements').add({
+                    type: 'member',
+                    title: `Welcome ${name}! 🎉`,
+                    message: `${name} just joined the TIMAWA squad. Say hi!`,
+                    icon: '👥',
+                    priority: 'info',
+                    link: 'index.html#members-section',
+                    linkLabel: 'View Members',
+                    targetUid: '',
+                    referenceId: newUser.uid,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                });
+                markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
+            } catch (e) {
+                console.warn('welcome gen:', e.message);
+            }
+        }
+
+        // ================================================================
+        // ===== AUTO-CLEANUP EXPIRED HIGHLIGHTS (CLOUDINARY + FIRESTORE) =====
+        // ================================================================
+        async function cleanupExpiredHighlights() {
+            try {
+                const now = new Date();
+                const snapshot = await db.collection('highlights')
+                    .where('expiresAt', '<=', now)
+                    .limit(100)
+                    .get();
+
+                if (snapshot.empty) return { deleted: 0, failed: 0 };
+
+                let deleted = 0;
+                let failed = 0;
+
+                for (const doc of snapshot.docs) {
+                    const data = doc.data();
+                    const imageUrls = data.imageURLs || [];
+
+                    // 1. Delete images from Cloudinary
+                    for (const url of imageUrls) {
+                        if (url && url.includes('res.cloudinary.com')) {
+                            try {
+                                await deleteFromCloudinary(url);
+                            } catch (e) {
+                                console.warn('Cloudinary delete failed for', url, e);
+                                failed++;
+                            }
+                        }
+                    }
+
+                    // 2. Delete Firestore document
+                    try {
+                        await db.collection('highlights').doc(doc.id).delete();
+                        deleted++;
+                    } catch (e) {
+                        console.warn('Firestore delete failed for', doc.id, e);
+                        failed++;
+                    }
+                }
+
+                if (deleted > 0) {
+                    console.log(`🧹 Auto-cleanup: ${deleted} expired highlight(s) deleted.`);
+                }
+
+                return { deleted, failed };
+            } catch (err) {
+                console.warn('Auto-cleanup error:', err);
+                return { deleted: 0, failed: 0 };
+            }
+        }
+
+        function startAutoCleanup() {
+            if (autoCleanupTimer) clearInterval(autoCleanupTimer);
+
+            // Initial cleanup after short delay
+            setTimeout(async () => {
+                await cleanupExpiredHighlights();
+            }, AUTO_CLEANUP_INITIAL_DELAY_MS);
+
+            // Periodic cleanup
+            autoCleanupTimer = setInterval(async () => {
+                await cleanupExpiredHighlights();
+            }, AUTO_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Auto-cleanup started (every 5 min)');
+        }
+
+        function stopAutoCleanup() {
+            if (autoCleanupTimer) {
+                clearInterval(autoCleanupTimer);
+                autoCleanupTimer = null;
+            }
+        }
+
         // ===== AUTH STATE =====
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
@@ -2086,8 +3690,7 @@
             titaCurrentUser = user;
 
             try {
-                const doc = await db.collection('users').doc(user.uid).get();
-                const data = doc.data();
+                const data = await getCurrentUserProfileCached(user);
                 currentUserData = data;
                 titaUserData = data;
                 userProfileCache[user.uid] = data;
@@ -2109,8 +3712,25 @@
                     }
                 }
 
-                // Show Tita Tima launcher
                 document.getElementById('titaLauncher').classList.add('visible');
+
+                // ============================================================
+                // ===== ANNOUNCEMENTS: LOAD + AUTOGEN =====
+                // ============================================================
+                loadAnnouncements(user);
+                runAutoGeneration(user, data);
+
+                if (data?.createdAt) {
+                    try {
+                        const created = data.createdAt.seconds
+                            ? new Date(data.createdAt.seconds * 1000)
+                            : new Date(data.createdAt);
+                        const ageMin = (Date.now() - created.getTime()) / 60000;
+                        if (ageMin < 5) {
+                            autoGenerateMemberAnnouncement(user, data);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
@@ -2121,6 +3741,19 @@
                 loadHighlights(),
                 loadMembers()
             ]);
+
+            // Load notes after members are loaded
+            loadNotes();
+
+            // ============================================================
+            // ===== START AUTO-CLEANUP =====
+            // ============================================================
+            startAutoCleanup();
+        });
+
+        // Stop cleanup when leaving page
+        window.addEventListener('beforeunload', function() {
+            stopAutoCleanup();
         });
 
         // ===== COLLAPSE =====
@@ -2268,18 +3901,12 @@
 
             unsubscribeHighlights = db.collection('highlights')
                 .orderBy('createdAt', 'desc')
+                .limit(HIGHLIGHTS_LIMIT)
                 .onSnapshot(async (snapshot) => {
-                    const grid = document.getElementById('highlightsGrid');
                     const countBadge = document.getElementById('highlightCountBadge');
 
                     if (snapshot.empty) {
-                        grid.innerHTML = `
-                            <div class="empty-highlights">
-                                <i class="fas fa-images"></i>
-                                <h3>No highlights yet</h3>
-                                <p>Share your favorite moments with the squad!</p>
-                            </div>
-                        `;
+                        renderHighlightsCarousel([]);
                         if (countBadge) countBadge.textContent = '0';
                         return;
                     }
@@ -2300,9 +3927,8 @@
                         }
                     }));
 
-                    let html = '';
-                    let visibleCount = 0;
                     const now = new Date();
+                    const validHighlights = [];
                     const expiredIds = [];
 
                     snapshot.forEach(doc => {
@@ -2310,60 +3936,17 @@
                         const id = doc.id;
                         const expiresAt = data.expiresAt ? new Date(data.expiresAt.toDate()) : new Date();
                         const timeLeft = expiresAt - now;
-                        const daysLeft = Math.ceil(timeLeft / (1000 * 60 * 60 * 24));
 
                         if (timeLeft <= 0) {
                             expiredIds.push({ id, imageURLs: data.imageURLs || [] });
                             return;
                         }
 
-                        const imageUrls = data.imageURLs || [];
-                        const authorName = data.authorName || 'Someone';
-                        const authorUid = data.authorUid || '';
-                        const authorProfile = userProfileCache[authorUid] || {};
-                        const authorPhoto = authorProfile.photoURL || '';
-                        const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                        const caption = data.caption || '';
-                        const isUrgent = daysLeft <= 1;
-                        const isSelected = selectedHighlights.has(id);
-
-                        const mainImage = imageUrls.length > 0 ? imageUrls[0] : '';
-                        const thumbImage = mainImage ? cloudinaryThumb(mainImage, 500) : '';
-                        const hasMulti = imageUrls.length > 1;
-
-                        const avatarContent = authorPhoto
-                            ? `<img src="${cloudinaryThumb(authorPhoto, 60)}" alt="${escapeHtml(authorName)}" loading="lazy" />`
-                            : initials;
-
-                        const safeId = id.replace(/'/g, "\\'");
-
-                        html += `
-                            <div class="highlight-card ${isSelected ? 'selected' : ''} ${hasMulti ? 'has-multi' : ''}" data-id="${id}">
-                                <div class="selection-checkbox" onclick="toggleHighlightSelection('${safeId}')">
-                                    ${isSelected ? '<i class="fas fa-check"></i>' : ''}
-                                </div>
-                                <div class="image-container">
-                                    ${thumbImage ? `<img src="${thumbImage}" alt="Highlight" loading="lazy" decoding="async" />` : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`}
-                                    ${hasMulti ? `<span class="image-count">+${imageUrls.length - 1} more</span>` : ''}
-                                    <span class="expiry-badge"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
-                                    <button class="delete-btn" onclick="deleteHighlight('${safeId}')"><i class="fas fa-trash"></i> Delete</button>
-                                    ${hasMulti ? `<button class="view-btn" onclick="openGallery('${safeId}')"><i class="fas fa-expand"></i> View All</button>` : ''}
-                                    ${imageUrls.length > 0 ? `<button class="download-btn" onclick="downloadHighlight('${safeId}')"><i class="fas fa-download"></i> ${hasMulti ? 'Zip' : 'Download'}</button>` : ''}
-                                </div>
-                                <div class="card-body">
-                                    ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
-                                    <div class="meta">
-                                        <span class="author"><span class="avatar-small">${avatarContent}</span> ${escapeHtml(authorName)}</span>
-                                        <span class="expiry-time ${isUrgent ? 'urgent' : ''}"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        visibleCount++;
+                        validHighlights.push({ id, ...data });
                     });
 
-                    grid.innerHTML = html;
-                    if (countBadge) countBadge.textContent = `${visibleCount}`;
+                    renderHighlightsCarousel(validHighlights);
+                    if (countBadge) countBadge.textContent = `${validHighlights.length}`;
                     updateSelectionUI();
 
                     if (expiredIds.length) {
@@ -2376,6 +3959,297 @@
                 }, (error) => {
                     console.error('Error loading highlights:', error);
                 });
+        }
+
+        // ===== RENDER HIGHLIGHTS CAROUSEL =====
+        function renderHighlightsCarousel(items) {
+            const track = document.getElementById('highlightsTrack');
+            const dotsContainer = document.getElementById('highlightsDots');
+
+            stopHighlightsAutoplay();
+
+            if (!items || items.length === 0) {
+                track.innerHTML = `
+                    <div class="highlights-carousel-slide single-item" style="display:flex;align-items:center;justify-content:center;padding:40px;min-height:250px;">
+                        <div class="empty-highlights">
+                            <i class="fas fa-images"></i>
+                            <h3>No highlights yet</h3>
+                            <p>Share your favorite moments with the squad!</p>
+                        </div>
+                    </div>
+                `;
+                dotsContainer.innerHTML = '';
+                const dot = document.createElement('button');
+                dot.className = 'dot active';
+                dotsContainer.appendChild(dot);
+                highlightsCarouselState.slides = [];
+                return;
+            }
+
+            const perSlide = getItemsPerSlide();
+            const slides = [];
+            for (let i = 0; i < items.length; i += perSlide) {
+                slides.push(items.slice(i, i + perSlide));
+            }
+
+            let html = '';
+            slides.forEach(slide => {
+                const slideClass = perSlide === 1 ? 'highlights-carousel-slide single-item' : 'highlights-carousel-slide';
+                html += `<div class="${slideClass}">`;
+                slide.forEach(item => {
+                    const imageUrls = item.imageURLs || [];
+                    const mainImage = imageUrls.length > 0 ? imageUrls[0] : '';
+                    const thumbImage = mainImage ? cloudinaryThumb(mainImage, 500) : '';
+                    const authorName = item.authorName || 'Someone';
+                    const authorUid = item.authorUid || '';
+                    const authorProfile = userProfileCache[authorUid] || {};
+                    const authorPhoto = authorProfile.photoURL || '';
+                    const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                    const caption = item.caption || '';
+                    const expiresAt = item.expiresAt ? new Date(item.expiresAt.toDate()) : new Date();
+                    const now = new Date();
+                    const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                    const isUrgent = daysLeft <= 1;
+                    const hasMulti = imageUrls.length > 1;
+                    const hasImages = imageUrls.length > 0;
+                    const isSelected = selectedHighlights.has(item.id);
+
+                    const avatarContent = authorPhoto
+                        ? `<img src="${cloudinaryThumb(authorPhoto, 60)}" alt="${escapeAttr(authorName)}" loading="lazy" decoding="async" />`
+                        : initials;
+
+                    const safeId = escapeAttr(item.id);
+
+                    html += `
+                        <div class="highlights-carousel-item ${isSelected ? 'selected' : ''}" data-highlight-id="${safeId}">
+                            <div class="image-container">
+                                ${thumbImage
+                                    ? `<img src="${thumbImage}" alt="Highlight" loading="lazy" decoding="async" />`
+                                    : `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:40px;color:rgb(16,137,211);"><i class="fas fa-image"></i></div>`}
+                                ${hasMulti ? `<span class="image-count"><i class="fas fa-images"></i> ${imageUrls.length}</span>` : ''}
+                                <span class="expiry-badge"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
+                                ${hasImages ? `
+                                    <div class="hl-actions">
+                                        ${hasMulti ? `
+                                            <button class="hl-view" onclick="event.stopPropagation(); openGallery('${safeId}')">
+                                                <i class="fas fa-expand"></i> View All
+                                            </button>
+                                            <button class="hl-download" onclick="event.stopPropagation(); downloadHighlight('${safeId}')">
+                                                <i class="fas fa-file-zipper"></i> Zip
+                                            </button>
+                                        ` : `
+                                            <button class="hl-download" onclick="event.stopPropagation(); downloadHighlight('${safeId}')">
+                                                <i class="fas fa-download"></i> Download
+                                            </button>
+                                        `}
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="item-body">
+                                ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ''}
+                                <div class="meta">
+                                    <span class="author"><span class="avatar-small">${avatarContent}</span> ${escapeHtml(authorName)}</span>
+                                    <span class="expiry-time ${isUrgent ? 'urgent' : ''}"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            });
+
+            track.innerHTML = html;
+
+            track.querySelectorAll('.highlights-carousel-item').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.closest('.hl-actions')) return;
+                    const id = this.dataset.highlightId;
+                    openHighlightDetail(id);
+                });
+            });
+
+            dotsContainer.innerHTML = '';
+            slides.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'dot' + (i === 0 ? ' active' : '');
+                dot.onclick = () => goToHighlightsSlide(i);
+                dotsContainer.appendChild(dot);
+            });
+
+            highlightsCarouselState.slides = track.querySelectorAll('.highlights-carousel-slide');
+            highlightsCarouselState.currentIndex = 0;
+            updateHighlightsCarouselTransform();
+            if (slides.length > 1) startHighlightsAutoplay();
+        }
+
+        function updateHighlightsCarouselTransform() {
+            const track = document.getElementById('highlightsTrack');
+            if (!track) return;
+            track.style.transform = `translateX(-${highlightsCarouselState.currentIndex * 100}%)`;
+            const dots = document.querySelectorAll('#highlightsDots .dot');
+            dots.forEach((dot, i) => {
+                dot.className = 'dot' + (i === highlightsCarouselState.currentIndex ? ' active' : '');
+            });
+        }
+
+        window.moveHighlightsCarousel = function(direction) {
+            const slidesCount = highlightsCarouselState.slides.length;
+            if (slidesCount === 0) return;
+            stopHighlightsAutoplay();
+            highlightsCarouselState.currentIndex = (highlightsCarouselState.currentIndex + direction + slidesCount) % slidesCount;
+            updateHighlightsCarouselTransform();
+            startHighlightsAutoplay();
+        };
+
+        function goToHighlightsSlide(i) {
+            highlightsCarouselState.currentIndex = i;
+            updateHighlightsCarouselTransform();
+            stopHighlightsAutoplay();
+            startHighlightsAutoplay();
+        }
+
+        function startHighlightsAutoplay() {
+            stopHighlightsAutoplay();
+            if (highlightsCarouselState.slides.length <= 1) return;
+            highlightsCarouselState.interval = setInterval(() => {
+                const slidesCount = highlightsCarouselState.slides.length;
+                highlightsCarouselState.currentIndex = (highlightsCarouselState.currentIndex + 1) % slidesCount;
+                updateHighlightsCarouselTransform();
+            }, CAROUSEL_AUTOPLAY_MS);
+        }
+
+        function stopHighlightsAutoplay() {
+            if (highlightsCarouselState.interval) {
+                clearInterval(highlightsCarouselState.interval);
+                highlightsCarouselState.interval = null;
+            }
+        }
+
+        // ===== HIGHLIGHT DETAIL POPUP =====
+        function openHighlightDetail(highlightId) {
+            db.collection('highlights').doc(highlightId).get().then(doc => {
+                if (!doc.exists) {
+                    alert('This highlight no longer exists.');
+                    return;
+                }
+                const item = { id: doc.id, ...doc.data() };
+
+                currentHighlightDetailId = highlightId;
+                currentHighlightDetailImageIndex = 0;
+
+                const imageUrls = item.imageURLs || [];
+                const mainImage = imageUrls[0] || '';
+                const authorName = item.authorName || 'Someone';
+                const authorUid = item.authorUid || '';
+                const authorProfile = userProfileCache[authorUid] || {};
+                const authorPhoto = authorProfile.photoURL || '';
+                const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const caption = item.caption || '';
+                const expiresAt = item.expiresAt ? new Date(item.expiresAt.toDate()) : new Date();
+                const createdAt = item.createdAt ? new Date(item.createdAt.toDate()) : null;
+                const now = new Date();
+                const daysLeft = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
+                const isUrgent = daysLeft <= 1;
+                const hasMulti = imageUrls.length > 1;
+
+                const imgEl = document.getElementById('hlDetailImage');
+                if (mainImage) {
+                    imgEl.src = mainImage;
+                    imgEl.style.display = 'block';
+                } else {
+                    imgEl.src = '';
+                    imgEl.style.display = 'none';
+                }
+
+                const multiBadge = document.getElementById('hlDetailMultiBadge');
+                if (hasMulti) {
+                    document.getElementById('hlDetailMultiCount').textContent = imageUrls.length;
+                    multiBadge.style.display = 'inline-flex';
+                } else {
+                    multiBadge.style.display = 'none';
+                }
+
+                const avatarEl = document.getElementById('hlDetailAvatar');
+                if (authorPhoto) {
+                    avatarEl.innerHTML = `<img src="${cloudinaryThumb(authorPhoto, 120)}" alt="${escapeAttr(authorName)}" />`;
+                } else {
+                    avatarEl.textContent = initials;
+                }
+
+                document.getElementById('hlDetailAuthor').textContent = authorName;
+                document.getElementById('hlDetailTime').textContent = createdAt ? `Posted ${formatRelativeTime(createdAt)}` : 'Posted recently';
+                document.getElementById('hlDetailCaption').textContent = caption || 'No caption';
+
+                document.getElementById('hlDetailPhotoCount').innerHTML =
+                    `<i class="fas fa-images"></i> <span>${imageUrls.length} photo${imageUrls.length !== 1 ? 's' : ''}</span>`;
+                const expiryEl = document.getElementById('hlDetailExpiry');
+                expiryEl.innerHTML = `<i class="fas fa-clock"></i> <span>${daysLeft} day${daysLeft !== 1 ? 's' : ''} left</span>`;
+                expiryEl.classList.toggle('urgent', isUrgent);
+
+                const downloadBtn = document.getElementById('hlDetailDownloadBtn');
+                const viewAllBtn = document.getElementById('hlDetailViewAllBtn');
+
+                if (imageUrls.length > 0) {
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = hasMulti ? '<i class="fas fa-download"></i> Download This' : '<i class="fas fa-download"></i> Download';
+                } else {
+                    downloadBtn.disabled = true;
+                    downloadBtn.innerHTML = '<i class="fas fa-ban"></i> No photo';
+                }
+
+                if (hasMulti) {
+                    viewAllBtn.style.display = 'inline-flex';
+                } else {
+                    viewAllBtn.style.display = 'none';
+                }
+
+                document.getElementById('highlightDetailModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }).catch(err => {
+                console.error('openHighlightDetail error:', err);
+                alert('Could not load highlight.');
+            });
+        }
+
+        function closeHighlightDetail() {
+            document.getElementById('highlightDetailModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            document.getElementById('hlDetailImage').src = '';
+            currentHighlightDetailId = null;
+            currentHighlightDetailImageIndex = 0;
+        }
+
+        async function downloadCurrentHighlightDetail() {
+            if (!currentHighlightDetailId) return;
+            try {
+                const doc = await db.collection('highlights').doc(currentHighlightDetailId).get();
+                if (!doc.exists) return;
+                const item = doc.data();
+                if (!item.imageURLs || !item.imageURLs.length) return;
+
+                const url = item.imageURLs[currentHighlightDetailImageIndex] || item.imageURLs[0];
+                const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+                const ext = extFromUrl(url);
+                const filename = `TIMAWA_${safeAuthor}_photo_${currentHighlightDetailImageIndex + 1}.${ext}`;
+                await downloadImage(url, filename);
+            } catch (err) {
+                console.error('downloadCurrentHighlightDetail:', err);
+                alert('❌ Failed to download: ' + err.message);
+            }
+        }
+
+        function viewAllFromHighlightDetail() {
+            const id = currentHighlightDetailId;
+            if (!id) return;
+            closeHighlightDetail();
+            setTimeout(() => openGallery(id), 180);
+        }
+
+        async function deleteCurrentHighlightDetail() {
+            if (!currentHighlightDetailId) return;
+            const id = currentHighlightDetailId;
+            closeHighlightDetail();
+            await deleteHighlight(id);
         }
 
         // ===== GALLERY =====
@@ -2507,6 +4381,43 @@
             }
         }
 
+        async function downloadAllGalleryImages() {
+            if (currentGalleryImages.length === 0) return;
+
+            const btn = document.getElementById('galleryDownloadAllBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zipping...';
+
+            try {
+                const zip = new JSZip();
+                const safeAuthor = sanitizeFilename(currentGalleryAuthor);
+                const folder = zip.folder(`TIMAWA_${safeAuthor}`);
+
+                for (let i = 0; i < currentGalleryImages.length; i++) {
+                    const url = currentGalleryImages[i];
+                    try {
+                        const response = await fetch(url);
+                        const blob = await response.blob();
+                        const ext = (blob.type.split('/')[1] || extFromUrl(url)).split('+')[0];
+                        folder.file(`photo_${i + 1}.${ext}`, blob);
+                    } catch (e) {
+                        console.warn('Failed to fetch image for zip:', e);
+                    }
+                }
+
+                const zipBlob = await zip.generateAsync({ type: 'blob' });
+                const date = new Date().toISOString().slice(0, 10);
+                saveAs(zipBlob, `TIMAWA_${safeAuthor}_${date}.zip`);
+            } catch (err) {
+                console.error('ZIP error:', err);
+                alert('❌ Error creating ZIP: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
         // ===== LIGHTBOX =====
         function openLightbox(url, index) {
             currentLightboxUrl = url;
@@ -2548,36 +4459,34 @@
             }
 
             document.getElementById('selectionInfo').textContent = selectionMode ? 'Select highlights to download or delete' : '';
+            refreshHighlights();
         }
 
         function toggleHighlightSelection(id) {
             if (!selectionMode) return;
-
             if (selectedHighlights.has(id)) {
                 selectedHighlights.delete(id);
             } else {
                 selectedHighlights.add(id);
             }
             updateSelectionUI();
+            refreshHighlights();
         }
 
         function updateSelectionUI() {
-            const cards = document.querySelectorAll('.highlight-card');
-            cards.forEach(card => {
-                const id = card.dataset.id;
-                const checkbox = card.querySelector('.selection-checkbox');
-                if (!checkbox) return;
-                if (selectedHighlights.has(id)) {
-                    card.classList.add('selected');
-                    checkbox.innerHTML = '<i class="fas fa-check"></i>';
-                } else {
-                    card.classList.remove('selected');
-                    checkbox.innerHTML = '';
-                }
-            });
-
             document.getElementById('selectionInfo').textContent = selectionMode ?
                 `${selectedHighlights.size} selected` : '';
+        }
+
+        function refreshHighlights() {
+            document.querySelectorAll('.highlights-carousel-item').forEach(card => {
+                const id = card.dataset.highlightId;
+                if (selectedHighlights.has(id)) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
         }
 
         async function batchDelete() {
@@ -2813,6 +4722,17 @@
             }
         }
 
+        function getStatusLabel(status) {
+            const map = {
+                'available': { label: 'Available', cls: 'available' },
+                'busy': { label: 'Busy', cls: 'busy' },
+                'away': { label: 'Away', cls: 'away' },
+                'dnd': { label: 'Do Not Disturb', cls: 'dnd' },
+                'offline': { label: 'Offline', cls: 'offline' }
+            };
+            return map[status] || map['offline'];
+        }
+
         // ===== LOAD MEMBERS =====
         async function loadMembers() {
             const grid = document.getElementById('membersGrid');
@@ -2820,6 +4740,7 @@
             try {
                 const snapshot = await db.collection('users')
                     .orderBy('displayName', 'asc')
+                    .limit(MEMBERS_LIMIT)
                     .get();
 
                 const count = snapshot.size;
@@ -2836,69 +4757,260 @@
                     return;
                 }
 
-                let html = '';
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     userProfileCache[doc.id] = data;
-
-                    const name = data.displayName || data.email || 'Anonymous';
-                    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                    const status = data.status || 'offline';
-                    const location = data.location || '📍 Not set';
-                    const photoUrl = data.photoURL || '';
-                    const bio = data.bio || 'New to the squad! 👋';
-                    const occupation = data.occupation || '';
-                    const interests = data.interests ? data.interests.split(',').map(t => t.trim()).filter(t => t) : [];
-                    const instagram = data.instagram || '';
-                    const twitter = data.twitter || '';
-                    const tiktok = data.tiktok || '';
-                    const facebook = data.facebook || '';
-                    const loveLife = data.loveLife || '';
-
-                    const statusLabels = {
-                        'available': 'Available',
-                        'busy': 'Busy',
-                        'away': 'Away',
-                        'dnd': 'Do Not Disturb',
-                        'offline': 'Offline'
-                    };
-
-                    const loveLifeInfo = getLoveLifeLabel(loveLife);
-                    const avatarThumb = photoUrl ? cloudinaryThumb(photoUrl, 128) : '';
-
-                    html += `
-                        <div class="member-card" data-name="${escapeHtml(name.toLowerCase())}">
-                            <div class="card-top">
-                                <div class="avatar">
-                                    ${avatarThumb ? `<img src="${avatarThumb}" alt="${escapeHtml(name)}" loading="lazy" decoding="async" />` : initials}
-                                </div>
-                                <div class="name-section">
-                                    <div class="name">${escapeHtml(name)}</div>
-                                    <div class="location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(location)}</div>
-                                    ${occupation ? `<div class="occupation"><i class="fas fa-briefcase"></i> ${escapeHtml(occupation)}</div>` : ''}
-                                    ${loveLifeInfo ? `<div class="lovelife-badge ${loveLifeInfo.cls}"><i class="fas ${loveLifeInfo.icon}"></i> ${loveLifeInfo.label}</div>` : ''}
-                                </div>
-                                <div class="status-wrapper">
-                                    <span class="status-dot ${status}"></span>
-                                    <span class="status-label">${statusLabels[status] || 'Offline'}</span>
-                                </div>
-                            </div>
-                            ${bio ? `<div class="bio">${escapeHtml(bio)}</div>` : ''}
-                            ${interests.length ? `<div class="interests">${interests.map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-                            <div class="social-icons">
-                                ${instagram ? `<a href="https://instagram.com/${encodeURIComponent(instagram.replace('@',''))}" target="_blank" rel="noopener"><i class="fab fa-instagram"></i></a>` : ''}
-                                ${twitter ? `<a href="https://twitter.com/${encodeURIComponent(twitter.replace('@',''))}" target="_blank" rel="noopener"><i class="fab fa-twitter"></i></a>` : ''}
-                                ${tiktok ? `<a href="https://tiktok.com/@${encodeURIComponent(tiktok.replace('@',''))}" target="_blank" rel="noopener"><i class="fab fa-tiktok"></i></a>` : ''}
-                                ${facebook ? `<a href="${escapeHtml(facebook)}" target="_blank" rel="noopener"><i class="fab fa-facebook"></i></a>` : ''}
-                            </div>
-                        </div>
-                    `;
                 });
 
-                grid.innerHTML = html;
+                renderMembersGridFromCache();
             } catch (error) {
                 console.error('Error loading members:', error);
             }
+        }
+
+        function renderMembersGridFromCache() {
+            const grid = document.getElementById('membersGrid');
+            if (!grid) return;
+
+            const memberIds = Object.keys(userProfileCache);
+            if (memberIds.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>No Members Yet</h3>
+                        <p>Be the first to join!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sorted = memberIds
+                .map(id => ({ id, ...userProfileCache[id] }))
+                .sort((a, b) => {
+                    const an = (a.displayName || a.email || '').toLowerCase();
+                    const bn = (b.displayName || b.email || '').toLowerCase();
+                    return an.localeCompare(bn);
+                });
+
+            document.getElementById('memberCountLabel').textContent = `(${sorted.length})`;
+
+            let html = '';
+            sorted.forEach(data => {
+                const docId = data.id;
+                const name = data.displayName || data.email || 'Anonymous';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const status = data.status || 'offline';
+                const location = data.location || '📍 Not set';
+                const photoUrl = data.photoURL || '';
+                const bio = data.bio || 'New to the squad! 👋';
+                const occupation = data.occupation || '';
+                const interests = data.interests ? data.interests.split(',').map(t => t.trim()).filter(t => t) : [];
+                const instagram = data.instagram || '';
+                const twitter = data.twitter || '';
+                const tiktok = data.tiktok || '';
+                const facebook = data.facebook || '';
+                const loveLife = data.loveLife || '';
+
+                const statusInfo = getStatusLabel(status);
+                const loveLifeInfo = getLoveLifeLabel(loveLife);
+                const avatarThumb = photoUrl ? cloudinaryThumb(photoUrl, 128) : '';
+
+                const memberIdSafe = escapeAttr(docId);
+
+                const note = notesCache[docId];
+                let noteBubbleHtml = '';
+                if (note && note.text) {
+                    const expireAt = note.expireAt
+                        ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                        : null;
+                    const isExpiringSoon = expireAt && (expireAt - new Date()) < 2 * 60 * 60 * 1000;
+                    noteBubbleHtml = `
+                        <div class="note-bubble" onclick="event.stopPropagation(); openNoteModal('${memberIdSafe}')" title="Tap to read full note">
+                            <i class="fas fa-comment-dots"></i>
+                            <span>${escapeHtml(note.text)}</span>
+                            ${isExpiringSoon ? '<i class="fas fa-hourglass-half" style="color:#ef4444;font-size:10px;"></i>' : ''}
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="member-card" data-member-id="${memberIdSafe}">
+                        <div class="card-top">
+                            <div class="avatar">
+                                ${avatarThumb ? `<img src="${avatarThumb}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" />` : escapeHtml(initials)}
+                            </div>
+                            <div class="name-section">
+                                <div class="name">${escapeHtml(name)}</div>
+                                <div class="location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(location)}</div>
+                                ${occupation ? `<div class="occupation"><i class="fas fa-briefcase"></i> ${escapeHtml(occupation)}</div>` : ''}
+                                ${loveLifeInfo ? `<div class="lovelife-badge ${loveLifeInfo.cls}"><i class="fas ${loveLifeInfo.icon}"></i> ${loveLifeInfo.label}</div>` : ''}
+                            </div>
+                            <div class="status-wrapper">
+                                <span class="status-dot ${status}"></span>
+                                <span class="status-label">${statusInfo.label}</span>
+                            </div>
+                        </div>
+                        ${noteBubbleHtml}
+                        ${bio ? `<div class="bio">${escapeHtml(bio)}</div>` : ''}
+                        ${interests.length ? `<div class="interests">${interests.map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                        <div class="social-icons">
+                            ${instagram ? `<a href="https://instagram.com/${encodeURIComponent(instagram.replace('@',''))}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fab fa-instagram"></i></a>` : ''}
+                            ${twitter ? `<a href="https://twitter.com/${encodeURIComponent(twitter.replace('@',''))}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fab fa-twitter"></i></a>` : ''}
+                            ${tiktok ? `<a href="https://tiktok.com/@${encodeURIComponent(tiktok.replace('@',''))}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fab fa-tiktok"></i></a>` : ''}
+                            ${facebook ? `<a href="${escapeAttr(facebook)}" target="_blank" rel="noopener" onclick="event.stopPropagation()"><i class="fab fa-facebook"></i></a>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+
+            grid.querySelectorAll('.member-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    openMemberDetail(this.dataset.memberId);
+                });
+            });
+        }
+
+        // ===== MEMBER DETAIL POPUP =====
+        function openMemberDetail(memberId) {
+            const data = userProfileCache[memberId];
+            if (!data) {
+                alert('Member not found.');
+                return;
+            }
+            currentMemberDetail = { id: memberId, ...data };
+
+            const name = data.displayName || data.email || 'Anonymous';
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const photoUrl = data.photoURL || '';
+
+            const avatarEl = document.getElementById('memberDetailAvatar');
+            if (photoUrl) {
+                avatarEl.innerHTML = `<img src="${cloudinaryAvatar(photoUrl, 320)}" alt="${escapeAttr(name)}" />`;
+            } else {
+                avatarEl.innerHTML = `<span id="memberDetailInitials">${escapeHtml(initials)}</span>`;
+            }
+
+            document.getElementById('memberDetailName').textContent = name;
+            document.getElementById('memberDetailLocation').textContent = data.location || 'Not set';
+
+            const badgesEl = document.getElementById('memberDetailBadges');
+            let badgesHtml = '';
+            const statusInfo = getStatusLabel(data.status || 'offline');
+            badgesHtml += `<span class="status-badge ${statusInfo.cls}"><span class="status-dot ${data.status || 'offline'}" style="background:${
+                data.status === 'available' ? '#22c55e' :
+                data.status === 'busy' ? '#ef4444' :
+                data.status === 'away' ? '#f59e0b' :
+                data.status === 'dnd' ? '#8b5cf6' : '#9ca3af'
+            };"></span> ${statusInfo.label}</span>`;
+
+            const loveLifeInfo = getLoveLifeLabel(data.loveLife);
+            if (loveLifeInfo) {
+                badgesHtml += `<span class="lovelife-badge ${loveLifeInfo.cls}"><i class="fas ${loveLifeInfo.icon}"></i> ${loveLifeInfo.label}</span>`;
+            }
+            badgesEl.innerHTML = badgesHtml;
+
+            const noteBlock = document.getElementById('memberDetailNoteBlock');
+            const note = notesCache[memberId];
+            if (note && note.text) {
+                noteBlock.style.display = 'block';
+                document.getElementById('memberDetailNoteText').textContent = note.text;
+
+                const expireAt = note.expireAt
+                    ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                    : null;
+                const hoursLeft = expireAt ? Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60))) : 0;
+                const expiryEl = document.getElementById('memberDetailNoteExpiry');
+                const expirySpan = expiryEl.querySelector('span');
+                if (expireAt) {
+                    if (hoursLeft <= 2) {
+                        expiryEl.classList.add('urgent');
+                        expirySpan.textContent = hoursLeft <= 1 ? 'Expiring very soon!' : `${hoursLeft} hours left`;
+                    } else {
+                        expiryEl.classList.remove('urgent');
+                        expirySpan.textContent = `${hoursLeft} hours left`;
+                    }
+                } else {
+                    expiryEl.classList.remove('urgent');
+                    expirySpan.textContent = '';
+                }
+            } else {
+                noteBlock.style.display = 'none';
+            }
+
+            const occupationSection = document.getElementById('memberDetailOccupationSection');
+            if (data.occupation) {
+                occupationSection.style.display = 'block';
+                document.getElementById('memberDetailOccupation').textContent = data.occupation;
+            } else {
+                occupationSection.style.display = 'none';
+            }
+
+            document.getElementById('memberDetailBio').textContent = data.bio || 'No bio provided.';
+
+            const interests = data.interests ? data.interests.split(',').map(t => t.trim()).filter(t => t) : [];
+            const interestsSection = document.getElementById('memberDetailInterestsSection');
+            if (interests.length) {
+                interestsSection.style.display = 'block';
+                document.getElementById('memberDetailInterests').innerHTML = interests.map(t => `<span class="interest-tag">#${escapeHtml(t)}</span>`).join('');
+            } else {
+                interestsSection.style.display = 'none';
+            }
+
+            const socialsEl = document.getElementById('memberDetailSocials');
+            const socialsSection = document.getElementById('memberDetailSocialsSection');
+            let socialsHtml = '';
+            if (data.instagram) socialsHtml += `<a href="https://instagram.com/${encodeURIComponent(data.instagram.replace('@',''))}" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>`;
+            if (data.twitter) socialsHtml += `<a href="https://twitter.com/${encodeURIComponent(data.twitter.replace('@',''))}" target="_blank" rel="noopener" title="Twitter / X"><i class="fab fa-twitter"></i></a>`;
+            if (data.tiktok) socialsHtml += `<a href="https://tiktok.com/@${encodeURIComponent(data.tiktok.replace('@',''))}" target="_blank" rel="noopener" title="TikTok"><i class="fab fa-tiktok"></i></a>`;
+            if (data.facebook) socialsHtml += `<a href="${escapeAttr(data.facebook)}" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook"></i></a>`;
+            if (socialsHtml) {
+                socialsSection.style.display = 'block';
+                socialsEl.innerHTML = socialsHtml;
+            } else {
+                socialsSection.style.display = 'none';
+            }
+
+            const dlBtn = document.getElementById('memberDetailDownloadBtn');
+            if (photoUrl) {
+                dlBtn.disabled = false;
+                dlBtn.innerHTML = '<i class="fas fa-download"></i> Download Avatar';
+            } else {
+                dlBtn.disabled = true;
+                dlBtn.innerHTML = '<i class="fas fa-ban"></i> No avatar';
+            }
+
+            document.getElementById('memberDetailModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMemberDetail() {
+            document.getElementById('memberDetailModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            document.getElementById('memberDetailAvatar').innerHTML = '';
+            currentMemberDetail = null;
+        }
+
+        async function downloadCurrentMemberDetail() {
+            if (!currentMemberDetail || !currentMemberDetail.photoURL) {
+                alert('No profile picture available.');
+                return;
+            }
+            const safeName = sanitizeFilename(currentMemberDetail.displayName || 'member');
+            const ext = extFromUrl(currentMemberDetail.photoURL);
+            const filename = `TIMAWA_${safeName}_avatar.${ext}`;
+            try {
+                await downloadImage(currentMemberDetail.photoURL, filename);
+            } catch (err) {
+                alert('❌ Failed to download: ' + err.message);
+            }
+        }
+
+        // ===== MODAL STATE HELPER =====
+        function anyModalOpen() {
+            return ['uploadModal', 'galleryModal', 'lightboxModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal']
+                .some(id => document.getElementById(id).classList.contains('active'));
         }
 
         // ===== UI HELPERS =====
@@ -2915,6 +5027,10 @@
 
         async function logout() {
             try {
+                stopAutoCleanup();
+                if (auth.currentUser) {
+                    try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                }
                 await auth.signOut();
                 window.location.href = 'index.html';
             } catch (error) {
@@ -2926,16 +5042,31 @@
             const uploadModal = document.getElementById('uploadModal');
             const galleryModal = document.getElementById('galleryModal');
             const lightboxModal = document.getElementById('lightboxModal');
+            const highlightDetailModal = document.getElementById('highlightDetailModal');
+            const memberDetailModal = document.getElementById('memberDetailModal');
+            const noteModal = document.getElementById('noteModal');
             const titaPanel = document.getElementById('titaPanel');
+            const announcementPopup = document.getElementById('announcementPopup');
 
             if (event.target === uploadModal) closeUploadModal();
             if (event.target === galleryModal) closeGallery();
             if (event.target === lightboxModal) closeLightbox();
+            if (event.target === highlightDetailModal) closeHighlightDetail();
+            if (event.target === memberDetailModal) closeMemberDetail();
+            if (event.target === noteModal) closeNoteModal();
 
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
                 !event.target.closest('#titaLauncher')) {
                 closeTitaPanel();
+            }
+
+            if (announcementPopup && announcementPopup.classList.contains('open')) {
+                if (!announcementPopup.contains(event.target) &&
+                    !event.target.closest('#announcementBell') &&
+                    !event.target.closest('.announcement-wrapper')) {
+                    closeAnnouncementPopup();
+                }
             }
         };
 
@@ -2947,8 +5078,16 @@
                     closeGallery();
                 } else if (document.getElementById('uploadModal').classList.contains('active')) {
                     closeUploadModal();
+                } else if (document.getElementById('highlightDetailModal').classList.contains('active')) {
+                    closeHighlightDetail();
+                } else if (document.getElementById('memberDetailModal').classList.contains('active')) {
+                    closeMemberDetail();
+                } else if (document.getElementById('noteModal').classList.contains('active')) {
+                    closeNoteModal();
                 } else if (document.getElementById('titaPanel').classList.contains('open')) {
                     closeTitaPanel();
+                } else if (document.getElementById('announcementPopup').classList.contains('open')) {
+                    closeAnnouncementPopup();
                 }
             }
         });
@@ -3037,10 +5176,44 @@
                 customEl.style.display = 'block';
             }
 
+            // ===== Load existing note =====
+            const note = notesCache[titaCurrentUser.uid];
+            const noteInput = document.getElementById('titaNote');
+            const noteCount = document.getElementById('titaNoteCount');
+            const noteStatus = document.getElementById('titaNoteStatus');
+
+            if (note && note.text) {
+                noteInput.value = note.text;
+                noteCount.textContent = note.text.length;
+
+                const expireAt = note.expireAt
+                    ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                    : null;
+                if (expireAt) {
+                    const hoursLeft = Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60)));
+                    noteStatus.style.display = 'block';
+                    noteStatus.querySelector('span').textContent = `Current note expires in ${hoursLeft}h`;
+                }
+            } else {
+                noteInput.value = '';
+                noteCount.textContent = '0';
+                noteStatus.style.display = 'none';
+            }
+
             const msg = document.getElementById('titaStatusMsg');
             msg.classList.remove('show');
             msg.textContent = '';
         }
+
+        // Live character counter for note field
+        document.addEventListener('DOMContentLoaded', function() {
+            const noteInput = document.getElementById('titaNote');
+            if (noteInput) {
+                noteInput.addEventListener('input', function() {
+                    document.getElementById('titaNoteCount').textContent = this.value.length;
+                });
+            }
+        });
 
         function titaToggleCustomLocation() {
             const select = document.getElementById('titaLocationSelect');
@@ -3105,8 +5278,35 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
+                // ===== Save or delete note =====
+                const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
+                const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
+
+                if (noteText) {
+                    const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24h from now
+                    await noteRef.set({
+                        uid: titaCurrentUser.uid,
+                        displayName: displayName,
+                        photoURL: titaUserData.photoURL || '',
+                        text: noteText,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    try { await noteRef.delete(); } catch (e) { /* ignore */ }
+                }
+
                 titaUserData = { ...titaUserData, ...updateData };
                 userProfileCache[titaCurrentUser.uid] = titaUserData;
+
+                try {
+                    sessionStorage.setItem('timawa_me_' + titaCurrentUser.uid, JSON.stringify({
+                        uid: titaCurrentUser.uid,
+                        t: Date.now(),
+                        data: titaUserData
+                    }));
+                } catch (e) { /* ignore */ }
 
                 if (displayName !== titaCurrentUser.displayName) {
                     try {
@@ -3116,11 +5316,12 @@
                     }
                 }
 
-                // Refresh navbar username
                 const heroNameEl = document.getElementById('heroName');
                 if (heroNameEl) heroNameEl.textContent = displayName;
                 const userNameEl = document.getElementById('userName');
                 if (userNameEl) userNameEl.textContent = displayName;
+
+                renderMembersGridFromCache();
 
                 titaShowStatus('✅ Saved! Anong susunod, \'nak?', 'success');
 
@@ -3137,6 +5338,35 @@
                 btn.innerHTML = originalHtml;
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const wrapper = document.getElementById('highlightsCarousel');
+            if (wrapper) {
+                wrapper.addEventListener('mouseenter', stopHighlightsAutoplay);
+                wrapper.addEventListener('mouseleave', startHighlightsAutoplay);
+            }
+        });
+
+        let lastIsMobile = isMobile();
+        let resizeDebounceTimer = null;
+
+        window.addEventListener('resize', function() {
+            if (resizeDebounceTimer) clearTimeout(resizeDebounceTimer);
+            resizeDebounceTimer = setTimeout(function() {
+                const nowMobile = isMobile();
+                if (nowMobile !== lastIsMobile) {
+                    lastIsMobile = nowMobile;
+                    loadHighlights();
+                }
+            }, 150);
+        });
+
+        window.addEventListener('resize', function() {
+            const popup = document.getElementById('announcementPopup');
+            if (popup && popup.classList.contains('open')) {
+                positionAnnouncementPopup();
+            }
+        });
     </script>
 
     <script src="idle-logout.js"></script>

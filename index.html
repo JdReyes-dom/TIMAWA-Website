@@ -27,6 +27,9 @@
             line-height: 1.6;
         }
 
+        /* ================================================================
+           ===== NAVBAR (mobile-friendly) =====
+           ================================================================ */
         .navbar {
             position: fixed; top: 0; left: 0; right: 0;
             z-index: 1000;
@@ -41,6 +44,7 @@
         .navbar .logo { font-size: 26px; font-weight: 900; color: rgb(16, 137, 211); letter-spacing: 2px; text-decoration: none; flex-shrink: 0; }
         .navbar .logo span { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); padding: 2px 10px; border-radius: 8px; font-size: 10px; color: white; margin-left: 8px; }
         .navbar .nav-links { display: flex; align-items: center; gap: 12px; list-style: none; flex-wrap: wrap; }
+        .navbar .nav-links > li { display: flex; align-items: center; }
         .navbar .nav-links a { text-decoration: none; color: #555; font-weight: 500; font-size: 13px; transition: all 0.3s ease; padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
         .navbar .nav-links a:hover { color: rgb(16, 137, 211); background: rgba(16, 137, 211, 0.06); }
         .navbar .mobile-toggle { display: none; font-size: 24px; color: rgb(16, 137, 211); cursor: pointer; background: none; border: none; }
@@ -54,6 +58,282 @@
         .auth-links-wrapper > button.logout-link { color: #ef4444; font-weight: 600; }
         .auth-links-wrapper > button.logout-link:hover { background: #fee2e2; }
 
+        /* ================================================================
+           ===== ANNOUNCEMENT BELL =====
+           ================================================================ */
+        .announcement-bell {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: #f0f7ff;
+            color: rgb(16, 137, 211);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            flex-shrink: 0;
+        }
+
+        .announcement-bell:hover {
+            background: #e0f2fe;
+            transform: scale(1.05);
+        }
+
+        .announcement-bell.active {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+        }
+
+        .announcement-bell.has-new {
+            animation: bellPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes bellPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        }
+
+        .announcement-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ef4444, #dc2626);
+            color: white;
+            font-size: 10px;
+            font-weight: 800;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+        }
+
+        .announcement-badge.show { display: flex; }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT POPUP =====
+           ================================================================ */
+        .announcement-popup {
+            position: fixed;
+            width: 380px;
+            max-width: calc(100vw - 40px);
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.22), 0 0 0 1px rgba(16, 137, 211, 0.06);
+            overflow: hidden;
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-8px) scale(0.97);
+            pointer-events: none;
+            transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-origin: top right;
+        }
+
+        .announcement-popup.open {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .announcement-popup::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 22px;
+            width: 12px;
+            height: 12px;
+            background: white;
+            transform: rotate(45deg);
+            box-shadow: -1px -1px 2px rgba(16, 137, 211, 0.06);
+        }
+
+        .announcement-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 18px;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border-bottom: 1px solid #eef2f7;
+        }
+
+        .announcement-popup-header h4 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+        }
+
+        .announcement-popup-header h4 i {
+            color: rgb(16, 137, 211);
+        }
+
+        .announcement-mark-all {
+            background: none;
+            border: none;
+            color: rgb(16, 137, 211);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .announcement-mark-all:hover {
+            background: rgba(16, 137, 211, 0.1);
+        }
+
+        .announcement-list {
+            max-height: 420px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+
+        .announcement-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            margin-bottom: 4px;
+            background: white;
+        }
+
+        .announcement-item:hover {
+            background: #f0f7ff;
+            transform: translateX(2px);
+        }
+
+        .announcement-item.unread {
+            background: #f0f9ff;
+        }
+
+        .announcement-item.unread:hover {
+            background: #e0f2fe;
+        }
+
+        .announcement-item.unread .announcement-title {
+            font-weight: 700;
+        }
+
+        .announcement-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            background: #e0f2fe;
+        }
+
+        .announcement-icon.type-admin { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+        .announcement-icon.type-birthday { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); }
+        .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
+        .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
+        .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+
+        .announcement-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .announcement-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a2e;
+            line-height: 1.35;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .announcement-priority-badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 7px;
+            border-radius: 50px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .announcement-priority-badge.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-priority-badge.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-message {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .announcement-time {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 3px;
+        }
+
+        .announcement-unread-dot {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgb(16, 137, 211);
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.15);
+        }
+
+        .announcement-popup-footer {
+            padding: 10px 18px;
+            background: #f8faff;
+            border-top: 1px solid #eef2f7;
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .announcement-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .announcement-empty i {
+            font-size: 36px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .announcement-empty p {
+            font-size: 13px;
+        }
+
+        /* ===== HERO ===== */
         .hero { padding: 100px 40px 60px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: 80vh; }
         .hero-content h1 { font-size: 52px; font-weight: 800; line-height: 1.1; margin-bottom: 15px; }
         .hero-content h1 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -151,31 +431,358 @@
 
         .carousel-divider { border: none; height: 2px; background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent); margin: 20px auto; max-width: 1200px; }
 
-        /* ===== MEMBERS SECTION ===== */
+        /* ================================================================
+           ===== MEMBERS SECTION =====
+           ================================================================ */
         .members-section { padding: 60px 40px 80px; max-width: 1200px; margin: 0 auto; }
         .members-section .section-header { text-align: center; margin-bottom: 40px; }
         .members-section .section-header h2 { font-size: 32px; font-weight: 800; }
         .members-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .members-section .section-header p { color: #888; font-size: 16px; }
+        .members-section .login-nudge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            background: #fef3c7;
+            color: #d97706;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            border: 1px solid #fde68a;
+        }
+        .members-section .login-nudge i { font-size: 12px; }
+
         .members-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
-        .member-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; cursor: pointer; position: relative; }
-        .member-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
-        .member-card .avatar-container { width: 100%; height: 200px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; position: relative; }
-        .member-card .avatar-container .avatar-text { font-size: 64px; font-weight: 700; color: rgb(16, 137, 211); }
-        .member-card .avatar-container img { width: 100%; height: 100%; object-fit: cover; }
-        .member-card .avatar-container .member-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.25s ease; z-index: 3; }
+
+        .member-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            contain: content;
+            cursor: pointer;
+            position: relative;
+        }
+        .member-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.12);
+            border-color: rgba(16, 137, 211, 0.28);
+        }
+
+        .member-card .avatar-container {
+            width: 100%;
+            height: 240px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: visible;
+            position: relative;
+            padding-top: 32px;
+        }
+
+        .member-card .avatar-container::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            pointer-events: none;
+        }
+        .member-card .avatar-container::after {
+            content: '';
+            position: absolute;
+            bottom: -60px;
+            left: -60px;
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+            pointer-events: none;
+        }
+
+        .member-card .avatar-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 56px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            overflow: hidden;
+            border: 5px solid white;
+            box-shadow: 0 10px 30px rgba(16, 137, 211, 0.28);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s ease;
+        }
+        .member-card:hover .avatar-circle {
+            transform: scale(1.05);
+        }
+        .member-card .avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .member-card .avatar-container .member-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            z-index: 3;
+        }
         .member-card:hover .avatar-container .member-actions { opacity: 1; }
-        .member-card .avatar-container .member-actions button { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .member-card .avatar-container .member-actions button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            color: white;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.22);
+            backdrop-filter: blur(6px);
+        }
         .member-card .avatar-container .member-actions .member-view { background: rgba(16, 137, 211, 0.95); }
+        .member-card .avatar-container .member-actions .member-view:hover { background: rgb(13, 107, 158); transform: scale(1.1); }
         .member-card .avatar-container .member-actions .member-download { background: rgba(0,0,0,0.75); }
         .member-card .avatar-container .member-actions .member-download:hover { background: rgb(16, 137, 211); transform: scale(1.1); }
-        .member-card .member-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
-        .member-card .member-body .member-name { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
-        .member-card .member-body .member-location { font-size: 13px; color: #888; display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
-        .member-card .member-body .member-location i { color: rgb(16, 137, 211); }
-        .member-card .member-body .member-bio { font-size: 14px; color: #666; line-height: 1.5; flex: 1; margin-bottom: 10px; }
-        .member-card .member-body .member-interests { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
-        .member-card .member-body .member-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
+
+        .member-card .avatar-container .avatar-status {
+            position: absolute;
+            bottom: calc(50% - 75px - 4px);
+            right: calc(50% - 75px - 4px);
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 4px solid white;
+            z-index: 2;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+        .member-card .avatar-container .avatar-status.available { background: #22c55e; }
+        .member-card .avatar-container .avatar-status.busy { background: #ef4444; }
+        .member-card .avatar-container .avatar-status.away { background: #f59e0b; }
+        .member-card .avatar-container .avatar-status.dnd { background: #8b5cf6; }
+        .member-card .avatar-container .avatar-status.offline { background: #9ca3af; }
+
+        /* ===== NOTE BUBBLE ON AVATAR (IMPROVED) ===== */
+        .member-note-bubble {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 5;
+            background: white;
+            border-radius: 22px;
+            padding: 9px 18px;
+            box-shadow: 0 6px 20px rgba(16, 137, 211, 0.22), 0 0 0 2px rgba(16, 137, 211, 0.14);
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            max-width: calc(100% - 24px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.3;
+            pointer-events: auto;
+            animation: noteFloatIn 0.4s ease-out;
+        }
+
+        .member-note-bubble:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 8px 26px rgba(16, 137, 211, 0.32), 0 0 0 2px rgba(16, 137, 211, 0.28);
+        }
+
+        .member-note-bubble i {
+            color: rgb(16, 137, 211);
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .member-note-bubble .note-text-preview {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 180px;
+        }
+
+        .member-note-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            width: 12px;
+            height: 12px;
+            background: white;
+            box-shadow: 2px 2px 4px rgba(16, 137, 211, 0.1);
+            border-radius: 0 0 3px 0;
+        }
+
+        @keyframes noteFloatIn {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.9); }
+            100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+        }
+
+        .member-card .member-body {
+            padding: 20px 22px 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+        .member-card .member-body .member-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .member-card .member-body .member-location {
+            font-size: 13px;
+            color: #888;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .member-card .member-body .member-location i { color: rgb(16, 137, 211); font-size: 12px; }
+
+        .member-card .member-body .member-meta-chips {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .member-card .member-body .member-meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f0f9ff;
+            color: #555;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid #e0f2fe;
+        }
+        .member-card .member-body .member-meta-chip i {
+            color: rgb(16, 137, 211);
+            font-size: 10px;
+        }
+
+        .member-card .member-body .lovelife-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 700;
+            margin: 0 auto 10px;
+            align-self: center;
+        }
+        .lovelife-badge.single { background: #fee2e2; color: #dc2626; }
+        .lovelife-badge.mu { background: #fce7f3; color: #db2777; }
+        .lovelife-badge.married { background: #dcfce7; color: #16a34a; }
+
+        .member-card .member-body .member-bio {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.55;
+            margin: 8px 0 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f4ff;
+            flex: 1;
+        }
+
+        .member-card .member-body .member-interests {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .member-card .member-body .member-interests .interest-tag {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 3px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .member-card .member-body .member-socials {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f4ff;
+            margin-top: auto;
+        }
+        .member-card .member-body .member-socials a {
+            color: #888;
+            font-size: 15px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #f8faff;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .member-card .member-body .member-socials a:hover {
+            color: rgb(16, 137, 211);
+            background: #e0f2fe;
+            transform: scale(1.1);
+        }
+
+        .member-card .member-body .member-locked-hint {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #f3f4f6;
+            color: #6b7280;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            margin: 8px auto 0;
+            align-self: center;
+        }
 
         .empty-state { text-align: center; padding: 40px 20px; color: #888; grid-column: 1 / -1; }
         .empty-state i { font-size: 40px; color: #cff0ff; display: block; margin-bottom: 10px; }
@@ -210,17 +817,253 @@
         .modal-actions .modal-secondary:hover { background: #e5e7eb; transform: scale(1.02); }
 
         .member-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
-        .member-modal .member-modal-header { position: relative; width: 100%; height: 280px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; }
-        .member-modal .member-modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .member-modal .member-modal-header { position: relative; width: 100%; height: 300px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; }
+        .member-modal .member-modal-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+        }
+        .member-modal .member-modal-header::after {
+            content: '';
+            position: absolute;
+            bottom: -70px;
+            left: -70px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
+            pointer-events: none;
+        }
+        .member-modal .member-modal-header .member-modal-avatar-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 68px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            overflow: hidden;
+            border: 6px solid white;
+            box-shadow: 0 12px 35px rgba(16, 137, 211, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .member-modal .member-modal-header .member-modal-avatar-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
         .member-modal .member-modal-header .member-modal-initials { font-size: 96px; font-weight: 700; color: rgb(16, 137, 211); }
         .member-modal .member-modal-body { padding: 26px 30px 30px; }
-        .member-modal .member-modal-body .member-modal-name { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; }
+        .member-modal .member-modal-body .member-modal-name { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .member-modal .member-modal-body .member-modal-location { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; margin-bottom: 18px; }
         .member-modal .member-modal-body .member-modal-location i { color: rgb(16, 137, 211); font-size: 15px; }
         .member-modal .member-modal-body .member-modal-section-label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .member-modal .member-modal-body .member-modal-bio { font-size: 15px; color: #555; line-height: 1.7; padding-bottom: 16px; border-bottom: 1px solid #f0f4ff; margin-bottom: 16px; white-space: pre-wrap; }
         .member-modal .member-modal-body .member-modal-interests { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
         .member-modal .member-modal-body .member-modal-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; }
+        .member-modal .member-modal-body .member-modal-socials { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+        .member-modal .member-modal-body .member-modal-socials a { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f8faff; color: #666; font-size: 16px; transition: all 0.3s ease; text-decoration: none; border: 1px solid #eef2f7; }
+        .member-modal .member-modal-body .member-modal-socials a:hover { background: #e0f2fe; color: rgb(16, 137, 211); transform: scale(1.1); }
+
+        .member-modal .member-modal-body .member-modal-meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        .member-modal .member-modal-body .member-modal-meta-item {
+            background: #f8faff;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #eef2f7;
+        }
+        .member-modal .member-modal-body .member-modal-meta-item i {
+            color: rgb(16, 137, 211);
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        .member-modal .member-modal-body .member-modal-meta-item.full-width {
+            grid-column: 1 / -1;
+        }
+        .member-modal .member-modal-body .member-modal-meta-item .meta-label {
+            font-weight: 700;
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-right: 4px;
+        }
+        .member-modal .member-modal-body .member-modal-meta-item .meta-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .member-modal .member-modal-body .member-modal-locked-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 14px 18px;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            border: 1px solid #fde68a;
+        }
+        .member-modal .member-modal-body .member-modal-locked-banner i {
+            color: #d97706;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-text {
+            flex: 1;
+            font-size: 13px;
+            color: #92400e;
+            line-height: 1.4;
+        }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-text strong {
+            color: #78350f;
+            display: block;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-cta {
+            background: linear-gradient(45deg, #d97706 0%, #b45309 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-cta:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
+        }
+
+        /* ===== NOTE POPUP MODAL ===== */
+        .note-modal .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            max-width: 420px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
+        }
+        .note-modal .note-modal-header {
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            padding: 22px 24px 18px;
+            text-align: center;
+            position: relative;
+        }
+        .note-modal .note-modal-header .note-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .note-modal .note-modal-header .note-modal-close:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
+        }
+        .note-modal .note-modal-avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 800;
+            color: rgb(16, 137, 211);
+            overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .note-modal .note-modal-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .note-modal .note-modal-name {
+            font-size: 17px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 2px;
+        }
+        .note-modal .note-modal-time {
+            font-size: 11px;
+            color: rgba(255,255,255,0.8);
+            font-weight: 500;
+        }
+        .note-modal .note-modal-body {
+            padding: 24px 26px 26px;
+            text-align: center;
+        }
+        .note-modal .note-modal-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a2e;
+            line-height: 1.55;
+            padding: 16px 18px;
+            background: #f8faff;
+            border-radius: 16px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 16px;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .note-modal .note-modal-expiry {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+        .note-modal .note-modal-expiry i {
+            color: rgb(16, 137, 211);
+        }
+        .note-modal .note-modal-expiry.urgent {
+            color: #ef4444;
+        }
+        .note-modal .note-modal-expiry.urgent i {
+            color: #ef4444;
+        }
 
         /* ===== HIGHLIGHT DETAIL MODAL ===== */
         .highlight-detail-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
@@ -270,7 +1113,6 @@
            ===== TITA TIMA AI ASSISTANT (FLOATING) =====
            ================================================================ */
 
-        /* Floating launcher button */
         .tita-launcher {
             position: fixed;
             bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -283,19 +1125,16 @@
             background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             color: white;
             font-size: 24px;
-            display: none; /* shown by JS when logged in */
+            display: none;
             align-items: center;
             justify-content: center;
-            /* Higher than modals (2000) so the launcher is always clickable */
             z-index: 2500;
             box-shadow: 0 8px 30px rgba(16, 137, 211, 0.45);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
-        .tita-launcher.visible {
-            display: flex;
-        }
+        .tita-launcher.visible { display: flex; }
 
         .tita-launcher:hover {
             transform: scale(1.08);
@@ -328,11 +1167,8 @@
             display: none;
         }
 
-        .tita-launcher .tita-badge.show {
-            display: block;
-        }
+        .tita-launcher .tita-badge.show { display: block; }
 
-        /* Chat panel */
         .tita-panel {
             position: fixed;
             bottom: calc(100px + env(safe-area-inset-bottom, 0px));
@@ -347,7 +1183,6 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            /* Below launcher, above page content */
             z-index: 2499;
             transform: translateY(20px) scale(0.95);
             opacity: 0;
@@ -385,10 +1220,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
 
-        .tita-header-info {
-            flex: 1;
-            min-width: 0;
-        }
+        .tita-header-info { flex: 1; min-width: 0; }
 
         .tita-name {
             font-size: 15px;
@@ -450,13 +1282,9 @@
             line-height: 1.5;
         }
 
-        .tita-greeting strong {
-            color: rgb(16, 137, 211);
-        }
+        .tita-greeting strong { color: rgb(16, 137, 211); }
 
-        .tita-field {
-            margin-bottom: 12px;
-        }
+        .tita-field { margin-bottom: 12px; }
 
         .tita-field label {
             display: flex;
@@ -572,7 +1400,9 @@
         .tita-status-msg.error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
         .tita-status-msg.info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
 
-        /* ===== RESPONSIVE (main page) ===== */
+        /* ================================================================
+           ===== RESPONSIVE =====
+           ================================================================ */
         @media (max-width: 1024px) {
             .hero { grid-template-columns: 1fr; text-align: center; padding: 80px 30px 40px; }
             .hero-content p { margin: 0 auto 30px; }
@@ -588,13 +1418,43 @@
         @media (max-width: 768px) {
             .navbar { padding: 12px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
             .navbar .logo { font-size: 22px; }
-            .navbar .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: white; padding: 20px; border-bottom: 2px solid #f0f4ff; gap: 10px; box-shadow: 0 20px 30px rgba(0,0,0,0.05); width: 100%; }
+            .navbar .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: white; padding: 20px; border-bottom: 2px solid #f0f4ff; gap: 10px; box-shadow: 0 20px 30px rgba(0,0,0,0.05); width: 100%; max-height: calc(100vh - 60px); overflow-y: auto; }
             .navbar .nav-links.active { display: flex; }
             .navbar .mobile-toggle { display: block; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
-            .navbar .nav-links > li { width: 100%; }
+            .navbar .nav-links > li { width: 100%; justify-content: center; }
             .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
             .auth-links-wrapper { flex-direction: column; width: 100%; gap: 10px; }
             .auth-links-wrapper > a, .auth-links-wrapper > button { width: 100%; text-align: center; font-size: 14px; padding: 8px 16px; display: block; }
+
+            /* Bell: full-width row on mobile, icon centered */
+            .navbar .nav-links > li.announcement-li {
+                display: flex;
+                justify-content: center;
+                width: 100%;
+                padding: 4px 0;
+            }
+            .announcement-bell {
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+            .announcement-badge {
+                top: -2px;
+                right: -2px;
+            }
+
+            /* Popup on mobile: fixed below navbar, full-width */
+            .announcement-popup {
+                position: fixed !important;
+                top: 70px !important;
+                left: 14px !important;
+                right: 14px !important;
+                width: auto !important;
+                max-width: none !important;
+            }
+            .announcement-popup::before { display: none; }
+            .announcement-list { max-height: 60vh; }
+
             .hero-content h1 { font-size: 32px; }
             .carousel-slide, .highlights-carousel-slide { gap: 0 !important; }
             .carousel-item .image-placeholder { height: 220px; }
@@ -605,13 +1465,23 @@
             .highlights-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
             .members-section { padding: 40px 20px; }
             .members-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
-            .member-card .avatar-container { height: 150px; }
-            .member-card .avatar-container .avatar-text { font-size: 48px; }
+            .member-card .avatar-container { height: 200px; padding-top: 28px; }
+            .member-card .avatar-circle { width: 120px; height: 120px; font-size: 44px; }
+            .member-card .avatar-container .avatar-status {
+                bottom: calc(50% - 60px - 4px);
+                right: calc(50% - 60px - 4px);
+                width: 16px;
+                height: 16px;
+            }
+            .member-card .member-body { padding: 16px 16px 18px; }
+            .member-card .member-body .member-name { font-size: 16px; }
             .item-modal .modal-header { height: 240px; }
             .item-modal .modal-body { padding: 22px; }
-            .member-modal .member-modal-header { height: 220px; }
+            .member-modal .member-modal-header { height: 240px; }
+            .member-modal .member-modal-header .member-modal-avatar-circle { width: 150px; height: 150px; font-size: 54px; }
             .member-modal .member-modal-header .member-modal-initials { font-size: 72px; }
             .member-modal .member-modal-body { padding: 20px 22px 24px; }
+            .member-modal .member-modal-body .member-modal-meta-grid { grid-template-columns: 1fr; }
             .highlight-detail-modal .modal-header { height: 260px; }
             .highlight-detail-modal .modal-body { padding: 20px 22px 24px; }
             .carousel-item .item-actions { opacity: 1; }
@@ -622,7 +1492,20 @@
             .gallery-modal .gallery-body { padding: 16px 18px 22px; }
             .gallery-modal .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 
-            /* ===== TITA TIMA — mobile/tablet adjustments ===== */
+            /* Note bubble on mobile */
+            .member-note-bubble {
+                font-size: 13px;
+                padding: 8px 14px;
+                max-width: calc(100% - 20px);
+                border-radius: 20px;
+            }
+            .member-note-bubble .note-text-preview {
+                max-width: 130px;
+            }
+            .member-note-bubble i {
+                font-size: 12px;
+            }
+
             .tita-launcher {
                 bottom: calc(20px + env(safe-area-inset-bottom, 0px));
                 right: 18px;
@@ -652,12 +1535,17 @@
             .highlights-carousel-btn { width: 32px; height: 32px; font-size: 12px; }
             .highlights-carousel-wrapper { padding: 0 38px; }
             .members-grid { grid-template-columns: 1fr; gap: 15px; }
-            .member-card .avatar-container { height: 180px; }
-            .member-card .avatar-container .avatar-text { font-size: 56px; }
+            .member-card .avatar-container { height: 220px; padding-top: 32px; }
+            .member-card .avatar-circle { width: 140px; height: 140px; font-size: 52px; }
+            .member-card .avatar-container .avatar-status {
+                bottom: calc(50% - 70px - 4px);
+                right: calc(50% - 70px - 4px);
+            }
             .item-modal .modal-header { height: 200px; }
             .item-modal .modal-body { padding: 18px; }
             .item-modal .modal-actions { flex-direction: column; }
-            .member-modal .member-modal-header { height: 200px; }
+            .member-modal .member-modal-header { height: 220px; }
+            .member-modal .member-modal-header .member-modal-avatar-circle { width: 140px; height: 140px; font-size: 52px; }
             .member-modal .member-modal-header .member-modal-initials { font-size: 64px; }
             .member-modal .member-modal-body { padding: 18px; }
             .member-modal .member-modal-actions { flex-direction: column; }
@@ -669,7 +1557,22 @@
             .gallery-modal .gallery-body { padding: 12px 14px 18px; }
             .gallery-modal .gallery-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
 
-            /* ===== TITA TIMA — small phone adjustments ===== */
+            .announcement-popup {
+                top: 65px !important;
+                left: 10px !important;
+                right: 10px !important;
+            }
+
+            /* Note bubble even more compact */
+            .member-note-bubble {
+                font-size: 12px;
+                padding: 7px 12px;
+                gap: 6px;
+            }
+            .member-note-bubble .note-text-preview {
+                max-width: 110px;
+            }
+
             .tita-launcher {
                 bottom: calc(18px + env(safe-area-inset-bottom, 0px));
                 right: 16px;
@@ -703,6 +1606,23 @@
             <li class="auth-links-wrapper" id="authLinks"></li>
         </ul>
     </nav>
+
+    <!-- Announcement popup (only rendered when logged in) -->
+    <div class="announcement-popup" id="announcementPopup" role="dialog" aria-labelledby="announcementTitle" style="display:none;">
+        <div class="announcement-popup-header">
+            <h4 id="announcementTitle"><i class="fas fa-bullhorn"></i> Announcements</h4>
+            <button class="announcement-mark-all" onclick="markAllAnnouncementsRead()">Mark all read</button>
+        </div>
+        <div class="announcement-list" id="announcementList">
+            <div class="announcement-empty">
+                <i class="fas fa-inbox"></i>
+                <p>Loading announcements...</p>
+            </div>
+        </div>
+        <div class="announcement-popup-footer" id="announcementFooter">
+            No new announcements
+        </div>
+    </div>
 
     <section class="hero" id="home">
         <div class="hero-content">
@@ -779,6 +1699,12 @@
         <div class="section-header">
             <h2>👥 Meet the <span class="highlight">Squad</span></h2>
             <p id="memberCountDisplay">Loading members...</p>
+            <div id="membersLoginNudge" style="display:none;">
+                <span class="login-nudge">
+                    <i class="fas fa-lock"></i>
+                    <span>Sign in to see full member details</span>
+                </span>
+            </div>
         </div>
         <div class="members-grid" id="membersGrid">
             <div class="empty-state">
@@ -817,12 +1743,25 @@
         <div class="modal-content">
             <div class="member-modal-header">
                 <button class="modal-close" onclick="closeMemberModal()" title="Close"><i class="fas fa-times"></i></button>
-                <img id="memberModalImage" src="" alt="Member" style="display:none;" />
-                <div class="member-modal-initials" id="memberModalInitials"></div>
+                <div class="member-modal-avatar-circle" id="memberModalAvatarCircle">
+                    <span class="member-modal-initials" id="memberModalInitials"></span>
+                </div>
             </div>
             <div class="member-modal-body">
                 <div class="member-modal-name" id="memberModalName">Name</div>
                 <div class="member-modal-location" id="memberModalLocation"><i class="fas fa-map-marker-alt"></i><span>Location</span></div>
+
+                <div id="memberModalMetaGrid" class="member-modal-meta-grid" style="display:none;"></div>
+
+                <div id="memberModalLockedBanner" class="member-modal-locked-banner" style="display:none;">
+                    <i class="fas fa-lock"></i>
+                    <div class="locked-text">
+                        <strong>Want to see more?</strong>
+                        Sign in to view location, birthday, availability, and love life.
+                    </div>
+                    <a href="login.html" class="locked-cta">Sign In</a>
+                </div>
+
                 <div id="memberModalBioSection">
                     <div class="member-modal-section-label">About</div>
                     <div class="member-modal-bio" id="memberModalBio">Bio</div>
@@ -831,9 +1770,31 @@
                     <div class="member-modal-section-label">Interests</div>
                     <div class="member-modal-interests" id="memberModalInterests"></div>
                 </div>
+                <div id="memberModalSocialsSection" style="display:none;">
+                    <div class="member-modal-section-label">Connect</div>
+                    <div class="member-modal-socials" id="memberModalSocials"></div>
+                </div>
                 <div class="modal-actions">
                     <button class="modal-download" id="memberModalDownloadBtn" onclick="downloadCurrentMemberAvatar()"><i class="fas fa-download"></i> Download Profile Picture</button>
                     <button class="modal-secondary" onclick="closeMemberModal()"><i class="fas fa-times"></i> Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== NOTE POPUP MODAL ===== -->
+    <div id="noteModal" class="modal note-modal">
+        <div class="modal-content">
+            <div class="note-modal-header">
+                <button class="note-modal-close" onclick="closeNoteModal()"><i class="fas fa-times"></i></button>
+                <div class="note-modal-avatar" id="noteModalAvatar"></div>
+                <div class="note-modal-name" id="noteModalName">Name</div>
+                <div class="note-modal-time" id="noteModalTime"></div>
+            </div>
+            <div class="note-modal-body">
+                <div class="note-modal-text" id="noteModalText"></div>
+                <div class="note-modal-expiry" id="noteModalExpiry">
+                    <i class="fas fa-clock"></i> <span></span>
                 </div>
             </div>
         </div>
@@ -967,6 +1928,21 @@
                 <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
             </div>
 
+            <!-- ===== QUICK NOTE FIELD ===== -->
+            <div class="tita-field">
+                <label>
+                    <i class="fas fa-comment-dots"></i> Quick Note
+                    <span style="color:#888;font-weight:500;text-transform:none;letter-spacing:0;font-size:11px;">(60 chars · expires in 24h)</span>
+                </label>
+                <input type="text" id="titaNote" placeholder="Coffee later? ☕" maxlength="60" />
+                <div style="font-size:11px;color:#888;margin-top:4px;text-align:right;">
+                    <span id="titaNoteCount">0</span>/60
+                </div>
+                <div id="titaNoteStatus" style="font-size:11px;color:#888;margin-top:4px;display:none;">
+                    <i class="fas fa-clock"></i> <span></span>
+                </div>
+            </div>
+
             <div class="tita-actions">
                 <button class="tita-save" id="titaSaveBtn" onclick="titaSaveProfile()">
                     <i class="fas fa-save"></i> Save Changes
@@ -992,18 +1968,34 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
+        db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+            if (err.code === 'failed-precondition') {
+                console.warn('Firestore persistence: multiple tabs open, cache disabled for this tab.');
+            } else if (err.code === 'unimplemented') {
+                console.warn('Firestore persistence: not supported in this browser.');
+            }
+        });
+
         const CLOUDINARY_CONFIG = { cloudName: "ooq99nlw" };
         const CAROUSEL_AUTOPLAY_MS = 10000;
         const MOBILE_BREAKPOINT = 768;
+
+        const HIGHLIGHTS_LIMIT = 20;
+        const CAROUSEL_LIMIT = 20;
+        const MEMBERS_LIMIT = 50;
+        const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
 
         function isMobile() { return window.innerWidth <= MOBILE_BREAKPOINT; }
         function getItemsPerSlide() { return isMobile() ? 1 : 3; }
 
         let highlightsData = [];
         let unsubscribeHighlights = null;
+        let unsubscribeMembers = null;
         const carousels = {};
         const userProfileCache = {};
         const carouselItemCache = {};
+
+        let isUserLoggedIn = false;
 
         let currentItem = null;
         let currentMember = null;
@@ -1014,19 +2006,50 @@
         let currentHighlightDetailId = null;
         let currentHighlightDetailImageIndex = 0;
 
-        // Tita Tima state
         let titaCurrentUser = null;
         let titaUserData = null;
 
-        // ===== CLOUDINARY THUMBNAIL HELPER =====
+        // ================================================================
+        // ===== NOTES STATE =====
+        // ================================================================
+        let notesCache = {};
+        let unsubscribeNotes = null;
+        let currentNoteUid = null;
+
+        // ================================================================
+        // ===== ANNOUNCEMENTS — OPTIMIZED STATE =====
+        // ================================================================
+        let announcementUser = null;
+        let announcementUnsubscribe = null;
+        let announcementItems = [];
+        let announcementReadIds = new Set();
+
+        const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
+        const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
+        const ANNOUNCEMENT_CACHE_KEY = 'timawa_ann_cache_';
+        const ANNOUNCEMENT_LIMIT = 30;
+        const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
+
+        // ================================================================
+        // ===== CLOUDINARY THUMBNAIL =====
+        // ================================================================
         function cloudinaryThumb(url, width = 500) {
             if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
             const afterUpload = url.split('/upload/')[1];
             if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
-            return url.replace('/upload/', `/upload/w_${width},q_auto,f_auto/`);
+            return url.replace('/upload/', `/upload/w_${width},q_auto:good,f_auto/`);
         }
 
+        function cloudinaryAvatar(url, size = 400) {
+            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+            const afterUpload = url.split('/upload/')[1];
+            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
+            return url.replace('/upload/', `/upload/w_${size},h_${size},c_fill,g_face,q_auto:good,f_auto/`);
+        }
+
+        // ================================================================
         // ===== HELPERS =====
+        // ================================================================
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = String(text);
@@ -1065,40 +2088,750 @@
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
-        // ===== NAV =====
-        function updateNavigation(user) {
-            const authLinks = document.getElementById('authLinks');
-            const heroCta = document.getElementById('heroCta');
+        function getLoveLifeLabel(value) {
+            switch (value) {
+                case 'Single': return { label: 'Single', icon: 'fa-heart-broken', cls: 'single' };
+                case 'MU': return { label: 'MU', icon: 'fa-heart', cls: 'mu' };
+                case 'Married': return { label: 'Married', icon: 'fa-ring', cls: 'married' };
+                default: return null;
+            }
+        }
 
-            if (user) {
-                db.collection('users').doc(user.uid).get().then((doc) => {
-                    const data = doc.data() || {};
-                    titaUserData = data;
-                    titaCurrentUser = user;
+        function getStatusLabel(status) {
+            const map = {
+                'available': { label: 'Available', cls: 'available' },
+                'busy': { label: 'Busy', cls: 'busy' },
+                'away': { label: 'Away', cls: 'away' },
+                'dnd': { label: 'Do Not Disturb', cls: 'dnd' },
+                'offline': { label: 'Offline', cls: 'offline' }
+            };
+            return map[status] || map['offline'];
+        }
 
-                    // Show Tita Tima launcher for logged-in users
-                    document.getElementById('titaLauncher').classList.add('visible');
+        function formatBirthday(birthday) {
+            if (!birthday || typeof birthday !== 'string') return '';
+            const parts = birthday.split('-');
+            if (parts.length !== 3) return birthday;
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            if (isNaN(month) || isNaN(day)) return birthday;
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${monthNames[month - 1]} ${day}`;
+        }
 
-                    const isAdmin = data?.isAdmin === true;
-                    const adminLink = isAdmin
-                        ? `<a href="admin.html" class="profile-link"><i class="fas fa-cog"></i> Admin</a>`
+        async function getCurrentUserProfileCached(user) {
+            const CACHE_KEY = 'timawa_me_' + user.uid;
+            try {
+                const raw = sessionStorage.getItem(CACHE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.uid === user.uid && (Date.now() - parsed.t) < USER_PROFILE_CACHE_TTL) {
+                        return parsed.data;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data() || {};
+                try {
+                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                        uid: user.uid,
+                        t: Date.now(),
+                        data
+                    }));
+                } catch (e) { /* ignore */ }
+                return data;
+            } catch (e) {
+                console.warn('getCurrentUserProfileCached failed:', e);
+                return {};
+            }
+        }
+
+        // ================================================================
+        // ===== NOTES SYSTEM =====
+        // ================================================================
+        function loadNotes() {
+            if (unsubscribeNotes) unsubscribeNotes();
+
+            const now = new Date();
+
+            unsubscribeNotes = db.collection('notes')
+                .where('expireAt', '>', now)
+                .onSnapshot((snapshot) => {
+                    const newCache = {};
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const expireAt = data.expireAt
+                            ? (data.expireAt.seconds ? new Date(data.expireAt.seconds * 1000) : new Date(data.expireAt))
+                            : null;
+                        if (!expireAt || expireAt > now) {
+                            newCache[doc.id] = { id: doc.id, ...data };
+                        }
+                    });
+                    notesCache = newCache;
+                    renderMembersSection();
+                }, (error) => {
+                    console.warn('Notes listener error:', error.message);
+                    notesCache = {};
+                });
+        }
+
+        function openNoteModal(uid) {
+            const note = notesCache[uid];
+            if (!note) return;
+
+            currentNoteUid = uid;
+
+            const member = carouselItemCache[`users:${uid}`] || {};
+            const name = member.displayName || member.email || 'Anonymous';
+            const photoUrl = member.photoURL || '';
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            const avatarEl = document.getElementById('noteModalAvatar');
+            if (photoUrl) {
+                avatarEl.innerHTML = `<img src="${cloudinaryAvatar(photoUrl, 120)}" alt="${escapeAttr(name)}" />`;
+            } else {
+                avatarEl.textContent = initials;
+            }
+
+            document.getElementById('noteModalName').textContent = name;
+
+            const expireAt = note.expireAt
+                ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                : null;
+            const hoursLeft = expireAt ? Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60))) : 0;
+            const minutesLeft = expireAt ? Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60))) : 0;
+
+            const timeEl = document.getElementById('noteModalTime');
+            if (expireAt && hoursLeft > 1) {
+                timeEl.textContent = `⏳ ${hoursLeft}h left`;
+            } else if (expireAt && minutesLeft > 1) {
+                timeEl.textContent = `⏳ ${minutesLeft}m left`;
+            } else if (expireAt) {
+                timeEl.textContent = `⏳ Expiring soon`;
+            } else {
+                timeEl.textContent = '';
+            }
+
+            document.getElementById('noteModalText').textContent = note.text || '';
+
+            const expiryEl = document.getElementById('noteModalExpiry');
+            const expirySpan = expiryEl.querySelector('span');
+            if (expireAt) {
+                if (hoursLeft <= 2) {
+                    expiryEl.classList.add('urgent');
+                    expirySpan.textContent = hoursLeft <= 1 ? 'Expiring very soon!' : `${hoursLeft} hours left`;
+                } else {
+                    expiryEl.classList.remove('urgent');
+                    expirySpan.textContent = `${hoursLeft} hours left`;
+                }
+            } else {
+                expiryEl.classList.remove('urgent');
+                expirySpan.textContent = '';
+            }
+
+            document.getElementById('noteModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentNoteUid = null;
+        }
+
+        // ================================================================
+        // ===== ANNOUNCEMENT SYSTEM (OPTIMIZED) =====
+        // ================================================================
+
+        const ANNOUNCEMENT_TYPE_META = {
+            'admin':     { icon: '📢', cls: 'type-admin',     label: 'Announcement' },
+            'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
+            'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
+            'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+        };
+
+        function getAnnouncementMeta(type) {
+            return ANNOUNCEMENT_TYPE_META[type] || ANNOUNCEMENT_TYPE_META['admin'];
+        }
+
+        function loadAnnouncementReadCache(uid) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_READ_CACHE_PREFIX + uid);
+                if (raw) {
+                    const arr = JSON.parse(raw);
+                    if (Array.isArray(arr)) return new Set(arr);
+                }
+            } catch (e) { /* ignore */ }
+            return new Set();
+        }
+
+        function saveAnnouncementReadCache(uid, idSet) {
+            try {
+                localStorage.setItem(
+                    ANNOUNCEMENT_READ_CACHE_PREFIX + uid,
+                    JSON.stringify([...idSet])
+                );
+            } catch (e) { /* ignore */ }
+        }
+
+        function loadAnnouncementSnapshotCache(uid) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_CACHE_KEY + uid);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.uid === uid && (Date.now() - parsed.t) < ANNOUNCEMENT_CACHE_TTL) {
+                    return parsed.items;
+                }
+            } catch (e) { /* ignore */ }
+            return null;
+        }
+
+        function saveAnnouncementSnapshotCache(uid, items) {
+            try {
+                localStorage.setItem(ANNOUNCEMENT_CACHE_KEY + uid, JSON.stringify({
+                    uid,
+                    t: Date.now(),
+                    items
+                }));
+            } catch (e) { /* ignore */ }
+        }
+
+        function hasAutogenRunToday(uid, kind) {
+            try {
+                const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
+                if (!raw) return false;
+                const parsed = JSON.parse(raw);
+                const today = new Date().toISOString().slice(0, 10);
+                return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
+            } catch (e) { return false; }
+        }
+
+        function markAutogenRunToday(uid, kind) {
+            try {
+                const today = new Date().toISOString().slice(0, 10);
+                let parsed = { date: today, kinds: {} };
+                const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
+                if (raw) {
+                    try { parsed = JSON.parse(raw); } catch (e) {}
+                }
+                if (parsed.date !== today) parsed = { date: today, kinds: {} };
+                parsed.kinds[kind] = true;
+                localStorage.setItem(ANNOUNCEMENT_AUTOGEN_KEY + uid, JSON.stringify(parsed));
+            } catch (e) { /* ignore */ }
+        }
+
+        // ===== POPUP TOGGLE =====
+        function toggleAnnouncementPopup(event) {
+            if (event) event.stopPropagation();
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (!popup || !bell) return;
+
+            const isOpen = popup.classList.toggle('open');
+            bell.classList.toggle('active', isOpen);
+
+            if (isOpen) {
+                positionAnnouncementPopup();
+            }
+        }
+
+        function positionAnnouncementPopup() {
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (!popup || !bell) return;
+
+            if (window.innerWidth > 768) {
+                const rect = bell.getBoundingClientRect();
+                popup.style.position = 'fixed';
+                popup.style.top = (rect.bottom + 14) + 'px';
+                popup.style.right = (window.innerWidth - rect.right - 8) + 'px';
+                popup.style.left = 'auto';
+            } else {
+                popup.style.position = 'fixed';
+                popup.style.top = '70px';
+                popup.style.left = '14px';
+                popup.style.right = '14px';
+            }
+        }
+
+        function closeAnnouncementPopup() {
+            const popup = document.getElementById('announcementPopup');
+            const bell = document.getElementById('announcementBell');
+            if (popup) popup.classList.remove('open');
+            if (bell) bell.classList.remove('active');
+        }
+
+        // ===== RENDER =====
+        function renderAnnouncements() {
+            const list = document.getElementById('announcementList');
+            const footer = document.getElementById('announcementFooter');
+            const badge = document.getElementById('announcementBadge');
+            if (!list) return;
+
+            const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
+
+            if (badge) {
+                if (unreadCount > 0) {
+                    badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
+                    badge.classList.add('show');
+                } else {
+                    badge.classList.remove('show');
+                }
+            }
+
+            const bell = document.getElementById('announcementBell');
+            if (bell) {
+                bell.classList.toggle('has-new', unreadCount > 0);
+            }
+
+            if (announcementItems.length === 0) {
+                list.innerHTML = `
+                    <div class="announcement-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>No announcements yet</p>
+                    </div>
+                `;
+                if (footer) footer.textContent = 'You\'re all caught up ✨';
+                return;
+            }
+
+            let html = '';
+            announcementItems.forEach(item => {
+                const meta = getAnnouncementMeta(item.type);
+                const isUnread = !announcementReadIds.has(item.id);
+                const createdDate = item.createdAt
+                    ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                    : new Date();
+                const priorityBadge = item.priority === 'urgent'
+                    ? '<span class="announcement-priority-badge urgent">Urgent</span>'
+                    : item.priority === 'info'
+                        ? '<span class="announcement-priority-badge info">Info</span>'
                         : '';
 
-                    authLinks.innerHTML = `
-                        <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
-                        <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
-                        ${adminLink}
-                        <a href="profile.html" class="profile-link"><i class="fas fa-user"></i> Profile</a>
-                        <button class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    `;
-                }).catch(err => console.error('Error checking admin status:', err));
+                html += `
+                    <div class="announcement-item ${isUnread ? 'unread' : ''}" data-announcement-id="${escapeAttr(item.id)}" onclick="handleAnnouncementClick('${escapeAttr(item.id)}')">
+                        <div class="announcement-icon ${meta.cls}">${meta.icon}</div>
+                        <div class="announcement-body">
+                            <div class="announcement-title">
+                                ${escapeHtml(item.title || 'Announcement')}
+                                ${priorityBadge}
+                            </div>
+                            <div class="announcement-message">${escapeHtml(item.message || '')}</div>
+                            <div class="announcement-time">${formatRelativeTime(createdDate)}</div>
+                        </div>
+                        ${isUnread ? '<span class="announcement-unread-dot"></span>' : ''}
+                    </div>
+                `;
+            });
+
+            list.innerHTML = html;
+
+            if (footer) {
+                footer.textContent = unreadCount > 0
+                    ? `${unreadCount} unread announcement${unreadCount !== 1 ? 's' : ''}`
+                    : 'You\'re all caught up ✨';
+            }
+        }
+
+        // ================================================================
+        // ===== READ STATE =====
+        // ================================================================
+        async function markAnnouncementRead(id) {
+            if (!announcementUser || announcementReadIds.has(id)) return;
+            announcementReadIds.add(id);
+            saveAnnouncementReadCache(announcementUser.uid, announcementReadIds);
+            renderAnnouncements();
+
+            try {
+                await db.collection('announcements').doc(id).update({
+                    readBy: firebase.firestore.FieldValue.arrayUnion(announcementUser.uid)
+                });
+            } catch (err) {
+                console.warn('Could not persist read state:', err);
+            }
+        }
+
+        async function markAllAnnouncementsRead() {
+            if (!announcementUser) return;
+
+            const unreadIds = announcementItems
+                .filter(a => !announcementReadIds.has(a.id))
+                .map(a => a.id);
+
+            if (unreadIds.length === 0) return;
+
+            unreadIds.forEach(id => announcementReadIds.add(id));
+            saveAnnouncementReadCache(announcementUser.uid, announcementReadIds);
+            renderAnnouncements();
+
+            try {
+                const batch = db.batch();
+                unreadIds.forEach(id => {
+                    batch.update(db.collection('announcements').doc(id), {
+                        readBy: firebase.firestore.FieldValue.arrayUnion(announcementUser.uid)
+                    });
+                });
+                await batch.commit();
+            } catch (err) {
+                console.warn('Could not persist read states:', err);
+            }
+        }
+
+        // ===== CLICK HANDLER =====
+        async function handleAnnouncementClick(id) {
+            const item = announcementItems.find(a => a.id === id);
+            if (!item) return;
+
+            markAnnouncementRead(id);
+
+            if (item.link) {
+                setTimeout(() => {
+                    window.location.href = item.link;
+                }, 200);
+            }
+        }
+
+        // ================================================================
+        // ===== LOAD ANNOUNCEMENTS =====
+        // ================================================================
+        function loadAnnouncements(user) {
+            if (!user) return;
+            if (announcementUnsubscribe) announcementUnsubscribe();
+
+            announcementUser = user;
+            announcementReadIds = loadAnnouncementReadCache(user.uid);
+
+            const popup = document.getElementById('announcementPopup');
+            if (popup) popup.style.display = 'block';
+
+            const cached = loadAnnouncementSnapshotCache(user.uid);
+            if (cached && cached.length > 0) {
+                announcementItems = cached;
+                renderAnnouncements();
+            }
+
+            announcementUnsubscribe = db.collection('announcements')
+                .orderBy('createdAt', 'desc')
+                .limit(ANNOUNCEMENT_LIMIT)
+                .onSnapshot((snapshot) => {
+                    const now = new Date();
+                    const items = [];
+                    const firestoreReadIds = new Set();
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+
+                        if (data.expiresAt) {
+                            const exp = data.expiresAt.seconds
+                                ? new Date(data.expiresAt.seconds * 1000)
+                                : new Date(data.expiresAt);
+                            if (exp < now) return;
+                        }
+
+                        if (data.targetUid && data.targetUid !== '' && data.targetUid !== user.uid) return;
+
+                        items.push({ id: doc.id, ...data });
+
+                        if (Array.isArray(data.readBy) && data.readBy.includes(user.uid)) {
+                            firestoreReadIds.add(doc.id);
+                        }
+                    });
+
+                    let changed = false;
+                    firestoreReadIds.forEach(id => {
+                        if (!announcementReadIds.has(id)) {
+                            announcementReadIds.add(id);
+                            changed = true;
+                        }
+                    });
+                    if (changed) saveAnnouncementReadCache(user.uid, announcementReadIds);
+
+                    announcementItems = items;
+                    saveAnnouncementSnapshotCache(user.uid, items);
+                    renderAnnouncements();
+                }, (error) => {
+                    console.warn('Announcements listener error:', error.message);
+                    if (!announcementItems.length) {
+                        announcementItems = [];
+                        renderAnnouncements();
+                    }
+                });
+        }
+
+        // ================================================================
+        // ===== AUTO-GENERATION =====
+        // ================================================================
+        function needsAnyAutogen(uid) {
+            return (
+                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'events') ||
+                !hasAutogenRunToday(uid, 'highlights')
+            );
+        }
+
+        async function autoGenerateBirthdayAnnouncement(user, userData) {
+            if (!userData || !userData.birthday) return;
+            if (hasAutogenRunToday(user.uid, 'birthday')) return;
+
+            const parts = userData.birthday.split('-');
+            if (parts.length !== 3) {
+                markAutogenRunToday(user.uid, 'birthday');
+                return;
+            }
+
+            const today = new Date();
+            const bMonth = parseInt(parts[1], 10) - 1;
+            const bDay = parseInt(parts[2], 10);
+
+            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
+                markAutogenRunToday(user.uid, 'birthday');
+                return;
+            }
+
+            const name = userData.displayName || user.displayName || user.email || 'Someone';
+
+            try {
+                await db.collection('announcements').add({
+                    type: 'birthday',
+                    title: `🎂 It's ${name}'s Birthday Today!`,
+                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
+                    icon: '🎂',
+                    priority: 'urgent',
+                    link: 'calendar.html',
+                    linkLabel: 'View Calendar',
+                    targetUid: user.uid,
+                    referenceId: user.uid,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                });
+            } catch (e) {
+                console.warn('birthday gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'birthday');
+        }
+
+        async function autoGenerateEventReminders(user) {
+            if (hasAutogenRunToday(user.uid, 'events')) return;
+
+            try {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(0, 0, 0, 0);
+                const dayAfter = new Date(tomorrow);
+                dayAfter.setDate(dayAfter.getDate() + 1);
+
+                const snap = await db.collection('events')
+                    .where('dateTime', '>=', tomorrow)
+                    .where('dateTime', '<', dayAfter)
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
+
+                const batch = db.batch();
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const eventRef = db.collection('announcements').doc();
+                    const title = data.title || 'Upcoming Event';
+                    const loc = data.location ? ` at ${data.location}` : '';
+                    batch.set(eventRef, {
+                        type: 'event',
+                        title: `⏰ Reminder: ${title} is tomorrow!`,
+                        message: `${title}${loc} — happening tomorrow. Don't miss it!`,
+                        icon: '📅',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Event',
+                        targetUid: '',
+                        referenceId: doc.id,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                });
+                await batch.commit();
+            } catch (e) {
+                console.warn('event gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'events');
+        }
+
+        async function autoGenerateHighlightAnnouncements(user) {
+            if (hasAutogenRunToday(user.uid, 'highlights')) return;
+
+            try {
+                const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+                const snap = await db.collection('highlights')
+                    .where('createdAt', '>=', yesterday)
+                    .orderBy('createdAt', 'desc')
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
+
+                const photoCount = snap.size;
+                const firstDoc = snap.docs[0].data();
+                const author = firstDoc.authorName || 'Someone';
+                const latestHighlightId = snap.docs[0].id;
+
+                const titleText = photoCount === 1
+                    ? `📸 ${author} shared a new highlight!`
+                    : `📸 ${photoCount} new highlights shared!`;
+
+                await db.collection('announcements').add({
+                    type: 'highlight',
+                    title: titleText,
+                    message: photoCount === 1
+                        ? `${author} just shared a new moment with the squad.`
+                        : `Fresh moments from the squad — check them out!`,
+                    icon: '📸',
+                    priority: 'info',
+                    link: 'index.html#highlights',
+                    linkLabel: 'View Highlights',
+                    targetUid: '',
+                    referenceId: latestHighlightId,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                });
+            } catch (e) {
+                console.warn('highlight gen:', e.message);
+            }
+            markAutogenRunToday(user.uid, 'highlights');
+        }
+
+        async function runAutoGeneration(user, userData) {
+            if (!needsAnyAutogen(user.uid)) return;
+
+            setTimeout(async () => {
+                try {
+                    await autoGenerateBirthdayAnnouncement(user, userData);
+                } catch (e) { console.warn('birthday gen:', e.message); }
+
+                try {
+                    await autoGenerateEventReminders(user);
+                } catch (e) { console.warn('event gen:', e.message); }
+
+                try {
+                    await autoGenerateHighlightAnnouncements(user);
+                } catch (e) { console.warn('highlight gen:', e.message); }
+            }, 1500);
+        }
+
+        async function autoGenerateMemberAnnouncement(newUser, newUserData) {
+            if (!newUser || !newUserData) return;
+            if (hasAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid)) return;
+
+            const name = newUserData.displayName || newUserData.email || 'A new member';
+            try {
+                await db.collection('announcements').add({
+                    type: 'member',
+                    title: `Welcome ${name}! 🎉`,
+                    message: `${name} just joined the TIMAWA squad. Say hi!`,
+                    icon: '👥',
+                    priority: 'info',
+                    link: 'index.html#members-section',
+                    linkLabel: 'View Members',
+                    targetUid: '',
+                    referenceId: newUser.uid,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                });
+                markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
+            } catch (e) {
+                console.warn('welcome gen:', e.message);
+            }
+        }
+
+        // ================================================================
+        // ===== NAV =====
+        // ================================================================
+        async function updateNavigation(user) {
+            const authLinks = document.getElementById('authLinks');
+            const heroCta = document.getElementById('heroCta');
+            const popup = document.getElementById('announcementPopup');
+
+            if (user) {
+                const data = await getCurrentUserProfileCached(user);
+                titaUserData = data;
+                titaCurrentUser = user;
+                isUserLoggedIn = true;
+
+                document.getElementById('titaLauncher').classList.add('visible');
+
+                const isAdmin = data?.isAdmin === true;
+                const adminLink = isAdmin
+                    ? `<a href="admin.html" class="profile-link"><i class="fas fa-cog"></i> Admin</a>`
+                    : '';
+
+                // ✅ Bell now sits AFTER Profile, BEFORE Logout
+                authLinks.innerHTML = `
+                    <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
+                    <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+                    ${adminLink}
+                    <a href="profile.html" class="profile-link"><i class="fas fa-user"></i> Profile</a>
+                    <div class="announcement-wrapper">
+                        <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                            <i class="fas fa-bell"></i>
+                            <span class="announcement-badge" id="announcementBadge">0</span>
+                        </button>
+                    </div>
+                    <button class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                `;
                 heroCta.textContent = ' Go to Dashboard';
                 heroCta.href = 'dashboard.html';
+
+                loadAnnouncements(user);
+                runAutoGeneration(user, data);
+
+                if (data?.createdAt) {
+                    try {
+                        const created = data.createdAt.seconds
+                            ? new Date(data.createdAt.seconds * 1000)
+                            : new Date(data.createdAt);
+                        const ageMin = (Date.now() - created.getTime()) / 60000;
+                        if (ageMin < 5) {
+                            autoGenerateMemberAnnouncement(user, data);
+                        }
+                    } catch (e) { /* ignore */ }
+                }
             } else {
                 titaCurrentUser = null;
                 titaUserData = null;
+                isUserLoggedIn = false;
 
-                // Hide Tita Tima and close her panel
+                // ✅ Guests: hide popup + clean up listener
+                if (popup) popup.style.display = 'none';
+                closeAnnouncementPopup();
+
+                if (announcementUnsubscribe) {
+                    announcementUnsubscribe();
+                    announcementUnsubscribe = null;
+                }
+                announcementUser = null;
+                announcementItems = [];
+
                 document.getElementById('titaLauncher').classList.remove('visible');
                 closeTitaPanel();
 
@@ -1108,12 +2841,17 @@
                 heroCta.textContent = ' Join the Squad';
                 heroCta.href = 'login.html';
             }
+
+            renderMembersSection();
         }
 
         auth.onAuthStateChanged(user => updateNavigation(user));
 
         async function logout() {
             try {
+                if (auth.currentUser) {
+                    try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                }
                 await auth.signOut();
                 window.location.reload();
             } catch (error) {
@@ -1209,6 +2947,7 @@
 
             db.collection(collection)
                 .orderBy('createdAt', 'desc')
+                .limit(CAROUSEL_LIMIT)
                 .onSnapshot((snapshot) => {
                     const items = [];
                     snapshot.forEach(doc => {
@@ -1344,28 +3083,25 @@
 
         // ===== MEMBER MODAL =====
         function openMemberModal(memberId) {
-            const member = carouselItemCache[`squadMembers:${memberId}`];
+            const member = carouselItemCache[`users:${memberId}`];
             if (!member) return;
             currentMember = member;
 
-            const imgEl = document.getElementById('memberModalImage');
-            const initialsEl = document.getElementById('memberModalInitials');
+            const avatarCircleEl = document.getElementById('memberModalAvatarCircle');
 
-            if (member.imageUrl) {
-                imgEl.src = member.imageUrl;
-                imgEl.style.display = 'block';
-                initialsEl.style.display = 'none';
+            const name = member.displayName || member.email || 'Anonymous';
+            const photoUrl = member.photoURL || '';
+
+            if (photoUrl) {
+                avatarCircleEl.innerHTML = `<img src="${cloudinaryAvatar(photoUrl, 600)}" alt="${escapeAttr(name)}" />`;
             } else {
-                imgEl.src = '';
-                imgEl.style.display = 'none';
-                const name = member.name || 'Anonymous';
-                const initials = member.initials || name.charAt(0).toUpperCase();
-                initialsEl.textContent = initials;
-                initialsEl.style.display = 'block';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                avatarCircleEl.innerHTML = `<span class="member-modal-initials">${escapeHtml(initials)}</span>`;
             }
 
-            document.getElementById('memberModalName').textContent = member.name || 'Anonymous';
+            document.getElementById('memberModalName').textContent = name;
             document.getElementById('memberModalLocation').querySelector('span').textContent = member.location || 'Not set';
+
             document.getElementById('memberModalBio').textContent = member.bio || 'No bio provided.';
 
             const interests = member.interests
@@ -1380,8 +3116,70 @@
                 interestsSection.style.display = 'none';
             }
 
+            const socialsEl = document.getElementById('memberModalSocials');
+            const socialsSection = document.getElementById('memberModalSocialsSection');
+            let socialsHtml = '';
+            if (member.instagram) socialsHtml += `<a href="https://instagram.com/${encodeURIComponent(member.instagram.replace('@',''))}" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>`;
+            if (member.twitter) socialsHtml += `<a href="https://twitter.com/${encodeURIComponent(member.twitter.replace('@',''))}" target="_blank" rel="noopener" title="Twitter / X"><i class="fab fa-twitter"></i></a>`;
+            if (member.tiktok) socialsHtml += `<a href="https://tiktok.com/@${encodeURIComponent(member.tiktok.replace('@',''))}" target="_blank" rel="noopener" title="TikTok"><i class="fab fa-tiktok"></i></a>`;
+            if (member.facebook) socialsHtml += `<a href="${escapeAttr(member.facebook)}" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook"></i></a>`;
+            if (socialsHtml) {
+                socialsSection.style.display = 'block';
+                socialsEl.innerHTML = socialsHtml;
+            } else {
+                socialsSection.style.display = 'none';
+            }
+
+            const metaGrid = document.getElementById('memberModalMetaGrid');
+            const lockedBanner = document.getElementById('memberModalLockedBanner');
+
+            if (isUserLoggedIn) {
+                metaGrid.style.display = 'grid';
+                lockedBanner.style.display = 'none';
+
+                const statusInfo = getStatusLabel(member.status || 'offline');
+                const loveLifeInfo = getLoveLifeLabel(member.loveLife);
+                const birthdayFormatted = formatBirthday(member.birthday);
+
+                let metaHtml = '';
+                metaHtml += `
+                    <div class="member-modal-meta-item full-width">
+                        <i class="fas fa-circle" style="color:${
+                            member.status === 'available' ? '#22c55e' :
+                            member.status === 'busy' ? '#ef4444' :
+                            member.status === 'away' ? '#f59e0b' :
+                            member.status === 'dnd' ? '#8b5cf6' : '#9ca3af'
+                        };"></i>
+                        <span class="meta-label">Status</span>
+                        <span class="meta-value">${statusInfo.label}</span>
+                    </div>
+                `;
+                if (birthdayFormatted) {
+                    metaHtml += `
+                        <div class="member-modal-meta-item">
+                            <i class="fas fa-birthday-cake"></i>
+                            <span class="meta-label">Bday</span>
+                            <span class="meta-value">${escapeHtml(birthdayFormatted)}</span>
+                        </div>
+                    `;
+                }
+                if (loveLifeInfo) {
+                    metaHtml += `
+                        <div class="member-modal-meta-item">
+                            <i class="fas ${loveLifeInfo.icon}"></i>
+                            <span class="meta-label">Love Life</span>
+                            <span class="meta-value">${loveLifeInfo.label}</span>
+                        </div>
+                    `;
+                }
+                metaGrid.innerHTML = metaHtml;
+            } else {
+                metaGrid.style.display = 'none';
+                lockedBanner.style.display = 'flex';
+            }
+
             const dlBtn = document.getElementById('memberModalDownloadBtn');
-            if (member.imageUrl) {
+            if (photoUrl) {
                 dlBtn.disabled = false;
                 dlBtn.innerHTML = '<i class="fas fa-download"></i> Download Profile Picture';
             } else {
@@ -1396,22 +3194,24 @@
         function closeMemberModal() {
             document.getElementById('memberModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
-            document.getElementById('memberModalImage').src = '';
+            const avatarCircleEl = document.getElementById('memberModalAvatarCircle');
+            if (avatarCircleEl) avatarCircleEl.innerHTML = '<span class="member-modal-initials" id="memberModalInitials"></span>';
             currentMember = null;
         }
 
         async function downloadCurrentMemberAvatar() {
-            if (!currentMember || !currentMember.imageUrl) {
+            if (!currentMember || !currentMember.photoURL) {
                 alert('No profile picture available.');
                 return;
             }
-            const safeName = sanitizeFilename(currentMember.name);
-            const ext = extFromUrl(currentMember.imageUrl);
+            const name = currentMember.displayName || currentMember.email || 'member';
+            const safeName = sanitizeFilename(name);
+            const ext = extFromUrl(currentMember.photoURL);
             const filename = `TIMAWA_${safeName}_avatar.${ext}`;
             try {
-                await downloadImage(currentMember.imageUrl, filename);
+                await downloadImage(currentMember.photoURL, filename);
             } catch (err) {
-                window.open(currentMember.imageUrl, '_blank', 'noopener');
+                window.open(currentMember.photoURL, '_blank', 'noopener');
             }
         }
 
@@ -1457,7 +3257,7 @@
 
             const avatarEl = document.getElementById('hlDetailAvatar');
             if (authorPhoto) {
-                avatarEl.innerHTML = `<img src="${cloudinaryThumb(authorPhoto, 120)}" alt="${escapeAttr(authorName)}" />`;
+                avatarEl.innerHTML = `<img src="${cloudinaryAvatar(authorPhoto, 160)}" alt="${escapeAttr(authorName)}" />`;
             } else {
                 avatarEl.textContent = initials;
             }
@@ -1632,15 +3432,18 @@
             const grid = document.getElementById('membersGrid');
             const countDisplay = document.getElementById('memberCountDisplay');
 
-            db.collection('squadMembers')
-                .orderBy('name', 'asc')
+            if (unsubscribeMembers) unsubscribeMembers();
+
+            unsubscribeMembers = db.collection('users')
+                .orderBy('displayName', 'asc')
+                .limit(MEMBERS_LIMIT)
                 .onSnapshot((snapshot) => {
                     if (snapshot.empty) {
                         grid.innerHTML = `
                             <div class="empty-state">
                                 <i class="fas fa-users"></i>
                                 <h3>No Members Yet</h3>
-                                <p>Admin can add members in the control panel.</p>
+                                <p>Be the first to join!</p>
                             </div>
                         `;
                         countDisplay.textContent = '0 members';
@@ -1648,60 +3451,172 @@
                     }
 
                     const count = snapshot.size;
-                    countDisplay.textContent = `${count} amazing members`;
+                    countDisplay.textContent = `${count} amazing member${count !== 1 ? 's' : ''}`;
 
-                    let html = '';
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        carouselItemCache[`squadMembers:${doc.id}`] = { id: doc.id, ...data };
-
-                        const name = data.name || 'Anonymous';
-                        const initials = data.initials || name.charAt(0).toUpperCase();
-                        const location = data.location || '📍 Not set';
-                        const bio = data.bio || 'New to the squad! 👋';
-                        const interests = data.interests
-                            ? data.interests.split(',').map(t => t.trim()).filter(t => t)
-                            : [];
-
-                        const avatarContent = data.imageUrl
-                            ? `<img src="${cloudinaryThumb(data.imageUrl, 400)}" alt="${escapeAttr(name)}" loading="lazy" decoding="async" />`
-                            : `<span class="avatar-text">${escapeHtml(initials)}</span>`;
-
-                        const hasImage = !!data.imageUrl;
-                        const memberIdSafe = escapeAttr(doc.id);
-
-                        html += `
-                            <div class="member-card" data-member-id="${memberIdSafe}">
-                                <div class="avatar-container">
-                                    ${avatarContent}
-                                    <div class="member-actions">
-                                        <button class="member-view" title="View profile" onclick="event.stopPropagation(); openMemberModal('${memberIdSafe}')"><i class="fas fa-expand"></i></button>
-                                        ${hasImage ? `<button class="member-download" title="Download profile picture" onclick="event.stopPropagation(); quickDownloadMemberAvatar('${memberIdSafe}')"><i class="fas fa-download"></i></button>` : ''}
-                                    </div>
-                                </div>
-                                <div class="member-body">
-                                    <div class="member-name">${escapeHtml(name)}</div>
-                                    <div class="member-location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(location)}</div>
-                                    <div class="member-bio">${escapeHtml(bio)}</div>
-                                    ${interests.length ? `<div class="member-interests">${interests.map(t => `<span class="interest-tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-                                </div>
-                            </div>
-                        `;
+                        userProfileCache[doc.id] = data;
+                        carouselItemCache[`users:${doc.id}`] = { id: doc.id, ...data };
                     });
 
-                    grid.innerHTML = html;
-
-                    grid.querySelectorAll('.member-card').forEach(card => {
-                        card.addEventListener('click', function() {
-                            openMemberModal(this.dataset.memberId);
-                        });
-                    });
+                    renderMembersSection();
+                }, (error) => {
+                    console.error('Error loading members:', error);
                 });
         }
 
+        // ===== RENDER MEMBERS SECTION =====
+        function renderMembersSection() {
+            const grid = document.getElementById('membersGrid');
+            const countDisplay = document.getElementById('memberCountDisplay');
+            const nudge = document.getElementById('membersLoginNudge');
+
+            if (!grid) return;
+
+            if (nudge) {
+                nudge.style.display = isUserLoggedIn ? 'none' : 'block';
+            }
+
+            const memberKeys = Object.keys(carouselItemCache).filter(k => k.startsWith('users:'));
+            if (memberKeys.length === 0) {
+                if (!grid.querySelector('.empty-state')) {
+                    grid.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>No Members Yet</h3>
+                            <p>Be the first to join!</p>
+                        </div>
+                    `;
+                }
+                if (countDisplay) countDisplay.textContent = '0 members';
+                return;
+            }
+
+            const members = memberKeys.map(k => carouselItemCache[k]).sort((a, b) => {
+                const an = (a.displayName || a.email || '').toLowerCase();
+                const bn = (b.displayName || b.email || '').toLowerCase();
+                return an.localeCompare(bn);
+            });
+
+            if (countDisplay) {
+                countDisplay.textContent = `${members.length} amazing member${members.length !== 1 ? 's' : ''}`;
+            }
+
+            let html = '';
+            members.forEach(member => {
+                const name = member.displayName || member.email || 'Anonymous';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const photoUrl = member.photoURL || '';
+                const bio = member.bio || 'New to the squad! 👋';
+                const occupation = member.occupation || '';
+                const interests = member.interests
+                    ? member.interests.split(',').map(t => t.trim()).filter(t => t)
+                    : [];
+                const instagram = member.instagram || '';
+                const twitter = member.twitter || '';
+                const tiktok = member.tiktok || '';
+                const facebook = member.facebook || '';
+
+                const location = member.location || '';
+                const birthdayFormatted = formatBirthday(member.birthday);
+                const status = member.status || 'offline';
+                const statusInfo = getStatusLabel(status);
+                const loveLifeInfo = getLoveLifeLabel(member.loveLife);
+
+                const avatarSrc = photoUrl ? cloudinaryAvatar(photoUrl, 400) : '';
+
+                const avatarContent = photoUrl
+                    ? `<img src="${avatarSrc}"
+                            alt="${escapeAttr(name)}"
+                            loading="lazy"
+                            decoding="async"
+                            onerror="this.parentElement.innerHTML='<span style=\\'font-size:56px;font-weight:800;letter-spacing:2px;\\'>${escapeHtml(initials)}</span>';"
+                       />`
+                    : escapeHtml(initials);
+
+                const hasImage = !!photoUrl;
+                const memberIdSafe = escapeAttr(member.id);
+
+                let metaChipsHtml = '';
+                if (occupation) {
+                    metaChipsHtml += `<span class="member-meta-chip"><i class="fas fa-briefcase"></i> ${escapeHtml(occupation)}</span>`;
+                }
+                if (isUserLoggedIn && birthdayFormatted) {
+                    metaChipsHtml += `<span class="member-meta-chip"><i class="fas fa-birthday-cake"></i> ${escapeHtml(birthdayFormatted)}</span>`;
+                }
+
+                let socialsHtml = '';
+                if (instagram) socialsHtml += `<a href="https://instagram.com/${encodeURIComponent(instagram.replace('@',''))}" target="_blank" rel="noopener" title="Instagram" onclick="event.stopPropagation()"><i class="fab fa-instagram"></i></a>`;
+                if (twitter) socialsHtml += `<a href="https://twitter.com/${encodeURIComponent(twitter.replace('@',''))}" target="_blank" rel="noopener" title="Twitter / X" onclick="event.stopPropagation()"><i class="fab fa-twitter"></i></a>`;
+                if (tiktok) socialsHtml += `<a href="https://tiktok.com/@${encodeURIComponent(tiktok.replace('@',''))}" target="_blank" rel="noopener" title="TikTok" onclick="event.stopPropagation()"><i class="fab fa-tiktok"></i></a>`;
+                if (facebook) socialsHtml += `<a href="${escapeAttr(facebook)}" target="_blank" rel="noopener" title="Facebook" onclick="event.stopPropagation()"><i class="fab fa-facebook"></i></a>`;
+
+                const locationRow = (isUserLoggedIn && location)
+                    ? `<div class="member-location"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(location)}</div>`
+                    : `<div class="member-location" style="visibility:hidden;height:0;overflow:hidden;">placeholder</div>`;
+
+                const loveLifeRow = (isUserLoggedIn && loveLifeInfo)
+                    ? `<div class="lovelife-badge ${loveLifeInfo.cls}"><i class="fas ${loveLifeInfo.icon}"></i> ${loveLifeInfo.label}</div>`
+                    : '';
+
+                const lockHint = !isUserLoggedIn
+                    ? `<div class="member-locked-hint"><i class="fas fa-lock"></i> Sign in to see more</div>`
+                    : '';
+
+                // ===== NOTE BUBBLE (IMPROVED) =====
+                const note = notesCache[member.id];
+                let noteBubbleHtml = '';
+                if (note && note.text) {
+                    const expireAt = note.expireAt
+                        ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                        : null;
+                    const isExpiringSoon = expireAt && (expireAt - new Date()) < 2 * 60 * 60 * 1000;
+                    noteBubbleHtml = `
+                        <div class="member-note-bubble" onclick="event.stopPropagation(); openNoteModal('${escapeAttr(member.id)}')" title="Tap to read full note">
+                            <i class="fas fa-comment-dots"></i>
+                            <span class="note-text-preview">${escapeHtml(note.text)}</span>
+                            ${isExpiringSoon ? '<i class="fas fa-hourglass-half" style="color:#ef4444;font-size:11px;"></i>' : ''}
+                        </div>
+                    `;
+                }
+
+                html += `
+                    <div class="member-card" data-member-id="${memberIdSafe}">
+                        <div class="avatar-container">
+                            ${noteBubbleHtml}
+                            ${isUserLoggedIn ? `<span class="avatar-status ${status}" title="${statusInfo.label}"></span>` : ''}
+                            <div class="avatar-circle">${avatarContent}</div>
+                            <div class="member-actions">
+                                <button class="member-view" title="View profile" onclick="event.stopPropagation(); openMemberModal('${memberIdSafe}')"><i class="fas fa-expand"></i></button>
+                                ${hasImage ? `<button class="member-download" title="Download profile picture" onclick="event.stopPropagation(); quickDownloadMemberAvatar('${memberIdSafe}')"><i class="fas fa-download"></i></button>` : ''}
+                            </div>
+                        </div>
+                        <div class="member-body">
+                            <div class="member-name">${escapeHtml(name)}</div>
+                            ${locationRow}
+                            ${metaChipsHtml ? `<div class="member-meta-chips">${metaChipsHtml}</div>` : ''}
+                            ${loveLifeRow}
+                            <div class="member-bio">${escapeHtml(bio)}</div>
+                            ${interests.length ? `<div class="member-interests">${interests.map(t => `<span class="interest-tag">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                            ${socialsHtml ? `<div class="member-socials">${socialsHtml}</div>` : ''}
+                            ${lockHint}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+
+            grid.querySelectorAll('.member-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    openMemberModal(this.dataset.memberId);
+                });
+            });
+        }
+
         async function quickDownloadMemberAvatar(memberId) {
-            const member = carouselItemCache[`squadMembers:${memberId}`];
-            if (!member || !member.imageUrl) return;
+            const member = carouselItemCache[`users:${memberId}`];
+            if (!member || !member.photoURL) return;
             const prev = currentMember;
             currentMember = member;
             await downloadCurrentMemberAvatar();
@@ -1809,6 +3724,7 @@
 
                 unsubscribeHighlights = db.collection('highlights')
                     .orderBy('createdAt', 'desc')
+                    .limit(HIGHLIGHTS_LIMIT)
                     .onSnapshot(async (snapshot) => {
                         const now = new Date();
                         const validHighlights = [];
@@ -1919,7 +3835,7 @@
                         const hasImages = imageUrls.length > 0;
 
                         const avatarContent = authorPhoto
-                            ? `<img src="${cloudinaryThumb(authorPhoto, 60)}" alt="${escapeAttr(authorName)}" loading="lazy" decoding="async" />`
+                            ? `<img src="${cloudinaryAvatar(authorPhoto, 80)}" alt="${escapeAttr(authorName)}" loading="lazy" decoding="async" />`
                             : initials;
 
                         const safeId = escapeAttr(item.id);
@@ -1964,7 +3880,6 @@
 
                 track.innerHTML = html;
 
-                // Click on the highlight card opens the detail popup
                 track.querySelectorAll('.highlights-carousel-item').forEach(card => {
                     card.addEventListener('click', function(e) {
                         if (e.target.closest('.hl-actions')) return;
@@ -2042,7 +3957,7 @@
 
         // ===== MODAL STATE HELPER =====
         function anyModalOpen() {
-            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal'].some(id =>
+            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal', 'noteModal'].some(id =>
                 document.getElementById(id).classList.contains('active')
             );
         }
@@ -2122,10 +4037,44 @@
                 customEl.style.display = 'block';
             }
 
+            // ===== Load existing note =====
+            const note = notesCache[titaCurrentUser.uid];
+            const noteInput = document.getElementById('titaNote');
+            const noteCount = document.getElementById('titaNoteCount');
+            const noteStatus = document.getElementById('titaNoteStatus');
+
+            if (note && note.text) {
+                noteInput.value = note.text;
+                noteCount.textContent = note.text.length;
+
+                const expireAt = note.expireAt
+                    ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
+                    : null;
+                if (expireAt) {
+                    const hoursLeft = Math.max(0, Math.ceil((expireAt - new Date()) / (1000 * 60 * 60)));
+                    noteStatus.style.display = 'block';
+                    noteStatus.querySelector('span').textContent = `Current note expires in ${hoursLeft}h`;
+                }
+            } else {
+                noteInput.value = '';
+                noteCount.textContent = '0';
+                noteStatus.style.display = 'none';
+            }
+
             const msg = document.getElementById('titaStatusMsg');
             msg.classList.remove('show');
             msg.textContent = '';
         }
+
+        // Live character counter for note field
+        document.addEventListener('DOMContentLoaded', function() {
+            const noteInput = document.getElementById('titaNote');
+            if (noteInput) {
+                noteInput.addEventListener('input', function() {
+                    document.getElementById('titaNoteCount').textContent = this.value.length;
+                });
+            }
+        });
 
         function titaToggleCustomLocation() {
             const select = document.getElementById('titaLocationSelect');
@@ -2190,7 +4139,36 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
+                // ===== Save or delete note =====
+                const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
+                const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
+
+                if (noteText) {
+                    const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                    await noteRef.set({
+                        uid: titaCurrentUser.uid,
+                        displayName: displayName,
+                        photoURL: titaUserData.photoURL || '',
+                        text: noteText,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } else {
+                    try { await noteRef.delete(); } catch (e) { /* ignore */ }
+                }
+
                 titaUserData = { ...titaUserData, ...updateData };
+                userProfileCache[titaCurrentUser.uid] = titaUserData;
+                carouselItemCache[`users:${titaCurrentUser.uid}`] = { id: titaCurrentUser.uid, ...titaUserData };
+
+                try {
+                    sessionStorage.setItem('timawa_me_' + titaCurrentUser.uid, JSON.stringify({
+                        uid: titaCurrentUser.uid,
+                        t: Date.now(),
+                        data: titaUserData
+                    }));
+                } catch (e) { /* ignore */ }
 
                 if (displayName !== titaCurrentUser.displayName) {
                     try {
@@ -2199,6 +4177,8 @@
                         console.warn('Could not update auth display name:', authErr);
                     }
                 }
+
+                renderMembersSection();
 
                 titaShowStatus('✅ Saved! Anong susunod, \'nak?', 'success');
 
@@ -2240,6 +4220,7 @@
             loadCarouselData('favoritePlaces', 'placesTrack', 'placesDots', 'places');
             loadCarouselData('thingsToDo', 'activitiesTrack', 'activitiesDots', 'activities');
             loadMembersFromFirestore();
+            loadNotes();
 
             setTimeout(() => { initHighlightsCarousel(); }, 500);
 
@@ -2280,21 +4261,34 @@
                 : '0 2px 20px rgba(0,0,0,0.04)';
         });
 
+        // Close popups on outside click
         window.addEventListener('click', function(event) {
             const itemModal = document.getElementById('itemModal');
             const memberModal = document.getElementById('memberModal');
             const galleryModal = document.getElementById('galleryModal');
             const highlightDetailModal = document.getElementById('highlightDetailModal');
             const titaPanel = document.getElementById('titaPanel');
+            const announcementPopup = document.getElementById('announcementPopup');
+            const noteModal = document.getElementById('noteModal');
 
             if (event.target === itemModal) closeItemModal();
             if (event.target === memberModal) closeMemberModal();
             if (event.target === galleryModal) closeGallery();
             if (event.target === highlightDetailModal) closeHighlightDetail();
+            if (event.target === noteModal) closeNoteModal();
+
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
                 !event.target.closest('#titaLauncher')) {
                 closeTitaPanel();
+            }
+
+            if (announcementPopup && announcementPopup.classList.contains('open')) {
+                if (!announcementPopup.contains(event.target) &&
+                    !event.target.closest('#announcementBell') &&
+                    !event.target.closest('.announcement-wrapper')) {
+                    closeAnnouncementPopup();
+                }
             }
         });
 
@@ -2304,7 +4298,17 @@
             else if (document.getElementById('highlightDetailModal').classList.contains('active')) closeHighlightDetail();
             else if (document.getElementById('memberModal').classList.contains('active')) closeMemberModal();
             else if (document.getElementById('itemModal').classList.contains('active')) closeItemModal();
+            else if (document.getElementById('noteModal').classList.contains('active')) closeNoteModal();
             else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
+            else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
+        });
+
+        // Reposition popup on resize
+        window.addEventListener('resize', function() {
+            const popup = document.getElementById('announcementPopup');
+            if (popup && popup.classList.contains('open')) {
+                positionAnnouncementPopup();
+            }
         });
     </script>
 
