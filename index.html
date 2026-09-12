@@ -4,19 +4,19 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TIMAWA - Friend Hub</title>
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
+
     <!-- JSZip for ZIP downloads -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -28,7 +28,7 @@
         }
 
         /* ================================================================
-           ===== NAVBAR (mobile-friendly) =====
+           ===== NAVBAR =====
            ================================================================ */
         .navbar {
             position: fixed; top: 0; left: 0; right: 0;
@@ -47,7 +47,11 @@
         .navbar .nav-links > li { display: flex; align-items: center; }
         .navbar .nav-links a { text-decoration: none; color: #555; font-weight: 500; font-size: 13px; transition: all 0.3s ease; padding: 6px 12px; border-radius: 8px; white-space: nowrap; }
         .navbar .nav-links a:hover { color: rgb(16, 137, 211); background: rgba(16, 137, 211, 0.06); }
-        .navbar .mobile-toggle { display: none; font-size: 24px; color: rgb(16, 137, 211); cursor: pointer; background: none; border: none; }
+
+        .navbar-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .navbar-mobile-bell { display: none; position: relative; }
+        .navbar-mobile-bell .announcement-bell { width: 42px; height: 42px; font-size: 17px; }
+        .navbar .mobile-toggle { display: none; font-size: 24px; color: rgb(16, 137, 211); cursor: pointer; background: none; border: none; padding: 4px 8px; }
 
         .auth-links-wrapper { display: flex; align-items: center; gap: 12px; list-style: none; flex-wrap: wrap; }
         .auth-links-wrapper > a, .auth-links-wrapper > button { text-decoration: none; color: #555; font-weight: 500; font-size: 13px; transition: all 0.3s ease; padding: 6px 12px; border-radius: 8px; white-space: nowrap; background: none; border: none; font-family: inherit; cursor: pointer; }
@@ -62,276 +66,223 @@
            ===== ANNOUNCEMENT BELL =====
            ================================================================ */
         .announcement-bell {
-            position: relative;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: #f0f7ff;
-            color: rgb(16, 137, 211);
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s ease;
-            font-family: inherit;
-            flex-shrink: 0;
+            position: relative; width: 40px; height: 40px; border-radius: 50%;
+            border: none; background: #f0f7ff; color: rgb(16, 137, 211);
+            font-size: 16px; cursor: pointer; display: flex;
+            align-items: center; justify-content: center;
+            transition: all 0.25s ease; font-family: inherit; flex-shrink: 0;
         }
-
-        .announcement-bell:hover {
-            background: #e0f2fe;
-            transform: scale(1.05);
-        }
-
+        .announcement-bell:hover { background: #e0f2fe; transform: scale(1.05); }
         .announcement-bell.active {
             background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+            color: white; box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
         }
-
-        .announcement-bell.has-new {
-            animation: bellPulse 2s ease-in-out infinite;
-        }
-
+        .announcement-bell.has-new { animation: bellPulse 2s ease-in-out infinite; }
         @keyframes bellPulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
             50% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
         }
-
         .announcement-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            min-width: 20px;
-            height: 20px;
-            padding: 0 6px;
-            border-radius: 50px;
+            position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px;
+            padding: 0 6px; border-radius: 50px;
             background: linear-gradient(45deg, #ef4444, #dc2626);
-            color: white;
-            font-size: 10px;
-            font-weight: 800;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            color: white; font-size: 10px; font-weight: 800; display: none;
+            align-items: center; justify-content: center;
+            border: 2px solid white; box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
         }
-
         .announcement-badge.show { display: flex; }
 
-        /* ================================================================
-           ===== ANNOUNCEMENT POPUP =====
-           ================================================================ */
         .announcement-popup {
-            position: fixed;
-            width: 380px;
-            max-width: calc(100vw - 40px);
-            background: white;
-            border-radius: 20px;
+            position: fixed; width: 380px; max-width: calc(100vw - 40px);
+            background: white; border-radius: 20px;
             box-shadow: 0 20px 60px rgba(16, 137, 211, 0.22), 0 0 0 1px rgba(16, 137, 211, 0.06);
-            overflow: hidden;
-            z-index: 2000;
-            opacity: 0;
-            transform: translateY(-8px) scale(0.97);
+            overflow: hidden; z-index: 2000;
+            opacity: 0; transform: translateY(-8px) scale(0.97);
             pointer-events: none;
             transition: all 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform-origin: top right;
         }
-
-        .announcement-popup.open {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-
+        .announcement-popup.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .announcement-popup::before {
-            content: '';
-            position: absolute;
-            top: -6px;
-            right: 22px;
-            width: 12px;
-            height: 12px;
-            background: white;
-            transform: rotate(45deg);
+            content: ''; position: absolute; top: -6px; right: 22px; width: 12px; height: 12px;
+            background: white; transform: rotate(45deg);
             box-shadow: -1px -1px 2px rgba(16, 137, 211, 0.06);
         }
-
         .announcement-popup-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             padding: 16px 18px;
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
             border-bottom: 1px solid #eef2f7;
         }
-
         .announcement-popup-header h4 {
-            font-size: 15px;
-            font-weight: 800;
-            color: #1a1a2e;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 0;
+            font-size: 15px; font-weight: 800; color: #1a1a2e;
+            display: flex; align-items: center; gap: 8px; margin: 0;
         }
-
-        .announcement-popup-header h4 i {
-            color: rgb(16, 137, 211);
-        }
-
+        .announcement-popup-header h4 i { color: rgb(16, 137, 211); }
         .announcement-mark-all {
-            background: none;
-            border: none;
-            color: rgb(16, 137, 211);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 50px;
-            transition: all 0.2s ease;
-            font-family: inherit;
+            background: none; border: none; color: rgb(16, 137, 211);
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            padding: 4px 10px; border-radius: 50px;
+            transition: all 0.2s ease; font-family: inherit;
         }
-
-        .announcement-mark-all:hover {
-            background: rgba(16, 137, 211, 0.1);
-        }
-
-        .announcement-list {
-            max-height: 420px;
-            overflow-y: auto;
-            padding: 6px;
-        }
-
+        .announcement-mark-all:hover { background: rgba(16, 137, 211, 0.1); }
+        .announcement-list { max-height: 420px; overflow-y: auto; padding: 6px; }
         .announcement-item {
-            display: flex;
-            gap: 12px;
-            padding: 12px 14px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            margin-bottom: 4px;
-            background: white;
+            display: flex; gap: 12px; padding: 12px 14px;
+            border-radius: 14px; cursor: pointer;
+            transition: all 0.2s ease; position: relative;
+            margin-bottom: 4px; background: white;
         }
-
-        .announcement-item:hover {
-            background: #f0f7ff;
-            transform: translateX(2px);
-        }
-
-        .announcement-item.unread {
-            background: #f0f9ff;
-        }
-
-        .announcement-item.unread:hover {
-            background: #e0f2fe;
-        }
-
-        .announcement-item.unread .announcement-title {
-            font-weight: 700;
-        }
-
+        .announcement-item:hover { background: #f0f7ff; transform: translateX(2px); }
+        .announcement-item.unread { background: #f0f9ff; }
+        .announcement-item.unread:hover { background: #e0f2fe; }
+        .announcement-item.unread .announcement-title { font-weight: 700; }
         .announcement-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-            background: #e0f2fe;
+            width: 42px; height: 42px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; flex-shrink: 0; background: #e0f2fe;
         }
-
         .announcement-icon.type-admin { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
         .announcement-icon.type-birthday { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); }
         .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
         .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
-
-        .announcement-body {
-            flex: 1;
-            min-width: 0;
-        }
-
+        .announcement-body { flex: 1; min-width: 0; }
         .announcement-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #1a1a2e;
-            line-height: 1.35;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
+            font-size: 13px; font-weight: 600; color: #1a1a2e;
+            line-height: 1.35; margin-bottom: 2px;
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
         }
-
         .announcement-priority-badge {
-            font-size: 9px;
-            font-weight: 800;
-            padding: 1px 7px;
-            border-radius: 50px;
-            letter-spacing: 0.4px;
-            text-transform: uppercase;
+            font-size: 9px; font-weight: 800; padding: 1px 7px;
+            border-radius: 50px; letter-spacing: 0.4px; text-transform: uppercase;
         }
-
         .announcement-priority-badge.urgent { background: #fee2e2; color: #dc2626; }
         .announcement-priority-badge.info { background: #dbeafe; color: #2563eb; }
-
         .announcement-message {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.45;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 12px; color: #666; line-height: 1.45;
+            display: -webkit-box; -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical; overflow: hidden;
         }
-
-        .announcement-time {
-            font-size: 11px;
-            color: #aaa;
-            margin-top: 3px;
-        }
-
+        .announcement-time { font-size: 11px; color: #aaa; margin-top: 3px; }
         .announcement-unread-dot {
-            position: absolute;
-            top: 14px;
-            right: 14px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
+            position: absolute; top: 14px; right: 14px;
+            width: 8px; height: 8px; border-radius: 50%;
             background: rgb(16, 137, 211);
             box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.15);
         }
-
         .announcement-popup-footer {
-            padding: 10px 18px;
-            background: #f8faff;
-            border-top: 1px solid #eef2f7;
-            text-align: center;
-            font-size: 11px;
-            color: #888;
-            font-weight: 600;
+            padding: 10px 18px; background: #f8faff;
+            border-top: 1px solid #eef2f7; text-align: center;
+            font-size: 11px; color: #888; font-weight: 600;
         }
+        .announcement-empty { text-align: center; padding: 40px 20px; color: #999; }
+        .announcement-empty i { font-size: 36px; color: #cff0ff; display: block; margin-bottom: 10px; }
+        .announcement-empty p { font-size: 13px; }
 
-        .announcement-empty {
-            text-align: center;
-            padding: 40px 20px;
-            color: #999;
+        .announcement-view-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px);
+            z-index: 2100; justify-content: center; align-items: center; padding: 20px;
         }
-
-        .announcement-empty i {
-            font-size: 36px;
-            color: #cff0ff;
-            display: block;
-            margin-bottom: 10px;
+        .announcement-view-modal.active { display: flex; }
+        .announcement-view-modal .modal-content {
+            background: white; border-radius: 24px; padding: 0;
+            max-width: 540px; width: 100%; max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(16, 137, 211, 0.35);
+            animation: annModalPop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
-        .announcement-empty p {
-            font-size: 13px;
+        @keyframes annModalPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
+        .announcement-view-header {
+            position: relative; padding: 30px 30px 22px;
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            border-radius: 24px 24px 0 0; text-align: center; overflow: hidden;
+        }
+        .announcement-view-header::before,
+        .announcement-view-header::after {
+            content: ''; position: absolute; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15); pointer-events: none;
+        }
+        .announcement-view-header::before { top: -50px; right: -50px; width: 160px; height: 160px; }
+        .announcement-view-header::after { bottom: -70px; left: -70px; width: 180px; height: 180px; background: rgba(255, 255, 255, 0.1); }
+        .announcement-view-close {
+            position: absolute; top: 14px; right: 14px;
+            width: 38px; height: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.22); border: none; color: white;
+            font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.25s ease; z-index: 2;
+        }
+        .announcement-view-close:hover { background: rgba(255,255,255,0.4); transform: rotate(90deg); }
+        .announcement-view-icon {
+            width: 80px; height: 80px; border-radius: 22px;
+            background: white; display: flex; align-items: center;
+            justify-content: center; font-size: 38px;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            position: relative; z-index: 1;
+        }
+        .announcement-view-type {
+            display: inline-block; background: rgba(255, 255, 255, 0.25);
+            color: white; font-size: 11px; font-weight: 700;
+            padding: 4px 14px; border-radius: 50px;
+            letter-spacing: 0.6px; text-transform: uppercase;
+            position: relative; z-index: 1;
+        }
+        .announcement-view-body { padding: 26px 30px 30px; }
+        .announcement-view-priority {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 50px;
+            font-size: 11px; font-weight: 800;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+        .announcement-view-priority.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-view-priority.info { background: #dbeafe; color: #2563eb; }
+        .announcement-view-title {
+            font-size: 22px; font-weight: 800; color: #1a1a2e;
+            line-height: 1.3; margin-bottom: 14px;
+        }
+        .announcement-view-message {
+            font-size: 15px; color: #444; line-height: 1.7;
+            padding: 18px 20px; background: #f8faff;
+            border-radius: 16px;
+            border-left: 4px solid rgb(16, 137, 211);
+            margin-bottom: 18px; white-space: pre-wrap; word-break: break-word;
+        }
+        .announcement-view-meta {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            font-size: 12px; color: #888;
+            padding-top: 16px; border-top: 1px solid #f0f4ff;
+            margin-bottom: 20px;
+        }
+        .announcement-view-meta span { display: inline-flex; align-items: center; gap: 6px; }
+        .announcement-view-meta i { color: rgb(16, 137, 211); font-size: 11px; }
+        .announcement-view-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .announcement-view-actions button,
+        .announcement-view-actions a {
+            flex: 1; min-width: 140px; padding: 13px 22px;
+            border-radius: 14px; border: none;
+            font-weight: 700; font-size: 14px;
+            cursor: pointer; transition: all 0.25s ease;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 8px; font-family: inherit; text-decoration: none;
+        }
+        .announcement-view-actions .ann-view-primary {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+        }
+        .announcement-view-actions .ann-view-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.45);
+        }
+        .announcement-view-actions .ann-view-secondary { background: #f3f4f6; color: #666; }
+        .announcement-view-actions .ann-view-secondary:hover { background: #e5e7eb; }
 
         /* ===== HERO ===== */
         .hero { padding: 100px 40px 60px; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; min-height: 80vh; }
@@ -343,26 +294,25 @@
         .hero-image .image-placeholder { width: 100%; max-width: 500px; aspect-ratio: 1; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); border-radius: 30px; display: flex; align-items: center; justify-content: center; font-size: 120px; color: rgb(16, 137, 211); box-shadow: 0 20px 60px rgba(16, 137, 211, 0.15); }
         .hero-image .image-placeholder img { width: 100%; height: 100%; object-fit: cover; border-radius: 30px; }
 
-        /* ===== HIGHLIGHTS CAROUSEL ===== */
+        /* ===== CAROUSELS ===== */
         .highlights-carousel-section { padding: 60px 40px; max-width: 1200px; margin: 0 auto; }
         .highlights-carousel-section .section-header { text-align: center; margin-bottom: 30px; }
         .highlights-carousel-section .section-header h2 { font-size: 32px; font-weight: 800; }
         .highlights-carousel-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .highlights-carousel-section .section-header p { color: #888; font-size: 16px; }
 
-        .highlights-carousel-wrapper { position: relative; overflow: hidden; border-radius: 20px; max-width: 1100px; margin: 0 auto; padding: 0 50px; }
-        .highlights-carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); gap: 0; will-change: transform; }
-        .highlights-carousel-slide { min-width: 100%; display: grid; gap: 25px; padding: 10px 5px; grid-template-columns: repeat(3, 1fr); }
-        .highlights-carousel-slide.single-item { grid-template-columns: 1fr; }
-        .highlights-carousel-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
-        .highlights-carousel-wrapper::before { content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to left, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
+        .highlights-carousel-wrapper, .carousel-wrapper { position: relative; overflow: hidden; border-radius: 20px; max-width: 1100px; margin: 0 auto; padding: 0 50px; }
+        .highlights-carousel-track, .carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); gap: 0; will-change: transform; }
+        .highlights-carousel-slide, .carousel-slide { min-width: 100%; display: grid; gap: 25px; padding: 10px 5px; grid-template-columns: repeat(3, 1fr); }
+        .highlights-carousel-slide.single-item, .carousel-slide.single-item { grid-template-columns: 1fr; }
+        .highlights-carousel-wrapper::after, .carousel-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
+        .highlights-carousel-wrapper::before, .carousel-wrapper::before { content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to left, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
 
-        .highlights-carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; cursor: pointer; position: relative; }
-        .highlights-carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
+        .highlights-carousel-item, .carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; position: relative; cursor: pointer; }
+        .highlights-carousel-item:hover, .carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
         .highlights-carousel-item .image-container { width: 100%; height: 220px; overflow: hidden; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); position: relative; flex-shrink: 0; }
         .highlights-carousel-item .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .highlights-carousel-item .image-container .expiry-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
-        .highlights-carousel-item .image-container .expiry-badge i { margin-right: 4px; }
         .highlights-carousel-item .image-container .image-count { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
         .highlights-carousel-item .image-container .hl-actions { position: absolute; bottom: 10px; left: 10px; right: 10px; display: flex; gap: 6px; z-index: 3; opacity: 0; transition: opacity 0.25s ease; }
         .highlights-carousel-item:hover .image-container .hl-actions { opacity: 1; }
@@ -371,7 +321,6 @@
         .highlights-carousel-item .image-container .hl-actions .hl-view { background: rgba(16, 137, 211, 0.95); }
         .highlights-carousel-item .image-container .hl-actions .hl-download { background: rgba(0,0,0,0.75); }
         .highlights-carousel-item .image-container .hl-actions .hl-download:hover { background: rgb(16, 137, 211); }
-
         .highlights-carousel-item .item-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
         .highlights-carousel-item .item-body .caption { font-size: 14px; color: #333; line-height: 1.5; margin-bottom: 8px; }
         .highlights-carousel-item .item-body .meta { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #888; margin-top: auto; }
@@ -380,33 +329,23 @@
         .highlights-carousel-item .item-body .meta .author .avatar-small img { width: 100%; height: 100%; object-fit: cover; }
         .highlights-carousel-item .item-body .meta .expiry-time.urgent { color: #ef4444; font-weight: 600; }
 
-        .highlights-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); border: 2px solid rgb(16, 137, 211); color: rgb(16, 137, 211); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-        .highlights-carousel-btn:hover { background: rgb(16, 137, 211); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35); }
-        .highlights-carousel-btn:active { transform: translateY(-50%) scale(0.95); }
-        .highlights-carousel-btn.prev { left: 5px; }
-        .highlights-carousel-btn.next { right: 5px; }
+        .highlights-carousel-btn, .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); border: 2px solid rgb(16, 137, 211); color: rgb(16, 137, 211); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+        .highlights-carousel-btn:hover, .carousel-btn:hover { background: rgb(16, 137, 211); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35); }
+        .highlights-carousel-btn:active, .carousel-btn:active { transform: translateY(-50%) scale(0.95); }
+        .highlights-carousel-btn.prev, .carousel-btn.prev { left: 5px; }
+        .highlights-carousel-btn.next, .carousel-btn.next { right: 5px; }
 
         .highlights-carousel-dots, .carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
         .highlights-carousel-dots .dot, .carousel-dots .dot { width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; cursor: pointer; transition: all 0.3s ease; border: none; }
         .highlights-carousel-dots .dot.active, .carousel-dots .dot.active { background: rgb(16, 137, 211); width: 30px; border-radius: 10px; }
         .highlights-carousel-dots .dot:hover, .carousel-dots .dot:hover { background: rgb(16, 137, 211); }
 
-        /* ===== OTHER CAROUSELS ===== */
         .carousel-section { padding: 60px 40px; max-width: 1200px; margin: 0 auto; }
         .carousel-section .section-header { text-align: center; margin-bottom: 30px; }
         .carousel-section .section-header h2 { font-size: 32px; font-weight: 800; }
         .carousel-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .carousel-section .section-header p { color: #888; font-size: 16px; }
 
-        .carousel-wrapper { position: relative; overflow: hidden; border-radius: 20px; max-width: 1100px; margin: 0 auto; padding: 0 50px; }
-        .carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94); gap: 0; will-change: transform; }
-        .carousel-slide { min-width: 100%; display: grid; gap: 25px; padding: 10px 5px; grid-template-columns: repeat(3, 1fr); }
-        .carousel-slide.single-item { grid-template-columns: 1fr; }
-        .carousel-wrapper::after { content: ''; position: absolute; top: 0; right: 0; width: 60px; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
-        .carousel-wrapper::before { content: ''; position: absolute; top: 0; left: 0; width: 60px; height: 100%; background: linear-gradient(to left, transparent, rgba(255,255,255,0.6)); pointer-events: none; z-index: 5; }
-
-        .carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; position: relative; cursor: pointer; }
-        .carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
         .carousel-item .image-placeholder { width: 100%; height: 200px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; color: rgb(16, 137, 211); flex-shrink: 0; overflow: hidden; position: relative; }
         .carousel-item .image-placeholder img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .carousel-item .item-actions { position: absolute; top: 10px; right: 10px; display: flex; gap: 6px; opacity: 0; transition: opacity 0.25s ease; z-index: 3; }
@@ -423,16 +362,10 @@
         .carousel-item .item-body .description { font-size: 13px; color: #666; margin-top: 6px; flex: 1; }
         .carousel-item .item-body .tag { display: inline-block; background: #e0f2fe; color: rgb(16, 137, 211); padding: 2px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; margin-top: 10px; align-self: flex-start; }
 
-        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255, 255, 255, 0.95); border: 2px solid rgb(16, 137, 211); color: rgb(16, 137, 211); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
-        .carousel-btn:hover { background: rgb(16, 137, 211); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px rgba(16, 137, 211, 0.35); }
-        .carousel-btn:active { transform: translateY(-50%) scale(0.95); }
-        .carousel-btn.prev { left: 5px; }
-        .carousel-btn.next { right: 5px; }
-
         .carousel-divider { border: none; height: 2px; background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent); margin: 20px auto; max-width: 1200px; }
 
         /* ================================================================
-           ===== MEMBERS SECTION =====
+           ===== MEMBERS =====
            ================================================================ */
         .members-section { padding: 60px 40px 80px; max-width: 1200px; margin: 0 auto; }
         .members-section .section-header { text-align: center; margin-bottom: 40px; }
@@ -440,16 +373,10 @@
         .members-section .section-header h2 .highlight { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .members-section .section-header p { color: #888; font-size: 16px; }
         .members-section .login-nudge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 12px;
-            background: #fef3c7;
-            color: #d97706;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 12px; background: #fef3c7; color: #d97706;
+            padding: 6px 16px; border-radius: 50px;
+            font-size: 13px; font-weight: 600;
             border: 1px solid #fde68a;
         }
         .members-section .login-nudge i { font-size: 12px; }
@@ -457,111 +384,50 @@
         .members-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
 
         .member-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
+            background: white; border-radius: 20px; overflow: hidden;
             box-shadow: 0 2px 15px rgba(0,0,0,0.06);
             border: 1px solid #eef2f7;
             transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            contain: content;
-            cursor: pointer;
-            position: relative;
+            display: flex; flex-direction: column; contain: content;
+            cursor: pointer; position: relative;
         }
-        .member-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.12);
-            border-color: rgba(16, 137, 211, 0.28);
-        }
+        .member-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.12); border-color: rgba(16, 137, 211, 0.28); }
 
         .member-card .avatar-container {
-            width: 100%;
-            height: 240px;
+            width: 100%; height: 240px;
             background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            overflow: visible;
-            position: relative;
-            padding-top: 32px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; overflow: visible;
+            position: relative; padding-top: 32px;
         }
-
-        .member-card .avatar-container::before {
-            content: '';
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.35);
-            pointer-events: none;
-        }
-        .member-card .avatar-container::after {
-            content: '';
-            position: absolute;
-            bottom: -60px;
-            left: -60px;
-            width: 170px;
-            height: 170px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.25);
-            pointer-events: none;
-        }
+        .member-card .avatar-container::before { content: ''; position: absolute; top: -40px; right: -40px; width: 150px; height: 150px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); pointer-events: none; }
+        .member-card .avatar-container::after { content: ''; position: absolute; bottom: -60px; left: -60px; width: 170px; height: 170px; border-radius: 50%; background: rgba(255, 255, 255, 0.25); pointer-events: none; }
 
         .member-card .avatar-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
+            width: 150px; height: 150px; border-radius: 50%;
             background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 56px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 56px; font-weight: 800;
+            letter-spacing: 2px; overflow: hidden;
             border: 5px solid white;
             box-shadow: 0 10px 30px rgba(16, 137, 211, 0.28);
-            position: relative;
-            z-index: 1;
+            position: relative; z-index: 1;
             transition: transform 0.4s ease;
         }
-        .member-card:hover .avatar-circle {
-            transform: scale(1.05);
-        }
-        .member-card .avatar-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .member-card:hover .avatar-circle { transform: scale(1.05); }
+        .member-card .avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         .member-card .avatar-container .member-actions {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 6px;
-            opacity: 0;
-            transition: opacity 0.25s ease;
-            z-index: 3;
+            position: absolute; top: 10px; right: 10px;
+            display: flex; gap: 6px; opacity: 0;
+            transition: opacity 0.25s ease; z-index: 3;
         }
         .member-card:hover .avatar-container .member-actions { opacity: 1; }
         .member-card .avatar-container .member-actions button {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-            color: white;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 36px; height: 36px; border-radius: 50%;
+            border: none; cursor: pointer; color: white;
+            font-size: 13px; display: flex;
+            align-items: center; justify-content: center;
             transition: all 0.2s ease;
             box-shadow: 0 2px 10px rgba(0,0,0,0.22);
             backdrop-filter: blur(6px);
@@ -575,11 +441,8 @@
             position: absolute;
             bottom: calc(50% - 75px - 4px);
             right: calc(50% - 75px - 4px);
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 4px solid white;
-            z-index: 2;
+            width: 18px; height: 18px; border-radius: 50%;
+            border: 4px solid white; z-index: 2;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
         .member-card .avatar-container .avatar-status.available { background: #22c55e; }
@@ -588,201 +451,68 @@
         .member-card .avatar-container .avatar-status.dnd { background: #8b5cf6; }
         .member-card .avatar-container .avatar-status.offline { background: #9ca3af; }
 
-        /* ===== NOTE BUBBLE ON AVATAR (IMPROVED) ===== */
+        /* ===== NOTE BUBBLE ===== */
         .member-note-bubble {
-            position: absolute;
-            top: 10px;
-            left: 50%;
+            position: absolute; top: 10px; left: 50%;
             transform: translateX(-50%);
-            z-index: 5;
-            background: white;
-            border-radius: 22px;
+            z-index: 5; background: white; border-radius: 22px;
             padding: 9px 18px;
             box-shadow: 0 6px 20px rgba(16, 137, 211, 0.22), 0 0 0 2px rgba(16, 137, 211, 0.14);
-            font-size: 14px;
-            font-weight: 700;
-            color: #1a1a2e;
+            font-size: 14px; font-weight: 700; color: #1a1a2e;
             max-width: calc(100% - 24px);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            cursor: pointer;
+            white-space: nowrap; overflow: hidden;
+            text-overflow: ellipsis; cursor: pointer;
             transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            line-height: 1.3;
-            pointer-events: auto;
+            display: flex; align-items: center; gap: 8px;
+            line-height: 1.3; pointer-events: auto;
             animation: noteFloatIn 0.4s ease-out;
         }
-
-        .member-note-bubble:hover {
-            transform: translateX(-50%) scale(1.05);
-            box-shadow: 0 8px 26px rgba(16, 137, 211, 0.32), 0 0 0 2px rgba(16, 137, 211, 0.28);
-        }
-
-        .member-note-bubble i {
+        .member-note-bubble:hover { transform: translateX(-50%) scale(1.05); box-shadow: 0 8px 26px rgba(16, 137, 211, 0.32), 0 0 0 2px rgba(16, 137, 211, 0.28); }
+        .member-note-bubble i { color: rgb(16, 137, 211); font-size: 13px; flex-shrink: 0; }
+        .member-note-bubble .note-text-preview { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; }
+        .member-note-bubble .note-comment-count {
+            display: inline-flex; align-items: center; gap: 3px;
+            background: rgba(16, 137, 211, 0.12);
             color: rgb(16, 137, 211);
-            font-size: 13px;
+            padding: 1px 8px; border-radius: 50px;
+            font-size: 11px; font-weight: 800;
             flex-shrink: 0;
         }
-
-        .member-note-bubble .note-text-preview {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 180px;
-        }
-
         .member-note-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -6px;
-            left: 50%;
+            content: ''; position: absolute;
+            bottom: -6px; left: 50%;
             transform: translateX(-50%) rotate(45deg);
-            width: 12px;
-            height: 12px;
+            width: 12px; height: 12px;
             background: white;
             box-shadow: 2px 2px 4px rgba(16, 137, 211, 0.1);
             border-radius: 0 0 3px 0;
         }
-
         @keyframes noteFloatIn {
             0% { opacity: 0; transform: translateX(-50%) translateY(-8px) scale(0.9); }
             100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
         }
 
         .member-card .member-body {
-            padding: 20px 22px 22px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            text-align: center;
+            padding: 20px 22px 22px; flex: 1;
+            display: flex; flex-direction: column; text-align: center;
         }
-        .member-card .member-body .member-name {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 4px;
-            line-height: 1.3;
-        }
-        .member-card .member-body .member-location {
-            font-size: 13px;
-            color: #888;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            margin-bottom: 10px;
-        }
+        .member-card .member-body .member-name { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.3; }
+        .member-card .member-body .member-location { font-size: 13px; color: #888; display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 10px; }
         .member-card .member-body .member-location i { color: rgb(16, 137, 211); font-size: 12px; }
-
-        .member-card .member-body .member-meta-chips {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-        .member-card .member-body .member-meta-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: #f0f9ff;
-            color: #555;
-            padding: 3px 10px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            border: 1px solid #e0f2fe;
-        }
-        .member-card .member-body .member-meta-chip i {
-            color: rgb(16, 137, 211);
-            font-size: 10px;
-        }
-
-        .member-card .member-body .lovelife-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 3px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 700;
-            margin: 0 auto 10px;
-            align-self: center;
-        }
+        .member-card .member-body .member-meta-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 10px; }
+        .member-card .member-body .member-meta-chip { display: inline-flex; align-items: center; gap: 5px; background: #f0f9ff; color: #555; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; border: 1px solid #e0f2fe; }
+        .member-card .member-body .member-meta-chip i { color: rgb(16, 137, 211); font-size: 10px; }
+        .member-card .member-body .lovelife-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; margin: 0 auto 10px; align-self: center; }
         .lovelife-badge.single { background: #fee2e2; color: #dc2626; }
         .lovelife-badge.mu { background: #fce7f3; color: #db2777; }
         .lovelife-badge.married { background: #dcfce7; color: #16a34a; }
-
-        .member-card .member-body .member-bio {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.55;
-            margin: 8px 0 12px;
-            padding-top: 12px;
-            border-top: 1px solid #f0f4ff;
-            flex: 1;
-        }
-
-        .member-card .member-body .member-interests {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
-        .member-card .member-body .member-interests .interest-tag {
-            background: #e0f2fe;
-            color: rgb(16, 137, 211);
-            padding: 3px 12px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .member-card .member-body .member-socials {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            padding-top: 10px;
-            border-top: 1px solid #f0f4ff;
-            margin-top: auto;
-        }
-        .member-card .member-body .member-socials a {
-            color: #888;
-            font-size: 15px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background: #f8faff;
-            transition: all 0.3s ease;
-            text-decoration: none;
-        }
-        .member-card .member-body .member-socials a:hover {
-            color: rgb(16, 137, 211);
-            background: #e0f2fe;
-            transform: scale(1.1);
-        }
-
-        .member-card .member-body .member-locked-hint {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: #f3f4f6;
-            color: #6b7280;
-            padding: 5px 14px;
-            border-radius: 50px;
-            font-size: 11px;
-            font-weight: 600;
-            margin: 8px auto 0;
-            align-self: center;
-        }
+        .member-card .member-body .member-bio { font-size: 13px; color: #666; line-height: 1.55; margin: 8px 0 12px; padding-top: 12px; border-top: 1px solid #f0f4ff; flex: 1; }
+        .member-card .member-body .member-interests { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 10px; }
+        .member-card .member-body .member-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
+        .member-card .member-body .member-socials { display: flex; justify-content: center; gap: 8px; padding-top: 10px; border-top: 1px solid #f0f4ff; margin-top: auto; }
+        .member-card .member-body .member-socials a { color: #888; font-size: 15px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f8faff; transition: all 0.3s ease; text-decoration: none; }
+        .member-card .member-body .member-socials a:hover { color: rgb(16, 137, 211); background: #e0f2fe; transform: scale(1.1); }
+        .member-card .member-body .member-locked-hint { display: inline-flex; align-items: center; justify-content: center; gap: 6px; background: #f3f4f6; color: #6b7280; padding: 5px 14px; border-radius: 50px; font-size: 11px; font-weight: 600; margin: 8px auto 0; align-self: center; }
 
         .empty-state { text-align: center; padding: 40px 20px; color: #888; grid-column: 1 / -1; }
         .empty-state i { font-size: 40px; color: #cff0ff; display: block; margin-bottom: 10px; }
@@ -818,52 +548,10 @@
 
         .member-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
         .member-modal .member-modal-header { position: relative; width: 100%; height: 300px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; }
-        .member-modal .member-modal-header::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            pointer-events: none;
-        }
-        .member-modal .member-modal-header::after {
-            content: '';
-            position: absolute;
-            bottom: -70px;
-            left: -70px;
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.22);
-            pointer-events: none;
-        }
-        .member-modal .member-modal-header .member-modal-avatar-circle {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 68px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            overflow: hidden;
-            border: 6px solid white;
-            box-shadow: 0 12px 35px rgba(16, 137, 211, 0.3);
-            position: relative;
-            z-index: 1;
-        }
-        .member-modal .member-modal-header .member-modal-avatar-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .member-modal .member-modal-header::before { content: ''; position: absolute; top: -50px; right: -50px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); pointer-events: none; }
+        .member-modal .member-modal-header::after { content: ''; position: absolute; bottom: -70px; left: -70px; width: 200px; height: 200px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); pointer-events: none; }
+        .member-modal .member-modal-header .member-modal-avatar-circle { width: 180px; height: 180px; border-radius: 50%; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 68px; font-weight: 800; letter-spacing: 2px; overflow: hidden; border: 6px solid white; box-shadow: 0 12px 35px rgba(16, 137, 211, 0.3); position: relative; z-index: 1; }
+        .member-modal .member-modal-header .member-modal-avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .member-modal .member-modal-header .member-modal-initials { font-size: 96px; font-weight: 700; color: rgb(16, 137, 211); }
         .member-modal .member-modal-body { padding: 26px 30px 30px; }
         .member-modal .member-modal-body .member-modal-name { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -876,77 +564,345 @@
         .member-modal .member-modal-body .member-modal-socials { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
         .member-modal .member-modal-body .member-modal-socials a { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f8faff; color: #666; font-size: 16px; transition: all 0.3s ease; text-decoration: none; border: 1px solid #eef2f7; }
         .member-modal .member-modal-body .member-modal-socials a:hover { background: #e0f2fe; color: rgb(16, 137, 211); transform: scale(1.1); }
+        .member-modal .member-modal-body .member-modal-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+        .member-modal .member-modal-body .member-modal-meta-item { background: #f8faff; padding: 10px 14px; border-radius: 12px; font-size: 13px; color: #555; display: flex; align-items: center; gap: 8px; border: 1px solid #eef2f7; }
+        .member-modal .member-modal-body .member-modal-meta-item i { color: rgb(16, 137, 211); width: 16px; text-align: center; flex-shrink: 0; }
+        .member-modal .member-modal-body .member-modal-meta-item.full-width { grid-column: 1 / -1; }
+        .member-modal .member-modal-body .member-modal-meta-item .meta-label { font-weight: 700; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; margin-right: 4px; }
+        .member-modal .member-modal-body .member-modal-meta-item .meta-value { color: #333; font-weight: 600; }
+        .member-modal .member-modal-body .member-modal-locked-banner { display: flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 14px 18px; border-radius: 14px; margin-bottom: 18px; border: 1px solid #fde68a; }
+        .member-modal .member-modal-body .member-modal-locked-banner i { color: #d97706; font-size: 20px; flex-shrink: 0; }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-text { flex: 1; font-size: 13px; color: #92400e; line-height: 1.4; }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-text strong { color: #78350f; display: block; font-size: 14px; margin-bottom: 2px; }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-cta { background: linear-gradient(45deg, #d97706 0%, #b45309 100%); color: white; padding: 8px 16px; border-radius: 50px; text-decoration: none; font-size: 12px; font-weight: 700; white-space: nowrap; flex-shrink: 0; transition: all 0.2s ease; }
+        .member-modal .member-modal-body .member-modal-locked-banner .locked-cta:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35); }
 
-        .member-modal .member-modal-body .member-modal-meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 18px;
+        /* ================================================================
+           ===== NOTE MODAL WITH COMMENTS =====
+           ================================================================ */
+        .note-modal .modal-content {
+            background: white; border-radius: 24px; padding: 0;
+            max-width: 480px; width: 100%;
+            max-height: 92vh;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
         }
-        .member-modal .member-modal-body .member-modal-meta-item {
-            background: #f8faff;
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 13px;
-            color: #555;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #eef2f7;
+        .note-modal .note-modal-header {
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            padding: 22px 24px 18px; text-align: center;
+            position: relative; flex-shrink: 0;
         }
-        .member-modal .member-modal-body .member-modal-meta-item i {
-            color: rgb(16, 137, 211);
-            width: 16px;
+        .note-modal .note-modal-header .note-modal-close {
+            position: absolute; top: 12px; right: 12px;
+            width: 34px; height: 34px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); border: none;
+            color: white; font-size: 16px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+        }
+        .note-modal .note-modal-header .note-modal-close:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
+        .note-modal .note-modal-avatar {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: white; margin: 0 auto 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; font-weight: 800;
+            color: rgb(16, 137, 211); overflow: hidden;
+            border: 4px solid rgba(255,255,255,0.5);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .note-modal .note-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .note-modal .note-modal-name { font-size: 17px; font-weight: 800; color: white; margin-bottom: 2px; }
+        .note-modal .note-modal-time { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
+
+        .note-modal .note-modal-body {
+            padding: 22px 24px 24px;
             text-align: center;
-            flex-shrink: 0;
+            overflow-y: auto;
+            flex: 1;
         }
-        .member-modal .member-modal-body .member-modal-meta-item.full-width {
-            grid-column: 1 / -1;
+        .note-modal .note-modal-text {
+            font-size: 18px; font-weight: 600; color: #1a1a2e;
+            line-height: 1.55; padding: 16px 18px;
+            background: #f8faff; border-radius: 16px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 14px;
+            word-break: break-word; white-space: pre-wrap;
         }
-        .member-modal .member-modal-body .member-modal-meta-item .meta-label {
-            font-weight: 700;
-            color: #888;
-            font-size: 11px;
+        .note-modal .note-modal-expiry {
+            font-size: 12px; color: #888;
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; font-weight: 600;
+            margin-bottom: 20px;
+        }
+        .note-modal .note-modal-expiry i { color: rgb(16, 137, 211); }
+        .note-modal .note-modal-expiry.urgent { color: #ef4444; }
+        .note-modal .note-modal-expiry.urgent i { color: #ef4444; }
+
+        /* ===== COMMENTS SECTION ===== */
+        .note-comments-section {
+            text-align: left;
+            border-top: 1px solid #f0f4ff;
+            padding-top: 18px;
+            margin-top: 4px;
+        }
+        .note-comments-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px; font-weight: 800;
+            color: #1a1a2e;
             text-transform: uppercase;
-            letter-spacing: 0.4px;
-            margin-right: 4px;
+            letter-spacing: 0.6px;
         }
-        .member-modal .member-modal-body .member-modal-meta-item .meta-value {
-            color: #333;
+        .note-comments-header .title-group {
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .note-comments-header .title-group i { color: rgb(16, 137, 211); font-size: 13px; }
+        .note-comments-header .comment-count-pill {
+            background: #e0f2fe; color: rgb(16, 137, 211);
+            padding: 1px 10px; border-radius: 50px;
+            font-size: 11px; font-weight: 800;
+        }
+
+        .note-comments-list {
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-bottom: 12px;
+        }
+        .note-comments-list::-webkit-scrollbar { width: 5px; }
+        .note-comments-list::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
+        .note-comments-list::-webkit-scrollbar-thumb { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); border-radius: 10px; }
+
+        .note-comment {
+            display: flex; gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f8faff;
+            border: 1px solid #eef2f7;
+            margin-bottom: 8px;
+            animation: commentFadeIn 0.3s ease-out;
+            position: relative;
+        }
+        @keyframes commentFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .note-comment.reply-indent {
+            margin-left: 28px;
+            background: #fafcff;
+            border-color: #e0f2fe;
+        }
+        .note-comment.reply-indent::before {
+            content: '';
+            position: absolute;
+            left: -14px; top: 50%;
+            width: 12px; height: 2px;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .note-comment .comment-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            flex-shrink: 0; overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .note-comment .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .note-comment .comment-main {
+            flex: 1; min-width: 0; text-align: left;
+        }
+        .note-comment .comment-top-row {
+            display: flex; align-items: baseline; gap: 8px;
+            flex-wrap: wrap; margin-bottom: 2px;
+        }
+        .note-comment .comment-author {
+            font-size: 12px; font-weight: 800;
+            color: #1a1a2e;
+        }
+        .note-comment .comment-author.is-me {
+            color: rgb(16, 137, 211);
+        }
+        .note-comment .comment-author.is-me::after {
+            content: ' (you)';
+            font-size: 10px; font-weight: 600;
+            color: #888;
+        }
+        .note-comment .comment-time {
+            font-size: 10px; color: #aaa;
             font-weight: 600;
         }
+        .note-comment .comment-text {
+            font-size: 13px; color: #444;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .note-comment .comment-actions {
+            display: flex; gap: 4px;
+            margin-top: 4px;
+        }
+        .note-comment .comment-actions button {
+            background: none; border: none;
+            color: rgb(16, 137, 211);
+            font-size: 11px; font-weight: 700;
+            cursor: pointer; padding: 2px 6px;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+        .note-comment .comment-actions button:hover { background: rgba(16, 137, 211, 0.1); }
+        .note-comment .comment-actions button.delete-btn {
+            color: #dc2626;
+        }
+        .note-comment .comment-actions button.delete-btn:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
 
-        .member-modal .member-modal-body .member-modal-locked-banner {
+        .note-comments-empty {
+            text-align: center;
+            padding: 22px 12px;
+            color: #aaa;
+            font-size: 13px;
+        }
+        .note-comments-empty i {
+            font-size: 28px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* ===== COMMENT INPUT ===== */
+        .note-comment-input-wrap {
+            display: flex; gap: 8px; align-items: flex-start;
+            padding-top: 12px;
+            border-top: 1px solid #f0f4ff;
+        }
+        .note-comment-input-wrap .my-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            flex-shrink: 0; overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .note-comment-input-wrap .my-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .note-comment-input-wrap .input-stack {
+            flex: 1; min-width: 0;
+        }
+        .note-comment-input-wrap .replying-to-banner {
+            display: none;
+            font-size: 11px;
+            color: rgb(16, 137, 211);
+            background: #e0f2fe;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-weight: 700;
+        }
+        .note-comment-input-wrap .replying-to-banner.show { display: flex; }
+        .note-comment-input-wrap .replying-to-banner button {
+            background: none; border: none;
+            color: #dc2626; cursor: pointer;
+            font-size: 12px; padding: 0 4px;
+            font-family: inherit;
+        }
+        .note-comment-input-wrap .input-row {
+            display: flex; gap: 8px; align-items: flex-end;
+        }
+        .note-comment-input-wrap textarea {
+            flex: 1;
+            min-height: 40px;
+            max-height: 100px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e0e7ff;
+            background: #f8faff;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            resize: none;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+        .note-comment-input-wrap textarea:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+        .note-comment-input-wrap .send-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
+        }
+        .note-comment-input-wrap .send-btn:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px rgba(16, 137, 211, 0.45);
+        }
+        .note-comment-input-wrap .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .note-comment-input-wrap .char-count {
+            font-size: 10px;
+            color: #aaa;
+            text-align: right;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .note-comment-input-wrap .char-count.warn { color: #f59e0b; }
+        .note-comment-input-wrap .char-count.danger { color: #dc2626; }
+
+        /* ===== LOCKED STATE ===== */
+        .note-comments-locked {
             display: flex;
             align-items: center;
             gap: 12px;
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            padding: 14px 18px;
+            padding: 14px 16px;
             border-radius: 14px;
-            margin-bottom: 18px;
             border: 1px solid #fde68a;
+            margin-top: 4px;
         }
-        .member-modal .member-modal-body .member-modal-locked-banner i {
+        .note-comments-locked i {
             color: #d97706;
             font-size: 20px;
             flex-shrink: 0;
         }
-        .member-modal .member-modal-body .member-modal-locked-banner .locked-text {
+        .note-comments-locked .locked-text {
             flex: 1;
-            font-size: 13px;
+            font-size: 12px;
             color: #92400e;
             line-height: 1.4;
+            text-align: left;
+            font-weight: 600;
         }
-        .member-modal .member-modal-body .member-modal-locked-banner .locked-text strong {
-            color: #78350f;
+        .note-comments-locked .locked-text strong {
             display: block;
-            font-size: 14px;
+            color: #78350f;
+            font-size: 13px;
             margin-bottom: 2px;
         }
-        .member-modal .member-modal-body .member-modal-locked-banner .locked-cta {
+        .note-comments-locked .locked-cta {
             background: linear-gradient(45deg, #d97706 0%, #b45309 100%);
             color: white;
-            padding: 8px 16px;
+            padding: 8px 14px;
             border-radius: 50px;
             text-decoration: none;
             font-size: 12px;
@@ -955,117 +911,12 @@
             flex-shrink: 0;
             transition: all 0.2s ease;
         }
-        .member-modal .member-modal-body .member-modal-locked-banner .locked-cta:hover {
+        .note-comments-locked .locked-cta:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(217, 119, 6, 0.35);
         }
 
-        /* ===== NOTE POPUP MODAL ===== */
-        .note-modal .modal-content {
-            background: white;
-            border-radius: 24px;
-            padding: 0;
-            max-width: 420px;
-            width: 100%;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
-        }
-        .note-modal .note-modal-header {
-            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            padding: 22px 24px 18px;
-            text-align: center;
-            position: relative;
-        }
-        .note-modal .note-modal-header .note-modal-close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-        .note-modal .note-modal-header .note-modal-close:hover {
-            background: rgba(255,255,255,0.35);
-            transform: rotate(90deg);
-        }
-        .note-modal .note-modal-avatar {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: white;
-            margin: 0 auto 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            font-weight: 800;
-            color: rgb(16, 137, 211);
-            overflow: hidden;
-            border: 4px solid rgba(255,255,255,0.5);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-        .note-modal .note-modal-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .note-modal .note-modal-name {
-            font-size: 17px;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 2px;
-        }
-        .note-modal .note-modal-time {
-            font-size: 11px;
-            color: rgba(255,255,255,0.8);
-            font-weight: 500;
-        }
-        .note-modal .note-modal-body {
-            padding: 24px 26px 26px;
-            text-align: center;
-        }
-        .note-modal .note-modal-text {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1a1a2e;
-            line-height: 1.55;
-            padding: 16px 18px;
-            background: #f8faff;
-            border-radius: 16px;
-            border: 1.5px solid #eef2f7;
-            margin-bottom: 16px;
-            word-break: break-word;
-            white-space: pre-wrap;
-        }
-        .note-modal .note-modal-expiry {
-            font-size: 12px;
-            color: #888;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-weight: 600;
-        }
-        .note-modal .note-modal-expiry i {
-            color: rgb(16, 137, 211);
-        }
-        .note-modal .note-modal-expiry.urgent {
-            color: #ef4444;
-        }
-        .note-modal .note-modal-expiry.urgent i {
-            color: #ef4444;
-        }
-
-        /* ===== HIGHLIGHT DETAIL MODAL ===== */
+        /* ===== HIGHLIGHT DETAIL / GALLERY MODALS ===== */
         .highlight-detail-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
         .highlight-detail-modal .modal-header { position: relative; width: 100%; height: 360px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; }
         .highlight-detail-modal .modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1084,7 +935,6 @@
         .highlight-detail-modal .hl-stats .stat.urgent { color: #ef4444; }
         .highlight-detail-modal .hl-stats .stat.urgent i { color: #ef4444; }
 
-        /* ===== HIGHLIGHT GALLERY MODAL ===== */
         .gallery-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 1000px; width: 95%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .gallery-modal .gallery-header { padding: 22px 28px; background: white; border-bottom: 1px solid #f0f4ff; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; flex-shrink: 0; }
         .gallery-modal .gallery-header-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -1110,291 +960,59 @@
         .gallery-modal .gallery-item .image-index { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.65); color: white; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; }
 
         /* ================================================================
-           ===== TITA TIMA AI ASSISTANT (FLOATING) =====
+           ===== TITA TIMA =====
            ================================================================ */
-
         .tita-launcher {
-            position: fixed;
-            bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-            right: 24px;
-            width: 62px;
-            height: 62px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
+            position: fixed; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); right: 24px;
+            width: 62px; height: 62px; border-radius: 50%; border: none; cursor: pointer;
             background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            font-size: 24px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 2500;
-            box-shadow: 0 8px 30px rgba(16, 137, 211, 0.45);
+            color: white; font-size: 24px; display: none; align-items: center; justify-content: center;
+            z-index: 2500; box-shadow: 0 8px 30px rgba(16, 137, 211, 0.45);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
-
         .tita-launcher.visible { display: flex; }
-
-        .tita-launcher:hover {
-            transform: scale(1.08);
-            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.6);
-        }
-
-        .tita-launcher .tita-pulse {
-            position: absolute;
-            inset: -6px;
-            border-radius: 50%;
-            border: 2px solid rgba(16, 137, 211, 0.5);
-            animation: titaPulse 2.4s ease-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes titaPulse {
-            0%   { transform: scale(0.9); opacity: 0.9; }
-            100% { transform: scale(1.35); opacity: 0; }
-        }
-
-        .tita-launcher .tita-badge {
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 16px;
-            height: 16px;
-            background: #ef4444;
-            border-radius: 50%;
-            border: 2px solid white;
-            display: none;
-        }
-
+        .tita-launcher:hover { transform: scale(1.08); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.6); }
+        .tita-launcher .tita-pulse { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid rgba(16, 137, 211, 0.5); animation: titaPulse 2.4s ease-out infinite; pointer-events: none; }
+        @keyframes titaPulse { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+        .tita-launcher .tita-badge { position: absolute; top: -2px; right: -2px; width: 16px; height: 16px; background: #ef4444; border-radius: 50%; border: 2px solid white; display: none; }
         .tita-launcher .tita-badge.show { display: block; }
 
         .tita-panel {
-            position: fixed;
-            bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-            right: 24px;
-            width: 380px;
-            max-width: calc(100vw - 40px);
-            max-height: calc(100vh - 140px);
-            background: white;
-            border-radius: 22px;
+            position: fixed; bottom: calc(100px + env(safe-area-inset-bottom, 0px)); right: 24px;
+            width: 380px; max-width: calc(100vw - 40px); max-height: calc(100vh - 140px);
+            background: white; border-radius: 22px;
             box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
-            border: 1px solid #eef2f7;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            z-index: 2499;
-            transform: translateY(20px) scale(0.95);
-            opacity: 0;
-            pointer-events: none;
+            border: 1px solid #eef2f7; display: flex; flex-direction: column;
+            overflow: hidden; z-index: 2499;
+            transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none;
             transition: all 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
-
-        .tita-panel.open {
-            transform: translateY(0) scale(1);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .tita-header {
-            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            padding: 16px 18px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .tita-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgb(16, 137, 211);
-            font-size: 20px;
-            flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-
+        .tita-panel.open { transform: translateY(0) scale(1); opacity: 1; pointer-events: auto; }
+        .tita-header { background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); color: white; padding: 16px 18px; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .tita-avatar { width: 42px; height: 42px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; color: rgb(16, 137, 211); font-size: 20px; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
         .tita-header-info { flex: 1; min-width: 0; }
-
-        .tita-name {
-            font-size: 15px;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .tita-name .tita-online {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #86efac;
-            box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.35);
-        }
-
-        .tita-tagline {
-            font-size: 11px;
-            opacity: 0.9;
-            font-style: italic;
-        }
-
-        .tita-close {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .tita-close:hover {
-            background: rgba(255,255,255,0.35);
-            transform: rotate(90deg);
-        }
-
-        .tita-body {
-            padding: 16px 18px 20px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .tita-greeting {
-            background: #f0f9ff;
-            border-left: 3px solid rgb(16, 137, 211);
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            color: #555;
-            margin-bottom: 16px;
-            line-height: 1.5;
-        }
-
+        .tita-name { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
+        .tita-name .tita-online { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #86efac; box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.35); }
+        .tita-tagline { font-size: 11px; opacity: 0.9; font-style: italic; }
+        .tita-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .tita-close:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
+        .tita-body { padding: 16px 18px 20px; overflow-y: auto; flex: 1; }
+        .tita-greeting { background: #f0f9ff; border-left: 3px solid rgb(16, 137, 211); padding: 10px 14px; border-radius: 10px; font-size: 13px; color: #555; margin-bottom: 16px; line-height: 1.5; }
         .tita-greeting strong { color: rgb(16, 137, 211); }
-
         .tita-field { margin-bottom: 12px; }
-
-        .tita-field label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #666;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .tita-field label i {
-            color: rgb(16, 137, 211);
-            font-size: 11px;
-        }
-
-        .tita-field input,
-        .tita-field textarea,
-        .tita-field select {
-            width: 100%;
-            padding: 10px 14px;
-            border-radius: 10px;
-            border: 2px solid #e0e7ff;
-            background: #f8faff;
-            font-size: 13px;
-            font-family: inherit;
-            color: #333;
-            transition: all 0.25s ease;
-        }
-
-        .tita-field input:focus,
-        .tita-field textarea:focus,
-        .tita-field select:focus {
-            outline: none;
-            border-color: rgb(16, 137, 211);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
-        }
-
-        .tita-field textarea {
-            min-height: 62px;
-            resize: vertical;
-        }
-
-        .tita-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
-
-        .tita-save {
-            flex: 1;
-            padding: 12px 18px;
-            border-radius: 12px;
-            border: none;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-family: inherit;
-            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
-        }
-
-        .tita-save:hover {
-            transform: scale(1.02);
-            box-shadow: 0 6px 20px rgba(16, 137, 211, 0.45);
-        }
-
-        .tita-save:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .tita-cancel {
-            padding: 12px 18px;
-            border-radius: 12px;
-            border: 2px solid #e0e7ff;
-            background: white;
-            color: #666;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            font-family: inherit;
-        }
-
-        .tita-cancel:hover {
-            border-color: rgb(16, 137, 211);
-            color: rgb(16, 137, 211);
-        }
-
-        .tita-status-msg {
-            margin-top: 12px;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            display: none;
-            text-align: center;
-        }
-
+        .tita-field label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #666; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .tita-field label i { color: rgb(16, 137, 211); font-size: 11px; }
+        .tita-field input, .tita-field textarea, .tita-field select { width: 100%; padding: 10px 14px; border-radius: 10px; border: 2px solid #e0e7ff; background: #f8faff; font-size: 13px; font-family: inherit; color: #333; transition: all 0.25s ease; }
+        .tita-field input:focus, .tita-field textarea:focus, .tita-field select:focus { outline: none; border-color: rgb(16, 137, 211); background: white; box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1); }
+        .tita-field textarea { min-height: 62px; resize: vertical; }
+        .tita-actions { display: flex; gap: 10px; margin-top: 6px; }
+        .tita-save { flex: 1; padding: 12px 18px; border-radius: 12px; border: none; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); color: white; font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: inherit; box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3); }
+        .tita-save:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(16, 137, 211, 0.45); }
+        .tita-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .tita-cancel { padding: 12px 18px; border-radius: 12px; border: 2px solid #e0e7ff; background: white; color: #666; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.25s ease; font-family: inherit; }
+        .tita-cancel:hover { border-color: rgb(16, 137, 211); color: rgb(16, 137, 211); }
+        .tita-status-msg { margin-top: 12px; padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 600; display: none; text-align: center; }
         .tita-status-msg.show { display: block; }
         .tita-status-msg.success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; }
         .tita-status-msg.error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
@@ -1416,42 +1034,19 @@
         }
 
         @media (max-width: 768px) {
-            .navbar { padding: 12px 20px; flex-direction: column; gap: 10px; align-items: flex-start; }
+            .navbar { padding: 12px 20px; flex-direction: row; gap: 10px; align-items: center; }
             .navbar .logo { font-size: 22px; }
+            .navbar-mobile-bell { display: block; }
+            .navbar .mobile-toggle { display: block; }
+            .navbar .nav-links > li .announcement-wrapper { display: none; }
             .navbar .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: white; padding: 20px; border-bottom: 2px solid #f0f4ff; gap: 10px; box-shadow: 0 20px 30px rgba(0,0,0,0.05); width: 100%; max-height: calc(100vh - 60px); overflow-y: auto; }
             .navbar .nav-links.active { display: flex; }
-            .navbar .mobile-toggle { display: block; position: absolute; right: 20px; top: 50%; transform: translateY(-50%); }
             .navbar .nav-links > li { width: 100%; justify-content: center; }
             .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
             .auth-links-wrapper { flex-direction: column; width: 100%; gap: 10px; }
             .auth-links-wrapper > a, .auth-links-wrapper > button { width: 100%; text-align: center; font-size: 14px; padding: 8px 16px; display: block; }
 
-            /* Bell: full-width row on mobile, icon centered */
-            .navbar .nav-links > li.announcement-li {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-                padding: 4px 0;
-            }
-            .announcement-bell {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-            }
-            .announcement-badge {
-                top: -2px;
-                right: -2px;
-            }
-
-            /* Popup on mobile: fixed below navbar, full-width */
-            .announcement-popup {
-                position: fixed !important;
-                top: 70px !important;
-                left: 14px !important;
-                right: 14px !important;
-                width: auto !important;
-                max-width: none !important;
-            }
+            .announcement-popup { position: fixed !important; top: 70px !important; left: 14px !important; right: 14px !important; width: auto !important; max-width: none !important; }
             .announcement-popup::before { display: none; }
             .announcement-list { max-height: 60vh; }
 
@@ -1467,12 +1062,7 @@
             .members-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
             .member-card .avatar-container { height: 200px; padding-top: 28px; }
             .member-card .avatar-circle { width: 120px; height: 120px; font-size: 44px; }
-            .member-card .avatar-container .avatar-status {
-                bottom: calc(50% - 60px - 4px);
-                right: calc(50% - 60px - 4px);
-                width: 16px;
-                height: 16px;
-            }
+            .member-card .avatar-container .avatar-status { bottom: calc(50% - 60px - 4px); right: calc(50% - 60px - 4px); width: 16px; height: 16px; }
             .member-card .member-body { padding: 16px 16px 18px; }
             .member-card .member-body .member-name { font-size: 16px; }
             .item-modal .modal-header { height: 240px; }
@@ -1492,37 +1082,25 @@
             .gallery-modal .gallery-body { padding: 16px 18px 22px; }
             .gallery-modal .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 
-            /* Note bubble on mobile */
-            .member-note-bubble {
-                font-size: 13px;
-                padding: 8px 14px;
-                max-width: calc(100% - 20px);
-                border-radius: 20px;
-            }
-            .member-note-bubble .note-text-preview {
-                max-width: 130px;
-            }
-            .member-note-bubble i {
-                font-size: 12px;
-            }
+            .announcement-view-modal .modal-content { max-width: calc(100vw - 24px); max-height: 94vh; }
+            .announcement-view-header { padding: 24px 22px 18px; }
+            .announcement-view-icon { width: 64px; height: 64px; font-size: 30px; border-radius: 18px; }
+            .announcement-view-body { padding: 20px 22px 24px; }
+            .announcement-view-title { font-size: 19px; }
+            .announcement-view-message { font-size: 14px; padding: 14px 16px; }
+            .announcement-view-actions { flex-direction: column; }
+            .announcement-view-actions button, .announcement-view-actions a { width: 100%; min-width: 0; }
 
-            .tita-launcher {
-                bottom: calc(20px + env(safe-area-inset-bottom, 0px));
-                right: 18px;
-                width: 58px;
-                height: 58px;
-                font-size: 22px;
-                z-index: 2500;
-            }
-            .tita-panel {
-                bottom: calc(90px + env(safe-area-inset-bottom, 0px));
-                right: 14px;
-                left: 14px;
-                width: auto;
-                max-width: none;
-                max-height: calc(100vh - 130px);
-                z-index: 2499;
-            }
+            .member-note-bubble { font-size: 13px; padding: 8px 14px; max-width: calc(100% - 20px); border-radius: 20px; }
+            .member-note-bubble .note-text-preview { max-width: 130px; }
+            .member-note-bubble i { font-size: 12px; }
+
+            .note-modal .modal-content { max-width: calc(100vw - 24px); }
+            .note-modal .note-modal-body { padding: 18px 20px 20px; }
+            .note-comments-list { max-height: 220px; }
+
+            .tita-launcher { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); right: 18px; width: 58px; height: 58px; font-size: 22px; z-index: 2500; }
+            .tita-panel { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); right: 14px; left: 14px; width: auto; max-width: none; max-height: calc(100vh - 130px); z-index: 2499; }
         }
 
         @media (max-width: 480px) {
@@ -1537,10 +1115,7 @@
             .members-grid { grid-template-columns: 1fr; gap: 15px; }
             .member-card .avatar-container { height: 220px; padding-top: 32px; }
             .member-card .avatar-circle { width: 140px; height: 140px; font-size: 52px; }
-            .member-card .avatar-container .avatar-status {
-                bottom: calc(50% - 70px - 4px);
-                right: calc(50% - 70px - 4px);
-            }
+            .member-card .avatar-container .avatar-status { bottom: calc(50% - 70px - 4px); right: calc(50% - 70px - 4px); }
             .item-modal .modal-header { height: 200px; }
             .item-modal .modal-body { padding: 18px; }
             .item-modal .modal-actions { flex-direction: column; }
@@ -1557,35 +1132,21 @@
             .gallery-modal .gallery-body { padding: 12px 14px 18px; }
             .gallery-modal .gallery-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
 
-            .announcement-popup {
-                top: 65px !important;
-                left: 10px !important;
-                right: 10px !important;
-            }
+            .announcement-popup { top: 65px !important; left: 10px !important; right: 10px !important; }
+            .announcement-view-header { padding: 20px 18px 16px; }
+            .announcement-view-icon { width: 56px; height: 56px; font-size: 26px; }
+            .announcement-view-body { padding: 18px 18px 22px; }
+            .announcement-view-title { font-size: 17px; }
 
-            /* Note bubble even more compact */
-            .member-note-bubble {
-                font-size: 12px;
-                padding: 7px 12px;
-                gap: 6px;
-            }
-            .member-note-bubble .note-text-preview {
-                max-width: 110px;
-            }
+            .member-note-bubble { font-size: 12px; padding: 7px 12px; gap: 6px; }
+            .member-note-bubble .note-text-preview { max-width: 110px; }
 
-            .tita-launcher {
-                bottom: calc(18px + env(safe-area-inset-bottom, 0px));
-                right: 16px;
-                width: 56px;
-                height: 56px;
-                font-size: 22px;
-            }
-            .tita-panel {
-                bottom: calc(86px + env(safe-area-inset-bottom, 0px));
-                right: 10px;
-                left: 10px;
-                max-height: calc(100vh - 120px);
-            }
+            .note-comment.reply-indent { margin-left: 18px; }
+            .note-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .note-comment .comment-text { font-size: 12px; }
+
+            .tita-launcher { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); right: 16px; width: 56px; height: 56px; font-size: 22px; }
+            .tita-panel { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); right: 10px; left: 10px; max-height: calc(100vh - 120px); }
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -1596,7 +1157,18 @@
 <body>
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo">TIMAWA <span>HUB</span></a>
-        <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+
+        <div class="navbar-right">
+            <div class="navbar-mobile-bell">
+                <button class="announcement-bell" id="announcementBellMobile" onclick="toggleAnnouncementPopup(event, 'mobile')" aria-label="Announcements">
+                    <i class="fas fa-bell"></i>
+                    <span class="announcement-badge" id="announcementBadgeMobile">0</span>
+                </button>
+            </div>
+
+            <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+
         <ul class="nav-links" id="navLinks">
             <li><a href="#highlights">Highlights</a></li>
             <li><a href="#coffee-shops">Coffee</a></li>
@@ -1607,7 +1179,6 @@
         </ul>
     </nav>
 
-    <!-- Announcement popup (only rendered when logged in) -->
     <div class="announcement-popup" id="announcementPopup" role="dialog" aria-labelledby="announcementTitle" style="display:none;">
         <div class="announcement-popup-header">
             <h4 id="announcementTitle"><i class="fas fa-bullhorn"></i> Announcements</h4>
@@ -1621,6 +1192,35 @@
         </div>
         <div class="announcement-popup-footer" id="announcementFooter">
             No new announcements
+        </div>
+    </div>
+
+    <div id="announcementViewModal" class="announcement-view-modal" role="dialog" aria-labelledby="annViewTitle">
+        <div class="modal-content">
+            <div class="announcement-view-header">
+                <button class="announcement-view-close" onclick="closeAnnouncementView()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="announcement-view-icon" id="annViewIcon">📢</div>
+                <div class="announcement-view-type" id="annViewType">Announcement</div>
+            </div>
+            <div class="announcement-view-body">
+                <div class="announcement-view-priority" id="annViewPriority" style="display:none;"></div>
+                <div class="announcement-view-title" id="annViewTitle">Announcement Title</div>
+                <div class="announcement-view-message" id="annViewMessage">Announcement message...</div>
+                <div class="announcement-view-meta" id="annViewMeta">
+                    <span><i class="fas fa-user"></i> <span id="annViewAuthor">Admin</span></span>
+                    <span><i class="fas fa-clock"></i> <span id="annViewTime">Just now</span></span>
+                </div>
+                <div class="announcement-view-actions">
+                    <a href="#" id="annViewLinkBtn" class="ann-view-primary" style="display:none;">
+                        <i class="fas fa-arrow-right"></i> <span id="annViewLinkLabel">Open</span>
+                    </a>
+                    <button class="ann-view-secondary" onclick="closeAnnouncementView()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1782,7 +1382,7 @@
         </div>
     </div>
 
-    <!-- ===== NOTE POPUP MODAL ===== -->
+    <!-- ===== NOTE POPUP MODAL (WITH COMMENTS) ===== -->
     <div id="noteModal" class="modal note-modal">
         <div class="modal-content">
             <div class="note-modal-header">
@@ -1796,6 +1396,8 @@
                 <div class="note-modal-expiry" id="noteModalExpiry">
                     <i class="fas fa-clock"></i> <span></span>
                 </div>
+
+                <div class="note-comments-section" id="noteCommentsSection"></div>
             </div>
         </div>
     </div>
@@ -1856,7 +1458,7 @@
         </div>
     </div>
 
-    <!-- ===== TITA TIMA AI ASSISTANT ===== -->
+    <!-- ===== TITA TIMA ===== -->
     <button id="titaLauncher" class="tita-launcher" onclick="toggleTitaPanel()" aria-label="Open Tita Tima assistant">
         <span class="tita-pulse"></span>
         <i class="fas fa-robot"></i>
@@ -1928,7 +1530,6 @@
                 <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
             </div>
 
-            <!-- ===== QUICK NOTE FIELD ===== -->
             <div class="tita-field">
                 <label>
                     <i class="fas fa-comment-dots"></i> Quick Note
@@ -1985,6 +1586,13 @@
         const MEMBERS_LIMIT = 50;
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
 
+        const NOTE_COMMENT_MAX_LEN = 150;
+
+        // ===== COMMENT CLEANUP CONFIG =====
+        const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // every 10 minutes
+        const COMMENT_CLEANUP_INITIAL_DELAY_MS = 8000;      // 8 seconds after load
+        const COMMENT_CLEANUP_BATCH_LIMIT = 450;             // per run (respect Firestore 500 limit)
+
         function isMobile() { return window.innerWidth <= MOBILE_BREAKPOINT; }
         function getItemsPerSlide() { return isMobile() ? 1 : 3; }
 
@@ -2017,12 +1625,29 @@
         let currentNoteUid = null;
 
         // ================================================================
-        // ===== ANNOUNCEMENTS — OPTIMIZED STATE =====
+        // ===== NOTE COMMENTS STATE =====
+        // ================================================================
+        // Aggregated counts per noteUid (for bubble pill on member card)
+        const noteCommentCounts = {};
+        // Per-note count listeners (detached on logout)
+        let noteCountUnsubscribes = [];
+        // Active comments listener for currently-open note modal
+        let activeCommentsUnsubscribe = null;
+        let activeCommentsNoteUid = null;
+        // Reply target for threading
+        let currentReplyTo = null;
+
+        // ===== COMMENT AUTO-CLEANUP TIMER =====
+        let commentCleanupTimer = null;
+
+        // ================================================================
+        // ===== ANNOUNCEMENTS STATE =====
         // ================================================================
         let announcementUser = null;
         let announcementUnsubscribe = null;
         let announcementItems = [];
         let announcementReadIds = new Set();
+        let currentAnnouncementViewId = null;
 
         const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
         const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
@@ -2031,7 +1656,7 @@
         const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
 
         // ================================================================
-        // ===== CLOUDINARY THUMBNAIL =====
+        // ===== CLOUDINARY THUMBS =====
         // ================================================================
         function cloudinaryThumb(url, width = 500) {
             if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
@@ -2086,6 +1711,18 @@
             const diffDay = Math.floor(diffHr / 24);
             if (diffDay < 7) return `${diffDay}d ago`;
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function formatFullDate(date) {
+            if (!date) return '';
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
         function getLoveLifeLabel(value) {
@@ -2154,6 +1791,7 @@
         // ================================================================
         function loadNotes() {
             if (unsubscribeNotes) unsubscribeNotes();
+            detachAllNoteCountListeners();
 
             const now = new Date();
 
@@ -2172,17 +1810,123 @@
                     });
                     notesCache = newCache;
                     renderMembersSection();
+                    // Attach count listeners for the new set of notes
+                    attachNoteCountListeners();
                 }, (error) => {
                     console.warn('Notes listener error:', error.message);
                     notesCache = {};
                 });
         }
 
+        function detachAllNoteCountListeners() {
+            noteCountUnsubscribes.forEach(fn => { try { fn(); } catch (e) {} });
+            noteCountUnsubscribes = [];
+        }
+
+        /**
+         * Attaches one lightweight count listener per active note (only `.size`).
+         * Detaches any previous ones. These power the "N replies" pill on the
+         * note bubble without needing to load all comments for every note.
+         */
+        function attachNoteCountListeners() {
+            detachAllNoteCountListeners();
+            Object.keys(noteCommentCounts).forEach(k => delete noteCommentCounts[k]);
+
+            Object.keys(notesCache).forEach(uid => {
+                const unsub = db.collection('noteComments')
+                    .where('noteUid', '==', uid)
+                    .onSnapshot(snap => {
+                        noteCommentCounts[uid] = snap.size;
+                        updateMemberBubbleCount(uid, snap.size);
+                    }, err => {
+                        console.warn('Comment count listener error for note', uid, err.message);
+                    });
+                noteCountUnsubscribes.push(unsub);
+            });
+        }
+
+        function updateMemberBubbleCount(uid, count) {
+            const bubble = document.querySelector(`.member-note-bubble[data-note-uid="${CSS.escape(uid)}"] .note-comment-count`);
+            if (bubble) {
+                if (count > 0) {
+                    bubble.innerHTML = `<i class="fas fa-comment"></i> ${count}`;
+                    bubble.style.display = 'inline-flex';
+                } else {
+                    bubble.style.display = 'none';
+                }
+            }
+        }
+
+        // ================================================================
+        // ===== ★ NEW: COMMENT AUTO-CLEANUP =====
+        // ================================================================
+        /**
+         * Deletes expired comments from Firestore (where expireAt <= now).
+         * Batched, capped at COMMENT_CLEANUP_BATCH_LIMIT per run.
+         * Recursively continues if the batch hit the cap.
+         */
+        async function cleanupExpiredComments() {
+            try {
+                const now = new Date();
+
+                const snapshot = await db.collection('noteComments')
+                    .where('expireAt', '<=', now)
+                    .limit(COMMENT_CLEANUP_BATCH_LIMIT)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+
+                await batch.commit();
+
+                console.log(`🧹 Comment cleanup: deleted ${snapshot.size} expired comment(s).`);
+
+                // If we hit the cap, schedule another pass shortly after
+                if (snapshot.size === COMMENT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(cleanupExpiredComments, 2000);
+                }
+
+                return { deleted: snapshot.size };
+            } catch (err) {
+                console.warn('Comment cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startCommentAutoCleanup() {
+            if (commentCleanupTimer) clearInterval(commentCleanupTimer);
+
+            setTimeout(() => {
+                cleanupExpiredComments();
+            }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
+
+            commentCleanupTimer = setInterval(() => {
+                cleanupExpiredComments();
+            }, COMMENT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Comment auto-cleanup started (every 10 min).');
+        }
+
+        function stopCommentAutoCleanup() {
+            if (commentCleanupTimer) {
+                clearInterval(commentCleanupTimer);
+                commentCleanupTimer = null;
+            }
+        }
+
+        // ================================================================
+        // ===== NOTE MODAL + COMMENTS =====
+        // ================================================================
         function openNoteModal(uid) {
             const note = notesCache[uid];
             if (!note) return;
 
             currentNoteUid = uid;
+            currentReplyTo = null;
 
             const member = carouselItemCache[`users:${uid}`] || {};
             const name = member.displayName || member.email || 'Anonymous';
@@ -2232,20 +1976,343 @@
                 expirySpan.textContent = '';
             }
 
+            renderNoteCommentsSection(uid);
+
             document.getElementById('noteModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeNoteModal() {
+            if (activeCommentsUnsubscribe) {
+                activeCommentsUnsubscribe();
+                activeCommentsUnsubscribe = null;
+            }
+            activeCommentsNoteUid = null;
+            currentReplyTo = null;
+
             document.getElementById('noteModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentNoteUid = null;
         }
 
-        // ================================================================
-        // ===== ANNOUNCEMENT SYSTEM (OPTIMIZED) =====
-        // ================================================================
+        function renderNoteCommentsSection(uid) {
+            const section = document.getElementById('noteCommentsSection');
+            if (!section) return;
 
+            if (!isUserLoggedIn) {
+                section.innerHTML = `
+                    <div class="note-comments-locked">
+                        <i class="fas fa-lock"></i>
+                        <div class="locked-text">
+                            <strong>Replies are private</strong>
+                            Sign in to view and join the conversation.
+                        </div>
+                        <a href="login.html" class="locked-cta">Sign In</a>
+                    </div>
+                `;
+                return;
+            }
+
+            section.innerHTML = `
+                <div class="note-comments-header">
+                    <span class="title-group">
+                        <i class="fas fa-comments"></i>
+                        Replies
+                        <span class="comment-count-pill" id="noteCommentCountPill">0</span>
+                    </span>
+                </div>
+                <div class="note-comments-list" id="noteCommentsList">
+                    <div class="note-comments-empty">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Loading replies...</p>
+                    </div>
+                </div>
+                <div class="note-comment-input-wrap">
+                    <div class="my-avatar" id="myCommentAvatar"></div>
+                    <div class="input-stack">
+                        <div class="replying-to-banner" id="replyingToBanner">
+                            <span>Replying to <strong id="replyingToName"></strong></span>
+                            <button type="button" onclick="cancelReplyTo()" title="Cancel reply">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="input-row">
+                            <textarea id="noteCommentInput" placeholder="Write a reply..." maxlength="${NOTE_COMMENT_MAX_LEN}" rows="1"></textarea>
+                            <button class="send-btn" id="noteCommentSendBtn" onclick="postNoteComment()" title="Send">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="char-count" id="noteCommentCharCount">0/${NOTE_COMMENT_MAX_LEN}</div>
+                    </div>
+                </div>
+            `;
+
+            const myAvatarEl = document.getElementById('myCommentAvatar');
+            if (myAvatarEl) {
+                const me = titaUserData || {};
+                const myName = me.displayName || titaCurrentUser?.displayName || titaCurrentUser?.email || 'Me';
+                const myPhoto = me.photoURL || '';
+                if (myPhoto) {
+                    myAvatarEl.innerHTML = `<img src="${cloudinaryAvatar(myPhoto, 80)}" alt="Me" />`;
+                } else {
+                    const initials = myName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                    myAvatarEl.textContent = initials;
+                }
+            }
+
+            const input = document.getElementById('noteCommentInput');
+            if (input) {
+                input.addEventListener('input', updateCommentCharCount);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        postNoteComment();
+                    }
+                });
+            }
+
+            attachCommentsListener(uid);
+        }
+
+        function updateCommentCharCount() {
+            const input = document.getElementById('noteCommentInput');
+            const counter = document.getElementById('noteCommentCharCount');
+            if (!input || !counter) return;
+            const len = input.value.length;
+            counter.textContent = `${len}/${NOTE_COMMENT_MAX_LEN}`;
+            counter.classList.remove('warn', 'danger');
+            if (len > NOTE_COMMENT_MAX_LEN * 0.9) counter.classList.add('danger');
+            else if (len > NOTE_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
+        }
+
+        /**
+         * Live listener for the currently-open note's comments.
+         * Uses composite index (noteUid ASC, createdAt ASC).
+         * Detached automatically when the modal closes.
+         */
+        function attachCommentsListener(uid) {
+            if (activeCommentsUnsubscribe) {
+                activeCommentsUnsubscribe();
+                activeCommentsUnsubscribe = null;
+            }
+            activeCommentsNoteUid = uid;
+
+            activeCommentsUnsubscribe = db.collection('noteComments')
+                .where('noteUid', '==', uid)
+                .orderBy('createdAt', 'asc')
+                .onSnapshot(snapshot => {
+                    if (activeCommentsNoteUid !== uid) return;
+
+                    const comments = [];
+                    snapshot.forEach(doc => comments.push({ id: doc.id, ...doc.data() }));
+
+                    renderNoteCommentsList(uid, comments);
+
+                    const pill = document.getElementById('noteCommentCountPill');
+                    if (pill) pill.textContent = comments.length;
+
+                    noteCommentCounts[uid] = comments.length;
+                    updateMemberBubbleCount(uid, comments.length);
+                }, err => {
+                    console.warn('Comments listener error:', err.message);
+                    const list = document.getElementById('noteCommentsList');
+                    if (list) {
+                        // Detect index-missing error specifically
+                        const isIndexError = /index/i.test(err.message) || /requires an index/i.test(err.message);
+                        list.innerHTML = `
+                            <div class="note-comments-empty">
+                                <i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i>
+                                <p>${isIndexError ? 'Missing Firestore index for replies.' : 'Could not load replies.'}</p>
+                                ${isIndexError ? `<p style="font-size:11px;color:#999;margin-top:6px;">Check the browser console — Firebase prints a direct link to create it.</p>` : ''}
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        function renderNoteCommentsList(uid, comments) {
+            const list = document.getElementById('noteCommentsList');
+            if (!list) return;
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = `
+                    <div class="note-comments-empty">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>No replies yet. Be the first!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const topLevel = comments.filter(c => !c.replyToId);
+            const repliesByParent = {};
+            comments.filter(c => c.replyToId).forEach(c => {
+                if (!repliesByParent[c.replyToId]) repliesByParent[c.replyToId] = [];
+                repliesByParent[c.replyToId].push(c);
+            });
+
+            let html = '';
+            topLevel.forEach(c => {
+                html += renderCommentItem(c, false);
+                const replies = repliesByParent[c.id] || [];
+                replies.forEach(r => {
+                    html += renderCommentItem(r, true);
+                });
+            });
+
+            // Orphan replies (parent deleted) → show as top-level
+            const orphanReplies = comments.filter(c => c.replyToId && !topLevel.find(t => t.id === c.replyToId));
+            orphanReplies.forEach(r => {
+                html += renderCommentItem(r, false);
+            });
+
+            list.innerHTML = html;
+        }
+
+        function renderCommentItem(comment, isReply) {
+            const authorName = comment.authorName || 'Anonymous';
+            const authorPhoto = comment.authorPhoto || '';
+            const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const isMe = titaCurrentUser && comment.authorUid === titaCurrentUser.uid;
+
+            const createdDate = comment.createdAt
+                ? (comment.createdAt.seconds ? new Date(comment.createdAt.seconds * 1000) : new Date(comment.createdAt))
+                : new Date();
+
+            const avatarContent = authorPhoto
+                ? `<img src="${cloudinaryAvatar(authorPhoto, 80)}" alt="${escapeAttr(authorName)}" loading="lazy" />`
+                : escapeHtml(initials);
+
+            const safeCommentId = escapeAttr(comment.id);
+            const safeAuthorName = escapeAttr(authorName);
+
+            const deleteBtn = isMe
+                ? `<button class="delete-btn" onclick="deleteNoteComment('${safeCommentId}')"><i class="fas fa-trash"></i> Delete</button>`
+                : '';
+
+            const replyBtn = !isReply
+                ? `<button onclick="startReplyTo('${safeCommentId}', '${safeAuthorName}')"><i class="fas fa-reply"></i> Reply</button>`
+                : '';
+
+            return `
+                <div class="note-comment ${isReply ? 'reply-indent' : ''}" data-comment-id="${safeCommentId}">
+                    <div class="comment-avatar">${avatarContent}</div>
+                    <div class="comment-main">
+                        <div class="comment-top-row">
+                            <span class="comment-author ${isMe ? 'is-me' : ''}">${escapeHtml(authorName)}</span>
+                            <span class="comment-time">${formatRelativeTime(createdDate)}</span>
+                        </div>
+                        <div class="comment-text">${escapeHtml(comment.text || '')}</div>
+                        <div class="comment-actions">
+                            ${replyBtn}
+                            ${deleteBtn}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startReplyTo(commentId, authorName) {
+            currentReplyTo = { id: commentId, authorName };
+            const banner = document.getElementById('replyingToBanner');
+            const nameEl = document.getElementById('replyingToName');
+            if (banner && nameEl) {
+                nameEl.textContent = authorName;
+                banner.classList.add('show');
+            }
+            const input = document.getElementById('noteCommentInput');
+            if (input) {
+                input.placeholder = `Reply to ${authorName}...`;
+                input.focus();
+            }
+        }
+
+        function cancelReplyTo() {
+            currentReplyTo = null;
+            const banner = document.getElementById('replyingToBanner');
+            if (banner) banner.classList.remove('show');
+            const input = document.getElementById('noteCommentInput');
+            if (input) {
+                input.placeholder = 'Write a reply...';
+            }
+        }
+
+        async function postNoteComment() {
+            if (!isUserLoggedIn || !titaCurrentUser) {
+                alert('Please sign in to reply.');
+                return;
+            }
+
+            const input = document.getElementById('noteCommentInput');
+            const btn = document.getElementById('noteCommentSendBtn');
+            if (!input || !btn) return;
+
+            const text = input.value.trim().slice(0, NOTE_COMMENT_MAX_LEN);
+            if (!text) {
+                input.focus();
+                return;
+            }
+
+            if (!currentNoteUid) return;
+
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                const me = titaUserData || {};
+                const authorName = me.displayName || titaCurrentUser.displayName || titaCurrentUser.email || 'Anonymous';
+                const authorPhoto = me.photoURL || '';
+
+                // Match the note's expiry (24h from now, capped by note's own expiry)
+                const note = notesCache[currentNoteUid];
+                let expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                if (note && note.expireAt) {
+                    const noteExp = note.expireAt.seconds
+                        ? new Date(note.expireAt.seconds * 1000)
+                        : new Date(note.expireAt);
+                    if (noteExp < expireAt) expireAt = noteExp;
+                }
+
+                await db.collection('noteComments').add({
+                    noteUid: currentNoteUid,
+                    text,
+                    authorUid: titaCurrentUser.uid,
+                    authorName,
+                    authorPhoto,
+                    replyToId: currentReplyTo ? currentReplyTo.id : null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
+                });
+
+                input.value = '';
+                updateCommentCharCount();
+                cancelReplyTo();
+
+            } catch (err) {
+                console.error('Post comment error:', err);
+                alert('❌ Could not post reply: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteNoteComment(commentId) {
+            if (!isUserLoggedIn) return;
+            if (!confirm('Delete this reply?')) return;
+
+            try {
+                await db.collection('noteComments').doc(commentId).delete();
+            } catch (err) {
+                console.error('Delete comment error:', err);
+                alert('❌ Could not delete reply: ' + err.message);
+            }
+        }
+
+        // ================================================================
+        // ===== ANNOUNCEMENT SYSTEM =====
+        // ================================================================
         const ANNOUNCEMENT_TYPE_META = {
             'admin':     { icon: '📢', cls: 'type-admin',     label: 'Announcement' },
             'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
@@ -2324,24 +2391,28 @@
             } catch (e) { /* ignore */ }
         }
 
-        // ===== POPUP TOGGLE =====
-        function toggleAnnouncementPopup(event) {
+        function toggleAnnouncementPopup(event, source) {
             if (event) event.stopPropagation();
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            const bell = (source === 'mobile' || (!desktopBell && mobileBell)) ? mobileBell : desktopBell;
             if (!popup || !bell) return;
 
             const isOpen = popup.classList.toggle('open');
-            bell.classList.toggle('active', isOpen);
+            if (bell) bell.classList.toggle('active', isOpen);
 
             if (isOpen) {
-                positionAnnouncementPopup();
+                positionAnnouncementPopup(bell);
+            } else {
+                if (desktopBell) desktopBell.classList.remove('active');
+                if (mobileBell) mobileBell.classList.remove('active');
             }
         }
 
-        function positionAnnouncementPopup() {
+        function positionAnnouncementPopup(anchorBell) {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const bell = anchorBell || document.getElementById('announcementBell') || document.getElementById('announcementBellMobile');
             if (!popup || !bell) return;
 
             if (window.innerWidth > 768) {
@@ -2360,33 +2431,38 @@
 
         function closeAnnouncementPopup() {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
             if (popup) popup.classList.remove('open');
-            if (bell) bell.classList.remove('active');
+            if (desktopBell) desktopBell.classList.remove('active');
+            if (mobileBell) mobileBell.classList.remove('active');
         }
 
-        // ===== RENDER =====
         function renderAnnouncements() {
             const list = document.getElementById('announcementList');
             const footer = document.getElementById('announcementFooter');
-            const badge = document.getElementById('announcementBadge');
+            const badgeDesktop = document.getElementById('announcementBadge');
+            const badgeMobile = document.getElementById('announcementBadgeMobile');
             if (!list) return;
 
             const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
 
-            if (badge) {
+            const setBadge = (badge) => {
+                if (!badge) return;
                 if (unreadCount > 0) {
                     badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
                     badge.classList.add('show');
                 } else {
                     badge.classList.remove('show');
                 }
-            }
+            };
+            setBadge(badgeDesktop);
+            setBadge(badgeMobile);
 
-            const bell = document.getElementById('announcementBell');
-            if (bell) {
-                bell.classList.toggle('has-new', unreadCount > 0);
-            }
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            if (desktopBell) desktopBell.classList.toggle('has-new', unreadCount > 0);
+            if (mobileBell) mobileBell.classList.toggle('has-new', unreadCount > 0);
 
             if (announcementItems.length === 0) {
                 list.innerHTML = `
@@ -2414,7 +2490,7 @@
 
                 html += `
                     <div class="announcement-item ${isUnread ? 'unread' : ''}" data-announcement-id="${escapeAttr(item.id)}" onclick="handleAnnouncementClick('${escapeAttr(item.id)}')">
-                        <div class="announcement-icon ${meta.cls}">${meta.icon}</div>
+                        <div class="announcement-icon ${meta.cls}">${item.icon || meta.icon}</div>
                         <div class="announcement-body">
                             <div class="announcement-title">
                                 ${escapeHtml(item.title || 'Announcement')}
@@ -2437,9 +2513,6 @@
             }
         }
 
-        // ================================================================
-        // ===== READ STATE =====
-        // ================================================================
         async function markAnnouncementRead(id) {
             if (!announcementUser || announcementReadIds.has(id)) return;
             announcementReadIds.add(id);
@@ -2481,23 +2554,65 @@
             }
         }
 
-        // ===== CLICK HANDLER =====
         async function handleAnnouncementClick(id) {
             const item = announcementItems.find(a => a.id === id);
             if (!item) return;
 
             markAnnouncementRead(id);
-
-            if (item.link) {
-                setTimeout(() => {
-                    window.location.href = item.link;
-                }, 200);
-            }
+            closeAnnouncementPopup();
+            openAnnouncementView(item);
         }
 
-        // ================================================================
-        // ===== LOAD ANNOUNCEMENTS =====
-        // ================================================================
+        function openAnnouncementView(item) {
+            if (!item) return;
+            currentAnnouncementViewId = item.id;
+
+            const meta = getAnnouncementMeta(item.type);
+            const createdDate = item.createdAt
+                ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                : new Date();
+
+            document.getElementById('annViewIcon').textContent = item.icon || meta.icon;
+            document.getElementById('annViewType').textContent = meta.label;
+
+            const priorityEl = document.getElementById('annViewPriority');
+            if (item.priority === 'urgent') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority urgent';
+                priorityEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Urgent';
+            } else if (item.priority === 'info') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority info';
+                priorityEl.innerHTML = '<i class="fas fa-info-circle"></i> Info';
+            } else {
+                priorityEl.style.display = 'none';
+            }
+
+            document.getElementById('annViewTitle').textContent = item.title || 'Announcement';
+            document.getElementById('annViewMessage').textContent = item.message || '';
+            document.getElementById('annViewAuthor').textContent = item.createdByName || 'Admin';
+            document.getElementById('annViewTime').textContent = formatFullDate(createdDate);
+
+            const linkBtn = document.getElementById('annViewLinkBtn');
+            const linkLabel = document.getElementById('annViewLinkLabel');
+            if (item.link) {
+                linkBtn.style.display = 'inline-flex';
+                linkBtn.href = item.link;
+                linkLabel.textContent = item.linkLabel || 'Open Link';
+            } else {
+                linkBtn.style.display = 'none';
+            }
+
+            document.getElementById('announcementViewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAnnouncementView() {
+            document.getElementById('announcementViewModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentAnnouncementViewId = null;
+        }
+
         function loadAnnouncements(user) {
             if (!user) return;
             if (announcementUnsubscribe) announcementUnsubscribe();
@@ -2562,59 +2677,115 @@
                 });
         }
 
-        // ================================================================
         // ===== AUTO-GENERATION =====
-        // ================================================================
         function needsAnyAutogen(uid) {
             return (
-                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'birthdays_all') ||
                 !hasAutogenRunToday(uid, 'events') ||
                 !hasAutogenRunToday(uid, 'highlights')
             );
         }
 
-        async function autoGenerateBirthdayAnnouncement(user, userData) {
-            if (!userData || !userData.birthday) return;
-            if (hasAutogenRunToday(user.uid, 'birthday')) return;
-
-            const parts = userData.birthday.split('-');
-            if (parts.length !== 3) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const today = new Date();
-            const bMonth = parseInt(parts[1], 10) - 1;
-            const bDay = parseInt(parts[2], 10);
-
-            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const name = userData.displayName || user.displayName || user.email || 'Someone';
+        async function autoGenerateBirthdayAnnouncementsForEveryone(currentUser) {
+            if (hasAutogenRunToday(currentUser.uid, 'birthdays_all')) return;
 
             try {
-                await db.collection('announcements').add({
-                    type: 'birthday',
-                    title: `🎂 It's ${name}'s Birthday Today!`,
-                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
-                    icon: '🎂',
-                    priority: 'urgent',
-                    link: 'calendar.html',
-                    linkLabel: 'View Calendar',
-                    targetUid: user.uid,
-                    referenceId: user.uid,
-                    readBy: [],
-                    createdBy: 'system',
-                    createdByName: 'System',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                const today = new Date();
+                const todayMonth = today.getMonth();
+                const todayDate = today.getDate();
+
+                const snap = await db.collection('users').limit(200).get();
+
+                const todayBirthdayUsers = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.birthday || typeof data.birthday !== 'string') return;
+                    const parts = data.birthday.split('-');
+                    if (parts.length !== 3) return;
+
+                    const bMonth = parseInt(parts[1], 10) - 1;
+                    const bDay = parseInt(parts[2], 10);
+                    if (isNaN(bMonth) || isNaN(bDay)) return;
+
+                    if (bMonth === todayMonth && bDay === todayDate) {
+                        todayBirthdayUsers.push({
+                            uid: doc.id,
+                            name: data.displayName || data.email || 'Someone'
+                        });
+                    }
                 });
+
+                if (todayBirthdayUsers.length === 0) {
+                    markAutogenRunToday(currentUser.uid, 'birthdays_all');
+                    return;
+                }
+
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                let alreadyAnnouncedUids = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'birthday')
+                        .where('createdAt', '>=', todayStart)
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
+                    });
+                } catch (err) {
+                    console.warn('Birthday check query failed (may need index), falling back:', err.message);
+                    const fallbackSnap = await db.collection('announcements')
+                        .orderBy('createdAt', 'desc')
+                        .limit(50)
+                        .get();
+                    fallbackSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.type === 'birthday' && d.referenceId) {
+                            const createdAt = d.createdAt && d.createdAt.seconds
+                                ? new Date(d.createdAt.seconds * 1000)
+                                : null;
+                            if (createdAt && createdAt >= todayStart) {
+                                alreadyAnnouncedUids.add(d.referenceId);
+                            }
+                        }
+                    });
+                }
+
+                const batch = db.batch();
+                let created = 0;
+
+                todayBirthdayUsers.forEach(person => {
+                    if (alreadyAnnouncedUids.has(person.uid)) return;
+
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, {
+                        type: 'birthday',
+                        title: `🎂 It's ${person.name}'s Birthday Today!`,
+                        message: `Don't forget to greet ${person.name} a happy birthday! 🎉`,
+                        icon: '🎂',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Calendar',
+                        targetUid: '',
+                        referenceId: person.uid,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                    created++;
+                });
+
+                if (created > 0) await batch.commit();
+
             } catch (e) {
-                console.warn('birthday gen:', e.message);
+                console.warn('birthday gen (all):', e.message);
             }
-            markAutogenRunToday(user.uid, 'birthday');
+
+            markAutogenRunToday(currentUser.uid, 'birthdays_all');
         }
 
         async function autoGenerateEventReminders(user) {
@@ -2723,7 +2894,7 @@
 
             setTimeout(async () => {
                 try {
-                    await autoGenerateBirthdayAnnouncement(user, userData);
+                    await autoGenerateBirthdayAnnouncementsForEveryone(user);
                 } catch (e) { console.warn('birthday gen:', e.message); }
 
                 try {
@@ -2785,14 +2956,13 @@
                     ? `<a href="admin.html" class="profile-link"><i class="fas fa-cog"></i> Admin</a>`
                     : '';
 
-                // ✅ Bell now sits AFTER Profile, BEFORE Logout
                 authLinks.innerHTML = `
                     <a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a>
                     <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
                     ${adminLink}
                     <a href="profile.html" class="profile-link"><i class="fas fa-user"></i> Profile</a>
                     <div class="announcement-wrapper">
-                        <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                        <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event, 'desktop')" aria-label="Announcements">
                             <i class="fas fa-bell"></i>
                             <span class="announcement-badge" id="announcementBadge">0</span>
                         </button>
@@ -2821,7 +2991,6 @@
                 titaUserData = null;
                 isUserLoggedIn = false;
 
-                // ✅ Guests: hide popup + clean up listener
                 if (popup) popup.style.display = 'none';
                 closeAnnouncementPopup();
 
@@ -2849,6 +3018,10 @@
 
         async function logout() {
             try {
+                stopCommentAutoCleanup();
+                detachAllNoteCountListeners();
+                if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
+
                 if (auth.currentUser) {
                     try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
                 }
@@ -2938,7 +3111,7 @@
             }
         }
 
-        // ===== CAROUSEL DATA + RENDERING =====
+        // ===== CAROUSEL DATA =====
         const carouselDataStore = {};
 
         function loadCarouselData(collection, trackId, dotsId, carouselId) {
@@ -3324,7 +3497,7 @@
             setTimeout(() => openGallery(id), 180);
         }
 
-        // ===== HIGHLIGHT GALLERY MODAL =====
+        // ===== HIGHLIGHT GALLERY =====
         function openGallery(highlightId) {
             const item = highlightsData.find(h => h.id === highlightId);
             if (!item) return;
@@ -3465,7 +3638,6 @@
                 });
         }
 
-        // ===== RENDER MEMBERS SECTION =====
         function renderMembersSection() {
             const grid = document.getElementById('membersGrid');
             const countDisplay = document.getElementById('memberCountDisplay');
@@ -3563,7 +3735,7 @@
                     ? `<div class="member-locked-hint"><i class="fas fa-lock"></i> Sign in to see more</div>`
                     : '';
 
-                // ===== NOTE BUBBLE (IMPROVED) =====
+                // ===== NOTE BUBBLE with comment count =====
                 const note = notesCache[member.id];
                 let noteBubbleHtml = '';
                 if (note && note.text) {
@@ -3571,11 +3743,14 @@
                         ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
                         : null;
                     const isExpiringSoon = expireAt && (expireAt - new Date()) < 2 * 60 * 60 * 1000;
+                    const commentCount = noteCommentCounts[member.id] || 0;
+
                     noteBubbleHtml = `
-                        <div class="member-note-bubble" onclick="event.stopPropagation(); openNoteModal('${escapeAttr(member.id)}')" title="Tap to read full note">
+                        <div class="member-note-bubble" data-note-uid="${escapeAttr(member.id)}" onclick="event.stopPropagation(); openNoteModal('${escapeAttr(member.id)}')" title="Tap to read full note${isUserLoggedIn && commentCount > 0 ? ' and replies' : ''}">
                             <i class="fas fa-comment-dots"></i>
                             <span class="note-text-preview">${escapeHtml(note.text)}</span>
                             ${isExpiringSoon ? '<i class="fas fa-hourglass-half" style="color:#ef4444;font-size:11px;"></i>' : ''}
+                            ${isUserLoggedIn && commentCount > 0 ? `<span class="note-comment-count"><i class="fas fa-comment"></i> ${commentCount}</span>` : ''}
                         </div>
                     `;
                 }
@@ -3957,15 +4132,14 @@
 
         // ===== MODAL STATE HELPER =====
         function anyModalOpen() {
-            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal', 'noteModal'].some(id =>
+            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal', 'noteModal', 'announcementViewModal'].some(id =>
                 document.getElementById(id).classList.contains('active')
             );
         }
 
         // ================================================================
-        // ===== TITA TIMA AI ASSISTANT =====
+        // ===== TITA TIMA =====
         // ================================================================
-
         function toggleTitaPanel() {
             const panel = document.getElementById('titaPanel');
             if (panel.classList.contains('open')) {
@@ -4037,7 +4211,6 @@
                 customEl.style.display = 'block';
             }
 
-            // ===== Load existing note =====
             const note = notesCache[titaCurrentUser.uid];
             const noteInput = document.getElementById('titaNote');
             const noteCount = document.getElementById('titaNoteCount');
@@ -4066,7 +4239,6 @@
             msg.textContent = '';
         }
 
-        // Live character counter for note field
         document.addEventListener('DOMContentLoaded', function() {
             const noteInput = document.getElementById('titaNote');
             if (noteInput) {
@@ -4139,7 +4311,7 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
-                // ===== Save or delete note =====
+                // Save or delete note
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
                 const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
 
@@ -4211,6 +4383,14 @@
                         window.__rerenderHighlights();
                     }
                 }
+                const popup = document.getElementById('announcementPopup');
+                if (popup && popup.classList.contains('open')) {
+                    const isMobileNow = window.innerWidth <= 768;
+                    const anchor = isMobileNow
+                        ? document.getElementById('announcementBellMobile')
+                        : document.getElementById('announcementBell');
+                    positionAnnouncementPopup(anchor);
+                }
             }, 150);
         });
 
@@ -4221,6 +4401,9 @@
             loadCarouselData('thingsToDo', 'activitiesTrack', 'activitiesDots', 'activities');
             loadMembersFromFirestore();
             loadNotes();
+
+            // Start the comment auto-cleanup timer
+            startCommentAutoCleanup();
 
             setTimeout(() => { initHighlightsCarousel(); }, 500);
 
@@ -4234,6 +4417,13 @@
                     startAutoplay(id);
                 });
             });
+        });
+
+        // Stop cleanup when leaving the page
+        window.addEventListener('beforeunload', function() {
+            stopCommentAutoCleanup();
+            detachAllNoteCountListeners();
+            if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
         });
 
         function toggleMobileMenu() {
@@ -4270,12 +4460,14 @@
             const titaPanel = document.getElementById('titaPanel');
             const announcementPopup = document.getElementById('announcementPopup');
             const noteModal = document.getElementById('noteModal');
+            const announcementViewModal = document.getElementById('announcementViewModal');
 
             if (event.target === itemModal) closeItemModal();
             if (event.target === memberModal) closeMemberModal();
             if (event.target === galleryModal) closeGallery();
             if (event.target === highlightDetailModal) closeHighlightDetail();
             if (event.target === noteModal) closeNoteModal();
+            if (event.target === announcementViewModal) closeAnnouncementView();
 
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
@@ -4286,7 +4478,9 @@
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
                     !event.target.closest('#announcementBell') &&
-                    !event.target.closest('.announcement-wrapper')) {
+                    !event.target.closest('#announcementBellMobile') &&
+                    !event.target.closest('.announcement-wrapper') &&
+                    !event.target.closest('.navbar-mobile-bell')) {
                     closeAnnouncementPopup();
                 }
             }
@@ -4294,21 +4488,14 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key !== 'Escape') return;
-            if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
+            if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
+            else if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
             else if (document.getElementById('highlightDetailModal').classList.contains('active')) closeHighlightDetail();
             else if (document.getElementById('memberModal').classList.contains('active')) closeMemberModal();
             else if (document.getElementById('itemModal').classList.contains('active')) closeItemModal();
             else if (document.getElementById('noteModal').classList.contains('active')) closeNoteModal();
             else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
             else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
-        });
-
-        // Reposition popup on resize
-        window.addEventListener('resize', function() {
-            const popup = document.getElementById('announcementPopup');
-            if (popup && popup.classList.contains('open')) {
-                positionAnnouncementPopup();
-            }
         });
     </script>
 

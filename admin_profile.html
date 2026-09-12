@@ -132,6 +132,25 @@
             transform: scale(1.03);
         }
 
+        /* ===== NAVBAR RIGHT WRAPPER (holds mobile bell + burger) ===== */
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Mobile bell — hidden on desktop, shown on mobile only */
+        .navbar-mobile-bell {
+            display: none;
+            position: relative;
+        }
+        .navbar-mobile-bell .announcement-bell {
+            width: 42px;
+            height: 42px;
+            font-size: 17px;
+        }
+
         .navbar .mobile-toggle {
             display: none;
             font-size: 24px;
@@ -139,6 +158,7 @@
             cursor: pointer;
             background: none;
             border: none;
+            padding: 4px 8px;
         }
 
         /* ================================================================
@@ -419,6 +439,239 @@
 
         .announcement-empty p {
             font-size: 13px;
+        }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT VIEW MODAL =====
+           ================================================================ */
+        .announcement-view-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .announcement-view-modal.active {
+            display: flex;
+        }
+
+        .announcement-view-modal .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            max-width: 540px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(139, 92, 246, 0.35);
+            animation: annModalPop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes annModalPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .announcement-view-header {
+            position: relative;
+            padding: 30px 30px 22px;
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+            border-radius: 24px 24px 0 0;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .announcement-view-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+        }
+
+        .announcement-view-header::after {
+            content: '';
+            position: absolute;
+            bottom: -70px;
+            left: -70px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        .announcement-view-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.22);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 2;
+        }
+
+        .announcement-view-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: rotate(90deg);
+        }
+
+        .announcement-view-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 22px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-view-type {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 50px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-view-body {
+            padding: 26px 30px 30px;
+        }
+
+        .announcement-view-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .announcement-view-priority.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-view-priority.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-view-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1.3;
+            margin-bottom: 14px;
+        }
+
+        .announcement-view-message {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.7;
+            padding: 18px 20px;
+            background: #f8faff;
+            border-radius: 16px;
+            border-left: 4px solid #7c3aed;
+            margin-bottom: 18px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .announcement-view-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 12px;
+            color: #888;
+            padding-top: 16px;
+            border-top: 1px solid #f0f4ff;
+            margin-bottom: 20px;
+        }
+
+        .announcement-view-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .announcement-view-meta i {
+            color: #7c3aed;
+            font-size: 11px;
+        }
+
+        .announcement-view-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .announcement-view-actions button,
+        .announcement-view-actions a {
+            flex: 1;
+            min-width: 140px;
+            padding: 13px 22px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .announcement-view-actions .ann-view-primary {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .announcement-view-actions .ann-view-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.45);
+        }
+
+        .announcement-view-actions .ann-view-secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .announcement-view-actions .ann-view-secondary:hover {
+            background: #e5e7eb;
         }
 
         .main-container {
@@ -734,14 +987,21 @@
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
-                flex-direction: column;
+                flex-direction: row;
                 gap: 10px;
-                align-items: flex-start;
+                align-items: center;
             }
 
             .navbar .logo {
                 font-size: 22px;
             }
+
+            /* ===== MOBILE BELL: next to burger, outside collapsible menu ===== */
+            .navbar-mobile-bell { display: block; }
+            .navbar .mobile-toggle { display: block; }
+
+            /* Hide the bell that lives inside the collapsible menu on mobile */
+            .navbar .nav-links > li.announcement-li .announcement-wrapper { display: none; }
 
             .navbar .nav-links {
                 display: none;
@@ -753,7 +1013,7 @@
                 background: white;
                 padding: 20px;
                 border-bottom: 2px solid #f0f4ff;
-                gap: 10px;
+                gap: 12px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
                 width: 100%;
                 max-height: calc(100vh - 60px);
@@ -764,33 +1024,8 @@
                 display: flex;
             }
 
-            .navbar .mobile-toggle {
-                display: block;
-                position: absolute;
-                right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
             .navbar .nav-links > li { width: 100%; justify-content: center; }
             .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
-
-            /* Bell on mobile */
-            .navbar .nav-links > li.announcement-li {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-                padding: 4px 0;
-            }
-            .announcement-bell {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-            }
-            .announcement-badge {
-                top: -2px;
-                right: -2px;
-            }
 
             .announcement-popup {
                 position: fixed !important;
@@ -850,6 +1085,16 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            /* Announcement view modal on mobile */
+            .announcement-view-modal .modal-content { max-width: calc(100vw - 24px); max-height: 94vh; }
+            .announcement-view-header { padding: 24px 22px 18px; }
+            .announcement-view-icon { width: 64px; height: 64px; font-size: 30px; border-radius: 18px; }
+            .announcement-view-body { padding: 20px 22px 24px; }
+            .announcement-view-title { font-size: 19px; }
+            .announcement-view-message { font-size: 14px; padding: 14px 16px; }
+            .announcement-view-actions { flex-direction: column; }
+            .announcement-view-actions button, .announcement-view-actions a { width: 100%; min-width: 0; }
         }
 
         @media (max-width: 480px) {
@@ -885,6 +1130,11 @@
                 left: 10px !important;
                 right: 10px !important;
             }
+
+            .announcement-view-header { padding: 20px 18px 16px; }
+            .announcement-view-icon { width: 56px; height: 56px; font-size: 26px; }
+            .announcement-view-body { padding: 18px 18px 22px; }
+            .announcement-view-title { font-size: 17px; }
         }
 
         ::-webkit-scrollbar {
@@ -914,13 +1164,25 @@
 <body>
     <nav class="navbar" id="navbar">
         <a href="admin.html" class="logo">TIMAWA <span>ADMIN</span></a>
-        <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+
+        <div class="navbar-right">
+            <!-- Mobile-only bell (hidden on desktop) -->
+            <div class="navbar-mobile-bell">
+                <button class="announcement-bell" id="announcementBellMobile" onclick="toggleAnnouncementPopup(event, 'mobile')" aria-label="Announcements">
+                    <i class="fas fa-bell"></i>
+                    <span class="announcement-badge" id="announcementBadgeMobile">0</span>
+                </button>
+            </div>
+
+            <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+
         <ul class="nav-links" id="navLinks">
             <li><a href="admin.html"><i class="fas fa-cog"></i> Admin Panel</a></li>
             <li><a href="admin_profile.html" class="active admin-link"><i class="fas fa-user-shield"></i> Admin Profile</a></li>
             <li class="announcement-li">
                 <div class="announcement-wrapper">
-                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event, 'desktop')" aria-label="Announcements">
                         <i class="fas fa-bell"></i>
                         <span class="announcement-badge" id="announcementBadge">0</span>
                     </button>
@@ -944,6 +1206,36 @@
         </div>
         <div class="announcement-popup-footer" id="announcementFooter">
             No new announcements
+        </div>
+    </div>
+
+    <!-- ===== ANNOUNCEMENT FULL VIEW MODAL ===== -->
+    <div id="announcementViewModal" class="announcement-view-modal" role="dialog" aria-labelledby="annViewTitle">
+        <div class="modal-content">
+            <div class="announcement-view-header">
+                <button class="announcement-view-close" onclick="closeAnnouncementView()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="announcement-view-icon" id="annViewIcon">📢</div>
+                <div class="announcement-view-type" id="annViewType">Announcement</div>
+            </div>
+            <div class="announcement-view-body">
+                <div class="announcement-view-priority" id="annViewPriority" style="display:none;"></div>
+                <div class="announcement-view-title" id="annViewTitle">Announcement Title</div>
+                <div class="announcement-view-message" id="annViewMessage">Announcement message...</div>
+                <div class="announcement-view-meta" id="annViewMeta">
+                    <span><i class="fas fa-user"></i> <span id="annViewAuthor">Admin</span></span>
+                    <span><i class="fas fa-clock"></i> <span id="annViewTime">Just now</span></span>
+                </div>
+                <div class="announcement-view-actions">
+                    <a href="#" id="annViewLinkBtn" class="ann-view-primary" style="display:none;">
+                        <i class="fas fa-arrow-right"></i> <span id="annViewLinkLabel">Open</span>
+                    </a>
+                    <button class="ann-view-secondary" onclick="closeAnnouncementView()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1118,6 +1410,7 @@
         let announcementUnsubscribe = null;
         let announcementItems = [];
         let announcementReadIds = new Set();
+        let currentAnnouncementViewId = null;
 
         const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
         const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
@@ -1150,6 +1443,18 @@
             const diffDay = Math.floor(diffHr / 24);
             if (diffDay < 7) return `${diffDay}d ago`;
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function formatFullDate(date) {
+            if (!date) return '';
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
 
         // ================================================================
@@ -1234,23 +1539,28 @@
         }
 
         // ===== POPUP TOGGLE =====
-        function toggleAnnouncementPopup(event) {
+        function toggleAnnouncementPopup(event, source) {
             if (event) event.stopPropagation();
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            const bell = (source === 'mobile' || (!desktopBell && mobileBell)) ? mobileBell : desktopBell;
             if (!popup || !bell) return;
 
             const isOpen = popup.classList.toggle('open');
-            bell.classList.toggle('active', isOpen);
+            if (bell) bell.classList.toggle('active', isOpen);
 
             if (isOpen) {
-                positionAnnouncementPopup();
+                positionAnnouncementPopup(bell);
+            } else {
+                if (desktopBell) desktopBell.classList.remove('active');
+                if (mobileBell) mobileBell.classList.remove('active');
             }
         }
 
-        function positionAnnouncementPopup() {
+        function positionAnnouncementPopup(anchorBell) {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const bell = anchorBell || document.getElementById('announcementBell') || document.getElementById('announcementBellMobile');
             if (!popup || !bell) return;
 
             if (window.innerWidth > 768) {
@@ -1269,33 +1579,39 @@
 
         function closeAnnouncementPopup() {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
             if (popup) popup.classList.remove('open');
-            if (bell) bell.classList.remove('active');
+            if (desktopBell) desktopBell.classList.remove('active');
+            if (mobileBell) mobileBell.classList.remove('active');
         }
 
         // ===== RENDER =====
         function renderAnnouncements() {
             const list = document.getElementById('announcementList');
             const footer = document.getElementById('announcementFooter');
-            const badge = document.getElementById('announcementBadge');
+            const badgeDesktop = document.getElementById('announcementBadge');
+            const badgeMobile = document.getElementById('announcementBadgeMobile');
             if (!list) return;
 
             const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
 
-            if (badge) {
+            const setBadge = (badge) => {
+                if (!badge) return;
                 if (unreadCount > 0) {
                     badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
                     badge.classList.add('show');
                 } else {
                     badge.classList.remove('show');
                 }
-            }
+            };
+            setBadge(badgeDesktop);
+            setBadge(badgeMobile);
 
-            const bell = document.getElementById('announcementBell');
-            if (bell) {
-                bell.classList.toggle('has-new', unreadCount > 0);
-            }
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            if (desktopBell) desktopBell.classList.toggle('has-new', unreadCount > 0);
+            if (mobileBell) mobileBell.classList.toggle('has-new', unreadCount > 0);
 
             if (announcementItems.length === 0) {
                 list.innerHTML = `
@@ -1387,17 +1703,67 @@
             }
         }
 
+        // ===== CLICK HANDLER (opens full view modal) =====
         async function handleAnnouncementClick(id) {
             const item = announcementItems.find(a => a.id === id);
             if (!item) return;
 
             markAnnouncementRead(id);
+            closeAnnouncementPopup();
+            openAnnouncementView(item);
+        }
 
-            if (item.link) {
-                setTimeout(() => {
-                    window.location.href = item.link;
-                }, 200);
+        // ================================================================
+        // ===== ANNOUNCEMENT FULL VIEW MODAL =====
+        // ================================================================
+        function openAnnouncementView(item) {
+            if (!item) return;
+            currentAnnouncementViewId = item.id;
+
+            const meta = getAnnouncementMeta(item.type);
+            const createdDate = item.createdAt
+                ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                : new Date();
+
+            document.getElementById('annViewIcon').textContent = item.icon || meta.icon;
+            document.getElementById('annViewType').textContent = meta.label;
+
+            const priorityEl = document.getElementById('annViewPriority');
+            if (item.priority === 'urgent') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority urgent';
+                priorityEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Urgent';
+            } else if (item.priority === 'info') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority info';
+                priorityEl.innerHTML = '<i class="fas fa-info-circle"></i> Info';
+            } else {
+                priorityEl.style.display = 'none';
             }
+
+            document.getElementById('annViewTitle').textContent = item.title || 'Announcement';
+            document.getElementById('annViewMessage').textContent = item.message || '';
+            document.getElementById('annViewAuthor').textContent = item.createdByName || 'Admin';
+            document.getElementById('annViewTime').textContent = formatFullDate(createdDate);
+
+            const linkBtn = document.getElementById('annViewLinkBtn');
+            const linkLabel = document.getElementById('annViewLinkLabel');
+            if (item.link) {
+                linkBtn.style.display = 'inline-flex';
+                linkBtn.href = item.link;
+                linkLabel.textContent = item.linkLabel || 'Open Link';
+            } else {
+                linkBtn.style.display = 'none';
+            }
+
+            document.getElementById('announcementViewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAnnouncementView() {
+            document.getElementById('announcementViewModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentAnnouncementViewId = null;
         }
 
         function loadAnnouncements(user) {
@@ -1467,54 +1833,115 @@
         // ===== AUTO-GENERATION =====
         function needsAnyAutogen(uid) {
             return (
-                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'birthdays_all') ||
                 !hasAutogenRunToday(uid, 'events') ||
                 !hasAutogenRunToday(uid, 'highlights')
             );
         }
 
-        async function autoGenerateBirthdayAnnouncement(user, userData) {
-            if (!userData || !userData.birthday) return;
-            if (hasAutogenRunToday(user.uid, 'birthday')) return;
-
-            const parts = userData.birthday.split('-');
-            if (parts.length !== 3) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const today = new Date();
-            const bMonth = parseInt(parts[1], 10) - 1;
-            const bDay = parseInt(parts[2], 10);
-
-            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const name = userData.displayName || user.displayName || user.email || 'Someone';
+        // ================================================================
+        // ===== FIX #1: Generate birthday announcements for EVERYONE =====
+        // ================================================================
+        async function autoGenerateBirthdayAnnouncementsForEveryone(currentUser) {
+            if (hasAutogenRunToday(currentUser.uid, 'birthdays_all')) return;
 
             try {
-                await db.collection('announcements').add({
-                    type: 'birthday',
-                    title: `🎂 It's ${name}'s Birthday Today!`,
-                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
-                    icon: '🎂',
-                    priority: 'urgent',
-                    link: 'calendar.html',
-                    linkLabel: 'View Calendar',
-                    targetUid: user.uid,
-                    referenceId: user.uid,
-                    readBy: [],
-                    createdBy: 'system',
-                    createdByName: 'System',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                const today = new Date();
+                const todayMonth = today.getMonth();
+                const todayDate = today.getDate();
+
+                const snap = await db.collection('users').limit(200).get();
+
+                const todayBirthdayUsers = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.birthday || typeof data.birthday !== 'string') return;
+                    const parts = data.birthday.split('-');
+                    if (parts.length !== 3) return;
+
+                    const bMonth = parseInt(parts[1], 10) - 1;
+                    const bDay = parseInt(parts[2], 10);
+                    if (isNaN(bMonth) || isNaN(bDay)) return;
+
+                    if (bMonth === todayMonth && bDay === todayDate) {
+                        todayBirthdayUsers.push({
+                            uid: doc.id,
+                            name: data.displayName || data.email || 'Someone'
+                        });
+                    }
                 });
+
+                if (todayBirthdayUsers.length === 0) {
+                    markAutogenRunToday(currentUser.uid, 'birthdays_all');
+                    return;
+                }
+
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                let alreadyAnnouncedUids = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'birthday')
+                        .where('createdAt', '>=', todayStart)
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
+                    });
+                } catch (err) {
+                    console.warn('Birthday check query failed (may need index), falling back:', err.message);
+                    const fallbackSnap = await db.collection('announcements')
+                        .orderBy('createdAt', 'desc')
+                        .limit(50)
+                        .get();
+                    fallbackSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.type === 'birthday' && d.referenceId) {
+                            const createdAt = d.createdAt && d.createdAt.seconds
+                                ? new Date(d.createdAt.seconds * 1000)
+                                : null;
+                            if (createdAt && createdAt >= todayStart) {
+                                alreadyAnnouncedUids.add(d.referenceId);
+                            }
+                        }
+                    });
+                }
+
+                const batch = db.batch();
+                let created = 0;
+
+                todayBirthdayUsers.forEach(person => {
+                    if (alreadyAnnouncedUids.has(person.uid)) return;
+
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, {
+                        type: 'birthday',
+                        title: `🎂 It's ${person.name}'s Birthday Today!`,
+                        message: `Don't forget to greet ${person.name} a happy birthday! 🎉`,
+                        icon: '🎂',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Calendar',
+                        targetUid: '', // 🌐 visible to everyone
+                        referenceId: person.uid,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                    created++;
+                });
+
+                if (created > 0) await batch.commit();
+
             } catch (e) {
-                console.warn('birthday gen:', e.message);
+                console.warn('birthday gen (all):', e.message);
             }
-            markAutogenRunToday(user.uid, 'birthday');
+
+            markAutogenRunToday(currentUser.uid, 'birthdays_all');
         }
 
         async function autoGenerateEventReminders(user) {
@@ -1622,9 +2049,17 @@
             if (!needsAnyAutogen(user.uid)) return;
 
             setTimeout(async () => {
-                try { await autoGenerateBirthdayAnnouncement(user, userData); } catch (e) { console.warn('birthday gen:', e.message); }
-                try { await autoGenerateEventReminders(user); } catch (e) { console.warn('event gen:', e.message); }
-                try { await autoGenerateHighlightAnnouncements(user); } catch (e) { console.warn('highlight gen:', e.message); }
+                try {
+                    await autoGenerateBirthdayAnnouncementsForEveryone(user);
+                } catch (e) { console.warn('birthday gen:', e.message); }
+
+                try {
+                    await autoGenerateEventReminders(user);
+                } catch (e) { console.warn('event gen:', e.message); }
+
+                try {
+                    await autoGenerateHighlightAnnouncements(user);
+                } catch (e) { console.warn('highlight gen:', e.message); }
             }, 1500);
         }
 
@@ -2097,13 +2532,29 @@
             }
         }
 
+        // ===== MODAL STATE HELPER =====
+        function anyModalOpen() {
+            return ['announcementViewModal'].some(id => {
+                const el = document.getElementById(id);
+                return el && el.classList.contains('active');
+            });
+        }
+
         // ===== CLOSE ANNOUNCEMENT POPUP ON OUTSIDE CLICK =====
         window.addEventListener('click', function(event) {
             const announcementPopup = document.getElementById('announcementPopup');
+            const announcementViewModal = document.getElementById('announcementViewModal');
+
+            if (event.target === announcementViewModal) {
+                closeAnnouncementView();
+            }
+
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
                     !event.target.closest('#announcementBell') &&
-                    !event.target.closest('.announcement-wrapper')) {
+                    !event.target.closest('#announcementBellMobile') &&
+                    !event.target.closest('.announcement-wrapper') &&
+                    !event.target.closest('.navbar-mobile-bell')) {
                     closeAnnouncementPopup();
                 }
             }
@@ -2112,8 +2563,11 @@
         // ===== ESCAPE KEY HANDLER =====
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
+                const viewModal = document.getElementById('announcementViewModal');
                 const popup = document.getElementById('announcementPopup');
-                if (popup && popup.classList.contains('open')) {
+                if (viewModal && viewModal.classList.contains('active')) {
+                    closeAnnouncementView();
+                } else if (popup && popup.classList.contains('open')) {
                     closeAnnouncementPopup();
                 }
             }
@@ -2123,7 +2577,11 @@
         window.addEventListener('resize', function() {
             const popup = document.getElementById('announcementPopup');
             if (popup && popup.classList.contains('open')) {
-                positionAnnouncementPopup();
+                const isMobileNow = window.innerWidth <= 768;
+                const anchor = isMobileNow
+                    ? document.getElementById('announcementBellMobile')
+                    : document.getElementById('announcementBell');
+                positionAnnouncementPopup(anchor);
             }
         });
     </script>

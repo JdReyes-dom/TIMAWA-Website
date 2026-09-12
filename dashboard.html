@@ -165,6 +165,25 @@
             transform: scale(1.03);
         }
 
+        /* ===== NAVBAR RIGHT WRAPPER (holds mobile bell + burger) ===== */
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Mobile bell — hidden on desktop, shown on mobile only */
+        .navbar-mobile-bell {
+            display: none;
+            position: relative;
+        }
+        .navbar-mobile-bell .announcement-bell {
+            width: 42px;
+            height: 42px;
+            font-size: 17px;
+        }
+
         .navbar .mobile-toggle {
             display: none;
             font-size: 24px;
@@ -172,6 +191,7 @@
             cursor: pointer;
             background: none;
             border: none;
+            padding: 4px 8px;
         }
 
         /* ================================================================
@@ -452,6 +472,239 @@
 
         .announcement-empty p {
             font-size: 13px;
+        }
+
+        /* ================================================================
+           ===== ANNOUNCEMENT VIEW MODAL =====
+           ================================================================ */
+        .announcement-view-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .announcement-view-modal.active {
+            display: flex;
+        }
+
+        .announcement-view-modal .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            max-width: 540px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(16, 137, 211, 0.35);
+            animation: annModalPop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes annModalPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .announcement-view-header {
+            position: relative;
+            padding: 30px 30px 22px;
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            border-radius: 24px 24px 0 0;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .announcement-view-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+        }
+
+        .announcement-view-header::after {
+            content: '';
+            position: absolute;
+            bottom: -70px;
+            left: -70px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        .announcement-view-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.22);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 2;
+        }
+
+        .announcement-view-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: rotate(90deg);
+        }
+
+        .announcement-view-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 22px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-view-type {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 50px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-view-body {
+            padding: 26px 30px 30px;
+        }
+
+        .announcement-view-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .announcement-view-priority.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-view-priority.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-view-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1.3;
+            margin-bottom: 14px;
+        }
+
+        .announcement-view-message {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.7;
+            padding: 18px 20px;
+            background: #f8faff;
+            border-radius: 16px;
+            border-left: 4px solid rgb(16, 137, 211);
+            margin-bottom: 18px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .announcement-view-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 12px;
+            color: #888;
+            padding-top: 16px;
+            border-top: 1px solid #f0f4ff;
+            margin-bottom: 20px;
+        }
+
+        .announcement-view-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .announcement-view-meta i {
+            color: rgb(16, 137, 211);
+            font-size: 11px;
+        }
+
+        .announcement-view-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .announcement-view-actions button,
+        .announcement-view-actions a {
+            flex: 1;
+            min-width: 140px;
+            padding: 13px 22px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .announcement-view-actions .ann-view-primary {
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.3);
+        }
+
+        .announcement-view-actions .ann-view-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.45);
+        }
+
+        .announcement-view-actions .ann-view-secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .announcement-view-actions .ann-view-secondary:hover {
+            background: #e5e7eb;
         }
 
         .main-container {
@@ -1776,14 +2029,17 @@
         }
 
         /* ================================================================
-           ===== NOTE POPUP MODAL =====
+           ===== NOTE POPUP MODAL WITH COMMENTS =====
            ================================================================ */
         .note-modal .modal-content {
             background: white;
             border-radius: 24px;
             padding: 0;
-            max-width: 420px;
+            max-width: 480px;
             width: 100%;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
         }
@@ -1792,6 +2048,7 @@
             padding: 22px 24px 18px;
             text-align: center;
             position: relative;
+            flex-shrink: 0;
         }
         .note-modal .note-modal-header .note-modal-close {
             position: absolute;
@@ -1847,8 +2104,10 @@
             font-weight: 500;
         }
         .note-modal .note-modal-body {
-            padding: 24px 26px 26px;
+            padding: 22px 24px 24px;
             text-align: center;
+            overflow-y: auto;
+            flex: 1;
         }
         .note-modal .note-modal-text {
             font-size: 18px;
@@ -1859,7 +2118,7 @@
             background: #f8faff;
             border-radius: 16px;
             border: 1.5px solid #eef2f7;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
             word-break: break-word;
             white-space: pre-wrap;
         }
@@ -1871,6 +2130,7 @@
             justify-content: center;
             gap: 6px;
             font-weight: 600;
+            margin-bottom: 20px;
         }
         .note-modal .note-modal-expiry i {
             color: rgb(16, 137, 211);
@@ -1881,6 +2141,244 @@
         .note-modal .note-modal-expiry.urgent i {
             color: #ef4444;
         }
+
+        /* ===== COMMENTS SECTION ===== */
+        .note-comments-section {
+            text-align: left;
+            border-top: 1px solid #f0f4ff;
+            padding-top: 18px;
+            margin-top: 4px;
+        }
+        .note-comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .note-comments-header .title-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .note-comments-header .title-group i {
+            color: rgb(16, 137, 211);
+            font-size: 13px;
+        }
+        .note-comments-header .comment-count-pill {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 1px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .note-comments-list {
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-bottom: 12px;
+        }
+        .note-comments-list::-webkit-scrollbar { width: 5px; }
+        .note-comments-list::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
+        .note-comments-list::-webkit-scrollbar-thumb { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); border-radius: 10px; }
+
+        .note-comment {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f8faff;
+            border: 1px solid #eef2f7;
+            margin-bottom: 8px;
+            animation: commentFadeIn 0.3s ease-out;
+            position: relative;
+        }
+        @keyframes commentFadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .note-comment.reply-indent {
+            margin-left: 28px;
+            background: #fafcff;
+            border-color: #e0f2fe;
+        }
+        .note-comment.reply-indent::before {
+            content: '';
+            position: absolute;
+            left: -14px; top: 50%;
+            width: 12px; height: 2px;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .note-comment .comment-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            flex-shrink: 0; overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .note-comment .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .note-comment .comment-main {
+            flex: 1; min-width: 0; text-align: left;
+        }
+        .note-comment .comment-top-row {
+            display: flex; align-items: baseline; gap: 8px;
+            flex-wrap: wrap; margin-bottom: 2px;
+        }
+        .note-comment .comment-author {
+            font-size: 12px; font-weight: 800;
+            color: #1a1a2e;
+        }
+        .note-comment .comment-author.is-me {
+            color: rgb(16, 137, 211);
+        }
+        .note-comment .comment-author.is-me::after {
+            content: ' (you)';
+            font-size: 10px; font-weight: 600;
+            color: #888;
+        }
+        .note-comment .comment-time {
+            font-size: 10px; color: #aaa;
+            font-weight: 600;
+        }
+        .note-comment .comment-text {
+            font-size: 13px; color: #444;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+        .note-comment .comment-actions {
+            display: flex; gap: 4px;
+            margin-top: 4px;
+        }
+        .note-comment .comment-actions button {
+            background: none; border: none;
+            color: rgb(16, 137, 211);
+            font-size: 11px; font-weight: 700;
+            cursor: pointer; padding: 2px 6px;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+        .note-comment .comment-actions button:hover { background: rgba(16, 137, 211, 0.1); }
+        .note-comment .comment-actions button.delete-btn { color: #dc2626; }
+        .note-comment .comment-actions button.delete-btn:hover { background: rgba(220, 38, 38, 0.1); }
+
+        .note-comments-empty {
+            text-align: center;
+            padding: 22px 12px;
+            color: #aaa;
+            font-size: 13px;
+        }
+        .note-comments-empty i {
+            font-size: 28px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* ===== COMMENT INPUT ===== */
+        .note-comment-input-wrap {
+            display: flex; gap: 8px; align-items: flex-start;
+            padding-top: 12px;
+            border-top: 1px solid #f0f4ff;
+        }
+        .note-comment-input-wrap .my-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            flex-shrink: 0; overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .note-comment-input-wrap .my-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .note-comment-input-wrap .input-stack {
+            flex: 1; min-width: 0;
+        }
+        .note-comment-input-wrap .replying-to-banner {
+            display: none;
+            font-size: 11px;
+            color: rgb(16, 137, 211);
+            background: #e0f2fe;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-weight: 700;
+        }
+        .note-comment-input-wrap .replying-to-banner.show { display: flex; }
+        .note-comment-input-wrap .replying-to-banner button {
+            background: none; border: none;
+            color: #dc2626; cursor: pointer;
+            font-size: 12px; padding: 0 4px;
+            font-family: inherit;
+        }
+        .note-comment-input-wrap .input-row {
+            display: flex; gap: 8px; align-items: flex-end;
+        }
+        .note-comment-input-wrap textarea {
+            flex: 1;
+            min-height: 40px;
+            max-height: 100px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e0e7ff;
+            background: #f8faff;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            resize: none;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+        .note-comment-input-wrap textarea:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+        .note-comment-input-wrap .send-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
+        }
+        .note-comment-input-wrap .send-btn:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px rgba(16, 137, 211, 0.45);
+        }
+        .note-comment-input-wrap .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .note-comment-input-wrap .char-count {
+            font-size: 10px;
+            color: #aaa;
+            text-align: right;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .note-comment-input-wrap .char-count.warn { color: #f59e0b; }
+        .note-comment-input-wrap .char-count.danger { color: #dc2626; }
 
         /* ================================================================
            ===== TITA TIMA AI ASSISTANT (FLOATING) =====
@@ -2182,12 +2680,19 @@
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
-                flex-direction: column;
+                flex-direction: row;
                 gap: 10px;
-                align-items: flex-start;
+                align-items: center;
             }
 
             .navbar .logo { font-size: 22px; }
+
+            /* ===== MOBILE BELL: next to burger, outside collapsible menu ===== */
+            .navbar-mobile-bell { display: block; }
+            .navbar .mobile-toggle { display: block; }
+
+            /* Hide the bell that lives inside the collapsible menu on mobile */
+            .navbar .nav-links > li.announcement-li .announcement-wrapper { display: none; }
 
             .navbar .nav-links {
                 display: none;
@@ -2199,7 +2704,7 @@
                 background: white;
                 padding: 20px;
                 border-bottom: 2px solid #f0f4ff;
-                gap: 10px;
+                gap: 12px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
                 width: 100%;
                 max-height: calc(100vh - 60px);
@@ -2208,33 +2713,8 @@
 
             .navbar .nav-links.active { display: flex; }
 
-            .navbar .mobile-toggle {
-                display: block;
-                position: absolute;
-                right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
             .navbar .nav-links > li { width: 100%; justify-content: center; }
             .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
-
-            /* Bell on mobile: full-width row, icon centered */
-            .navbar .nav-links > li.announcement-li {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-                padding: 4px 0;
-            }
-            .announcement-bell {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-            }
-            .announcement-badge {
-                top: -2px;
-                right: -2px;
-            }
 
             /* Popup on mobile: fixed below navbar, full-width */
             .announcement-popup {
@@ -2296,6 +2776,25 @@
             .member-detail-modal .member-hero-name { font-size: 21px; }
             .member-detail-modal .member-modal-body { padding: 20px 20px 22px; }
             .member-detail-modal .member-modal-actions { flex-direction: column; }
+
+            /* Announcement view modal on mobile */
+            .announcement-view-modal .modal-content { max-width: calc(100vw - 24px); max-height: 94vh; }
+            .announcement-view-header { padding: 24px 22px 18px; }
+            .announcement-view-icon { width: 64px; height: 64px; font-size: 30px; border-radius: 18px; }
+            .announcement-view-body { padding: 20px 22px 24px; }
+            .announcement-view-title { font-size: 19px; }
+            .announcement-view-message { font-size: 14px; padding: 14px 16px; }
+            .announcement-view-actions { flex-direction: column; }
+            .announcement-view-actions button, .announcement-view-actions a { width: 100%; min-width: 0; }
+
+            /* Note modal on mobile */
+            .note-modal .modal-content { max-width: calc(100vw - 24px); }
+            .note-modal .note-modal-body { padding: 18px 20px 20px; }
+            .note-comments-list { max-height: 220px; }
+
+            .note-comment.reply-indent { margin-left: 18px; }
+            .note-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .note-comment .comment-text { font-size: 12px; }
 
             .tita-launcher {
                 bottom: calc(20px + env(safe-area-inset-bottom, 0px));
@@ -2384,6 +2883,11 @@
                 right: 10px !important;
             }
 
+            .announcement-view-header { padding: 20px 18px 16px; }
+            .announcement-view-icon { width: 56px; height: 56px; font-size: 26px; }
+            .announcement-view-body { padding: 18px 18px 22px; }
+            .announcement-view-title { font-size: 17px; }
+
             .tita-launcher {
                 bottom: calc(18px + env(safe-area-inset-bottom, 0px));
                 right: 16px;
@@ -2415,21 +2919,34 @@
     </style>
 </head>
 <body>
+    <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo">TIMAWA <span>HUB</span></a>
-        <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+
+        <div class="navbar-right">
+            <!-- Mobile-only bell (hidden on desktop) -->
+            <div class="navbar-mobile-bell">
+                <button class="announcement-bell" id="announcementBellMobile" onclick="toggleAnnouncementPopup(event, 'mobile')" aria-label="Announcements">
+                    <i class="fas fa-bell"></i>
+                    <span class="announcement-badge" id="announcementBadgeMobile">0</span>
+                </button>
+            </div>
+
+            <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+
         <ul class="nav-links" id="navLinks">
             <li><a href="index.html#highlights">Highlights</a></li>
             <li><a href="index.html#coffee-shops">Coffee</a></li>
             <li><a href="index.html#favorite-places">Places</a></li>
             <li><a href="index.html#things-to-do">Activities</a></li>
             <li><a href="index.html#members-section">Members</a></li>
-            <li><a href="calendar.html">Calendar</a></li>
+            <li><a href="calendar.html"><i class="fas fa-calendar-alt"></i> Calendar</a></li>
             <li><a href="dashboard.html" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
             <li class="announcement-li">
                 <div class="announcement-wrapper">
-                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event, 'desktop')" aria-label="Announcements">
                         <i class="fas fa-bell"></i>
                         <span class="announcement-badge" id="announcementBadge">0</span>
                     </button>
@@ -2453,6 +2970,36 @@
         </div>
         <div class="announcement-popup-footer" id="announcementFooter">
             No new announcements
+        </div>
+    </div>
+
+    <!-- ===== ANNOUNCEMENT FULL VIEW MODAL ===== -->
+    <div id="announcementViewModal" class="announcement-view-modal" role="dialog" aria-labelledby="annViewTitle">
+        <div class="modal-content">
+            <div class="announcement-view-header">
+                <button class="announcement-view-close" onclick="closeAnnouncementView()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="announcement-view-icon" id="annViewIcon">📢</div>
+                <div class="announcement-view-type" id="annViewType">Announcement</div>
+            </div>
+            <div class="announcement-view-body">
+                <div class="announcement-view-priority" id="annViewPriority" style="display:none;"></div>
+                <div class="announcement-view-title" id="annViewTitle">Announcement Title</div>
+                <div class="announcement-view-message" id="annViewMessage">Announcement message...</div>
+                <div class="announcement-view-meta" id="annViewMeta">
+                    <span><i class="fas fa-user"></i> <span id="annViewAuthor">Admin</span></span>
+                    <span><i class="fas fa-clock"></i> <span id="annViewTime">Just now</span></span>
+                </div>
+                <div class="announcement-view-actions">
+                    <a href="#" id="annViewLinkBtn" class="ann-view-primary" style="display:none;">
+                        <i class="fas fa-arrow-right"></i> <span id="annViewLinkLabel">Open</span>
+                    </a>
+                    <button class="ann-view-secondary" onclick="closeAnnouncementView()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -2646,7 +3193,7 @@
         </div>
     </div>
 
-    <!-- Note Popup Modal -->
+    <!-- Note Popup Modal with Comments -->
     <div id="noteModal" class="modal note-modal">
         <div class="modal-content">
             <div class="note-modal-header">
@@ -2660,6 +3207,7 @@
                 <div class="note-modal-expiry" id="noteModalExpiry">
                     <i class="fas fa-clock"></i> <span></span>
                 </div>
+                <div class="note-comments-section" id="noteCommentsSection"></div>
             </div>
         </div>
     </div>
@@ -2840,6 +3388,12 @@
         const CAROUSEL_AUTOPLAY_MS = 10000;
         const MOBILE_BREAKPOINT = 768;
 
+        // ===== COMMENT CLEANUP CONFIG =====
+        const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // every 10 minutes
+        const COMMENT_CLEANUP_INITIAL_DELAY_MS = 8000;      // 8 seconds after load
+        const COMMENT_CLEANUP_BATCH_LIMIT = 450;             // per run (respect Firestore 500 limit)
+        const NOTE_COMMENT_MAX_LEN = 150;
+
         let currentUser = null;
         let currentUserData = null;
         let selectedFiles = [];
@@ -2869,6 +3423,7 @@
 
         // ===== AUTO-CLEANUP TIMER =====
         let autoCleanupTimer = null;
+        let commentCleanupTimer = null;
 
         // ================================================================
         // ===== NOTES STATE =====
@@ -2878,12 +3433,22 @@
         let currentNoteUid = null;
 
         // ================================================================
+        // ===== NOTE COMMENTS STATE =====
+        // ================================================================
+        const noteCommentCounts = {};
+        let noteCountUnsubscribes = [];
+        let activeCommentsUnsubscribe = null;
+        let activeCommentsNoteUid = null;
+        let currentReplyTo = null;
+
+        // ================================================================
         // ===== ANNOUNCEMENTS — OPTIMIZED STATE =====
         // ================================================================
         let announcementUser = null;
         let announcementUnsubscribe = null;
         let announcementItems = [];
         let announcementReadIds = new Set();
+        let currentAnnouncementViewId = null;
 
         const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
         const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
@@ -2957,6 +3522,18 @@
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
+        function formatFullDate(date) {
+            if (!date) return '';
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
         async function getCurrentUserProfileCached(user) {
             const CACHE_KEY = 'timawa_me_' + user.uid;
             try {
@@ -2991,6 +3568,7 @@
         // ================================================================
         function loadNotes() {
             if (unsubscribeNotes) unsubscribeNotes();
+            detachAllNoteCountListeners();
 
             const now = new Date();
 
@@ -3011,17 +3589,110 @@
                     if (document.getElementById('membersGrid')) {
                         renderMembersGridFromCache();
                     }
+                    attachNoteCountListeners();
                 }, (error) => {
                     console.warn('Notes listener error:', error.message);
                     notesCache = {};
                 });
         }
 
+        function detachAllNoteCountListeners() {
+            noteCountUnsubscribes.forEach(fn => { try { fn(); } catch (e) {} });
+            noteCountUnsubscribes = [];
+        }
+
+        function attachNoteCountListeners() {
+            detachAllNoteCountListeners();
+            Object.keys(noteCommentCounts).forEach(k => delete noteCommentCounts[k]);
+
+            Object.keys(notesCache).forEach(uid => {
+                const unsub = db.collection('noteComments')
+                    .where('noteUid', '==', uid)
+                    .onSnapshot(snap => {
+                        noteCommentCounts[uid] = snap.size;
+                        updateMemberBubbleCount(uid, snap.size);
+                    }, err => {
+                        console.warn('Comment count listener error for note', uid, err.message);
+                    });
+                noteCountUnsubscribes.push(unsub);
+            });
+        }
+
+        function updateMemberBubbleCount(uid, count) {
+            const bubble = document.querySelector(`.member-note-bubble[data-note-uid="${CSS.escape(uid)}"] .note-comment-count`);
+            if (bubble) {
+                if (count > 0) {
+                    bubble.innerHTML = `<i class="fas fa-comment"></i> ${count}`;
+                    bubble.style.display = 'inline-flex';
+                } else {
+                    bubble.style.display = 'none';
+                }
+            }
+        }
+
+        // ================================================================
+        // ===== COMMENT AUTO-CLEANUP =====        // ================================================================
+        async function cleanupExpiredComments() {
+            try {
+                const now = new Date();
+
+                const snapshot = await db.collection('noteComments')
+                    .where('expireAt', '<=', now)
+                    .limit(COMMENT_CLEANUP_BATCH_LIMIT)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+
+                await batch.commit();
+
+                console.log(`🧹 Comment cleanup: deleted ${snapshot.size} expired comment(s).`);
+
+                if (snapshot.size === COMMENT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(cleanupExpiredComments, 2000);
+                }
+
+                return { deleted: snapshot.size };
+            } catch (err) {
+                console.warn('Comment cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startCommentAutoCleanup() {
+            if (commentCleanupTimer) clearInterval(commentCleanupTimer);
+
+            setTimeout(() => {
+                cleanupExpiredComments();
+            }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
+
+            commentCleanupTimer = setInterval(() => {
+                cleanupExpiredComments();
+            }, COMMENT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Comment auto-cleanup started (every 10 min).');
+        }
+
+        function stopCommentAutoCleanup() {
+            if (commentCleanupTimer) {
+                clearInterval(commentCleanupTimer);
+                commentCleanupTimer = null;
+            }
+        }
+
+        // ================================================================
+        // ===== NOTE MODAL + COMMENTS =====
+        // ================================================================
         function openNoteModal(uid) {
             const note = notesCache[uid];
             if (!note) return;
 
             currentNoteUid = uid;
+            currentReplyTo = null;
 
             const member = userProfileCache[uid] || {};
             const name = member.displayName || member.email || 'Anonymous';
@@ -3071,14 +3742,316 @@
                 expirySpan.textContent = '';
             }
 
+            renderNoteCommentsSection(uid);
+
             document.getElementById('noteModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
         function closeNoteModal() {
+            if (activeCommentsUnsubscribe) {
+                activeCommentsUnsubscribe();
+                activeCommentsUnsubscribe = null;
+            }
+            activeCommentsNoteUid = null;
+            currentReplyTo = null;
+
             document.getElementById('noteModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentNoteUid = null;
+        }
+
+        function renderNoteCommentsSection(uid) {
+            const section = document.getElementById('noteCommentsSection');
+            if (!section) return;
+
+            section.innerHTML = `
+                <div class="note-comments-header">
+                    <span class="title-group">
+                        <i class="fas fa-comments"></i>
+                        Replies
+                        <span class="comment-count-pill" id="noteCommentCountPill">0</span>
+                    </span>
+                </div>
+                <div class="note-comments-list" id="noteCommentsList">
+                    <div class="note-comments-empty">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Loading replies...</p>
+                    </div>
+                </div>
+                <div class="note-comment-input-wrap">
+                    <div class="my-avatar" id="myCommentAvatar"></div>
+                    <div class="input-stack">
+                        <div class="replying-to-banner" id="replyingToBanner">
+                            <span>Replying to <strong id="replyingToName"></strong></span>
+                            <button type="button" onclick="cancelReplyTo()" title="Cancel reply">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="input-row">
+                            <textarea id="noteCommentInput" placeholder="Write a reply..." maxlength="${NOTE_COMMENT_MAX_LEN}" rows="1"></textarea>
+                            <button class="send-btn" id="noteCommentSendBtn" onclick="postNoteComment()" title="Send">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="char-count" id="noteCommentCharCount">0/${NOTE_COMMENT_MAX_LEN}</div>
+                    </div>
+                </div>
+            `;
+
+            const myAvatarEl = document.getElementById('myCommentAvatar');
+            if (myAvatarEl) {
+                const me = titaUserData || {};
+                const myName = me.displayName || titaCurrentUser?.displayName || titaCurrentUser?.email || 'Me';
+                const myPhoto = me.photoURL || '';
+                if (myPhoto) {
+                    myAvatarEl.innerHTML = `<img src="${cloudinaryAvatar(myPhoto, 80)}" alt="Me" />`;
+                } else {
+                    const initials = myName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                    myAvatarEl.textContent = initials;
+                }
+            }
+
+            const input = document.getElementById('noteCommentInput');
+            if (input) {
+                input.addEventListener('input', updateCommentCharCount);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        postNoteComment();
+                    }
+                });
+            }
+
+            attachCommentsListener(uid);
+        }
+
+        function updateCommentCharCount() {
+            const input = document.getElementById('noteCommentInput');
+            const counter = document.getElementById('noteCommentCharCount');
+            if (!input || !counter) return;
+            const len = input.value.length;
+            counter.textContent = `${len}/${NOTE_COMMENT_MAX_LEN}`;
+            counter.classList.remove('warn', 'danger');
+            if (len > NOTE_COMMENT_MAX_LEN * 0.9) counter.classList.add('danger');
+            else if (len > NOTE_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
+        }
+
+        function attachCommentsListener(uid) {
+            if (activeCommentsUnsubscribe) {
+                activeCommentsUnsubscribe();
+                activeCommentsUnsubscribe = null;
+            }
+            activeCommentsNoteUid = uid;
+
+            activeCommentsUnsubscribe = db.collection('noteComments')
+                .where('noteUid', '==', uid)
+                .orderBy('createdAt', 'asc')
+                .onSnapshot(snapshot => {
+                    if (activeCommentsNoteUid !== uid) return;
+
+                    const comments = [];
+                    snapshot.forEach(doc => comments.push({ id: doc.id, ...doc.data() }));
+
+                    renderNoteCommentsList(uid, comments);
+
+                    const pill = document.getElementById('noteCommentCountPill');
+                    if (pill) pill.textContent = comments.length;
+
+                    noteCommentCounts[uid] = comments.length;
+                    updateMemberBubbleCount(uid, comments.length);
+                }, err => {
+                    console.warn('Comments listener error:', err.message);
+                    const list = document.getElementById('noteCommentsList');
+                    if (list) {
+                        const isIndexError = /index/i.test(err.message) || /requires an index/i.test(err.message);
+                        list.innerHTML = `
+                            <div class="note-comments-empty">
+                                <i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i>
+                                <p>${isIndexError ? 'Missing Firestore index for replies.' : 'Could not load replies.'}</p>
+                                ${isIndexError ? `<p style="font-size:11px;color:#999;margin-top:6px;">Check the browser console — Firebase prints a direct link to create it.</p>` : ''}
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        function renderNoteCommentsList(uid, comments) {
+            const list = document.getElementById('noteCommentsList');
+            if (!list) return;
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = `
+                    <div class="note-comments-empty">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>No replies yet. Be the first!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const topLevel = comments.filter(c => !c.replyToId);
+            const repliesByParent = {};
+            comments.filter(c => c.replyToId).forEach(c => {
+                if (!repliesByParent[c.replyToId]) repliesByParent[c.replyToId] = [];
+                repliesByParent[c.replyToId].push(c);
+            });
+
+            let html = '';
+            topLevel.forEach(c => {
+                html += renderCommentItem(c, false);
+                const replies = repliesByParent[c.id] || [];
+                replies.forEach(r => {
+                    html += renderCommentItem(r, true);
+                });
+            });
+
+            const orphanReplies = comments.filter(c => c.replyToId && !topLevel.find(t => t.id === c.replyToId));
+            orphanReplies.forEach(r => {
+                html += renderCommentItem(r, false);
+            });
+
+            list.innerHTML = html;
+        }
+
+        function renderCommentItem(comment, isReply) {
+            const authorName = comment.authorName || 'Anonymous';
+            const authorPhoto = comment.authorPhoto || '';
+            const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const isMe = titaCurrentUser && comment.authorUid === titaCurrentUser.uid;
+
+            const createdDate = comment.createdAt
+                ? (comment.createdAt.seconds ? new Date(comment.createdAt.seconds * 1000) : new Date(comment.createdAt))
+                : new Date();
+
+            const avatarContent = authorPhoto
+                ? `<img src="${cloudinaryAvatar(authorPhoto, 80)}" alt="${escapeAttr(authorName)}" loading="lazy" />`
+                : escapeHtml(initials);
+
+            const safeCommentId = escapeAttr(comment.id);
+            const safeAuthorName = escapeAttr(authorName);
+
+            const deleteBtn = isMe
+                ? `<button class="delete-btn" onclick="deleteNoteComment('${safeCommentId}')"><i class="fas fa-trash"></i> Delete</button>`
+                : '';
+
+            const replyBtn = !isReply
+                ? `<button onclick="startReplyTo('${safeCommentId}', '${safeAuthorName}')"><i class="fas fa-reply"></i> Reply</button>`
+                : '';
+
+            return `
+                <div class="note-comment ${isReply ? 'reply-indent' : ''}" data-comment-id="${safeCommentId}">
+                    <div class="comment-avatar">${avatarContent}</div>
+                    <div class="comment-main">
+                        <div class="comment-top-row">
+                            <span class="comment-author ${isMe ? 'is-me' : ''}">${escapeHtml(authorName)}</span>
+                            <span class="comment-time">${formatRelativeTime(createdDate)}</span>
+                        </div>
+                        <div class="comment-text">${escapeHtml(comment.text || '')}</div>
+                        <div class="comment-actions">
+                            ${replyBtn}
+                            ${deleteBtn}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startReplyTo(commentId, authorName) {
+            currentReplyTo = { id: commentId, authorName };
+            const banner = document.getElementById('replyingToBanner');
+            const nameEl = document.getElementById('replyingToName');
+            if (banner && nameEl) {
+                nameEl.textContent = authorName;
+                banner.classList.add('show');
+            }
+            const input = document.getElementById('noteCommentInput');
+            if (input) {
+                input.placeholder = `Reply to ${authorName}...`;
+                input.focus();
+            }
+        }
+
+        function cancelReplyTo() {
+            currentReplyTo = null;
+            const banner = document.getElementById('replyingToBanner');
+            if (banner) banner.classList.remove('show');
+            const input = document.getElementById('noteCommentInput');
+            if (input) {
+                input.placeholder = 'Write a reply...';
+            }
+        }
+
+        async function postNoteComment() {
+            if (!currentUser || !titaCurrentUser) {
+                alert('Please sign in to reply.');
+                return;
+            }
+
+            const input = document.getElementById('noteCommentInput');
+            const btn = document.getElementById('noteCommentSendBtn');
+            if (!input || !btn) return;
+
+            const text = input.value.trim().slice(0, NOTE_COMMENT_MAX_LEN);
+            if (!text) {
+                input.focus();
+                return;
+            }
+
+            if (!currentNoteUid) return;
+
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                const me = titaUserData || {};
+                const authorName = me.displayName || titaCurrentUser.displayName || titaCurrentUser.email || 'Anonymous';
+                const authorPhoto = me.photoURL || '';
+
+                const note = notesCache[currentNoteUid];
+                let expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                if (note && note.expireAt) {
+                    const noteExp = note.expireAt.seconds
+                        ? new Date(note.expireAt.seconds * 1000)
+                        : new Date(note.expireAt);
+                    if (noteExp < expireAt) expireAt = noteExp;
+                }
+
+                await db.collection('noteComments').add({
+                    noteUid: currentNoteUid,
+                    text,
+                    authorUid: titaCurrentUser.uid,
+                    authorName,
+                    authorPhoto,
+                    replyToId: currentReplyTo ? currentReplyTo.id : null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
+                });
+
+                input.value = '';
+                updateCommentCharCount();
+                cancelReplyTo();
+
+            } catch (err) {
+                console.error('Post comment error:', err);
+                alert('❌ Could not post reply: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteNoteComment(commentId) {
+            if (!currentUser) return;
+            if (!confirm('Delete this reply?')) return;
+
+            try {
+                await db.collection('noteComments').doc(commentId).delete();
+            } catch (err) {
+                console.error('Delete comment error:', err);
+                alert('❌ Could not delete reply: ' + err.message);
+            }
         }
 
         // ================================================================
@@ -3164,23 +4137,28 @@
         }
 
         // ===== POPUP TOGGLE =====
-        function toggleAnnouncementPopup(event) {
+        function toggleAnnouncementPopup(event, source) {
             if (event) event.stopPropagation();
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            const bell = (source === 'mobile' || (!desktopBell && mobileBell)) ? mobileBell : desktopBell;
             if (!popup || !bell) return;
 
             const isOpen = popup.classList.toggle('open');
-            bell.classList.toggle('active', isOpen);
+            if (bell) bell.classList.toggle('active', isOpen);
 
             if (isOpen) {
-                positionAnnouncementPopup();
+                positionAnnouncementPopup(bell);
+            } else {
+                if (desktopBell) desktopBell.classList.remove('active');
+                if (mobileBell) mobileBell.classList.remove('active');
             }
         }
 
-        function positionAnnouncementPopup() {
+        function positionAnnouncementPopup(anchorBell) {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const bell = anchorBell || document.getElementById('announcementBell') || document.getElementById('announcementBellMobile');
             if (!popup || !bell) return;
 
             if (window.innerWidth > 768) {
@@ -3199,33 +4177,39 @@
 
         function closeAnnouncementPopup() {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
             if (popup) popup.classList.remove('open');
-            if (bell) bell.classList.remove('active');
+            if (desktopBell) desktopBell.classList.remove('active');
+            if (mobileBell) mobileBell.classList.remove('active');
         }
 
         // ===== RENDER =====
         function renderAnnouncements() {
             const list = document.getElementById('announcementList');
             const footer = document.getElementById('announcementFooter');
-            const badge = document.getElementById('announcementBadge');
+            const badgeDesktop = document.getElementById('announcementBadge');
+            const badgeMobile = document.getElementById('announcementBadgeMobile');
             if (!list) return;
 
             const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
 
-            if (badge) {
+            const setBadge = (badge) => {
+                if (!badge) return;
                 if (unreadCount > 0) {
                     badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
                     badge.classList.add('show');
                 } else {
                     badge.classList.remove('show');
                 }
-            }
+            };
+            setBadge(badgeDesktop);
+            setBadge(badgeMobile);
 
-            const bell = document.getElementById('announcementBell');
-            if (bell) {
-                bell.classList.toggle('has-new', unreadCount > 0);
-            }
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            if (desktopBell) desktopBell.classList.toggle('has-new', unreadCount > 0);
+            if (mobileBell) mobileBell.classList.toggle('has-new', unreadCount > 0);
 
             if (announcementItems.length === 0) {
                 list.innerHTML = `
@@ -3253,7 +4237,7 @@
 
                 html += `
                     <div class="announcement-item ${isUnread ? 'unread' : ''}" data-announcement-id="${escapeAttr(item.id)}" onclick="handleAnnouncementClick('${escapeAttr(item.id)}')">
-                        <div class="announcement-icon ${meta.cls}">${meta.icon}</div>
+                        <div class="announcement-icon ${meta.cls}">${item.icon || meta.icon}</div>
                         <div class="announcement-body">
                             <div class="announcement-title">
                                 ${escapeHtml(item.title || 'Announcement')}
@@ -3320,18 +4304,69 @@
             }
         }
 
-        // ===== CLICK HANDLER =====
+        // ================================================================
+        // ===== CLICK HANDLER (opens full view modal) =====
+        // ================================================================
         async function handleAnnouncementClick(id) {
             const item = announcementItems.find(a => a.id === id);
             if (!item) return;
 
             markAnnouncementRead(id);
+            closeAnnouncementPopup();
+            openAnnouncementView(item);
+        }
 
-            if (item.link) {
-                setTimeout(() => {
-                    window.location.href = item.link;
-                }, 200);
+        // ================================================================
+        // ===== ANNOUNCEMENT FULL VIEW MODAL =====
+        // ================================================================
+        function openAnnouncementView(item) {
+            if (!item) return;
+            currentAnnouncementViewId = item.id;
+
+            const meta = getAnnouncementMeta(item.type);
+            const createdDate = item.createdAt
+                ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                : new Date();
+
+            document.getElementById('annViewIcon').textContent = item.icon || meta.icon;
+            document.getElementById('annViewType').textContent = meta.label;
+
+            const priorityEl = document.getElementById('annViewPriority');
+            if (item.priority === 'urgent') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority urgent';
+                priorityEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Urgent';
+            } else if (item.priority === 'info') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority info';
+                priorityEl.innerHTML = '<i class="fas fa-info-circle"></i> Info';
+            } else {
+                priorityEl.style.display = 'none';
             }
+
+            document.getElementById('annViewTitle').textContent = item.title || 'Announcement';
+            document.getElementById('annViewMessage').textContent = item.message || '';
+            document.getElementById('annViewAuthor').textContent = item.createdByName || 'Admin';
+            document.getElementById('annViewTime').textContent = formatFullDate(createdDate);
+
+            const linkBtn = document.getElementById('annViewLinkBtn');
+            const linkLabel = document.getElementById('annViewLinkLabel');
+            if (item.link) {
+                linkBtn.style.display = 'inline-flex';
+                linkBtn.href = item.link;
+                linkLabel.textContent = item.linkLabel || 'Open Link';
+            } else {
+                linkBtn.style.display = 'none';
+            }
+
+            document.getElementById('announcementViewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAnnouncementView() {
+            document.getElementById('announcementViewModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentAnnouncementViewId = null;
         }
 
         // ================================================================
@@ -3406,54 +4441,112 @@
         // ================================================================
         function needsAnyAutogen(uid) {
             return (
-                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'birthdays_all') ||
                 !hasAutogenRunToday(uid, 'events') ||
                 !hasAutogenRunToday(uid, 'highlights')
             );
         }
 
-        async function autoGenerateBirthdayAnnouncement(user, userData) {
-            if (!userData || !userData.birthday) return;
-            if (hasAutogenRunToday(user.uid, 'birthday')) return;
-
-            const parts = userData.birthday.split('-');
-            if (parts.length !== 3) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const today = new Date();
-            const bMonth = parseInt(parts[1], 10) - 1;
-            const bDay = parseInt(parts[2], 10);
-
-            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const name = userData.displayName || user.displayName || user.email || 'Someone';
+        async function autoGenerateBirthdayAnnouncementsForEveryone(currentUser) {
+            if (hasAutogenRunToday(currentUser.uid, 'birthdays_all')) return;
 
             try {
-                await db.collection('announcements').add({
-                    type: 'birthday',
-                    title: `🎂 It's ${name}'s Birthday Today!`,
-                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
-                    icon: '🎂',
-                    priority: 'urgent',
-                    link: 'calendar.html',
-                    linkLabel: 'View Calendar',
-                    targetUid: user.uid,
-                    referenceId: user.uid,
-                    readBy: [],
-                    createdBy: 'system',
-                    createdByName: 'System',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                const today = new Date();
+                const todayMonth = today.getMonth();
+                const todayDate = today.getDate();
+
+                const snap = await db.collection('users').limit(200).get();
+
+                const todayBirthdayUsers = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.birthday || typeof data.birthday !== 'string') return;
+                    const parts = data.birthday.split('-');
+                    if (parts.length !== 3) return;
+
+                    const bMonth = parseInt(parts[1], 10) - 1;
+                    const bDay = parseInt(parts[2], 10);
+                    if (isNaN(bMonth) || isNaN(bDay)) return;
+
+                    if (bMonth === todayMonth && bDay === todayDate) {
+                        todayBirthdayUsers.push({
+                            uid: doc.id,
+                            name: data.displayName || data.email || 'Someone'
+                        });
+                    }
                 });
+
+                if (todayBirthdayUsers.length === 0) {
+                    markAutogenRunToday(currentUser.uid, 'birthdays_all');
+                    return;
+                }
+
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                let alreadyAnnouncedUids = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'birthday')
+                        .where('createdAt', '>=', todayStart)
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
+                    });
+                } catch (err) {
+                    console.warn('Birthday check query failed (may need index), falling back:', err.message);
+                    const fallbackSnap = await db.collection('announcements')
+                        .orderBy('createdAt', 'desc')
+                        .limit(50)
+                        .get();
+                    fallbackSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.type === 'birthday' && d.referenceId) {
+                            const createdAt = d.createdAt && d.createdAt.seconds
+                                ? new Date(d.createdAt.seconds * 1000)
+                                : null;
+                            if (createdAt && createdAt >= todayStart) {
+                                alreadyAnnouncedUids.add(d.referenceId);
+                            }
+                        }
+                    });
+                }
+
+                const batch = db.batch();
+                let created = 0;
+
+                todayBirthdayUsers.forEach(person => {
+                    if (alreadyAnnouncedUids.has(person.uid)) return;
+
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, {
+                        type: 'birthday',
+                        title: `🎂 It's ${person.name}'s Birthday Today!`,
+                        message: `Don't forget to greet ${person.name} a happy birthday! 🎉`,
+                        icon: '🎂',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Calendar',
+                        targetUid: '',
+                        referenceId: person.uid,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                    created++;
+                });
+
+                if (created > 0) await batch.commit();
+
             } catch (e) {
-                console.warn('birthday gen:', e.message);
+                console.warn('birthday gen (all):', e.message);
             }
-            markAutogenRunToday(user.uid, 'birthday');
+
+            markAutogenRunToday(currentUser.uid, 'birthdays_all');
         }
 
         async function autoGenerateEventReminders(user) {
@@ -3562,7 +4655,7 @@
 
             setTimeout(async () => {
                 try {
-                    await autoGenerateBirthdayAnnouncement(user, userData);
+                    await autoGenerateBirthdayAnnouncementsForEveryone(user);
                 } catch (e) { console.warn('birthday gen:', e.message); }
 
                 try {
@@ -3623,7 +4716,6 @@
                     const data = doc.data();
                     const imageUrls = data.imageURLs || [];
 
-                    // 1. Delete images from Cloudinary
                     for (const url of imageUrls) {
                         if (url && url.includes('res.cloudinary.com')) {
                             try {
@@ -3635,7 +4727,6 @@
                         }
                     }
 
-                    // 2. Delete Firestore document
                     try {
                         await db.collection('highlights').doc(doc.id).delete();
                         deleted++;
@@ -3659,12 +4750,10 @@
         function startAutoCleanup() {
             if (autoCleanupTimer) clearInterval(autoCleanupTimer);
 
-            // Initial cleanup after short delay
             setTimeout(async () => {
                 await cleanupExpiredHighlights();
             }, AUTO_CLEANUP_INITIAL_DELAY_MS);
 
-            // Periodic cleanup
             autoCleanupTimer = setInterval(async () => {
                 await cleanupExpiredHighlights();
             }, AUTO_CLEANUP_INTERVAL_MS);
@@ -3714,9 +4803,6 @@
 
                 document.getElementById('titaLauncher').classList.add('visible');
 
-                // ============================================================
-                // ===== ANNOUNCEMENTS: LOAD + AUTOGEN =====
-                // ============================================================
                 loadAnnouncements(user);
                 runAutoGeneration(user, data);
 
@@ -3742,18 +4828,17 @@
                 loadMembers()
             ]);
 
-            // Load notes after members are loaded
             loadNotes();
 
-            // ============================================================
-            // ===== START AUTO-CLEANUP =====
-            // ============================================================
             startAutoCleanup();
+            startCommentAutoCleanup();
         });
 
-        // Stop cleanup when leaving page
         window.addEventListener('beforeunload', function() {
             stopAutoCleanup();
+            stopCommentAutoCleanup();
+            detachAllNoteCountListeners();
+            if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
         });
 
         // ===== COLLAPSE =====
@@ -4824,11 +5909,13 @@
                         ? (note.expireAt.seconds ? new Date(note.expireAt.seconds * 1000) : new Date(note.expireAt))
                         : null;
                     const isExpiringSoon = expireAt && (expireAt - new Date()) < 2 * 60 * 60 * 1000;
+                    const commentCount = noteCommentCounts[docId] || 0;
                     noteBubbleHtml = `
-                        <div class="note-bubble" onclick="event.stopPropagation(); openNoteModal('${memberIdSafe}')" title="Tap to read full note">
+                        <div class="note-bubble" data-note-uid="${memberIdSafe}" onclick="event.stopPropagation(); openNoteModal('${memberIdSafe}')" title="Tap to read full note${commentCount > 0 ? ' and replies' : ''}">
                             <i class="fas fa-comment-dots"></i>
                             <span>${escapeHtml(note.text)}</span>
                             ${isExpiringSoon ? '<i class="fas fa-hourglass-half" style="color:#ef4444;font-size:10px;"></i>' : ''}
+                            ${commentCount > 0 ? `<span class="note-comment-count"><i class="fas fa-comment"></i> ${commentCount}</span>` : ''}
                         </div>
                     `;
                 }
@@ -5009,8 +6096,11 @@
 
         // ===== MODAL STATE HELPER =====
         function anyModalOpen() {
-            return ['uploadModal', 'galleryModal', 'lightboxModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal']
-                .some(id => document.getElementById(id).classList.contains('active'));
+            return ['uploadModal', 'galleryModal', 'lightboxModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal']
+                .some(id => {
+                    const el = document.getElementById(id);
+                    return el && el.classList.contains('active');
+                }) || (document.getElementById('titaPanel') && document.getElementById('titaPanel').classList.contains('open'));
         }
 
         // ===== UI HELPERS =====
@@ -5028,6 +6118,10 @@
         async function logout() {
             try {
                 stopAutoCleanup();
+                stopCommentAutoCleanup();
+                detachAllNoteCountListeners();
+                if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
+
                 if (auth.currentUser) {
                     try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
                 }
@@ -5047,6 +6141,7 @@
             const noteModal = document.getElementById('noteModal');
             const titaPanel = document.getElementById('titaPanel');
             const announcementPopup = document.getElementById('announcementPopup');
+            const announcementViewModal = document.getElementById('announcementViewModal');
 
             if (event.target === uploadModal) closeUploadModal();
             if (event.target === galleryModal) closeGallery();
@@ -5054,6 +6149,7 @@
             if (event.target === highlightDetailModal) closeHighlightDetail();
             if (event.target === memberDetailModal) closeMemberDetail();
             if (event.target === noteModal) closeNoteModal();
+            if (event.target === announcementViewModal) closeAnnouncementView();
 
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
@@ -5064,7 +6160,9 @@
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
                     !event.target.closest('#announcementBell') &&
-                    !event.target.closest('.announcement-wrapper')) {
+                    !event.target.closest('#announcementBellMobile') &&
+                    !event.target.closest('.announcement-wrapper') &&
+                    !event.target.closest('.navbar-mobile-bell')) {
                     closeAnnouncementPopup();
                 }
             }
@@ -5084,6 +6182,8 @@
                     closeMemberDetail();
                 } else if (document.getElementById('noteModal').classList.contains('active')) {
                     closeNoteModal();
+                } else if (document.getElementById('announcementViewModal').classList.contains('active')) {
+                    closeAnnouncementView();
                 } else if (document.getElementById('titaPanel').classList.contains('open')) {
                     closeTitaPanel();
                 } else if (document.getElementById('announcementPopup').classList.contains('open')) {
@@ -5364,7 +6464,11 @@
         window.addEventListener('resize', function() {
             const popup = document.getElementById('announcementPopup');
             if (popup && popup.classList.contains('open')) {
-                positionAnnouncementPopup();
+                const isMobileNow = window.innerWidth <= 768;
+                const anchor = isMobileNow
+                    ? document.getElementById('announcementBellMobile')
+                    : document.getElementById('announcementBell');
+                positionAnnouncementPopup(anchor);
             }
         });
     </script>

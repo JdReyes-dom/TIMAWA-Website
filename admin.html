@@ -117,6 +117,23 @@
             transform: scale(1.03);
         }
 
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .navbar-mobile-bell {
+            display: none;
+            position: relative;
+        }
+        .navbar-mobile-bell .announcement-bell {
+            width: 42px;
+            height: 42px;
+            font-size: 17px;
+        }
+
         .navbar .mobile-toggle {
             display: none;
             font-size: 24px;
@@ -124,11 +141,9 @@
             cursor: pointer;
             background: none;
             border: none;
+            padding: 4px 8px;
         }
 
-        /* ================================================================
-           ===== ANNOUNCEMENT BELL =====
-           ================================================================ */
         .announcement-wrapper {
             display: flex;
             align-items: center;
@@ -193,9 +208,6 @@
 
         .announcement-badge.show { display: flex; }
 
-        /* ================================================================
-           ===== ANNOUNCEMENT POPUP =====
-           ================================================================ */
         .announcement-popup {
             position: fixed;
             width: 380px;
@@ -406,6 +418,236 @@
             font-size: 13px;
         }
 
+        .announcement-view-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            z-index: 2100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .announcement-view-modal.active {
+            display: flex;
+        }
+
+        .announcement-view-modal .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            max-width: 540px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(139, 92, 246, 0.35);
+            animation: annModalPop 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        @keyframes annModalPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .announcement-view-header {
+            position: relative;
+            padding: 30px 30px 22px;
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+            border-radius: 24px 24px 0 0;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .announcement-view-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+        }
+
+        .announcement-view-header::after {
+            content: '';
+            position: absolute;
+            bottom: -70px;
+            left: -70px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        .announcement-view-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.22);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 2;
+        }
+
+        .announcement-view-close:hover {
+            background: rgba(255,255,255,0.4);
+            transform: rotate(90deg);
+        }
+
+        .announcement-view-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 22px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin: 0 auto 14px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-view-type {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 50px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .announcement-view-body {
+            padding: 26px 30px 30px;
+        }
+
+        .announcement-view-priority {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .announcement-view-priority.urgent { background: #fee2e2; color: #dc2626; }
+        .announcement-view-priority.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-view-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a1a2e;
+            line-height: 1.3;
+            margin-bottom: 14px;
+        }
+
+        .announcement-view-message {
+            font-size: 15px;
+            color: #444;
+            line-height: 1.7;
+            padding: 18px 20px;
+            background: #f8faff;
+            border-radius: 16px;
+            border-left: 4px solid #7c3aed;
+            margin-bottom: 18px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .announcement-view-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            font-size: 12px;
+            color: #888;
+            padding-top: 16px;
+            border-top: 1px solid #f0f4ff;
+            margin-bottom: 20px;
+        }
+
+        .announcement-view-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .announcement-view-meta i {
+            color: #7c3aed;
+            font-size: 11px;
+        }
+
+        .announcement-view-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .announcement-view-actions button,
+        .announcement-view-actions a {
+            flex: 1;
+            min-width: 140px;
+            padding: 13px 22px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            text-decoration: none;
+        }
+
+        .announcement-view-actions .ann-view-primary {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .announcement-view-actions .ann-view-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.45);
+        }
+
+        .announcement-view-actions .ann-view-secondary {
+            background: #f3f4f6;
+            color: #666;
+        }
+
+        .announcement-view-actions .ann-view-secondary:hover {
+            background: #e5e7eb;
+        }
+
         .main-container {
             max-width: 1400px;
             margin: 80px auto 40px;
@@ -602,6 +844,26 @@
             margin-right: 8px;
         }
 
+        .admin-tab .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            border-radius: 50px;
+            background: #ede9fe;
+            color: #7c3aed;
+            font-size: 10px;
+            font-weight: 800;
+            margin-left: 6px;
+        }
+
+        .admin-tab.active .tab-badge {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+
         .tab-content {
             display: none;
             animation: fadeIn 0.3s ease;
@@ -675,6 +937,12 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
+        .item-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+
         .item-card .item-actions {
             position: absolute;
             top: 12px;
@@ -728,7 +996,6 @@
             font-weight: 600;
         }
 
-        /* ===== ANNOUNCEMENT CARD (admin) ===== */
         .announcement-card {
             background: #f8faff;
             border-radius: 16px;
@@ -747,6 +1014,22 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
+        .announcement-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+
+        .announcement-card.expired {
+            opacity: 0.65;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .announcement-card.expired:hover {
+            opacity: 1;
+        }
+
         .announcement-card .announcement-card-icon {
             width: 50px;
             height: 50px;
@@ -757,6 +1040,10 @@
             font-size: 22px;
             flex-shrink: 0;
             background: #ede9fe;
+        }
+
+        .announcement-card.expired .announcement-card-icon {
+            background: #fee2e2;
         }
 
         .announcement-card .announcement-card-body {
@@ -786,6 +1073,17 @@
 
         .announcement-card .announcement-card-priority.urgent { background: #fee2e2; color: #dc2626; }
         .announcement-card .announcement-card-priority.info { background: #dbeafe; color: #2563eb; }
+
+        .announcement-card .announcement-card-expired-badge {
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 50px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
 
         .announcement-card .announcement-card-message {
             font-size: 13px;
@@ -857,7 +1155,6 @@
         }
         .announcement-card .announcement-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
 
-        /* ===== APP USER CARD ===== */
         .user-card {
             background: #f8faff;
             border-radius: 16px;
@@ -874,6 +1171,12 @@
             border-color: #7c3aed;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .user-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
         }
 
         .user-card .user-avatar-circle {
@@ -1011,7 +1314,6 @@
         }
         .user-card .user-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
 
-        /* status dot */
         .user-card .user-card-name .status-dot {
             width: 9px;
             height: 9px;
@@ -1024,7 +1326,7 @@
         .status-dot.dnd { background: #8b5cf6; }
         .status-dot.offline { background: #9ca3af; }
 
-        /* ===== NOTE CARD ===== */
+        /* ===== NOTE CARDS ===== */
         .note-card {
             background: #f8faff;
             border-radius: 16px;
@@ -1041,6 +1343,12 @@
             border-color: #7c3aed;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .note-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
         }
 
         .note-card.expired {
@@ -1154,13 +1462,203 @@
             font-family: inherit;
         }
 
+        .note-card .note-card-actions .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .note-card .note-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
+
         .note-card .note-card-actions .btn-danger {
             background: #fee2e2;
             color: #dc2626;
         }
         .note-card .note-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
 
-        /* Search bar */
+        .note-card .note-card-actions .btn-view-comments {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+        .note-card .note-card-actions .btn-view-comments:hover { background: #ddd6fe; transform: scale(1.05); }
+
+        /* ===== COMMENT (REPLY) CARDS ===== */
+        .comment-card {
+            background: #f8faff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+        }
+
+        .comment-card:hover {
+            border-color: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .comment-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+
+        .comment-card.expired {
+            opacity: 0.7;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .comment-card .comment-card-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
+        }
+
+        .comment-card .comment-card-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-card .comment-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .comment-card .comment-card-author {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .comment-card .comment-card-text {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 8px 14px;
+            background: white;
+            border-radius: 10px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 8px;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .comment-card .comment-card-context {
+            font-size: 12px;
+            color: #888;
+            padding: 8px 12px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            border-left: 3px solid #7c3aed;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .comment-card .comment-card-context strong {
+            color: #7c3aed;
+            font-weight: 700;
+        }
+
+        .comment-card .comment-card-reply-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #ede9fe;
+            color: #7c3aed;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 50px;
+            margin-left: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .comment-card .comment-card-meta {
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .comment-card .comment-card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .comment-card .comment-card-meta i {
+            color: #7c3aed;
+            font-size: 10px;
+        }
+
+        .comment-card .comment-card-meta .expired-label {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .comment-card .comment-card-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .comment-card:hover .comment-card-actions {
+            opacity: 1;
+        }
+
+        .comment-card .comment-card-actions button {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .comment-card .comment-card-actions .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .comment-card .comment-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
+
+        .comment-card .comment-card-actions .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .comment-card .comment-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
+
         .user-search-wrap {
             position: relative;
             display: flex;
@@ -1191,6 +1689,122 @@
             color: #aaa;
             font-size: 13px;
             pointer-events: none;
+        }
+
+        /* ===== SELECTION CHECKBOX ===== */
+        .select-checkbox {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 5;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #7c3aed;
+            display: none;
+        }
+
+        .batch-mode .select-checkbox {
+            display: block;
+        }
+
+        .batch-toolbar {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            background: #f5f3ff;
+            border-radius: 14px;
+            border: 1px solid #e0e7ff;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .batch-toolbar.active {
+            display: flex;
+        }
+
+        .batch-toolbar .batch-count {
+            font-weight: 700;
+            font-size: 13px;
+            color: #7c3aed;
+        }
+
+        .batch-toolbar .batch-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+
+        .batch-toolbar .batch-actions button {
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+            transition: all 0.25s ease;
+        }
+
+        .batch-toolbar .batch-actions .btn-batch-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .batch-toolbar .batch-actions .btn-batch-delete:hover {
+            background: #fecaca;
+            transform: scale(1.03);
+        }
+
+        .batch-toolbar .batch-actions .btn-batch-cancel {
+            background: white;
+            color: #666;
+            border: 1px solid #e0e7ff;
+        }
+
+        .batch-toolbar .batch-actions .btn-batch-cancel:hover {
+            background: #f8faff;
+        }
+
+        .batch-toolbar .batch-actions .btn-batch-select-all {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .batch-toolbar .batch-actions .btn-batch-select-all:hover {
+            background: #ddd6fe;
+        }
+
+        .batch-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8faff;
+            color: #7c3aed;
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 2px solid #e0e7ff;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+        }
+
+        .batch-toggle-btn:hover {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+        }
+
+        .batch-toggle-btn.active {
+            background: #7c3aed;
+            color: white;
+            border-color: #7c3aed;
         }
 
         .modal {
@@ -1484,17 +2098,61 @@
             border-top: 1px solid #eef2f7;
         }
 
+        /* ===== NOTES-COMMENTS FILTER BAR ===== */
+        .comments-filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8faff;
+            border-radius: 14px;
+            border: 1px solid #eef2f7;
+            margin-bottom: 15px;
+        }
+
+        .comments-filter-bar label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .comments-filter-bar select {
+            padding: 8px 14px;
+            border-radius: 50px;
+            border: 2px solid #e0e7ff;
+            background: white;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+
+        .comments-filter-bar select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
-                flex-direction: column;
+                flex-direction: row;
                 gap: 10px;
-                align-items: flex-start;
+                align-items: center;
             }
 
             .navbar .logo {
                 font-size: 22px;
             }
+
+            .navbar-mobile-bell { display: block; }
+            .navbar .mobile-toggle { display: block; }
+
+            .navbar .nav-links > li.announcement-li .announcement-wrapper { display: none; }
 
             .navbar .nav-links {
                 display: none;
@@ -1506,7 +2164,7 @@
                 background: white;
                 padding: 20px;
                 border-bottom: 2px solid #f0f4ff;
-                gap: 10px;
+                gap: 12px;
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
                 width: 100%;
                 max-height: calc(100vh - 60px);
@@ -1517,33 +2175,8 @@
                 display: flex;
             }
 
-            .navbar .mobile-toggle {
-                display: block;
-                position: absolute;
-                right: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
             .navbar .nav-links > li { width: 100%; justify-content: center; }
             .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
-
-            /* Bell on mobile */
-            .navbar .nav-links > li.announcement-li {
-                display: flex;
-                justify-content: center;
-                width: 100%;
-                padding: 4px 0;
-            }
-            .announcement-bell {
-                width: 48px;
-                height: 48px;
-                font-size: 20px;
-            }
-            .announcement-badge {
-                top: -2px;
-                right: -2px;
-            }
 
             .announcement-popup {
                 position: fixed !important;
@@ -1614,6 +2247,29 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .announcement-view-modal .modal-content { max-width: calc(100vw - 24px); max-height: 94vh; }
+            .announcement-view-header { padding: 24px 22px 18px; }
+            .announcement-view-icon { width: 64px; height: 64px; font-size: 30px; border-radius: 18px; }
+            .announcement-view-body { padding: 20px 22px 24px; }
+            .announcement-view-title { font-size: 19px; }
+            .announcement-view-message { font-size: 14px; padding: 14px 16px; }
+            .announcement-view-actions { flex-direction: column; }
+            .announcement-view-actions button, .announcement-view-actions a { width: 100%; min-width: 0; }
+
+            .batch-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            .batch-toolbar .batch-actions {
+                margin-left: 0;
+                justify-content: stretch;
+            }
+            .batch-toolbar .batch-actions button {
+                flex: 1;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1652,6 +2308,11 @@
                 left: 10px !important;
                 right: 10px !important;
             }
+
+            .announcement-view-header { padding: 20px 18px 16px; }
+            .announcement-view-icon { width: 56px; height: 56px; font-size: 26px; }
+            .announcement-view-body { padding: 18px 18px 22px; }
+            .announcement-view-title { font-size: 17px; }
         }
 
         ::-webkit-scrollbar {
@@ -1672,13 +2333,24 @@
 <body>
     <nav class="navbar" id="navbar">
         <a href="admin.html" class="logo">TIMAWA <span>ADMIN</span></a>
-        <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+
+        <div class="navbar-right">
+            <div class="navbar-mobile-bell">
+                <button class="announcement-bell" id="announcementBellMobile" onclick="toggleAnnouncementPopup(event, 'mobile')" aria-label="Announcements">
+                    <i class="fas fa-bell"></i>
+                    <span class="announcement-badge" id="announcementBadgeMobile">0</span>
+                </button>
+            </div>
+
+            <button class="mobile-toggle" onclick="toggleMobileMenu()"><i class="fas fa-bars"></i></button>
+        </div>
+
         <ul class="nav-links" id="navLinks">
             <li><a href="admin.html" class="active admin-link"><i class="fas fa-cog"></i> Admin Panel</a></li>
             <li><a href="admin_profile.html"><i class="fas fa-user-shield"></i> Admin Profile</a></li>
             <li class="announcement-li">
                 <div class="announcement-wrapper">
-                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event)" aria-label="Announcements">
+                    <button class="announcement-bell" id="announcementBell" onclick="toggleAnnouncementPopup(event, 'desktop')" aria-label="Announcements">
                         <i class="fas fa-bell"></i>
                         <span class="announcement-badge" id="announcementBadge">0</span>
                     </button>
@@ -1705,6 +2377,36 @@
         </div>
     </div>
 
+    <!-- ===== ANNOUNCEMENT FULL VIEW MODAL ===== -->
+    <div id="announcementViewModal" class="announcement-view-modal" role="dialog" aria-labelledby="annViewTitle">
+        <div class="modal-content">
+            <div class="announcement-view-header">
+                <button class="announcement-view-close" onclick="closeAnnouncementView()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="announcement-view-icon" id="annViewIcon">📢</div>
+                <div class="announcement-view-type" id="annViewType">Announcement</div>
+            </div>
+            <div class="announcement-view-body">
+                <div class="announcement-view-priority" id="annViewPriority" style="display:none;"></div>
+                <div class="announcement-view-title" id="annViewTitle">Announcement Title</div>
+                <div class="announcement-view-message" id="annViewMessage">Announcement message...</div>
+                <div class="announcement-view-meta" id="annViewMeta">
+                    <span><i class="fas fa-user"></i> <span id="annViewAuthor">Admin</span></span>
+                    <span><i class="fas fa-clock"></i> <span id="annViewTime">Just now</span></span>
+                </div>
+                <div class="announcement-view-actions">
+                    <a href="#" id="annViewLinkBtn" class="ann-view-primary" style="display:none;">
+                        <i class="fas fa-arrow-right"></i> <span id="annViewLinkLabel">Open</span>
+                    </a>
+                    <button class="ann-view-secondary" onclick="closeAnnouncementView()">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-container">
         <div class="hero-banner">
             <div class="content">
@@ -1725,6 +2427,10 @@
             <button class="admin-tab" data-tab="announcements"><i class="fas fa-bullhorn"></i> Announcements</button>
             <button class="admin-tab" data-tab="users"><i class="fas fa-user-friends"></i> App Users</button>
             <button class="admin-tab" data-tab="notes"><i class="fas fa-sticky-note"></i> Notes</button>
+            <button class="admin-tab" data-tab="comments">
+                <i class="fas fa-comments"></i> Replies
+                <span class="tab-badge" id="commentsTabBadge" style="display:none;">0</span>
+            </button>
         </div>
 
         <div id="tab-coffee" class="tab-content active">
@@ -1733,7 +2439,16 @@
                     <h3><i class="fas fa-coffee" style="color: #7c3aed;"></i> Favorite Coffee Shops</h3>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                         <span class="count" id="coffeeCount">0 items</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('coffee')"><i class="fas fa-check-square"></i> Select</button>
                         <button class="btn-primary" onclick="showAddModal('coffee')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="batch-toolbar" id="batchToolbar-coffee">
+                    <span class="batch-count" id="batchCount-coffee">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('coffee')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('coffee')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('coffee')"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
                 <div class="items-grid" id="coffeeGrid"></div>
@@ -1746,7 +2461,16 @@
                     <h3><i class="fas fa-map-marked-alt" style="color: #7c3aed;"></i> Favorite Places</h3>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                         <span class="count" id="placesCount">0 items</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('places')"><i class="fas fa-check-square"></i> Select</button>
                         <button class="btn-primary" onclick="showAddModal('places')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="batch-toolbar" id="batchToolbar-places">
+                    <span class="batch-count" id="batchCount-places">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('places')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('places')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('places')"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
                 <div class="items-grid" id="placesGrid"></div>
@@ -1759,7 +2483,16 @@
                     <h3><i class="fas fa-gamepad" style="color: #7c3aed;"></i> Favorite Things to Do</h3>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                         <span class="count" id="activitiesCount">0 items</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('activities')"><i class="fas fa-check-square"></i> Select</button>
                         <button class="btn-primary" onclick="showAddModal('activities')"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+                <div class="batch-toolbar" id="batchToolbar-activities">
+                    <span class="batch-count" id="batchCount-activities">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('activities')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('activities')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('activities')"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
                 <div class="items-grid" id="activitiesGrid"></div>
@@ -1777,8 +2510,20 @@
                             <input type="text" id="announcementSearchInput" placeholder="Search announcements by title, message, or type..." oninput="filterAnnouncements()" />
                         </div>
                         <span class="count" id="announcementsCount">0 announcements</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('announcements')"><i class="fas fa-check-square"></i> Select</button>
+                        <button class="btn-danger" onclick="deleteAllExpiredAnnouncements()" title="Delete all expired announcements">
+                            <i class="fas fa-trash-alt"></i> Delete Expired
+                        </button>
                         <button class="btn-primary" onclick="showAnnouncementModal()"><i class="fas fa-plus"></i> New Announcement</button>
                         <button class="btn-secondary" onclick="loadAnnouncementsAdmin(true)"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                </div>
+                <div class="batch-toolbar" id="batchToolbar-announcements">
+                    <span class="batch-count" id="batchCount-announcements">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('announcements')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('announcements')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('announcements')"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
                 <div class="items-grid" id="announcementsGrid"></div>
@@ -1796,14 +2541,23 @@
                             <input type="text" id="userSearchInput" placeholder="Search users by name, email, or location..." oninput="filterUsers()" />
                         </div>
                         <span class="count" id="usersCount">0 users</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('users')"><i class="fas fa-check-square"></i> Select</button>
                         <button class="btn-secondary" onclick="loadAppUsers(true)"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                </div>
+                <div class="batch-toolbar" id="batchToolbar-users">
+                    <span class="batch-count" id="batchCount-users">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('users')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('users')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('users')"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
                 <div class="items-grid" id="usersGrid"></div>
             </div>
         </div>
 
-        <!-- ===== NOTES TAB (NEW) ===== -->
+        <!-- ===== NOTES TAB ===== -->
         <div id="tab-notes" class="tab-content">
             <div class="admin-card">
                 <div class="card-header">
@@ -1814,11 +2568,64 @@
                             <input type="text" id="notesSearchInput" placeholder="Search notes by author or text..." oninput="filterNotes()" />
                         </div>
                         <span class="count" id="notesCount">0 notes</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('notes')"><i class="fas fa-check-square"></i> Select</button>
                         <button class="btn-danger" onclick="deleteAllExpiredNotes()"><i class="fas fa-trash-alt"></i> Delete All Expired</button>
                         <button class="btn-secondary" onclick="loadNotesAdmin(true)"><i class="fas fa-sync"></i> Refresh</button>
                     </div>
                 </div>
+                <div class="batch-toolbar" id="batchToolbar-notes">
+                    <span class="batch-count" id="batchCount-notes">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('notes')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('notes')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('notes')"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
                 <div class="items-grid" id="notesGrid"></div>
+            </div>
+        </div>
+
+        <!-- ===== NEW: COMMENTS / REPLIES TAB ===== -->
+        <div id="tab-comments" class="tab-content">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-comments" style="color: #7c3aed;"></i> Note Replies (Comments)</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;margin-top:10px;">
+                        <div class="user-search-wrap">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="commentsSearchInput" placeholder="Search replies by text, author, or note content..." oninput="filterComments()" />
+                        </div>
+                        <span class="count" id="commentsCount">0 replies</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('comments')"><i class="fas fa-check-square"></i> Select</button>
+                        <button class="btn-danger" onclick="deleteAllExpiredComments()"><i class="fas fa-trash-alt"></i> Delete All Expired</button>
+                        <button class="btn-secondary" onclick="loadCommentsAdmin(true)"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                </div>
+
+                <!-- Filter bar -->
+                <div class="comments-filter-bar">
+                    <label><i class="fas fa-filter"></i> Filter:</label>
+                    <select id="commentsNoteFilter" onchange="filterComments()">
+                        <option value="">All Notes</option>
+                    </select>
+                    <select id="commentsStatusFilter" onchange="filterComments()">
+                        <option value="">All Statuses</option>
+                        <option value="active">✅ Active (not expired)</option>
+                        <option value="expired">🗑️ Expired</option>
+                        <option value="replies">💬 Replies Only</option>
+                        <option value="top">📌 Top-level Only</option>
+                    </select>
+                </div>
+
+                <div class="batch-toolbar" id="batchToolbar-comments">
+                    <span class="batch-count" id="batchCount-comments">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('comments')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('comments')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('comments')"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="commentsGrid"></div>
             </div>
         </div>
     </div>
@@ -2058,7 +2865,7 @@
         </div>
     </div>
 
-    <!-- ===== NOTE EDIT MODAL (NEW) ===== -->
+    <!-- ===== NOTE EDIT MODAL ===== -->
     <div id="noteEditModal" class="modal">
         <div class="modal-content" style="max-width:480px;">
             <h2><i class="fas fa-sticky-note"></i> Edit Note</h2>
@@ -2074,6 +2881,32 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-primary" id="noteSaveBtn" onclick="saveNoteEdit()"><i class="fas fa-save"></i> Save Note</button>
                     <button type="button" class="btn-secondary" onclick="closeNoteEditModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== COMMENT / REPLY EDIT MODAL ===== -->
+    <div id="commentEditModal" class="modal">
+        <div class="modal-content" style="max-width:560px;">
+            <h2><i class="fas fa-comment-edit"></i> Edit Reply</h2>
+            <form id="commentEditForm" onsubmit="return false;">
+                <input type="hidden" id="editCommentId" />
+
+                <div class="input-group" id="commentContextGroup">
+                    <label>Replying to Note</label>
+                    <div id="editCommentContext" style="font-size:13px;color:#555;background:#f0f4ff;padding:12px 14px;border-radius:12px;border-left:3px solid #7c3aed;line-height:1.5;"></div>
+                </div>
+
+                <div class="input-group">
+                    <label>Reply Text <span class="required-star">*</span></label>
+                    <textarea id="editCommentText" placeholder="Enter reply text..." maxlength="150" style="min-height:90px;"></textarea>
+                    <span style="font-size:11px;color:#999;display:block;margin-top:4px;"><span id="editCommentCharCount">0</span>/150 characters</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-primary" id="commentSaveBtn" onclick="saveCommentEdit()"><i class="fas fa-save"></i> Save Reply</button>
+                    <button type="button" class="btn-secondary" onclick="closeCommentEditModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -2108,6 +2941,22 @@
     </footer>
 
     <script>
+        /* ============================================================
+           ===== CHANGES FROM PREVIOUS VERSION =====
+           ============================================================
+           1. NEW: Comment/Reply management tab (tab-comments)
+           2. NEW: Live comment listener (unsubscribeAdminComments)
+           3. NEW: filterComments() with note + status filters
+           4. NEW: renderCommentCard() with reply context
+           5. NEW: editComment() / saveCommentEdit() / deleteComment()
+           6. NEW: deleteAllExpiredComments() with chunked batches
+           7. NEW: Comment cleanup config + auto-cleanup timer
+           8. NEW: Comment count badge on tab
+           9. NEW: Comment count per note shown in Notes tab
+           10. NEW: Data cache for comments
+           11. NEW: Batch selection support for comments
+           ============================================================ */
+
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
             authDomain: "timawa2.firebaseapp.com",
@@ -2138,7 +2987,27 @@
         const APP_USERS_LIMIT = 200;
         const ANNOUNCEMENTS_LIMIT = 100;
         const NOTES_LIMIT = 200;
+        const COMMENTS_LIMIT = 500;
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
+
+        // ===== BATCH DELETE CONFIG =====
+        const BATCH_CHUNK_SIZE = 450; // Firestore limit is 500, leaving room
+
+        // ===== AUTO-CLEANUP CONFIG =====
+        const ANNOUNCEMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
+        const ANNOUNCEMENT_CLEANUP_INITIAL_DELAY_MS = 5000;
+        const ANNOUNCEMENT_CLEANUP_BATCH_LIMIT = 450;
+
+        // ===== HIGHLIGHT CLEANUP CONFIG =====
+        const HIGHLIGHT_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
+        const HIGHLIGHT_CLEANUP_INITIAL_DELAY_MS = 8000;
+        const HIGHLIGHT_CLEANUP_BATCH_LIMIT = 450;
+        const HIGHLIGHT_MAX_AGE_DAYS = 30;
+
+        // ===== COMMENT CLEANUP CONFIG =====
+        const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
+        const COMMENT_CLEANUP_INITIAL_DELAY_MS = 7000;
+        const COMMENT_CLEANUP_BATCH_LIMIT = 450;
 
         let currentUser = null;
         let editingId = null;
@@ -2146,41 +3015,65 @@
         let selectedImageFile = null;
         let currentImageUrl = null;
 
-        // App Users state
         let allAppUsers = [];
         let unsubscribeAppUsers = null;
         let editingUserId = null;
         let selectedUserImageFile = null;
 
-        // ================================================================
-        // ===== NOTES STATE (ADMIN) =====
-        // ================================================================
         let allNotes = [];
         let unsubscribeAdminNotes = null;
         let editingNoteUid = null;
-        let noteUserCache = {}; // { uid: { displayName, photoURL } }
+        let noteUserCache = {};
 
-        // ================================================================
-        // ===== ANNOUNCEMENTS (ADMIN) STATE =====
-        // ================================================================
+        // ===== NEW: COMMENTS STATE =====
+        let allComments = [];
+        let unsubscribeAdminComments = null;
+        let editingCommentId = null;
+        let commentAuthorCache = {};  // uid -> { displayName, photoURL }
+
         let allAnnouncements = [];
         let unsubscribeAdminAnnouncements = null;
         let editingAnnouncementId = null;
         let announcementUsersCache = null;
 
-        // ================================================================
-        // ===== BELL/POPUP STATE (for logged-in admin viewing) =====
-        // ================================================================
         let announcementUser = null;
         let announcementUnsubscribe = null;
         let announcementItems = [];
         let announcementReadIds = new Set();
+        let currentAnnouncementViewId = null;
 
         const ANNOUNCEMENT_READ_CACHE_PREFIX = 'timawa_ann_read_';
         const ANNOUNCEMENT_AUTOGEN_KEY = 'timawa_ann_autogen_';
         const ANNOUNCEMENT_CACHE_KEY = 'timawa_ann_cache_';
         const ANNOUNCEMENT_LIMIT = 30;
         const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
+
+        // ===== CLEANUP TIMERS =====
+        let announcementCleanupTimer = null;
+        let highlightCleanupTimer = null;
+        let commentCleanupTimer = null;
+
+        // ===== BATCH STATE =====
+        const batchState = {
+            coffee: { active: false, selected: new Set() },
+            places: { active: false, selected: new Set() },
+            activities: { active: false, selected: new Set() },
+            announcements: { active: false, selected: new Set() },
+            users: { active: false, selected: new Set() },
+            notes: { active: false, selected: new Set() },
+            comments: { active: false, selected: new Set() }
+        };
+
+        // ===== DATA CACHE (for select all / batch refs) =====
+        const dataCache = {
+            coffee: [],
+            places: [],
+            activities: [],
+            announcements: [],
+            users: [],
+            notes: [],
+            comments: []
+        };
 
         const COLLECTIONS = {
             coffee: 'coffeeShops',
@@ -2250,6 +3143,18 @@
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
+        function formatFullDate(date) {
+            if (!date) return '';
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
         function getStatusLabel(status) {
             const map = {
                 'available': 'Available',
@@ -2272,7 +3177,237 @@
             return url.replace('/upload/', `/upload/w_${width},q_auto,f_auto/`);
         }
 
-        // ===== IMAGE UPLOAD (ITEMS) =====
+        // ===== CHUNKED BATCH DELETE =====
+        async function chunkedBatchDelete(refs) {
+            let deleted = 0;
+            let errors = 0;
+
+            for (let i = 0; i < refs.length; i += BATCH_CHUNK_SIZE) {
+                const chunk = refs.slice(i, i + BATCH_CHUNK_SIZE);
+                const batch = db.batch();
+
+                chunk.forEach(({ collection, id }) => {
+                    batch.delete(db.collection(collection).doc(id));
+                });
+
+                try {
+                    await batch.commit();
+                    deleted += chunk.length;
+                } catch (err) {
+                    console.error('Batch chunk failed:', err);
+                    errors += chunk.length;
+                }
+            }
+
+            return { deleted, errors };
+        }
+
+        // ================================================================
+        // ===== BATCH SELECTION SYSTEM =====
+        // ================================================================
+        function toggleBatchMode(tab) {
+            const state = batchState[tab];
+            if (!state) return;
+
+            state.active = !state.active;
+            if (!state.active) {
+                state.selected.clear();
+            }
+
+            const toolbar = document.getElementById(`batchToolbar-${tab}`);
+            if (toolbar) toolbar.classList.toggle('active', state.active);
+
+            const toggleBtn = document.querySelector(`#tab-${tab} .batch-toggle-btn`);
+            if (toggleBtn) toggleBtn.classList.toggle('active', state.active);
+
+            const grid = document.getElementById(`${tab}Grid`);
+            if (grid) grid.classList.toggle('batch-mode', state.active);
+
+            if (tab === 'announcements') {
+                filterAnnouncements();
+            } else if (tab === 'users') {
+                filterUsers();
+            } else if (tab === 'notes') {
+                filterNotes();
+            } else if (tab === 'comments') {
+                filterComments();
+            } else {
+                renderItemsFromCache(tab);
+            }
+
+            updateBatchCount(tab);
+        }
+
+        function cancelBatchMode(tab) {
+            const state = batchState[tab];
+            if (!state) return;
+
+            state.active = false;
+            state.selected.clear();
+
+            const toolbar = document.getElementById(`batchToolbar-${tab}`);
+            if (toolbar) toolbar.classList.remove('active');
+
+            const toggleBtn = document.querySelector(`#tab-${tab} .batch-toggle-btn`);
+            if (toggleBtn) toggleBtn.classList.remove('active');
+
+            const grid = document.getElementById(`${tab}Grid`);
+            if (grid) grid.classList.remove('batch-mode');
+
+            if (tab === 'announcements') {
+                filterAnnouncements();
+            } else if (tab === 'users') {
+                filterUsers();
+            } else if (tab === 'notes') {
+                filterNotes();
+            } else if (tab === 'comments') {
+                filterComments();
+            } else {
+                renderItemsFromCache(tab);
+            }
+
+            updateBatchCount(tab);
+        }
+
+        function toggleItemSelection(tab, id, checked) {
+            const state = batchState[tab];
+            if (!state || !state.active) return;
+
+            if (checked) {
+                state.selected.add(id);
+            } else {
+                state.selected.delete(id);
+            }
+
+            const card = document.querySelector(`#${tab}Grid [data-id="${CSS.escape(id)}"]`);
+            if (card) card.classList.toggle('selected', checked);
+
+            updateBatchCount(tab);
+        }
+
+        function selectAll(tab) {
+            const state = batchState[tab];
+            if (!state || !state.active) return;
+
+            const items = dataCache[tab] || [];
+            const allSelected = state.selected.size === items.length && items.length > 0;
+
+            if (allSelected) {
+                state.selected.clear();
+            } else {
+                state.selected.clear();
+                items.forEach(item => state.selected.add(item.id));
+            }
+
+            const grid = document.getElementById(`${tab}Grid`);
+            if (grid) {
+                grid.querySelectorAll('.select-checkbox').forEach(cb => {
+                    cb.checked = state.selected.size === items.length;
+                });
+                grid.querySelectorAll('.item-card, .announcement-card, .user-card, .note-card, .comment-card').forEach(card => {
+                    const id = card.dataset.id;
+                    if (id) card.classList.toggle('selected', state.selected.has(id));
+                });
+            }
+
+            updateBatchCount(tab);
+        }
+
+        function updateBatchCount(tab) {
+            const state = batchState[tab];
+            const countEl = document.getElementById(`batchCount-${tab}`);
+            if (countEl) {
+                const n = state ? state.selected.size : 0;
+                countEl.textContent = `${n} selected`;
+            }
+        }
+
+        async function batchDelete(tab) {
+            const state = batchState[tab];
+            if (!state || state.selected.size === 0) {
+                alert('No items selected.');
+                return;
+            }
+
+            const ids = [...state.selected];
+            const count = ids.length;
+
+            if (!confirm(`Delete ${count} selected item${count !== 1 ? 's' : ''}?\n\nThis will permanently remove them from Firestore.`)) {
+                return;
+            }
+
+            let collectionName;
+            if (tab === 'announcements') collectionName = 'announcements';
+            else if (tab === 'users') collectionName = 'users';
+            else if (tab === 'notes') collectionName = 'notes';
+            else if (tab === 'comments') collectionName = 'noteComments';
+            else collectionName = COLLECTIONS[tab];
+
+            if (!collectionName) {
+                alert('Unknown collection for tab: ' + tab);
+                return;
+            }
+
+            const btn = document.querySelector(`#batchToolbar-${tab} .btn-batch-delete`);
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+            try {
+                const refs = ids.map(id => ({ collection: collectionName, id }));
+                const result = await chunkedBatchDelete(refs);
+
+                if (result.errors > 0) {
+                    alert(`⚠️ Deleted ${result.deleted} of ${count} items. ${result.errors} failed — check console.`);
+                } else {
+                    alert(`✅ Deleted ${result.deleted} item${result.deleted !== 1 ? 's' : ''}.`);
+                }
+
+                state.selected.clear();
+                state.active = false;
+
+                const toolbar = document.getElementById(`batchToolbar-${tab}`);
+                if (toolbar) toolbar.classList.remove('active');
+                const toggleBtn = document.querySelector(`#tab-${tab} .batch-toggle-btn`);
+                if (toggleBtn) toggleBtn.classList.remove('active');
+                const grid = document.getElementById(`${tab}Grid`);
+                if (grid) grid.classList.remove('batch-mode');
+
+                updateBatchCount(tab);
+            } catch (err) {
+                console.error('Batch delete error:', err);
+                alert('❌ Error during batch delete: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        function renderItemsFromCache(tab) {
+            const grid = document.getElementById(`${tab}Grid`);
+            if (!grid) return;
+
+            const items = dataCache[tab] || [];
+            if (items.length === 0) return;
+
+            let html = '';
+            items.forEach(item => {
+                if (tab === 'coffee' || tab === 'places' || tab === 'activities') {
+                    html += renderItemCard(tab, item.id, item);
+                } else if (tab === 'announcements') {
+                    html += renderAnnouncementCard(item);
+                } else if (tab === 'users') {
+                    html += renderUserCard(item);
+                } else if (tab === 'notes') {
+                    html += renderNoteCard(item);
+                } else if (tab === 'comments') {
+                    html += renderCommentCard(item);
+                }
+            });
+            grid.innerHTML = html;
+        }
+
+        // ===== IMAGE UPLOAD =====
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -2310,7 +3445,6 @@
             document.getElementById('imageInput').value = '';
         }
 
-        // ===== IMAGE UPLOAD (USERS) =====
         function handleUserImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -2345,7 +3479,6 @@
             document.getElementById('userImageInput').value = '';
         }
 
-        // ===== UPLOAD TO CLOUDINARY =====
         async function uploadToCloudinary(file, folder = 't-imawa/items') {
             const formData = new FormData();
             formData.append('file', file);
@@ -2370,7 +3503,6 @@
             });
         }
 
-        // ===== SEED DATA =====
         async function seedData() {
             if (!confirm('This will add default placeholder data to all collections. Existing data will not be deleted. Continue?')) return;
 
@@ -2408,7 +3540,6 @@
             }
         }
 
-        // ===== CACHED ADMIN PROFILE =====
         async function getCurrentUserProfileCached(user) {
             const CACHE_KEY = 'timawa_me_' + user.uid;
             try {
@@ -2439,6 +3570,255 @@
         }
 
         // ================================================================
+        // ===== ANNOUNCEMENT AUTO-CLEANUP =====
+        // ================================================================
+        async function cleanupExpiredAnnouncements() {
+            try {
+                const now = new Date();
+
+                const snapshot = await db.collection('announcements')
+                    .where('expiresAt', '<=', now)
+                    .limit(ANNOUNCEMENT_CLEANUP_BATCH_LIMIT)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const refs = [];
+                snapshot.forEach(doc => refs.push({ collection: 'announcements', id: doc.id }));
+
+                const result = await chunkedBatchDelete(refs);
+
+                console.log(`🧹 Auto-cleanup: deleted ${result.deleted} expired announcement(s).`);
+
+                if (snapshot.size === ANNOUNCEMENT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(cleanupExpiredAnnouncements, 2000);
+                }
+
+                return { deleted: result.deleted, errors: result.errors };
+            } catch (err) {
+                console.warn('Announcement auto-cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startAnnouncementAutoCleanup() {
+            if (announcementCleanupTimer) clearInterval(announcementCleanupTimer);
+
+            setTimeout(() => {
+                cleanupExpiredAnnouncements();
+            }, ANNOUNCEMENT_CLEANUP_INITIAL_DELAY_MS);
+
+            announcementCleanupTimer = setInterval(() => {
+                cleanupExpiredAnnouncements();
+            }, ANNOUNCEMENT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Announcement auto-cleanup started (every 10 min).');
+        }
+
+        function stopAnnouncementAutoCleanup() {
+            if (announcementCleanupTimer) {
+                clearInterval(announcementCleanupTimer);
+                announcementCleanupTimer = null;
+            }
+        }
+
+        async function deleteAllExpiredAnnouncements() {
+            const now = new Date();
+
+            const expiredCount = allAnnouncements.filter(a => {
+                if (!a.expiresAt) return false;
+                const exp = a.expiresAt.seconds
+                    ? new Date(a.expiresAt.seconds * 1000)
+                    : new Date(a.expiresAt);
+                return exp < now;
+            }).length;
+
+            if (expiredCount === 0) {
+                alert('✨ No expired announcements to clean up.');
+                return;
+            }
+
+            if (!confirm(`Delete ${expiredCount} expired announcement${expiredCount !== 1 ? 's' : ''}?\n\nThis will permanently remove them from Firestore.`)) {
+                return;
+            }
+
+            const btn = document.querySelector('#tab-announcements .btn-danger');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+            try {
+                const result = await cleanupExpiredAnnouncements();
+
+                if (result.deleted === 0) {
+                    alert('✨ Nothing to delete (already cleaned up).');
+                } else {
+                    alert(`✅ Deleted ${result.deleted} expired announcement${result.deleted !== 1 ? 's' : ''}.`);
+                }
+            } catch (err) {
+                console.error('Manual cleanup error:', err);
+                alert('❌ Error cleaning up: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ================================================================
+        // ===== HIGHLIGHT AUTO-CLEANUP =====
+        // ================================================================
+        async function cleanupOldHighlights() {
+            try {
+                const cutoff = new Date(Date.now() - HIGHLIGHT_MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
+
+                const snapshot = await db.collection('highlights')
+                    .where('createdAt', '<=', cutoff)
+                    .limit(HIGHLIGHT_CLEANUP_BATCH_LIMIT)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const refs = [];
+                snapshot.forEach(doc => refs.push({ collection: 'highlights', id: doc.id }));
+
+                const result = await chunkedBatchDelete(refs);
+
+                console.log(`🧹 Highlight cleanup: deleted ${result.deleted} old highlight(s).`);
+
+                if (snapshot.size === HIGHLIGHT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(cleanupOldHighlights, 2000);
+                }
+
+                return { deleted: result.deleted, errors: result.errors };
+            } catch (err) {
+                console.warn('Highlight auto-cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startHighlightAutoCleanup() {
+            if (highlightCleanupTimer) clearInterval(highlightCleanupTimer);
+
+            setTimeout(() => {
+                cleanupOldHighlights();
+            }, HIGHLIGHT_CLEANUP_INITIAL_DELAY_MS);
+
+            highlightCleanupTimer = setInterval(() => {
+                cleanupOldHighlights();
+            }, HIGHLIGHT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Highlight auto-cleanup started (every 15 min).');
+        }
+
+        function stopHighlightAutoCleanup() {
+            if (highlightCleanupTimer) {
+                clearInterval(highlightCleanupTimer);
+                highlightCleanupTimer = null;
+            }
+        }
+
+        // ================================================================
+        // ===== NEW: COMMENT AUTO-CLEANUP =====
+        // ================================================================
+        async function cleanupExpiredComments() {
+            try {
+                const now = new Date();
+
+                const snapshot = await db.collection('noteComments')
+                    .where('expireAt', '<=', now)
+                    .limit(COMMENT_CLEANUP_BATCH_LIMIT)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const refs = [];
+                snapshot.forEach(doc => refs.push({ collection: 'noteComments', id: doc.id }));
+
+                const result = await chunkedBatchDelete(refs);
+
+                console.log(`🧹 Comment cleanup: deleted ${result.deleted} expired comment(s).`);
+
+                if (snapshot.size === COMMENT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(cleanupExpiredComments, 2000);
+                }
+
+                return { deleted: result.deleted, errors: result.errors };
+            } catch (err) {
+                console.warn('Comment auto-cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startCommentAutoCleanup() {
+            if (commentCleanupTimer) clearInterval(commentCleanupTimer);
+
+            setTimeout(() => {
+                cleanupExpiredComments();
+            }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
+
+            commentCleanupTimer = setInterval(() => {
+                cleanupExpiredComments();
+            }, COMMENT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Comment auto-cleanup started (every 10 min).');
+        }
+
+        function stopCommentAutoCleanup() {
+            if (commentCleanupTimer) {
+                clearInterval(commentCleanupTimer);
+                commentCleanupTimer = null;
+            }
+        }
+
+        async function deleteAllExpiredComments() {
+            const now = new Date();
+
+            const expiredCount = allComments.filter(c => {
+                if (!c.expireAt) return false;
+                const exp = c.expireAt.seconds
+                    ? new Date(c.expireAt.seconds * 1000)
+                    : new Date(c.expireAt);
+                return exp < now;
+            }).length;
+
+            if (expiredCount === 0) {
+                alert('✨ No expired replies to clean up.');
+                return;
+            }
+
+            if (!confirm(`Delete ${expiredCount} expired repl${expiredCount !== 1 ? 'ies' : 'y'}?\n\nThis will permanently remove them from Firestore.`)) {
+                return;
+            }
+
+            const btn = document.querySelector('#tab-comments .btn-danger');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+            try {
+                const result = await cleanupExpiredComments();
+
+                if (result.deleted === 0) {
+                    alert('✨ Nothing to delete (already cleaned up).');
+                } else {
+                    alert(`✅ Deleted ${result.deleted} expired repl${result.deleted !== 1 ? 'ies' : 'y'}.`);
+                }
+            } catch (err) {
+                console.error('Manual comment cleanup error:', err);
+                alert('❌ Error cleaning up: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ================================================================
         // ===== NOTES MANAGEMENT (ADMIN) =====
         // ================================================================
         function loadNotesAdmin(showToast = false) {
@@ -2455,7 +3835,6 @@
                         allNotes.push({ id: doc.id, ...doc.data() });
                     });
 
-                    // Sort: non-expired first, then by expiry date
                     allNotes.sort((a, b) => {
                         const aExp = a.expireAt ? new Date(a.expireAt.seconds ? a.expireAt.seconds * 1000 : a.expireAt) : new Date(0);
                         const bExp = b.expireAt ? new Date(b.expireAt.seconds ? b.expireAt.seconds * 1000 : b.expireAt) : new Date(0);
@@ -2465,11 +3844,11 @@
                         return aExp - bExp;
                     });
 
+                    dataCache.notes = allNotes.slice();
+
                     if (countEl) countEl.textContent = `${allNotes.length} note${allNotes.length !== 1 ? 's' : ''}`;
 
-                    // Also load user info for notes
                     loadNoteUserInfo();
-
                     filterNotes();
 
                     if (showToast) console.log('Notes refreshed:', allNotes.length);
@@ -2544,6 +3923,13 @@
                 html += renderNoteCard(note);
             });
             grid.innerHTML = html;
+
+            grid.classList.toggle('batch-mode', batchState.notes.active);
+        }
+
+        function getCommentCountForNote(noteUid) {
+            // Count comments for a given note uid from allComments
+            return allComments.filter(c => c.noteUid === noteUid).length;
         }
 
         function renderNoteCard(note) {
@@ -2577,8 +3963,16 @@
                 timeLabel = `<span><i class="fas fa-clock"></i> Expiring soon</span>`;
             }
 
+            const isSelected = batchState.notes.active && batchState.notes.selected.has(note.id);
+            const commentCount = getCommentCountForNote(note.uid);
+
+            const commentBtn = commentCount > 0
+                ? `<button class="btn-view-comments" onclick="viewNoteComments('${escapeAttr(note.uid)}')" title="View ${commentCount} repl${commentCount === 1 ? 'y' : 'ies'}"><i class="fas fa-comments"></i> ${commentCount}</button>`
+                : '';
+
             return `
-                <div class="note-card ${isExpired ? 'expired' : ''}" data-note-id="${escapeAttr(note.id)}">
+                <div class="note-card ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}" data-id="${escapeAttr(note.id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('notes', '${escapeAttr(note.id)}', this.checked)" />
                     <div class="note-card-icon" style="background:${isExpired ? '#fee2e2' : '#ede9fe'};">
                         ${isExpired ? '🗑️' : '📝'}
                     </div>
@@ -2595,10 +3989,12 @@
                         <div class="note-card-meta">
                             ${createdAt ? `<span><i class="fas fa-calendar-plus"></i> Created ${formatRelativeTime(createdAt)}</span>` : ''}
                             ${timeLabel}
+                            ${commentCount > 0 ? `<span style="color:#7c3aed;font-weight:700;"><i class="fas fa-comments"></i> ${commentCount} repl${commentCount === 1 ? 'y' : 'ies'}</span>` : ''}
                             ${isExpired ? '<span><i class="fas fa-trash-alt"></i> Ready for cleanup</span>' : ''}
                         </div>
                     </div>
                     <div class="note-card-actions">
+                        ${commentBtn}
                         <button class="btn-edit" onclick="editNote('${escapeAttr(note.id)}')"><i class="fas fa-edit"></i></button>
                         <button class="btn-danger" onclick="deleteNote('${escapeAttr(note.id)}')"><i class="fas fa-trash"></i></button>
                     </div>
@@ -2606,7 +4002,22 @@
             `;
         }
 
-        // ===== EDIT NOTE =====
+        function viewNoteComments(noteUid) {
+            // Switch to comments tab + filter by note
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.admin-tab[data-tab="comments"]').classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-comments').classList.add('active');
+
+            // Set filter to this note's uid
+            const filterSelect = document.getElementById('commentsNoteFilter');
+            if (filterSelect) {
+                filterSelect.value = noteUid;
+                filterComments();
+            }
+        }
+
         function editNote(noteId) {
             const note = allNotes.find(n => n.id === noteId);
             if (!note) {
@@ -2623,7 +4034,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // ===== SAVE NOTE EDIT =====
         async function saveNoteEdit() {
             const uid = document.getElementById('editNoteUid').value;
             const text = document.getElementById('editNoteText').value.trim();
@@ -2671,7 +4081,6 @@
             editingNoteUid = null;
         }
 
-        // ===== DELETE NOTE =====
         async function deleteNote(noteId) {
             const note = allNotes.find(n => n.id === noteId);
             const user = noteUserCache[note?.uid] || {};
@@ -2689,7 +4098,6 @@
             }
         }
 
-        // ===== DELETE ALL EXPIRED NOTES =====
         async function deleteAllExpiredNotes() {
             const now = new Date();
             const expiredNotes = allNotes.filter(n => {
@@ -2712,19 +4120,372 @@
             btn.innerHTML = '<span class="spinner"></span> Deleting...';
 
             try {
-                const batch = db.batch();
-                expiredNotes.forEach(note => {
-                    batch.delete(db.collection('notes').doc(note.id));
-                });
-                await batch.commit();
+                const refs = expiredNotes.map(n => ({ collection: 'notes', id: n.id }));
+                const result = await chunkedBatchDelete(refs);
 
-                alert(`✅ Deleted ${expiredNotes.length} expired note${expiredNotes.length !== 1 ? 's' : ''}.`);
+                alert(`✅ Deleted ${result.deleted} expired note${result.deleted !== 1 ? 's' : ''}.`);
             } catch (err) {
                 console.error('Error deleting expired notes:', err);
                 alert('❌ Error deleting expired notes: ' + err.message);
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ================================================================
+        // ===== ★ NEW: COMMENTS (REPLIES) MANAGEMENT =====
+        // ================================================================
+        function loadCommentsAdmin(showToast = false) {
+            const grid = document.getElementById('commentsGrid');
+            const countEl = document.getElementById('commentsCount');
+            const badgeEl = document.getElementById('commentsTabBadge');
+            if (!grid) return;
+
+            if (unsubscribeAdminComments) unsubscribeAdminComments();
+
+            unsubscribeAdminComments = db.collection('noteComments')
+                .orderBy('createdAt', 'desc')
+                .limit(COMMENTS_LIMIT)
+                .onSnapshot((snapshot) => {
+                    allComments = [];
+                    snapshot.forEach(doc => {
+                        allComments.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    dataCache.comments = allComments.slice();
+
+                    if (countEl) countEl.textContent = `${allComments.length} repl${allComments.length === 1 ? 'y' : 'ies'}`;
+                    if (badgeEl) {
+                        if (allComments.length > 0) {
+                            badgeEl.textContent = allComments.length > 99 ? '99+' : String(allComments.length);
+                            badgeEl.style.display = 'inline-flex';
+                        } else {
+                            badgeEl.style.display = 'none';
+                        }
+                    }
+
+                    loadCommentAuthorInfo();
+                    populateCommentsNoteFilter();
+                    filterComments();
+
+                    if (showToast) console.log('Comments refreshed:', allComments.length);
+                }, (error) => {
+                    console.error('Error loading comments:', error);
+                    if (grid) {
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Could not load replies</h3>
+                                <p>${escapeHtml(error.message)}</p>
+                                <p style="font-size:11px;margin-top:8px;color:#999;">If you see an "index" error, check the browser console for the create-index link.</p>
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        async function loadCommentAuthorInfo() {
+            const uids = [...new Set(allComments.map(c => c.authorUid).filter(Boolean))];
+            const missing = uids.filter(uid => !commentAuthorCache[uid]);
+
+            for (const uid of missing) {
+                try {
+                    const doc = await db.collection('users').doc(uid).get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        commentAuthorCache[uid] = {
+                            displayName: data.displayName || data.email || 'Anonymous',
+                            photoURL: data.photoURL || ''
+                        };
+                    } else {
+                        commentAuthorCache[uid] = { displayName: 'Unknown User', photoURL: '' };
+                    }
+                } catch (e) {
+                    commentAuthorCache[uid] = { displayName: 'Unknown User', photoURL: '' };
+                }
+            }
+        }
+
+        function populateCommentsNoteFilter() {
+            const select = document.getElementById('commentsNoteFilter');
+            if (!select) return;
+
+            const currentValue = select.value;
+
+            // Collect unique note UIDs from comments
+            const noteUids = [...new Set(allComments.map(c => c.noteUid).filter(Boolean))];
+
+            // Build options
+            let html = '<option value="">All Notes</option>';
+            noteUids.forEach(uid => {
+                const note = allNotes.find(n => n.uid === uid);
+                const noteText = note?.text
+                    ? `"${note.text.slice(0, 40)}${note.text.length > 40 ? '...' : ''}"`
+                    : `Note ${uid.slice(0, 8)}...`;
+                const user = noteUserCache[uid];
+                const authorName = user?.displayName || 'Unknown';
+                html += `<option value="${escapeAttr(uid)}">📝 ${escapeHtml(authorName)}: ${escapeHtml(noteText)}</option>`;
+            });
+
+            select.innerHTML = html;
+
+            // Restore selection if still valid
+            if (currentValue && noteUids.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function filterComments() {
+            const grid = document.getElementById('commentsGrid');
+            if (!grid) return;
+
+            const term = (document.getElementById('commentsSearchInput')?.value || '').trim().toLowerCase();
+            const noteFilter = document.getElementById('commentsNoteFilter')?.value || '';
+            const statusFilter = document.getElementById('commentsStatusFilter')?.value || '';
+
+            const now = new Date();
+
+            let filtered = allComments;
+
+            // Filter by note
+            if (noteFilter) {
+                filtered = filtered.filter(c => c.noteUid === noteFilter);
+            }
+
+            // Filter by status
+            if (statusFilter === 'active') {
+                filtered = filtered.filter(c => {
+                    if (!c.expireAt) return true;
+                    const exp = c.expireAt.seconds
+                        ? new Date(c.expireAt.seconds * 1000)
+                        : new Date(c.expireAt);
+                    return exp > now;
+                });
+            } else if (statusFilter === 'expired') {
+                filtered = filtered.filter(c => {
+                    if (!c.expireAt) return false;
+                    const exp = c.expireAt.seconds
+                        ? new Date(c.expireAt.seconds * 1000)
+                        : new Date(c.expireAt);
+                    return exp <= now;
+                });
+            } else if (statusFilter === 'replies') {
+                filtered = filtered.filter(c => c.replyToId);
+            } else if (statusFilter === 'top') {
+                filtered = filtered.filter(c => !c.replyToId);
+            }
+
+            // Filter by search term
+            if (term) {
+                filtered = filtered.filter(c => {
+                    const author = commentAuthorCache[c.authorUid] || {};
+                    const note = allNotes.find(n => n.uid === c.noteUid);
+                    const haystack = [
+                        c.text || '',
+                        author.displayName || '',
+                        c.authorUid || '',
+                        note?.text || '',
+                        noteUserCache[c.noteUid]?.displayName || ''
+                    ].join(' ').toLowerCase();
+                    return haystack.includes(term);
+                });
+            }
+
+            if (filtered.length === 0) {
+                const hasFilters = term || noteFilter || statusFilter;
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <h3>${hasFilters ? 'No replies match your filters' : 'No replies yet'}</h3>
+                        <p>${hasFilters ? 'Try adjusting the filters or search term.' : 'Replies will appear here once users start commenting on notes.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(comment => {
+                html += renderCommentCard(comment);
+            });
+            grid.innerHTML = html;
+
+            grid.classList.toggle('batch-mode', batchState.comments.active);
+        }
+
+        function renderCommentCard(comment) {
+            const author = commentAuthorCache[comment.authorUid] || {
+                displayName: comment.authorName || 'Anonymous',
+                photoURL: comment.authorPhoto || ''
+            };
+
+            const now = new Date();
+            const expireAt = comment.expireAt
+                ? new Date(comment.expireAt.seconds ? comment.expireAt.seconds * 1000 : comment.expireAt)
+                : null;
+            const createdAt = comment.createdAt
+                ? new Date(comment.createdAt.seconds ? comment.createdAt.seconds * 1000 : comment.createdAt)
+                : null;
+
+            const isExpired = expireAt ? expireAt < now : false;
+            const hoursLeft = expireAt ? Math.max(0, Math.ceil((expireAt - now) / (1000 * 60 * 60))) : 0;
+            const minutesLeft = expireAt ? Math.max(0, Math.ceil((expireAt - now) / (1000 * 60))) : 0;
+
+            const initials = (author.displayName || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            const avatarContent = author.photoURL
+                ? `<img src="${cloudinaryThumb(author.photoURL, 100)}" alt="${escapeAttr(author.displayName)}" loading="lazy" />`
+                : escapeHtml(initials);
+
+            let timeLabel = '';
+            if (isExpired) {
+                timeLabel = `<span class="expired-label"><i class="fas fa-exclamation-circle"></i> EXPIRED</span>`;
+            } else if (hoursLeft > 1) {
+                timeLabel = `<span><i class="fas fa-clock"></i> ${hoursLeft}h left</span>`;
+            } else if (minutesLeft > 1) {
+                timeLabel = `<span><i class="fas fa-clock"></i> ${minutesLeft}m left</span>`;
+            } else {
+                timeLabel = `<span><i class="fas fa-clock"></i> Expiring soon</span>`;
+            }
+
+            // Find the note this reply belongs to
+            const note = allNotes.find(n => n.uid === comment.noteUid);
+            const noteAuthor = noteUserCache[comment.noteUid] || { displayName: 'Unknown' };
+            const noteText = note?.text || '(note deleted)';
+            const notePreview = noteText.length > 80 ? noteText.slice(0, 80) + '...' : noteText;
+
+            // Reply-to context (if this is a threaded reply)
+            let replyContext = '';
+            if (comment.replyToId) {
+                const parent = allComments.find(c => c.id === comment.replyToId);
+                if (parent) {
+                    const parentAuthor = commentAuthorCache[parent.authorUid]?.displayName || 'someone';
+                    replyContext = `<span class="comment-card-reply-indicator"><i class="fas fa-reply"></i> reply to ${escapeHtml(parentAuthor)}</span>`;
+                } else {
+                    replyContext = `<span class="comment-card-reply-indicator"><i class="fas fa-reply"></i> reply</span>`;
+                }
+            }
+
+            const isSelected = batchState.comments.active && batchState.comments.selected.has(comment.id);
+
+            return `
+                <div class="comment-card ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}" data-id="${escapeAttr(comment.id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('comments', '${escapeAttr(comment.id)}', this.checked)" />
+                    <div class="comment-card-avatar">${avatarContent}</div>
+                    <div class="comment-card-body">
+                        <div class="comment-card-author">
+                            ${escapeHtml(author.displayName)}
+                            ${replyContext}
+                        </div>
+
+                        <div class="comment-card-context">
+                            <strong><i class="fas fa-quote-left" style="font-size:9px;"></i> ${escapeHtml(noteAuthor.displayName)}'s note:</strong>
+                            ${escapeHtml(notePreview)}
+                        </div>
+
+                        <div class="comment-card-text">${escapeHtml(comment.text || '')}</div>
+
+                        <div class="comment-card-meta">
+                            ${createdAt ? `<span><i class="fas fa-calendar-plus"></i> ${formatRelativeTime(createdAt)}</span>` : ''}
+                            ${timeLabel}
+                            ${isExpired ? '<span><i class="fas fa-trash-alt"></i> Ready for cleanup</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="comment-card-actions">
+                        <button class="btn-edit" onclick="editComment('${escapeAttr(comment.id)}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-danger" onclick="deleteComment('${escapeAttr(comment.id)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editComment(commentId) {
+            const comment = allComments.find(c => c.id === commentId);
+            if (!comment) {
+                alert('Reply not found.');
+                return;
+            }
+
+            editingCommentId = commentId;
+            document.getElementById('editCommentId').value = commentId;
+            document.getElementById('editCommentText').value = comment.text || '';
+            document.getElementById('editCommentCharCount').textContent = (comment.text || '').length;
+
+            // Show note context
+            const note = allNotes.find(n => n.uid === comment.noteUid);
+            const noteAuthor = noteUserCache[comment.noteUid] || { displayName: 'Unknown' };
+            const contextEl = document.getElementById('editCommentContext');
+            if (note) {
+                contextEl.innerHTML = `<strong>${escapeHtml(noteAuthor.displayName)}</strong> wrote: "${escapeHtml(note.text || '')}"`;
+            } else {
+                contextEl.innerHTML = `<em>Original note no longer exists (uid: ${escapeHtml(comment.noteUid)})</em>`;
+            }
+
+            document.getElementById('commentEditModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        async function saveCommentEdit() {
+            const id = document.getElementById('editCommentId').value;
+            const text = document.getElementById('editCommentText').value.trim();
+
+            if (!id) {
+                alert('No reply selected.');
+                return;
+            }
+
+            if (!text) {
+                alert('Reply text cannot be empty. Use delete instead.');
+                return;
+            }
+
+            if (text.length > 150) {
+                alert('Reply text must be 150 characters or less.');
+                return;
+            }
+
+            const btn = document.getElementById('commentSaveBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+            try {
+                await db.collection('noteComments').doc(id).update({
+                    text: text,
+                    editedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert('✅ Reply updated successfully!');
+                closeCommentEditModal();
+            } catch (err) {
+                console.error('Error updating reply:', err);
+                alert('❌ Error updating reply: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        function closeCommentEditModal() {
+            document.getElementById('commentEditModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            editingCommentId = null;
+        }
+
+        async function deleteComment(commentId) {
+            const comment = allComments.find(c => c.id === commentId);
+            const author = commentAuthorCache[comment?.authorUid] || {};
+            const name = author.displayName || comment?.authorName || 'this user';
+            const textPreview = comment?.text ? `"${comment.text.slice(0, 50)}${comment.text.length > 50 ? '...' : ''}"` : '';
+
+            if (!confirm(`Delete reply ${textPreview} from ${name}?\n\nThis will remove it from Firestore permanently.`)) return;
+
+            try {
+                await db.collection('noteComments').doc(commentId).delete();
+                alert('✅ Reply deleted.');
+            } catch (err) {
+                console.error('Error deleting reply:', err);
+                alert('❌ Error deleting reply: ' + err.message);
             }
         }
 
@@ -2797,24 +4558,28 @@
             } catch (e) { /* ignore */ }
         }
 
-        // ===== POPUP TOGGLE =====
-        function toggleAnnouncementPopup(event) {
+        function toggleAnnouncementPopup(event, source) {
             if (event) event.stopPropagation();
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            const bell = (source === 'mobile' || (!desktopBell && mobileBell)) ? mobileBell : desktopBell;
             if (!popup || !bell) return;
 
             const isOpen = popup.classList.toggle('open');
-            bell.classList.toggle('active', isOpen);
+            if (bell) bell.classList.toggle('active', isOpen);
 
             if (isOpen) {
-                positionAnnouncementPopup();
+                positionAnnouncementPopup(bell);
+            } else {
+                if (desktopBell) desktopBell.classList.remove('active');
+                if (mobileBell) mobileBell.classList.remove('active');
             }
         }
 
-        function positionAnnouncementPopup() {
+        function positionAnnouncementPopup(anchorBell) {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const bell = anchorBell || document.getElementById('announcementBell') || document.getElementById('announcementBellMobile');
             if (!popup || !bell) return;
 
             if (window.innerWidth > 768) {
@@ -2833,32 +4598,38 @@
 
         function closeAnnouncementPopup() {
             const popup = document.getElementById('announcementPopup');
-            const bell = document.getElementById('announcementBell');
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
             if (popup) popup.classList.remove('open');
-            if (bell) bell.classList.remove('active');
+            if (desktopBell) desktopBell.classList.remove('active');
+            if (mobileBell) mobileBell.classList.remove('active');
         }
 
         function renderAnnouncements() {
             const list = document.getElementById('announcementList');
             const footer = document.getElementById('announcementFooter');
-            const badge = document.getElementById('announcementBadge');
+            const badgeDesktop = document.getElementById('announcementBadge');
+            const badgeMobile = document.getElementById('announcementBadgeMobile');
             if (!list) return;
 
             const unreadCount = announcementItems.filter(a => !announcementReadIds.has(a.id)).length;
 
-            if (badge) {
+            const setBadge = (badge) => {
+                if (!badge) return;
                 if (unreadCount > 0) {
                     badge.textContent = unreadCount > 99 ? '99+' : String(unreadCount);
                     badge.classList.add('show');
                 } else {
                     badge.classList.remove('show');
                 }
-            }
+            };
+            setBadge(badgeDesktop);
+            setBadge(badgeMobile);
 
-            const bell = document.getElementById('announcementBell');
-            if (bell) {
-                bell.classList.toggle('has-new', unreadCount > 0);
-            }
+            const desktopBell = document.getElementById('announcementBell');
+            const mobileBell = document.getElementById('announcementBellMobile');
+            if (desktopBell) desktopBell.classList.toggle('has-new', unreadCount > 0);
+            if (mobileBell) mobileBell.classList.toggle('has-new', unreadCount > 0);
 
             if (announcementItems.length === 0) {
                 list.innerHTML = `
@@ -2955,12 +4726,58 @@
             if (!item) return;
 
             markAnnouncementRead(id);
+            closeAnnouncementPopup();
+            openAnnouncementView(item);
+        }
 
-            if (item.link) {
-                setTimeout(() => {
-                    window.location.href = item.link;
-                }, 200);
+        function openAnnouncementView(item) {
+            if (!item) return;
+            currentAnnouncementViewId = item.id;
+
+            const meta = getAnnouncementMeta(item.type);
+            const createdDate = item.createdAt
+                ? new Date(item.createdAt.seconds ? item.createdAt.seconds * 1000 : item.createdAt)
+                : new Date();
+
+            document.getElementById('annViewIcon').textContent = item.icon || meta.icon;
+            document.getElementById('annViewType').textContent = meta.label;
+
+            const priorityEl = document.getElementById('annViewPriority');
+            if (item.priority === 'urgent') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority urgent';
+                priorityEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Urgent';
+            } else if (item.priority === 'info') {
+                priorityEl.style.display = 'inline-flex';
+                priorityEl.className = 'announcement-view-priority info';
+                priorityEl.innerHTML = '<i class="fas fa-info-circle"></i> Info';
+            } else {
+                priorityEl.style.display = 'none';
             }
+
+            document.getElementById('annViewTitle').textContent = item.title || 'Announcement';
+            document.getElementById('annViewMessage').textContent = item.message || '';
+            document.getElementById('annViewAuthor').textContent = item.createdByName || 'Admin';
+            document.getElementById('annViewTime').textContent = formatFullDate(createdDate);
+
+            const linkBtn = document.getElementById('annViewLinkBtn');
+            const linkLabel = document.getElementById('annViewLinkLabel');
+            if (item.link) {
+                linkBtn.style.display = 'inline-flex';
+                linkBtn.href = item.link;
+                linkLabel.textContent = item.linkLabel || 'Open Link';
+            } else {
+                linkBtn.style.display = 'none';
+            }
+
+            document.getElementById('announcementViewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAnnouncementView() {
+            document.getElementById('announcementViewModal').classList.remove('active');
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentAnnouncementViewId = null;
         }
 
         function loadAnnouncements(user) {
@@ -3027,59 +4844,115 @@
                 });
         }
 
-        // ================================================================
-        // ===== AUTO-GENERATION (for admin's own bell) =====
-        // ================================================================
+        // ===== AUTO-GENERATION =====
         function needsAnyAutogen(uid) {
             return (
-                !hasAutogenRunToday(uid, 'birthday') ||
+                !hasAutogenRunToday(uid, 'birthdays_all') ||
                 !hasAutogenRunToday(uid, 'events') ||
                 !hasAutogenRunToday(uid, 'highlights')
             );
         }
 
-        async function autoGenerateBirthdayAnnouncement(user, userData) {
-            if (!userData || !userData.birthday) return;
-            if (hasAutogenRunToday(user.uid, 'birthday')) return;
-
-            const parts = userData.birthday.split('-');
-            if (parts.length !== 3) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const today = new Date();
-            const bMonth = parseInt(parts[1], 10) - 1;
-            const bDay = parseInt(parts[2], 10);
-
-            if (today.getMonth() !== bMonth || today.getDate() !== bDay) {
-                markAutogenRunToday(user.uid, 'birthday');
-                return;
-            }
-
-            const name = userData.displayName || user.displayName || user.email || 'Someone';
+        async function autoGenerateBirthdayAnnouncementsForEveryone(currentUser) {
+            if (hasAutogenRunToday(currentUser.uid, 'birthdays_all')) return;
 
             try {
-                await db.collection('announcements').add({
-                    type: 'birthday',
-                    title: `🎂 It's ${name}'s Birthday Today!`,
-                    message: `Don't forget to greet ${name} a happy birthday! 🎉`,
-                    icon: '🎂',
-                    priority: 'urgent',
-                    link: 'calendar.html',
-                    linkLabel: 'View Calendar',
-                    targetUid: user.uid,
-                    referenceId: user.uid,
-                    readBy: [],
-                    createdBy: 'system',
-                    createdByName: 'System',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                const today = new Date();
+                const todayMonth = today.getMonth();
+                const todayDate = today.getDate();
+
+                const snap = await db.collection('users').limit(200).get();
+
+                const todayBirthdayUsers = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (!data.birthday || typeof data.birthday !== 'string') return;
+                    const parts = data.birthday.split('-');
+                    if (parts.length !== 3) return;
+
+                    const bMonth = parseInt(parts[1], 10) - 1;
+                    const bDay = parseInt(parts[2], 10);
+                    if (isNaN(bMonth) || isNaN(bDay)) return;
+
+                    if (bMonth === todayMonth && bDay === todayDate) {
+                        todayBirthdayUsers.push({
+                            uid: doc.id,
+                            name: data.displayName || data.email || 'Someone'
+                        });
+                    }
                 });
+
+                if (todayBirthdayUsers.length === 0) {
+                    markAutogenRunToday(currentUser.uid, 'birthdays_all');
+                    return;
+                }
+
+                const todayStart = new Date();
+                todayStart.setHours(0, 0, 0, 0);
+
+                let alreadyAnnouncedUids = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'birthday')
+                        .where('createdAt', '>=', todayStart)
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
+                    });
+                } catch (err) {
+                    console.warn('Birthday check query failed (may need index), falling back:', err.message);
+                    const fallbackSnap = await db.collection('announcements')
+                        .orderBy('createdAt', 'desc')
+                        .limit(50)
+                        .get();
+                    fallbackSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.type === 'birthday' && d.referenceId) {
+                            const createdAt = d.createdAt && d.createdAt.seconds
+                                ? new Date(d.createdAt.seconds * 1000)
+                                : null;
+                            if (createdAt && createdAt >= todayStart) {
+                                alreadyAnnouncedUids.add(d.referenceId);
+                            }
+                        }
+                    });
+                }
+
+                const batch = db.batch();
+                let created = 0;
+
+                todayBirthdayUsers.forEach(person => {
+                    if (alreadyAnnouncedUids.has(person.uid)) return;
+
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, {
+                        type: 'birthday',
+                        title: `🎂 It's ${person.name}'s Birthday Today!`,
+                        message: `Don't forget to greet ${person.name} a happy birthday! 🎉`,
+                        icon: '🎂',
+                        priority: 'urgent',
+                        link: 'calendar.html',
+                        linkLabel: 'View Calendar',
+                        targetUid: '',
+                        referenceId: person.uid,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+                    });
+                    created++;
+                });
+
+                if (created > 0) await batch.commit();
+
             } catch (e) {
-                console.warn('birthday gen:', e.message);
+                console.warn('birthday gen (all):', e.message);
             }
-            markAutogenRunToday(user.uid, 'birthday');
+
+            markAutogenRunToday(currentUser.uid, 'birthdays_all');
         }
 
         async function autoGenerateEventReminders(user) {
@@ -3187,9 +5060,17 @@
             if (!needsAnyAutogen(user.uid)) return;
 
             setTimeout(async () => {
-                try { await autoGenerateBirthdayAnnouncement(user, userData); } catch (e) { console.warn('birthday gen:', e.message); }
-                try { await autoGenerateEventReminders(user); } catch (e) { console.warn('event gen:', e.message); }
-                try { await autoGenerateHighlightAnnouncements(user); } catch (e) { console.warn('highlight gen:', e.message); }
+                try {
+                    await autoGenerateBirthdayAnnouncementsForEveryone(user);
+                } catch (e) { console.warn('birthday gen:', e.message); }
+
+                try {
+                    await autoGenerateEventReminders(user);
+                } catch (e) { console.warn('event gen:', e.message); }
+
+                try {
+                    await autoGenerateHighlightAnnouncements(user);
+                } catch (e) { console.warn('highlight gen:', e.message); }
             }, 1500);
         }
 
@@ -3212,6 +5093,8 @@
                         allAnnouncements.push({ id: doc.id, ...doc.data() });
                     });
 
+                    dataCache.announcements = allAnnouncements.slice();
+
                     if (countEl) countEl.textContent = `${allAnnouncements.length} announcement${allAnnouncements.length !== 1 ? 's' : ''}`;
 
                     filterAnnouncements();
@@ -3230,7 +5113,6 @@
                     }
                 });
 
-            // Pre-load users for the target dropdown
             loadUsersForAnnouncementTarget();
         }
 
@@ -3241,7 +5123,6 @@
                 const select = document.getElementById('announcementTargetInput');
                 if (!select) return;
 
-                // Keep the "Everyone" option, remove old user options
                 while (select.options.length > 1) select.remove(1);
 
                 snap.forEach(doc => {
@@ -3295,6 +5176,8 @@
                 html += renderAnnouncementCard(a);
             });
             grid.innerHTML = html;
+
+            grid.classList.toggle('batch-mode', batchState.announcements.active);
         }
 
         function renderAnnouncementCard(a) {
@@ -3307,11 +5190,18 @@
                 ? new Date(a.expiresAt.seconds ? a.expiresAt.seconds * 1000 : a.expiresAt)
                 : null;
 
+            const isExpired = expiresDate ? expiresDate < new Date() : false;
+            const isSelected = batchState.announcements.active && batchState.announcements.selected.has(a.id);
+
             const priorityBadge = a.priority === 'urgent'
                 ? '<span class="announcement-card-priority urgent">Urgent</span>'
                 : a.priority === 'info'
                     ? '<span class="announcement-card-priority info">Info</span>'
                     : '';
+
+            const expiredBadge = isExpired
+                ? '<span class="announcement-card-expired-badge">Expired</span>'
+                : '';
 
             let targetLabel = '🌐 Everyone';
             if (a.targetUid && a.targetUid !== '') {
@@ -3322,19 +5212,21 @@
             const readCount = Array.isArray(a.readBy) ? a.readBy.length : 0;
 
             return `
-                <div class="announcement-card" data-announcement-id="${escapeAttr(a.id)}">
-                    <div class="announcement-card-icon">${icon}</div>
+                <div class="announcement-card ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}" data-id="${escapeAttr(a.id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('announcements', '${escapeAttr(a.id)}', this.checked)" />
+                    <div class="announcement-card-icon">${isExpired ? '🗑️' : icon}</div>
                     <div class="announcement-card-body">
                         <div class="announcement-card-title">
                             ${escapeHtml(a.title || 'Untitled')}
                             ${priorityBadge}
+                            ${expiredBadge}
                         </div>
                         <div class="announcement-card-message">${escapeHtml(a.message || '')}</div>
                         <div class="announcement-card-meta">
                             <span><i class="fas fa-tag"></i> ${escapeHtml(meta.label)}</span>
                             <span><i class="fas fa-user"></i> ${escapeHtml(a.createdByName || 'Admin')}</span>
                             <span><i class="fas fa-clock"></i> ${formatRelativeTime(createdDate)}</span>
-                            ${expiresDate ? `<span><i class="fas fa-hourglass-half"></i> Expires ${expiresDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>` : ''}
+                            ${expiresDate ? `<span><i class="fas fa-hourglass-half"></i> ${isExpired ? 'Expired' : 'Expires'} ${expiresDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>` : ''}
                             <span><i class="fas fa-eye"></i> ${readCount} read</span>
                             <span><i class="fas fa-bullseye"></i> ${escapeHtml(targetLabel)}</span>
                         </div>
@@ -3347,7 +5239,6 @@
             `;
         }
 
-        // ===== SHOW ANNOUNCEMENT MODAL =====
         function showAnnouncementModal() {
             editingAnnouncementId = null;
             document.getElementById('announcementModalTitle').innerHTML = '<i class="fas fa-bullhorn"></i> New Announcement';
@@ -3360,7 +5251,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // ===== EDIT ANNOUNCEMENT =====
         function editAnnouncement(id) {
             const a = allAnnouncements.find(x => x.id === id);
             if (!a) {
@@ -3379,7 +5269,6 @@
             document.getElementById('announcementLinkInput').value = a.link || '';
             document.getElementById('announcementTargetInput').value = a.targetUid || '';
 
-            // Compute remaining days from expiresAt
             if (a.expiresAt) {
                 const exp = new Date(a.expiresAt.seconds ? a.expiresAt.seconds * 1000 : a.expiresAt);
                 const days = Math.max(1, Math.ceil((exp - Date.now()) / (1000 * 60 * 60 * 24)));
@@ -3399,7 +5288,6 @@
             editingAnnouncementId = null;
         }
 
-        // ===== SAVE ANNOUNCEMENT =====
         async function saveAnnouncement() {
             const btn = document.getElementById('announcementSaveBtn');
             const originalHtml = btn.innerHTML;
@@ -3449,7 +5337,6 @@
                 };
 
                 if (editingAnnouncementId) {
-                    // Preserve existing readBy on edit? We'll reset it to keep it simple and consistent
                     await db.collection('announcements').doc(editingAnnouncementId).update({
                         ...data,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -3471,7 +5358,6 @@
             }
         }
 
-        // ===== DELETE ANNOUNCEMENT =====
         async function deleteAnnouncement(id) {
             const a = allAnnouncements.find(x => x.id === id);
             const title = a?.title || 'this announcement';
@@ -3511,13 +5397,25 @@
                 loadAppUsers();
                 loadAnnouncementsAdmin();
                 loadNotesAdmin();
+                loadCommentsAdmin();  // ★ NEW
 
-                // Wire up the admin's own bell/popup
                 loadAnnouncements(user);
                 runAutoGeneration(user, data);
+
+                // ★ Start auto-cleanup timers
+                startAnnouncementAutoCleanup();
+                startHighlightAutoCleanup();
+                startCommentAutoCleanup();  // ★ NEW
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
+        });
+
+        // ★ Stop cleanup timers when leaving
+        window.addEventListener('beforeunload', function() {
+            stopAnnouncementAutoCleanup();
+            stopHighlightAutoCleanup();
+            stopCommentAutoCleanup();  // ★ NEW
         });
 
         // ===== LOAD ALL DATA =====
@@ -3527,7 +5425,6 @@
             loadCollection('activities');
         }
 
-        // ===== LOAD COLLECTION =====
         function loadCollection(type) {
             const collectionName = COLLECTIONS[type];
             if (!collectionName) return;
@@ -3550,18 +5447,25 @@
                             </div>
                         `;
                         if (countEl) countEl.textContent = '0 items';
+                        dataCache[type] = [];
                         return;
                     }
 
+                    const items = [];
                     let html = '';
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        const id = doc.id;
-                        html += renderItemCard(type, id, data);
+                        const item = { id: doc.id, ...data };
+                        items.push(item);
+                        html += renderItemCard(type, doc.id, data);
                     });
+
+                    dataCache[type] = items;
 
                     grid.innerHTML = html;
                     if (countEl) countEl.textContent = `${snapshot.size} items`;
+
+                    grid.classList.toggle('batch-mode', batchState[type].active);
                 }, (error) => {
                     console.error(`Error loading ${type}:`, error);
                 });
@@ -3572,8 +5476,11 @@
                 `<img src="${data.imageUrl}" alt="${escapeAttr(data.title)}" class="item-image" />` :
                 '';
 
+            const isSelected = batchState[type] && batchState[type].active && batchState[type].selected.has(id);
+
             return `
-                <div class="item-card">
+                <div class="item-card ${isSelected ? 'selected' : ''}" data-id="${escapeAttr(id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('${type}', '${escapeAttr(id)}', this.checked)" />
                     ${imageHtml}
                     <div class="item-actions">
                         <button class="btn-edit" onclick="editItem('${type}', '${id}')"><i class="fas fa-edit"></i></button>
@@ -3587,7 +5494,6 @@
             `;
         }
 
-        // ===== SHOW ADD MODAL =====
         function showAddModal(type) {
             editingType = type;
             editingId = null;
@@ -3613,7 +5519,6 @@
             document.body.style.overflow = 'hidden';
         }
 
-        // ===== EDIT ITEM =====
         async function editItem(type, id) {
             editingType = type;
             editingId = id;
@@ -3778,6 +5683,8 @@
                         allAppUsers.push({ id: doc.id, ...doc.data() });
                     });
 
+                    dataCache.users = allAppUsers.slice();
+
                     if (countEl) countEl.textContent = `${allAppUsers.length} user${allAppUsers.length !== 1 ? 's' : ''}`;
 
                     filterUsers();
@@ -3833,6 +5740,8 @@
                 html += renderUserCard(user);
             });
             grid.innerHTML = html;
+
+            grid.classList.toggle('batch-mode', batchState.users.active);
         }
 
         function renderUserCard(user) {
@@ -3841,6 +5750,7 @@
             const photoUrl = user.photoURL || '';
             const status = user.status || 'offline';
             const isAdmin = user.isAdmin === true;
+            const isSelected = batchState.users.active && batchState.users.selected.has(user.id);
 
             const avatarContent = photoUrl
                 ? `<img src="${cloudinaryThumb(photoUrl, 120)}" alt="${escapeAttr(name)}" loading="lazy" />`
@@ -3858,7 +5768,8 @@
             const adminBadge = isAdmin ? `<span class="admin-mini-badge">ADMIN</span>` : '';
 
             return `
-                <div class="user-card" data-user-id="${escapeAttr(user.id)}">
+                <div class="user-card ${isSelected ? 'selected' : ''}" data-id="${escapeAttr(user.id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('users', '${escapeAttr(user.id)}', this.checked)" />
                     <div class="user-avatar-circle">${avatarContent}</div>
                     <div class="user-card-body">
                         <div class="user-card-name">
@@ -4009,16 +5920,15 @@
             }
         }
 
-        // ===== REFRESH ALL =====
         function refreshAll() {
             loadAllData();
             loadAppUsers(true);
             loadAnnouncementsAdmin(true);
             loadNotesAdmin(true);
+            loadCommentsAdmin(true);  // ★ NEW
             alert('🔄 All content refreshed!');
         }
 
-        // ===== PREVIEW =====
         function openPreview() {
             document.getElementById('previewModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -4040,7 +5950,6 @@
             window.open('index.html', '_blank');
         }
 
-        // ===== TAB SWITCHING =====
         document.querySelectorAll('.admin-tab').forEach(tab => {
             tab.addEventListener('click', function() {
                 document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -4051,7 +5960,6 @@
             });
         });
 
-        // ===== MOBILE MENU =====
         function toggleMobileMenu() {
             const nav = document.getElementById('navLinks');
             nav.classList.toggle('active');
@@ -4063,7 +5971,6 @@
             });
         });
 
-        // ===== LOGOUT =====
         async function logout() {
             try {
                 if (auth.currentUser) {
@@ -4076,31 +5983,43 @@
             }
         }
 
-        // ===== CLOSE MODALS ON OUTSIDE CLICK =====
+        function anyModalOpen() {
+            return ['itemModal', 'previewModal', 'userEditModal', 'announcementModal', 'noteEditModal', 'commentEditModal', 'announcementViewModal']
+                .some(id => {
+                    const el = document.getElementById(id);
+                    return el && el.classList.contains('active');
+                });
+        }
+
         window.onclick = function(event) {
             const itemModal = document.getElementById('itemModal');
             const previewModal = document.getElementById('previewModal');
             const userEditModal = document.getElementById('userEditModal');
             const announcementModal = document.getElementById('announcementModal');
             const noteEditModal = document.getElementById('noteEditModal');
+            const commentEditModal = document.getElementById('commentEditModal');
             const announcementPopup = document.getElementById('announcementPopup');
+            const announcementViewModal = document.getElementById('announcementViewModal');
 
             if (event.target === itemModal) closeModal();
             if (event.target === previewModal) closePreview();
             if (event.target === userEditModal) closeUserEditModal();
             if (event.target === announcementModal) closeAnnouncementModal();
             if (event.target === noteEditModal) closeNoteEditModal();
+            if (event.target === commentEditModal) closeCommentEditModal();
+            if (event.target === announcementViewModal) closeAnnouncementView();
 
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
                     !event.target.closest('#announcementBell') &&
-                    !event.target.closest('.announcement-wrapper')) {
+                    !event.target.closest('#announcementBellMobile') &&
+                    !event.target.closest('.announcement-wrapper') &&
+                    !event.target.closest('.navbar-mobile-bell')) {
                     closeAnnouncementPopup();
                 }
             }
         };
 
-        // ===== ESCAPE KEY =====
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (document.getElementById('itemModal').classList.contains('active')) closeModal();
@@ -4108,11 +6027,12 @@
                 else if (document.getElementById('userEditModal').classList.contains('active')) closeUserEditModal();
                 else if (document.getElementById('announcementModal').classList.contains('active')) closeAnnouncementModal();
                 else if (document.getElementById('noteEditModal').classList.contains('active')) closeNoteEditModal();
+                else if (document.getElementById('commentEditModal').classList.contains('active')) closeCommentEditModal();
+                else if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
                 else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
             }
         });
 
-        // ===== NAVBAR SCROLL =====
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
             if (window.scrollY > 20) {
@@ -4122,17 +6042,24 @@
             }
         });
 
-        // Reposition popup on resize
         window.addEventListener('resize', function() {
             const popup = document.getElementById('announcementPopup');
             if (popup && popup.classList.contains('open')) {
-                positionAnnouncementPopup();
+                const isMobileNow = window.innerWidth <= 768;
+                const anchor = isMobileNow
+                    ? document.getElementById('announcementBellMobile')
+                    : document.getElementById('announcementBell');
+                positionAnnouncementPopup(anchor);
             }
         });
 
-        // Live character counter for note edit
         document.getElementById('editNoteText')?.addEventListener('input', function() {
             document.getElementById('editNoteCharCount').textContent = this.value.length;
+        });
+
+        // ★ NEW: Character counter for comment edit
+        document.getElementById('editCommentText')?.addEventListener('input', function() {
+            document.getElementById('editCommentCharCount').textContent = this.value.length;
         });
     </script>
 
