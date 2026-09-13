@@ -1691,6 +1691,9 @@
     </div>
 
     <script>
+        // ================================================================
+        // ===== FIREBASE INIT =====
+        // ================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
             authDomain: "timawa2.firebaseapp.com",
@@ -1725,7 +1728,6 @@
         const MENTION_MAX_RESULTS = 6;
         const MENTION_REGEX = /@([\w\s.'-]{0,30})$/;
 
-        // ===== COMMENT CLEANUP CONFIG =====
         const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
         const COMMENT_CLEANUP_INITIAL_DELAY_MS = 8000;
         const COMMENT_CLEANUP_BATCH_LIMIT = 450;
@@ -1773,14 +1775,15 @@
         // ================================================================
         // ===== ★ MENTION STATE =====
         // ================================================================
-        // Map of mention displayName -> uid for the currently-typed comment
         let pendingMentions = new Map();
         let mentionDropdownIndex = -1;
         let mentionCandidates = [];
         let mentionDropdownOpen = false;
         let mentionAnchorStart = -1;
 
+        // ================================================================
         // ===== COMMENT AUTO-CLEANUP TIMER =====
+        // ================================================================
         let commentCleanupTimer = null;
 
         // ================================================================
@@ -1971,7 +1974,8 @@
 
         function attachNoteCountListeners() {
             detachAllNoteCountListeners();
-            Object.keys(noteCommentCounts).forEach(k => delete noteCommentCounts[k]);
+            // Don't clear existing counts - keep them until new ones arrive
+            // This prevents the count from disappearing on refresh
 
             Object.keys(notesCache).forEach(uid => {
                 const unsub = db.collection('noteComments')
@@ -1987,14 +1991,21 @@
         }
 
         function updateMemberBubbleCount(uid, count) {
-            const bubble = document.querySelector(`.member-note-bubble[data-note-uid="${CSS.escape(uid)}"] .note-comment-count`);
-            if (bubble) {
-                if (count > 0) {
-                    bubble.innerHTML = `<i class="fas fa-comment"></i> ${count}`;
-                    bubble.style.display = 'inline-flex';
-                } else {
-                    bubble.style.display = 'none';
+            const bubble = document.querySelector(`.member-note-bubble[data-note-uid="${CSS.escape(uid)}"]`);
+            if (!bubble) return;
+            
+            let countEl = bubble.querySelector('.note-comment-count');
+            
+            if (count > 0) {
+                if (!countEl) {
+                    countEl = document.createElement('span');
+                    countEl.className = 'note-comment-count';
+                    bubble.appendChild(countEl);
                 }
+                countEl.innerHTML = `<i class="fas fa-comment"></i> ${count}`;
+                countEl.style.display = 'inline-flex';
+            } else if (countEl) {
+                countEl.style.display = 'none';
             }
         }
 
@@ -2200,7 +2211,6 @@
                 input.addEventListener('input', handleCommentInput);
                 input.addEventListener('keydown', handleCommentKeydown);
                 input.addEventListener('blur', () => {
-                    // Delay hiding so click on mention option registers
                     setTimeout(closeMentionDropdown, 180);
                 });
             }
@@ -2228,7 +2238,6 @@
         }
 
         function handleCommentKeydown(e) {
-            // Handle mention dropdown navigation
             if (mentionDropdownOpen) {
                 if (e.key === 'ArrowDown') {
                     e.preventDefault();
@@ -2258,7 +2267,6 @@
                 }
             }
 
-            // Normal Enter = send
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 postNoteComment();
@@ -2270,7 +2278,6 @@
             const cursorPos = input.selectionStart;
             const beforeCursor = value.slice(0, cursorPos);
 
-            // Match @ followed by word characters/space at the end
             const match = beforeCursor.match(MENTION_REGEX);
 
             if (!match) {
@@ -2280,7 +2287,6 @@
 
             const query = match[1].toLowerCase().trim();
 
-            // Get all members (excluding self)
             const myUid = titaCurrentUser?.uid;
             const allMembers = Object.values(userProfileCache)
                 .filter(u => u.id !== myUid && (u.displayName || u.email));
@@ -2290,10 +2296,8 @@
                 return;
             }
 
-            // Filter by query
             let filtered;
             if (!query) {
-                // Show first N members alphabetically
                 filtered = allMembers
                     .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
                     .slice(0, MENTION_MAX_RESULTS);
@@ -2306,7 +2310,6 @@
                     .sort((a, b) => {
                         const aName = (a.displayName || '').toLowerCase();
                         const bName = (b.displayName || '').toLowerCase();
-                        // Prioritize names that START with the query
                         const aStarts = aName.startsWith(query) ? 0 : 1;
                         const bStarts = bName.startsWith(query) ? 0 : 1;
                         if (aStarts !== bStarts) return aStarts - bStarts;
@@ -2379,7 +2382,6 @@
             dropdown.innerHTML = html;
             dropdown.classList.add('show');
 
-            // Scroll active into view
             const activeEl = dropdown.querySelector('.mention-option.active');
             if (activeEl) {
                 activeEl.scrollIntoView({ block: 'nearest' });
@@ -2405,7 +2407,6 @@
             const beforeCursor = value.slice(0, cursorPos);
             const afterCursor = value.slice(cursorPos);
 
-            // Replace the @query with @DisplayName
             const match = beforeCursor.match(MENTION_REGEX);
             if (!match) return;
 
@@ -2416,14 +2417,11 @@
 
             input.value = newValue;
 
-            // Record the mention
             pendingMentions.set(name.toLowerCase(), { uid, name });
 
-            // Position cursor after the inserted mention
             const newCursorPos = startIdx + mentionText.length;
             input.setSelectionRange(newCursorPos, newCursorPos);
 
-            // Reset state
             closeMentionDropdown();
             updateCommentCharCount();
             input.focus();
@@ -2441,32 +2439,21 @@
         // ================================================================
         // ===== MENTION PARSING & NOTIFICATION =====
         // ================================================================
-        /**
-         * Extract @DisplayName references from text and return the matching
-         * uids using the current userProfileCache. Names must match exactly
-         * (case-insensitive) and be present in pendingMentions or cache.
-         *
-         * Returns an array of unique uids.
-         */
         function resolveMentions(text) {
             const found = new Set();
 
-            // First: any mention the user explicitly picked from the dropdown
             pendingMentions.forEach((info) => {
                 if (text.toLowerCase().includes(`@${info.name.toLowerCase()}`)) {
                     found.add(info.uid);
                 }
             });
 
-            // Second: scan the text for @Name patterns that match a cached user
-            // Sort by name length (longest first) to avoid partial matches
             const cachedUsers = Object.values(userProfileCache)
                 .filter(u => u.displayName)
                 .sort((a, b) => b.displayName.length - a.displayName.length);
 
             cachedUsers.forEach(u => {
                 const pattern = `@${u.displayName}`;
-                // Match @Name followed by whitespace, punctuation, or end-of-string
                 const regex = new RegExp(
                     escapeRegex(pattern) + '(?=\\s|[.,!?;:]|$)',
                     'i'
@@ -2559,22 +2546,15 @@
             list.innerHTML = html;
         }
 
-        /**
-         * Turns a plain text string into HTML with @mention chips.
-         * Uses the mentions array on the comment (source of truth) plus
-         * a fallback scan against the userProfileCache.
-         */
         function renderTextWithMentions(text, mentionUids) {
             if (!text) return '';
 
             const safeText = escapeHtml(text);
             const myUid = titaCurrentUser?.uid;
 
-            // Build name -> uid map
             const nameMap = new Map();
             const allUids = new Set(mentionUids || []);
 
-            // From explicit mentions array
             allUids.forEach(uid => {
                 const user = userProfileCache[uid];
                 if (user && user.displayName) {
@@ -2582,7 +2562,6 @@
                 }
             });
 
-            // Also scan for any @DisplayName in the text that matches a cached user
             const cachedUsers = Object.values(userProfileCache)
                 .filter(u => u.displayName && u.id)
                 .sort((a, b) => b.displayName.length - a.displayName.length);
@@ -2594,7 +2573,6 @@
 
             if (nameMap.size === 0) return safeText;
 
-            // Sort names by length desc to avoid partial overlaps
             const names = [...nameMap.keys()].sort((a, b) => b.length - a.length);
 
             let result = safeText;
@@ -2737,15 +2715,6 @@
         // ================================================================
         // ===== REPLY + MENTION NOTIFICATIONS (BATCHED) =====
         // ================================================================
-        /**
-         * Creates notifications for:
-         *   1. The note owner (if not replying to own note)
-         *   2. The parent comment author (if this is a reply-to-comment)
-         *   3. Any @mentioned users
-         *
-         * Uses ONE batched write for all notifications — Firebase-optimized.
-         * Skips the replier themselves and any duplicate recipients.
-         */
         async function createReplyAndMentionNotifications({
             noteUid,
             noteOwnerUid,
@@ -2764,13 +2733,11 @@
                 const now = Date.now();
                 const expiresAt = new Date(now + 3 * 24 * 60 * 60 * 1000);
 
-                // Track who we've already queued to avoid duplicate notifications
                 const queued = new Set();
                 const notifications = [];
                 const replySnippet = (replyText || '').slice(0, 80) + ((replyText || '').length > 80 ? '...' : '');
                 const noteSnippet = (noteText || '').slice(0, 60) + ((noteText || '').length > 60 ? '...' : '');
 
-                // 1. Reply notification to note owner
                 if (!isReplyToComment && noteOwnerUid && noteOwnerUid !== replierUid) {
                     if (!queued.has(noteOwnerUid)) {
                         queued.add(noteOwnerUid);
@@ -2793,7 +2760,6 @@
                     }
                 }
 
-                // 2. Reply-to-comment notification to parent author
                 if (isReplyToComment && parentCommentAuthorUid && parentCommentAuthorUid !== replierUid) {
                     if (!queued.has(parentCommentAuthorUid)) {
                         queued.add(parentCommentAuthorUid);
@@ -2816,12 +2782,11 @@
                     }
                 }
 
-                // 3. Mention notifications — batch these too
                 if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
                     mentionedUids.forEach(uid => {
                         if (!uid) return;
-                        if (uid === replierUid) return; // don't notify self
-                        if (queued.has(uid)) return;      // already getting a reply notification
+                        if (uid === replierUid) return;
+                        if (queued.has(uid)) return;
                         queued.add(uid);
                         notifications.push({
                             type: 'mention',
@@ -2844,7 +2809,6 @@
 
                 if (notifications.length === 0) return;
 
-                // ★ Single batched write — Firebase-optimized
                 const batch = db.batch();
                 notifications.forEach(n => {
                     const ref = db.collection('announcements').doc();
@@ -2893,7 +2857,6 @@
                     if (noteExp < expireAt) expireAt = noteExp;
                 }
 
-                // Snapshot parent comment info + resolve mentions in one pass
                 let parentCommentAuthorUid = null;
                 let parentCommentAuthorName = null;
                 let parentCommentId = null;
@@ -2910,10 +2873,8 @@
                     } catch (e) { /* ignore */ }
                 }
 
-                // ★ Resolve mentions from text BEFORE writing
                 const mentionedUids = resolveMentions(text);
 
-                // ★ Write the comment with mentions array
                 await db.collection('noteComments').add({
                     noteUid: currentNoteUid,
                     text,
@@ -2926,7 +2887,6 @@
                     expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
                 });
 
-                // ★ Fire off batched notifications (non-blocking)
                 const noteOwnerUid = currentNoteUid;
                 const noteOwnerName = carouselItemCache[`users:${noteOwnerUid}`]?.displayName
                     || note?.displayName
@@ -3229,6 +3189,9 @@
             openAnnouncementView(item);
         }
 
+        // ================================================================
+        // ★ FIXED: Announcement View Modal with working link navigation
+        // ================================================================
         function openAnnouncementView(item) {
             if (!item) return;
             currentAnnouncementViewId = item.id;
@@ -3261,12 +3224,25 @@
 
             const linkBtn = document.getElementById('annViewLinkBtn');
             const linkLabel = document.getElementById('annViewLinkLabel');
+            
             if (item.link) {
                 linkBtn.style.display = 'inline-flex';
                 linkBtn.href = item.link;
                 linkLabel.textContent = item.linkLabel || 'Open Link';
+                // ★ Remove old listeners and add new one to handle navigation properly
+                linkBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    // Close the modal first
+                    closeAnnouncementView();
+                    // Navigate after modal is closed
+                    setTimeout(() => {
+                        window.location.href = item.link;
+                    }, 150);
+                };
             } else {
                 linkBtn.style.display = 'none';
+                linkBtn.onclick = null;
             }
 
             document.getElementById('announcementViewModal').classList.add('active');
@@ -3625,7 +3601,7 @@
                             <span class="announcement-badge" id="announcementBadge">0</span>
                         </button>
                     </div>
-                    <button class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <button class="logout-link" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout
                 `;
                 heroCta.textContent = ' Go to Dashboard';
                 heroCta.href = 'dashboard.html';
@@ -4968,7 +4944,6 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
-                // ===== Save or delete note =====
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
                 const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
                 const existingNote = notesCache[titaCurrentUser.uid];

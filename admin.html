@@ -336,6 +336,7 @@
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
         .announcement-icon.type-reply { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
         .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
+        .announcement-icon.type-chat { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
 
         .announcement-body {
             flex: 1;
@@ -1340,8 +1341,8 @@
         .status-dot.dnd { background: #8b5cf6; }
         .status-dot.offline { background: #9ca3af; }
 
-        /* ===== NOTE CARDS ===== */
-        .note-card {
+        /* ===== CHAT CARDS (Admin moderation view) ===== */
+        .chat-card {
             background: #f8faff;
             border-radius: 16px;
             padding: 18px 20px;
@@ -1352,184 +1353,31 @@
             gap: 14px;
             align-items: flex-start;
             min-width: 0;
+            grid-column: 1 / -1;
         }
 
-        .note-card:hover {
+        .chat-card:hover {
             border-color: #7c3aed;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        .note-card.selected {
+        .chat-card.selected {
             border-color: #7c3aed;
             background: #f5f3ff;
             box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
         }
 
-        .note-card.expired {
-            opacity: 0.7;
-            border-color: #fecaca;
-            background: #fef2f2;
+        .chat-card.group-chat {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.04) 0%, rgba(139, 92, 246, 0.04) 100%);
+            border-color: rgba(124, 58, 237, 0.18);
         }
 
-        .note-card.expired:hover {
-            opacity: 1;
-        }
-
-        .note-card .note-card-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-            background: #ede9fe;
-        }
-
-        .note-card.expired .note-card-icon {
-            background: #fee2e2;
-        }
-
-        .note-card .note-card-body {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .note-card .note-card-author {
-            font-weight: 700;
-            font-size: 14px;
-            color: #1a1a2e;
-            margin-bottom: 2px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            overflow-wrap: anywhere;
-        }
-
-        .note-card .note-card-text {
-            font-size: 15px;
-            color: #333;
-            font-weight: 600;
-            line-height: 1.5;
-            padding: 8px 14px;
-            background: white;
-            border-radius: 10px;
-            border: 1.5px solid #eef2f7;
-            margin-bottom: 8px;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-        }
-
-        .note-card .note-card-meta {
-            font-size: 11px;
-            color: #888;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .note-card .note-card-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .note-card .note-card-meta i {
-            color: #7c3aed;
-            font-size: 10px;
-        }
-
-        .note-card .note-card-meta .expired-label {
-            color: #dc2626;
-            font-weight: 700;
-        }
-
-        .note-card .note-card-meta .expired-label i {
-            color: #dc2626;
-        }
-
-        .note-card .note-card-actions {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            display: flex;
-            gap: 6px;
-            opacity: 0;
-            transition: opacity 0.25s ease;
-        }
-
-        .note-card:hover .note-card-actions {
-            opacity: 1;
-        }
-
-        .note-card .note-card-actions button {
-            padding: 5px 10px;
-            font-size: 11px;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.2s ease;
-            font-family: inherit;
-        }
-
-        .note-card .note-card-actions .btn-edit {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-        .note-card .note-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
-
-        .note-card .note-card-actions .btn-danger {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        .note-card .note-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
-
-        .note-card .note-card-actions .btn-view-comments {
-            background: #ede9fe;
-            color: #7c3aed;
-        }
-        .note-card .note-card-actions .btn-view-comments:hover { background: #ddd6fe; transform: scale(1.05); }
-
-        /* ===== COMMENT (REPLY) CARDS ===== */
-        .comment-card {
-            background: #f8faff;
-            border-radius: 16px;
-            padding: 18px 20px;
-            border: 1px solid #eef2f7;
-            transition: all 0.3s ease;
-            position: relative;
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-            min-width: 0;
-        }
-
-        .comment-card:hover {
+        .chat-card.group-chat:hover {
             border-color: #7c3aed;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
-        .comment-card.selected {
-            border-color: #7c3aed;
-            background: #f5f3ff;
-            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
-        }
-
-        .comment-card.expired {
-            opacity: 0.7;
-            border-color: #fecaca;
-            background: #fef2f2;
-        }
-
-        .comment-card .comment-card-avatar {
+        .chat-card .chat-card-avatar {
             width: 46px;
             height: 46px;
             border-radius: 50%;
@@ -1546,22 +1394,22 @@
             box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
         }
 
-        .comment-card .comment-card-avatar img {
+        .chat-card .chat-card-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        .comment-card .comment-card-body {
+        .chat-card .chat-card-body {
             flex: 1;
             min-width: 0;
         }
 
-        .comment-card .comment-card-author {
+        .chat-card .chat-card-author {
             font-weight: 700;
             font-size: 14px;
             color: #1a1a2e;
-            margin-bottom: 2px;
+            margin-bottom: 4px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -1569,39 +1417,7 @@
             overflow-wrap: anywhere;
         }
 
-        .comment-card .comment-card-text {
-            font-size: 14px;
-            color: #333;
-            font-weight: 500;
-            line-height: 1.5;
-            padding: 8px 14px;
-            background: white;
-            border-radius: 10px;
-            border: 1.5px solid #eef2f7;
-            margin-bottom: 8px;
-            word-break: break-word;
-            overflow-wrap: anywhere;
-            white-space: pre-wrap;
-        }
-
-        .comment-card .comment-card-context {
-            font-size: 12px;
-            color: #888;
-            padding: 8px 12px;
-            background: #f0f4ff;
-            border-radius: 10px;
-            border-left: 3px solid #7c3aed;
-            margin-bottom: 8px;
-            line-height: 1.5;
-            overflow-wrap: anywhere;
-        }
-
-        .comment-card .comment-card-context strong {
-            color: #7c3aed;
-            font-weight: 700;
-        }
-
-        .comment-card .comment-card-reply-indicator {
+        .chat-card .chat-card-recipient {
             display: inline-flex;
             align-items: center;
             gap: 4px;
@@ -1611,12 +1427,37 @@
             font-weight: 700;
             padding: 2px 8px;
             border-radius: 50px;
-            margin-left: 6px;
             text-transform: uppercase;
             letter-spacing: 0.4px;
         }
 
-        .comment-card .comment-card-meta {
+        .chat-card .chat-card-recipient.group-recipient {
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.25);
+        }
+
+        .chat-card .chat-card-text {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 8px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .chat-card.group-chat .chat-card-text {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        .chat-card .chat-card-meta {
             font-size: 11px;
             color: #888;
             display: flex;
@@ -1624,23 +1465,27 @@
             gap: 10px;
         }
 
-        .comment-card .comment-card-meta span {
+        .chat-card .chat-card-meta span {
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
 
-        .comment-card .comment-card-meta i {
+        .chat-card .chat-card-meta i {
             color: #7c3aed;
             font-size: 10px;
         }
 
-        .comment-card .comment-card-meta .expired-label {
-            color: #dc2626;
+        .chat-card .chat-card-meta .mention-badge {
+            color: #d97706;
             font-weight: 700;
         }
 
-        .comment-card .comment-card-actions {
+        .chat-card .chat-card-meta .mention-badge i {
+            color: #d97706;
+        }
+
+        .chat-card .chat-card-actions {
             position: absolute;
             top: 12px;
             right: 12px;
@@ -1650,11 +1495,11 @@
             transition: opacity 0.25s ease;
         }
 
-        .comment-card:hover .comment-card-actions {
+        .chat-card:hover .chat-card-actions {
             opacity: 1;
         }
 
-        .comment-card .comment-card-actions button {
+        .chat-card .chat-card-actions button {
             padding: 5px 10px;
             font-size: 11px;
             border-radius: 50px;
@@ -1668,17 +1513,153 @@
             font-family: inherit;
         }
 
-        .comment-card .comment-card-actions .btn-edit {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-        .comment-card .comment-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
-
-        .comment-card .comment-card-actions .btn-danger {
+        .chat-card .chat-card-actions .btn-danger {
             background: #fee2e2;
             color: #dc2626;
         }
-        .comment-card .comment-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
+        .chat-card .chat-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
+
+        /* ===== CHAT FEATURE TOGGLE BANNER ===== */
+        .feature-toggle-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px 24px;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #eef2f7;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+            flex-wrap: wrap;
+        }
+
+        .feature-toggle-banner.off {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #fde68a;
+        }
+
+        .feature-toggle-banner.on {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-color: #bbf7d0;
+        }
+
+        .feature-toggle-banner .icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .feature-toggle-banner.off .icon-wrap { color: #d97706; }
+        .feature-toggle-banner.on .icon-wrap { color: #16a34a; }
+
+        .feature-toggle-banner .text-block {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .feature-toggle-banner .text-block .title {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .feature-toggle-banner.off .text-block .title { color: #78350f; }
+        .feature-toggle-banner.on .text-block .title { color: #14532d; }
+
+        .feature-toggle-banner .text-block .subtitle {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .feature-toggle-banner.off .text-block .subtitle { color: #92400e; }
+        .feature-toggle-banner.on .text-block .subtitle { color: #166534; }
+
+        .feature-toggle-banner .toggle-switch {
+            position: relative;
+            width: 70px;
+            height: 38px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            background: #d1d5db;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+        }
+
+        .feature-toggle-banner .toggle-switch.on {
+            background: linear-gradient(45deg, #16a34a 0%, #22c55e 100%);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.1), 0 4px 12px rgba(34, 197, 94, 0.35);
+        }
+
+        .feature-toggle-banner .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .feature-toggle-banner .toggle-switch.on::after {
+            transform: translateX(32px);
+        }
+
+        .feature-toggle-banner .toggle-switch:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ===== NOTES-COMMENTS FILTER BAR ===== */
+        .comments-filter-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f8faff;
+            border-radius: 14px;
+            border: 1px solid #eef2f7;
+            margin-bottom: 15px;
+        }
+
+        .comments-filter-bar label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .comments-filter-bar select {
+            padding: 8px 14px;
+            border-radius: 50px;
+            border: 2px solid #e0e7ff;
+            background: white;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            max-width: 260px;
+        }
+
+        .comments-filter-bar select:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
 
         .user-search-wrap {
             position: relative;
@@ -1712,7 +1693,6 @@
             pointer-events: none;
         }
 
-        /* ===== SELECTION CHECKBOX ===== */
         .select-checkbox {
             position: absolute;
             top: 12px;
@@ -2119,46 +2099,6 @@
             border-top: 1px solid #eef2f7;
         }
 
-        /* ===== NOTES-COMMENTS FILTER BAR ===== */
-        .comments-filter-bar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-            padding: 12px 16px;
-            background: #f8faff;
-            border-radius: 14px;
-            border: 1px solid #eef2f7;
-            margin-bottom: 15px;
-        }
-
-        .comments-filter-bar label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-        }
-
-        .comments-filter-bar select {
-            padding: 8px 14px;
-            border-radius: 50px;
-            border: 2px solid #e0e7ff;
-            background: white;
-            font-size: 13px;
-            font-family: inherit;
-            color: #333;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            max-width: 260px;
-        }
-
-        .comments-filter-bar select:focus {
-            outline: none;
-            border-color: #7c3aed;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
-        }
-
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
@@ -2292,6 +2232,22 @@
                 flex: 1;
                 justify-content: center;
             }
+
+            .feature-toggle-banner {
+                padding: 16px 18px;
+                gap: 12px;
+            }
+            .feature-toggle-banner .icon-wrap {
+                width: 44px;
+                height: 44px;
+                font-size: 20px;
+            }
+            .feature-toggle-banner .text-block .title {
+                font-size: 14px;
+            }
+            .feature-toggle-banner .text-block .subtitle {
+                font-size: 12px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -2335,6 +2291,18 @@
             .announcement-view-icon { width: 56px; height: 56px; font-size: 26px; }
             .announcement-view-body { padding: 18px 18px 22px; }
             .announcement-view-title { font-size: 17px; }
+
+            .feature-toggle-banner {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+            .feature-toggle-banner .icon-wrap {
+                margin: 0 auto;
+            }
+            .feature-toggle-banner .toggle-switch {
+                margin: 0 auto;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -2452,6 +2420,10 @@
             <button class="admin-tab" data-tab="comments">
                 <i class="fas fa-comments"></i> Replies
                 <span class="tab-badge" id="commentsTabBadge" style="display:none;">0</span>
+            </button>
+            <button class="admin-tab" data-tab="chats">
+                <i class="fas fa-comment-dots"></i> Chats
+                <span class="tab-badge" id="chatsTabBadge" style="display:none;">0</span>
             </button>
         </div>
 
@@ -2624,7 +2596,6 @@
                     </div>
                 </div>
 
-                <!-- Filter bar -->
                 <div class="comments-filter-bar">
                     <label><i class="fas fa-filter"></i> Filter:</label>
                     <select id="commentsNoteFilter" onchange="filterComments()">
@@ -2648,6 +2619,67 @@
                     </div>
                 </div>
                 <div class="items-grid" id="commentsGrid"></div>
+            </div>
+        </div>
+
+        <!-- ===== CHATS TAB (with group support) ===== -->
+        <div id="tab-chats" class="tab-content">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-comment-dots" style="color: #7c3aed;"></i> Squad Chats (Moderation)</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;margin-top:10px;">
+                        <div class="user-search-wrap">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="chatsSearchInput" placeholder="Search chats by sender, receiver, or message text..." oninput="filterChats()" />
+                        </div>
+                        <span class="count" id="chatsCount">0 messages</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('chats')"><i class="fas fa-check-square"></i> Select</button>
+                        <button class="btn-danger" onclick="deleteAllOldChats()"><i class="fas fa-trash-alt"></i> Delete Old (30d+)</button>
+                        <button class="btn-secondary" onclick="loadChatsAdmin(true)"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                </div>
+
+                <!-- ★ FEATURE TOGGLE BANNER -->
+                <div class="feature-toggle-banner off" id="chatFeatureBanner">
+                    <div class="icon-wrap">
+                        <i class="fas fa-comment-slash" id="chatFeatureIcon"></i>
+                    </div>
+                    <div class="text-block">
+                        <div class="title" id="chatFeatureTitle">Chat is DISABLED</div>
+                        <div class="subtitle" id="chatFeatureSubtitle">
+                            Users cannot send messages. Toggle ON to enable squad chat. This will start new Firestore listeners on all active user pages.
+                        </div>
+                    </div>
+                    <button class="toggle-switch" id="chatFeatureToggle" onclick="toggleChatFeature()" aria-label="Toggle chat feature"></button>
+                </div>
+
+                <div class="comments-filter-bar">
+                    <label><i class="fas fa-filter"></i> Filter:</label>
+                    <select id="chatsTypeFilter" onchange="filterChats()">
+                        <option value="">All Types</option>
+                        <option value="group">👥 Group messages only</option>
+                        <option value="direct">💬 Direct messages only</option>
+                    </select>
+                    <select id="chatsReadFilter" onchange="filterChats()">
+                        <option value="">All Messages</option>
+                        <option value="unread">🔵 Unread Only</option>
+                        <option value="read">✅ Read</option>
+                        <option value="mentions">📣 With Mentions</option>
+                    </select>
+                    <select id="chatsSenderFilter" onchange="filterChats()">
+                        <option value="">All Senders</option>
+                    </select>
+                </div>
+
+                <div class="batch-toolbar" id="batchToolbar-chats">
+                    <span class="batch-count" id="batchCount-chats">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('chats')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('chats')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('chats')"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="chatsGrid"></div>
             </div>
         </div>
     </div>
@@ -2733,6 +2765,7 @@
                             <option value="member">👥 New Member</option>
                             <option value="reply">💬 Reply</option>
                             <option value="mention">📣 Mention</option>
+                            <option value="chat">💬 Chat</option>
                         </select>
                     </div>
                     <div class="input-group">
@@ -2971,11 +3004,12 @@
         /* ============================================================
            ===== WHAT'S NEW IN THIS VERSION =====
            ============================================================
-           1. NEW: 'mention' announcement type in the dropdown and meta.
-           2. NEW: Editing a note's text purges all its old replies.
-           3. NEW: Deleting a note also deletes its replies.
-           4. NEW: 'reply' and 'mention' types appear with proper icons.
-           5. NEW: Comment cards show note context and mention chips.
+           1. Chats tab — moderate all squad chat messages (direct + group).
+           2. Chat feature toggle via settings/features.chatEnabled.
+           3. NEW: Group chat support — group messages now show a
+              👥 GROUP badge instead of "→ Unknown", and filter dropdown
+              includes "Group only" / "Direct only" options.
+           4. Direct messages continue to render exactly as before.
            ============================================================ */
 
         const firebaseConfig = {
@@ -3009,26 +3043,33 @@
         const ANNOUNCEMENTS_LIMIT = 100;
         const NOTES_LIMIT = 200;
         const COMMENTS_LIMIT = 500;
+        const CHATS_LIMIT = 100;
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
 
         // ===== BATCH DELETE CONFIG =====
-        const BATCH_CHUNK_SIZE = 450; // Firestore limit is 500, leaving room
+        const BATCH_CHUNK_SIZE = 450;
 
         // ===== AUTO-CLEANUP CONFIG =====
         const ANNOUNCEMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
         const ANNOUNCEMENT_CLEANUP_INITIAL_DELAY_MS = 5000;
         const ANNOUNCEMENT_CLEANUP_BATCH_LIMIT = 450;
 
-        // ===== HIGHLIGHT CLEANUP CONFIG =====
         const HIGHLIGHT_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
         const HIGHLIGHT_CLEANUP_INITIAL_DELAY_MS = 8000;
         const HIGHLIGHT_CLEANUP_BATCH_LIMIT = 450;
         const HIGHLIGHT_MAX_AGE_DAYS = 30;
 
-        // ===== COMMENT CLEANUP CONFIG =====
         const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
         const COMMENT_CLEANUP_INITIAL_DELAY_MS = 7000;
         const COMMENT_CLEANUP_BATCH_LIMIT = 450;
+
+        const CHAT_CLEANUP_INTERVAL_MS = 15 * 60 * 1000;
+        const CHAT_CLEANUP_INITIAL_DELAY_MS = 9000;
+        const CHAT_CLEANUP_BATCH_LIMIT = 450;
+        const CHAT_MAX_AGE_DAYS = 30;
+
+        // ===== GROUP CHAT CONSTANTS =====
+        const GROUP_CHAT_KEY = 'GROUP';
 
         let currentUser = null;
         let editingId = null;
@@ -3046,11 +3087,18 @@
         let editingNoteUid = null;
         let noteUserCache = {};
 
-        // ===== COMMENTS STATE =====
         let allComments = [];
         let unsubscribeAdminComments = null;
         let editingCommentId = null;
         let commentAuthorCache = {};
+
+        // ===== CHATS STATE =====
+        let allChats = [];
+        let unsubscribeAdminChats = null;
+        let chatUserCache = {};
+        let chatFeatureEnabled = false;
+        let chatFeatureUnsubscribe = null;
+        let chatFeatureBusy = false;
 
         let allAnnouncements = [];
         let unsubscribeAdminAnnouncements = null;
@@ -3073,6 +3121,7 @@
         let announcementCleanupTimer = null;
         let highlightCleanupTimer = null;
         let commentCleanupTimer = null;
+        let chatCleanupTimer = null;
 
         // ===== BATCH STATE =====
         const batchState = {
@@ -3082,10 +3131,10 @@
             announcements: { active: false, selected: new Set() },
             users: { active: false, selected: new Set() },
             notes: { active: false, selected: new Set() },
-            comments: { active: false, selected: new Set() }
+            comments: { active: false, selected: new Set() },
+            chats: { active: false, selected: new Set() }
         };
 
-        // ===== DATA CACHE (for select all / batch refs) =====
         const dataCache = {
             coffee: [],
             places: [],
@@ -3093,7 +3142,8 @@
             announcements: [],
             users: [],
             notes: [],
-            comments: []
+            comments: [],
+            chats: []
         };
 
         const COLLECTIONS = {
@@ -3109,7 +3159,8 @@
             'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
             'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' },
             'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
-            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' }
+            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' },
+            'chat':      { icon: '💬', cls: 'type-chat',      label: 'Chat' }
         };
 
         const SEED_DATA = {
@@ -3200,6 +3251,10 @@
             return url.replace('/upload/', `/upload/w_${width},q_auto,f_auto/`);
         }
 
+        function escapeRegex(str) {
+            return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
         // ===== CHUNKED BATCH DELETE =====
         async function chunkedBatchDelete(refs) {
             let deleted = 0;
@@ -3226,7 +3281,7 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: PURGE COMMENTS helper =====
+        // ===== PURGE COMMENTS helper =====
         // ================================================================
         async function purgeCommentsForNote(noteUid) {
             try {
@@ -3277,6 +3332,8 @@
                 filterNotes();
             } else if (tab === 'comments') {
                 filterComments();
+            } else if (tab === 'chats') {
+                filterChats();
             } else {
                 renderItemsFromCache(tab);
             }
@@ -3308,6 +3365,8 @@
                 filterNotes();
             } else if (tab === 'comments') {
                 filterComments();
+            } else if (tab === 'chats') {
+                filterChats();
             } else {
                 renderItemsFromCache(tab);
             }
@@ -3350,7 +3409,7 @@
                 grid.querySelectorAll('.select-checkbox').forEach(cb => {
                     cb.checked = state.selected.size === items.length;
                 });
-                grid.querySelectorAll('.item-card, .announcement-card, .user-card, .note-card, .comment-card').forEach(card => {
+                grid.querySelectorAll('.item-card, .announcement-card, .user-card, .note-card, .comment-card, .chat-card').forEach(card => {
                     const id = card.dataset.id;
                     if (id) card.classList.toggle('selected', state.selected.has(id));
                 });
@@ -3387,6 +3446,7 @@
             else if (tab === 'users') collectionName = 'users';
             else if (tab === 'notes') collectionName = 'notes';
             else if (tab === 'comments') collectionName = 'noteComments';
+            else if (tab === 'chats') collectionName = 'chatMessages';
             else collectionName = COLLECTIONS[tab];
 
             if (!collectionName) {
@@ -3448,6 +3508,8 @@
                     html += renderNoteCard(item);
                 } else if (tab === 'comments') {
                     html += renderCommentCard(item);
+                } else if (tab === 'chats') {
+                    html += renderChatCard(item);
                 }
             });
             grid.innerHTML = html;
@@ -3612,6 +3674,465 @@
             } catch (e) {
                 console.warn('getCurrentUserProfileCached failed:', e);
                 return {};
+            }
+        }
+
+        // ================================================================
+        // ===== ★ CHAT FEATURE TOGGLE =====
+        // ================================================================
+        function loadChatFeatureFlag() {
+            if (chatFeatureUnsubscribe) chatFeatureUnsubscribe();
+            chatFeatureUnsubscribe = db.collection('settings').doc('features')
+                .onSnapshot((doc) => {
+                    const data = doc.exists ? (doc.data() || {}) : {};
+                    chatFeatureEnabled = data.chatEnabled === true;
+                    updateChatFeatureBanner();
+                }, (error) => {
+                    console.warn('Chat feature flag listener error:', error.message);
+                    chatFeatureEnabled = false;
+                    updateChatFeatureBanner();
+                });
+        }
+
+        function updateChatFeatureBanner() {
+            const banner = document.getElementById('chatFeatureBanner');
+            const icon = document.getElementById('chatFeatureIcon');
+            const title = document.getElementById('chatFeatureTitle');
+            const subtitle = document.getElementById('chatFeatureSubtitle');
+            const toggle = document.getElementById('chatFeatureToggle');
+            if (!banner) return;
+
+            if (chatFeatureEnabled) {
+                banner.classList.remove('off');
+                banner.classList.add('on');
+                icon.className = 'fas fa-comment-dots';
+                title.textContent = 'Chat is ENABLED';
+                subtitle.textContent = 'Users can chat and mention each other. Users will see chat listeners active on their dashboards.';
+                toggle.classList.add('on');
+            } else {
+                banner.classList.remove('on');
+                banner.classList.add('off');
+                icon.className = 'fas fa-comment-slash';
+                title.textContent = 'Chat is DISABLED';
+                subtitle.textContent = 'Users cannot send messages. Toggle ON to enable squad chat. This will start new Firestore listeners on all active user pages.';
+                toggle.classList.remove('on');
+            }
+        }
+
+        async function toggleChatFeature() {
+            if (chatFeatureBusy) return;
+            chatFeatureBusy = true;
+
+            const toggle = document.getElementById('chatFeatureToggle');
+            if (toggle) toggle.disabled = true;
+
+            const targetState = !chatFeatureEnabled;
+
+            try {
+                await db.collection('settings').doc('features').set(
+                    {
+                        chatEnabled: targetState,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedBy: currentUser ? currentUser.uid : 'unknown'
+                    },
+                    { merge: true }
+                );
+                // onSnapshot will update UI
+            } catch (err) {
+                console.error('toggleChatFeature error:', err);
+                alert('❌ Could not toggle chat: ' + err.message);
+            } finally {
+                chatFeatureBusy = false;
+                if (toggle) toggle.disabled = false;
+            }
+        }
+
+        // ================================================================
+        // ===== CHATS MANAGEMENT (ADMIN MODERATION) =====
+        // ================================================================
+        function loadChatsAdmin(showToast = false) {
+            const grid = document.getElementById('chatsGrid');
+            const countEl = document.getElementById('chatsCount');
+            const badgeEl = document.getElementById('chatsTabBadge');
+            if (!grid) return;
+
+            if (unsubscribeAdminChats) unsubscribeAdminChats();
+
+            unsubscribeAdminChats = db.collection('chatMessages')
+                .orderBy('createdAt', 'desc')
+                .limit(CHATS_LIMIT)
+                .onSnapshot((snapshot) => {
+                    allChats = [];
+                    snapshot.forEach(doc => {
+                        allChats.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    dataCache.chats = allChats.slice();
+
+                    if (countEl) countEl.textContent = `${allChats.length} message${allChats.length !== 1 ? 's' : ''}`;
+                    if (badgeEl) {
+                        if (allChats.length > 0) {
+                            badgeEl.textContent = allChats.length > 99 ? '99+' : String(allChats.length);
+                            badgeEl.style.display = 'inline-flex';
+                        } else {
+                            badgeEl.style.display = 'none';
+                        }
+                    }
+
+                    loadChatUserInfo();
+                    populateChatsSenderFilter();
+                    filterChats();
+
+                    if (showToast) console.log('Chats refreshed:', allChats.length);
+                }, (error) => {
+                    console.error('Error loading chats:', error);
+                    if (grid) {
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Could not load chats</h3>
+                                <p>${escapeHtml(error.message)}</p>
+                                <p style="font-size:11px;margin-top:8px;color:#999;">If you see an "index" error, check the browser console for the create-index link.</p>
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        async function loadChatUserInfo() {
+            const uids = new Set();
+            allChats.forEach(c => {
+                if (c.senderUid) uids.add(c.senderUid);
+                if (c.receiverUid) uids.add(c.receiverUid);
+            });
+
+            const missing = [...uids].filter(uid => !chatUserCache[uid]);
+
+            await Promise.all(missing.map(async (uid) => {
+                try {
+                    const doc = await db.collection('users').doc(uid).get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        chatUserCache[uid] = {
+                            displayName: data.displayName || data.email || 'Unknown',
+                            photoURL: data.photoURL || ''
+                        };
+                    } else {
+                        chatUserCache[uid] = { displayName: 'Unknown User', photoURL: '' };
+                    }
+                } catch (e) {
+                    chatUserCache[uid] = { displayName: 'Unknown User', photoURL: '' };
+                }
+            }));
+        }
+
+        function populateChatsSenderFilter() {
+            const select = document.getElementById('chatsSenderFilter');
+            if (!select) return;
+
+            const currentValue = select.value;
+
+            const senderUids = [...new Set(allChats.map(c => c.senderUid).filter(Boolean))];
+
+            let html = '<option value="">All Senders</option>';
+            senderUids.forEach(uid => {
+                const user = chatUserCache[uid];
+                const name = user?.displayName || uid.slice(0, 8);
+                html += `<option value="${escapeAttr(uid)}">👤 ${escapeHtml(name)}</option>`;
+            });
+
+            select.innerHTML = html;
+
+            if (currentValue && senderUids.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function filterChats() {
+            const grid = document.getElementById('chatsGrid');
+            if (!grid) return;
+
+            const term = (document.getElementById('chatsSearchInput')?.value || '').trim().toLowerCase();
+            const typeFilter = document.getElementById('chatsTypeFilter')?.value || '';
+            const readFilter = document.getElementById('chatsReadFilter')?.value || '';
+            const senderFilter = document.getElementById('chatsSenderFilter')?.value || '';
+
+            let filtered = allChats;
+
+            // ★ TYPE FILTER (group vs direct)
+            if (typeFilter === 'group') {
+                filtered = filtered.filter(c => c.isGroup === true || c.participantsKey === GROUP_CHAT_KEY);
+            } else if (typeFilter === 'direct') {
+                filtered = filtered.filter(c => c.isGroup !== true && c.participantsKey !== GROUP_CHAT_KEY);
+            }
+
+            if (senderFilter) {
+                filtered = filtered.filter(c => c.senderUid === senderFilter);
+            }
+
+            if (readFilter === 'unread') {
+                filtered = filtered.filter(c => c.read === false);
+            } else if (readFilter === 'read') {
+                filtered = filtered.filter(c => c.read === true);
+            } else if (readFilter === 'mentions') {
+                filtered = filtered.filter(c => Array.isArray(c.mentions) && c.mentions.length > 0);
+            }
+
+            if (term) {
+                filtered = filtered.filter(c => {
+                    const sender = chatUserCache[c.senderUid] || {};
+                    const receiver = chatUserCache[c.receiverUid] || {};
+                    const haystack = [
+                        c.text || '',
+                        sender.displayName || '',
+                        receiver.displayName || '',
+                        c.senderName || '',
+                        (c.isGroup || c.participantsKey === GROUP_CHAT_KEY) ? 'group squad group chat' : ''
+                    ].join(' ').toLowerCase();
+                    return haystack.includes(term);
+                });
+            }
+
+            if (filtered.length === 0) {
+                const hasFilters = term || typeFilter || readFilter || senderFilter;
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comment-dots"></i>
+                        <h3>${hasFilters ? 'No chats match your filters' : 'No chat messages yet'}</h3>
+                        <p>${hasFilters ? 'Try adjusting the filters or search term.' : 'Messages will appear here once users start chatting.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(chat => {
+                html += renderChatCard(chat);
+            });
+            grid.innerHTML = html;
+
+            grid.classList.toggle('batch-mode', batchState.chats.active);
+        }
+
+        function renderChatCard(chat) {
+            const isGroupMessage = chat.isGroup === true || chat.participantsKey === GROUP_CHAT_KEY;
+
+            const sender = chatUserCache[chat.senderUid] || {
+                displayName: chat.senderName || 'Anonymous',
+                photoURL: chat.senderPhoto || ''
+            };
+
+            // For group messages, receiver is the group itself (not a single user)
+            let receiver;
+            if (isGroupMessage) {
+                const memberCount = Array.isArray(chat.participants) ? chat.participants.length : 0;
+                receiver = { displayName: `Squad Group (${memberCount} member${memberCount !== 1 ? 's' : ''})`, photoURL: '' };
+            } else {
+                receiver = chatUserCache[chat.receiverUid] || { displayName: 'Unknown', photoURL: '' };
+            }
+
+            const createdDate = chat.createdAt
+                ? new Date(chat.createdAt.seconds ? chat.createdAt.seconds * 1000 : chat.createdAt)
+                : new Date();
+
+            const initials = (sender.displayName || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            const avatarContent = sender.photoURL
+                ? `<img src="${cloudinaryThumb(sender.photoURL, 100)}" alt="${escapeAttr(sender.displayName)}" loading="lazy" />`
+                : escapeHtml(initials);
+
+            const hasMentions = Array.isArray(chat.mentions) && chat.mentions.length > 0;
+            const mentionBadge = hasMentions
+                ? `<span class="mention-badge"><i class="fas fa-at"></i> ${chat.mentions.length} mention${chat.mentions.length !== 1 ? 's' : ''}</span>`
+                : '';
+
+            const readBadge = chat.read === true
+                ? `<span style="color:#16a34a;"><i class="fas fa-check-double"></i> Read</span>`
+                : `<span style="color:#d97706;"><i class="fas fa-clock"></i> Unread</span>`;
+
+            const isSelected = batchState.chats.active && batchState.chats.selected.has(chat.id);
+
+            // Render text with mention chips
+            const textHtml = renderTextWithMentions(chat.text || '', chat.mentions);
+
+            // ★ Recipient badge — GROUP gets special styling + icon
+            const recipientBadgeHtml = isGroupMessage
+                ? `<span class="chat-card-recipient group-recipient"><i class="fas fa-users"></i> ${escapeHtml(receiver.displayName)}</span>`
+                : `<span class="chat-card-recipient"><i class="fas fa-arrow-right"></i> ${escapeHtml(receiver.displayName)}</span>`;
+
+            // ★ Card gets a class for group styling
+            const cardClass = `chat-card ${isGroupMessage ? 'group-chat' : ''} ${isSelected ? 'selected' : ''}`;
+
+            return `
+                <div class="${cardClass}" data-id="${escapeAttr(chat.id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('chats', '${escapeAttr(chat.id)}', this.checked)" />
+                    <div class="chat-card-avatar">${avatarContent}</div>
+                    <div class="chat-card-body">
+                        <div class="chat-card-author">
+                            ${escapeHtml(sender.displayName)}
+                            ${recipientBadgeHtml}
+                        </div>
+                        <div class="chat-card-text">${textHtml}</div>
+                        <div class="chat-card-meta">
+                            <span><i class="fas fa-calendar-plus"></i> ${formatRelativeTime(createdDate)}</span>
+                            ${isGroupMessage ? `<span><i class="fas fa-users"></i> Group</span>` : readBadge}
+                            ${mentionBadge}
+                        </div>
+                    </div>
+                    <div class="chat-card-actions">
+                        <button class="btn-danger" onclick="deleteChatMessageAdmin('${escapeAttr(chat.id)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTextWithMentions(text, mentionUids) {
+            if (!text) return '';
+            const safeText = escapeHtml(text);
+
+            const nameMap = new Map();
+            const allUids = new Set(mentionUids || []);
+
+            allUids.forEach(uid => {
+                const user = chatUserCache[uid];
+                if (user && user.displayName) nameMap.set(user.displayName, uid);
+            });
+
+            const cachedUsers = Object.values(chatUserCache)
+                .filter(u => u.displayName)
+                .sort((a, b) => b.displayName.length - a.displayName.length);
+
+            cachedUsers.forEach(u => {
+                if (!safeText.toLowerCase().includes(`@${u.displayName.toLowerCase()}`)) return;
+                if (!nameMap.has(u.displayName)) nameMap.set(u.displayName, null);
+            });
+
+            if (nameMap.size === 0) return safeText;
+
+            const names = [...nameMap.keys()].sort((a, b) => b.length - a.length);
+            let result = safeText;
+            names.forEach(name => {
+                const safeName = escapeHtml(name);
+                const uid = nameMap.get(name);
+                const replacement = uid
+                    ? `<span class="mention-chip" data-mention-uid="${escapeAttr(uid)}">@${safeName}</span>`
+                    : `<span class="mention-chip">@${safeName}</span>`;
+                const regex = new RegExp(`@${escapeRegex(safeName)}(?=\\s|[.,!?;:]|&nbsp;|$)`, 'g');
+                result = result.replace(regex, replacement);
+            });
+            return result;
+        }
+
+        async function deleteChatMessageAdmin(chatId) {
+            const chat = allChats.find(c => c.id === chatId);
+            const sender = chatUserCache[chat?.senderUid] || {};
+            const preview = chat?.text ? `"${chat.text.slice(0, 60)}${chat.text.length > 60 ? '...' : ''}"` : '';
+            const context = (chat?.isGroup || chat?.participantsKey === GROUP_CHAT_KEY)
+                ? 'from the Squad Group Chat'
+                : `from ${sender.displayName || 'this user'}`;
+
+            if (!confirm(`Delete chat message ${preview} ${context}?\n\nThis will remove it from Firestore permanently.`)) return;
+
+            try {
+                await db.collection('chatMessages').doc(chatId).delete();
+                alert('✅ Chat message deleted.');
+            } catch (err) {
+                console.error('Error deleting chat:', err);
+                alert('❌ Error deleting chat: ' + err.message);
+            }
+        }
+
+        async function deleteAllOldChats() {
+            const cutoff = new Date(Date.now() - CHAT_MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
+
+            const oldCount = allChats.filter(c => {
+                if (!c.createdAt) return false;
+                const created = c.createdAt.seconds
+                    ? new Date(c.createdAt.seconds * 1000)
+                    : new Date(c.createdAt);
+                return created < cutoff;
+            }).length;
+
+            if (oldCount === 0) {
+                alert(`✨ No messages older than ${CHAT_MAX_AGE_DAYS} days (from the loaded ${allChats.length}).`);
+                return;
+            }
+
+            if (!confirm(`Delete ${oldCount} chat message(s) older than ${CHAT_MAX_AGE_DAYS} days?\n\nThis cannot be undone.`)) return;
+
+            const btn = document.querySelector('#tab-chats .btn-danger');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+            try {
+                const result = await cleanupOldChats();
+                if (result.deleted === 0) {
+                    alert('✨ Nothing to delete (already cleaned up).');
+                } else {
+                    alert(`✅ Deleted ${result.deleted} old chat message${result.deleted !== 1 ? 's' : ''}.`);
+                }
+            } catch (err) {
+                console.error('Manual chat cleanup error:', err);
+                alert('❌ Error cleaning up: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ================================================================
+        // ===== CHAT AUTO-CLEANUP =====
+        // ================================================================
+        async function cleanupOldChats() {
+            try {
+                const cutoff = new Date(Date.now() - CHAT_MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
+
+                const snapshot = await db.collection('chatMessages')
+                    .where('createdAt', '<=', cutoff)
+                    .limit(CHAT_CLEANUP_BATCH_LIMIT)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const refs = [];
+                snapshot.forEach(doc => refs.push({ collection: 'chatMessages', id: doc.id }));
+
+                const result = await chunkedBatchDelete(refs);
+
+                console.log(`🧹 Chat cleanup: deleted ${result.deleted} old chat message(s).`);
+
+                if (snapshot.size === CHAT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(cleanupOldChats, 2000);
+                }
+
+                return { deleted: result.deleted, errors: result.errors };
+            } catch (err) {
+                console.warn('Chat auto-cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startChatAutoCleanup() {
+            if (chatCleanupTimer) clearInterval(chatCleanupTimer);
+
+            setTimeout(() => {
+                cleanupOldChats();
+            }, CHAT_CLEANUP_INITIAL_DELAY_MS);
+
+            chatCleanupTimer = setInterval(() => {
+                cleanupOldChats();
+            }, CHAT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Chat auto-cleanup started (every 15 min).');
+        }
+
+        function stopChatAutoCleanup() {
+            if (chatCleanupTimer) {
+                clearInterval(chatCleanupTimer);
+                chatCleanupTimer = null;
             }
         }
 
@@ -4096,7 +4617,6 @@
                 return;
             }
 
-            // Check if text actually changed
             const existing = allNotes.find(n => n.uid === uid);
             const oldText = existing?.text || '';
             const textChanged = text !== oldText;
@@ -4116,7 +4636,6 @@
             btn.innerHTML = '<span class="spinner"></span> Saving...';
 
             try {
-                // ★ If text changed → purge old replies first
                 if (textChanged) {
                     await purgeCommentsForNote(uid);
                 }
@@ -4158,7 +4677,6 @@
             if (!confirm(`Delete note ${textPreview} from ${name}?${replyMsg}\n\nThis will remove it from Firestore permanently.`)) return;
 
             try {
-                // ★ Purge replies first
                 if (note?.uid) {
                     await purgeCommentsForNote(note.uid);
                 }
@@ -4193,7 +4711,6 @@
             btn.innerHTML = '<span class="spinner"></span> Deleting...';
 
             try {
-                // ★ Purge replies for each expired note first
                 let purgedReplies = 0;
                 for (const n of expiredNotes) {
                     if (n.uid) {
@@ -4260,7 +4777,6 @@
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <h3>Could not load replies</h3>
                                 <p>${escapeHtml(error.message)}</p>
-                                <p style="font-size:11px;margin-top:8px;color:#999;">If you see an "index" error, check the browser console for the create-index link.</p>
                             </div>
                         `;
                     }
@@ -4551,7 +5067,6 @@
             const name = author.displayName || comment?.authorName || 'this user';
             const textPreview = comment?.text ? `"${comment.text.slice(0, 50)}${comment.text.length > 50 ? '...' : ''}"` : '';
 
-            // Check for child replies
             const childCount = allComments.filter(c => c.replyToId === commentId).length;
             const childMsg = childCount > 0
                 ? `\n\n⚠️ This will also delete ${childCount} nested repl${childCount === 1 ? 'y' : 'ies'} that replied to it.`
@@ -4560,7 +5075,6 @@
             if (!confirm(`Delete reply ${textPreview} from ${name}?${childMsg}\n\nThis will remove it from Firestore permanently.`)) return;
 
             try {
-                // Delete the comment and any children pointing to it
                 const refs = [{ collection: 'noteComments', id: commentId }];
                 allComments.filter(c => c.replyToId === commentId).forEach(c => {
                     refs.push({ collection: 'noteComments', id: c.id });
@@ -4575,7 +5089,7 @@
         }
 
         // ================================================================
-        // ===== BELL/POPUP SYSTEM (ADMIN VIEW) =====
+        // ===== BELL/POPUP SYSTEM =====
         // ================================================================
         function loadAnnouncementReadCache(uid) {
             try {
@@ -4987,7 +5501,6 @@
                         if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
                     });
                 } catch (err) {
-                    console.warn('Birthday check query failed (may need index), falling back:', err.message);
                     const fallbackSnap = await db.collection('announcements')
                         .orderBy('createdAt', 'desc')
                         .limit(50)
@@ -5475,6 +5988,8 @@
                 loadAnnouncementsAdmin();
                 loadNotesAdmin();
                 loadCommentsAdmin();
+                loadChatsAdmin();
+                loadChatFeatureFlag();
 
                 loadAnnouncements(user);
                 runAutoGeneration(user, data);
@@ -5482,6 +5997,7 @@
                 startAnnouncementAutoCleanup();
                 startHighlightAutoCleanup();
                 startCommentAutoCleanup();
+                startChatAutoCleanup();
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
@@ -5491,6 +6007,8 @@
             stopAnnouncementAutoCleanup();
             stopHighlightAutoCleanup();
             stopCommentAutoCleanup();
+            stopChatAutoCleanup();
+            if (chatFeatureUnsubscribe) { try { chatFeatureUnsubscribe(); } catch (e) {} }
         });
 
         // ===== LOAD ALL DATA =====
@@ -6001,6 +6519,7 @@
             loadAnnouncementsAdmin(true);
             loadNotesAdmin(true);
             loadCommentsAdmin(true);
+            loadChatsAdmin(true);
             alert('🔄 All content refreshed!');
         }
 
@@ -6051,6 +6570,8 @@
                 stopAnnouncementAutoCleanup();
                 stopHighlightAutoCleanup();
                 stopCommentAutoCleanup();
+                stopChatAutoCleanup();
+                if (chatFeatureUnsubscribe) { try { chatFeatureUnsubscribe(); } catch (e) {} }
 
                 if (auth.currentUser) {
                     try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
