@@ -387,6 +387,8 @@
         .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
         .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+        .announcement-icon.type-reply { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
+        .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
 
         .announcement-body {
             flex: 1;
@@ -2340,7 +2342,9 @@
             'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
             'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
             'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
-            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' },
+            'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
+            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' }
         };
 
         function getAnnouncementMeta(type) {
@@ -2975,6 +2979,127 @@
                 markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
             } catch (e) {
                 console.warn('welcome gen:', e.message);
+            }
+        }
+
+        // ================================================================
+        // ===== ★ NEW: REPLY & MENTION NOTIFICATIONS =====
+        // ================================================================
+        /**
+         * Creates notifications for:
+         *   1. The note owner (if not replying to own note)
+         *   2. The parent comment author (if this is a reply-to-comment)
+         *   3. Any @mentioned users
+         *
+         * Uses ONE batched write for all notifications — Firebase-optimized.
+         * Exposed here for parity with index.html.
+         */
+        async function createReplyAndMentionNotifications({
+            noteUid,
+            noteOwnerUid,
+            noteOwnerName,
+            noteText,
+            parentCommentId,
+            parentCommentAuthorUid,
+            parentCommentAuthorName,
+            replierUid,
+            replierName,
+            replyText,
+            isReplyToComment,
+            mentionedUids
+        }) {
+            try {
+                const now = Date.now();
+                const expiresAt = new Date(now + 3 * 24 * 60 * 60 * 1000);
+
+                const queued = new Set();
+                const notifications = [];
+                const replySnippet = (replyText || '').slice(0, 80) + ((replyText || '').length > 80 ? '...' : '');
+                const noteSnippet = (noteText || '').slice(0, 60) + ((noteText || '').length > 60 ? '...' : '');
+
+                // 1. Reply notification to note owner
+                if (!isReplyToComment && noteOwnerUid && noteOwnerUid !== replierUid) {
+                    if (!queued.has(noteOwnerUid)) {
+                        queued.add(noteOwnerUid);
+                        notifications.push({
+                            type: 'reply',
+                            title: `💬 ${replierName} replied to your note`,
+                            message: `"${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '💬',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Reply',
+                            targetUid: noteOwnerUid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    }
+                }
+
+                // 2. Reply-to-comment notification to parent author
+                if (isReplyToComment && parentCommentAuthorUid && parentCommentAuthorUid !== replierUid) {
+                    if (!queued.has(parentCommentAuthorUid)) {
+                        queued.add(parentCommentAuthorUid);
+                        notifications.push({
+                            type: 'reply',
+                            title: `💬 ${replierName} replied to your reply`,
+                            message: `On ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '💬',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Reply',
+                            targetUid: parentCommentAuthorUid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    }
+                }
+
+                // 3. Mention notifications — batch these too
+                if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
+                    mentionedUids.forEach(uid => {
+                        if (!uid) return;
+                        if (uid === replierUid) return;
+                        if (queued.has(uid)) return;
+                        queued.add(uid);
+                        notifications.push({
+                            type: 'mention',
+                            title: `@ ${replierName} mentioned you`,
+                            message: `In ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '📣',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Mention',
+                            targetUid: uid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    });
+                }
+
+                if (notifications.length === 0) return;
+
+                const batch = db.batch();
+                notifications.forEach(n => {
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, n);
+                });
+                await batch.commit();
+
+            } catch (err) {
+                console.warn('createReplyAndMentionNotifications error:', err);
             }
         }
 

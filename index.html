@@ -147,6 +147,8 @@
         .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
         .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+        .announcement-icon.type-reply { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
+        .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
         .announcement-body { flex: 1; min-width: 0; }
         .announcement-title {
             font-size: 13px; font-weight: 600; color: #1a1a2e;
@@ -495,18 +497,19 @@
         .member-card .member-body {
             padding: 20px 22px 22px; flex: 1;
             display: flex; flex-direction: column; text-align: center;
+            min-width: 0;
         }
-        .member-card .member-body .member-name { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.3; }
-        .member-card .member-body .member-location { font-size: 13px; color: #888; display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 10px; }
+        .member-card .member-body .member-name { font-size: 18px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
+        .member-card .member-body .member-location { font-size: 13px; color: #888; display: inline-flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 10px; overflow-wrap: anywhere; }
         .member-card .member-body .member-location i { color: rgb(16, 137, 211); font-size: 12px; }
         .member-card .member-body .member-meta-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 10px; }
-        .member-card .member-body .member-meta-chip { display: inline-flex; align-items: center; gap: 5px; background: #f0f9ff; color: #555; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; border: 1px solid #e0f2fe; }
+        .member-card .member-body .member-meta-chip { display: inline-flex; align-items: center; gap: 5px; background: #f0f9ff; color: #555; padding: 3px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; border: 1px solid #e0f2fe; max-width: 100%; overflow-wrap: anywhere; }
         .member-card .member-body .member-meta-chip i { color: rgb(16, 137, 211); font-size: 10px; }
         .member-card .member-body .lovelife-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 700; margin: 0 auto 10px; align-self: center; }
         .lovelife-badge.single { background: #fee2e2; color: #dc2626; }
         .lovelife-badge.mu { background: #fce7f3; color: #db2777; }
         .lovelife-badge.married { background: #dcfce7; color: #16a34a; }
-        .member-card .member-body .member-bio { font-size: 13px; color: #666; line-height: 1.55; margin: 8px 0 12px; padding-top: 12px; border-top: 1px solid #f0f4ff; flex: 1; }
+        .member-card .member-body .member-bio { font-size: 13px; color: #666; line-height: 1.55; margin: 8px 0 12px; padding-top: 12px; border-top: 1px solid #f0f4ff; flex: 1; overflow-wrap: anywhere; word-break: break-word; }
         .member-card .member-body .member-interests { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 10px; }
         .member-card .member-body .member-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 3px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; }
         .member-card .member-body .member-socials { display: flex; justify-content: center; gap: 8px; padding-top: 10px; border-top: 1px solid #f0f4ff; margin-top: auto; }
@@ -554,18 +557,18 @@
         .member-modal .member-modal-header .member-modal-avatar-circle img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .member-modal .member-modal-header .member-modal-initials { font-size: 96px; font-weight: 700; color: rgb(16, 137, 211); }
         .member-modal .member-modal-body { padding: 26px 30px 30px; }
-        .member-modal .member-modal-body .member-modal-name { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .member-modal .member-modal-body .member-modal-location { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; margin-bottom: 18px; }
+        .member-modal .member-modal-body .member-modal-name { font-size: 24px; font-weight: 800; color: #1a1a2e; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; overflow-wrap: anywhere; }
+        .member-modal .member-modal-body .member-modal-location { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #888; margin-bottom: 18px; overflow-wrap: anywhere; }
         .member-modal .member-modal-body .member-modal-location i { color: rgb(16, 137, 211); font-size: 15px; }
         .member-modal .member-modal-body .member-modal-section-label { font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .member-modal .member-modal-body .member-modal-bio { font-size: 15px; color: #555; line-height: 1.7; padding-bottom: 16px; border-bottom: 1px solid #f0f4ff; margin-bottom: 16px; white-space: pre-wrap; }
+        .member-modal .member-modal-body .member-modal-bio { font-size: 15px; color: #555; line-height: 1.7; padding-bottom: 16px; border-bottom: 1px solid #f0f4ff; margin-bottom: 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
         .member-modal .member-modal-body .member-modal-interests { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
         .member-modal .member-modal-body .member-modal-interests .interest-tag { background: #e0f2fe; color: rgb(16, 137, 211); padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; }
         .member-modal .member-modal-body .member-modal-socials { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
         .member-modal .member-modal-body .member-modal-socials a { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #f8faff; color: #666; font-size: 16px; transition: all 0.3s ease; text-decoration: none; border: 1px solid #eef2f7; }
         .member-modal .member-modal-body .member-modal-socials a:hover { background: #e0f2fe; color: rgb(16, 137, 211); transform: scale(1.1); }
         .member-modal .member-modal-body .member-modal-meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-        .member-modal .member-modal-body .member-modal-meta-item { background: #f8faff; padding: 10px 14px; border-radius: 12px; font-size: 13px; color: #555; display: flex; align-items: center; gap: 8px; border: 1px solid #eef2f7; }
+        .member-modal .member-modal-body .member-modal-meta-item { background: #f8faff; padding: 10px 14px; border-radius: 12px; font-size: 13px; color: #555; display: flex; align-items: center; gap: 8px; border: 1px solid #eef2f7; overflow-wrap: anywhere; }
         .member-modal .member-modal-body .member-modal-meta-item i { color: rgb(16, 137, 211); width: 16px; text-align: center; flex-shrink: 0; }
         .member-modal .member-modal-body .member-modal-meta-item.full-width { grid-column: 1 / -1; }
         .member-modal .member-modal-body .member-modal-meta-item .meta-label { font-weight: 700; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; margin-right: 4px; }
@@ -612,7 +615,7 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
         }
         .note-modal .note-modal-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .note-modal .note-modal-name { font-size: 17px; font-weight: 800; color: white; margin-bottom: 2px; }
+        .note-modal .note-modal-name { font-size: 17px; font-weight: 800; color: white; margin-bottom: 2px; overflow-wrap: anywhere; }
         .note-modal .note-modal-time { font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 500; }
 
         .note-modal .note-modal-body {
@@ -683,6 +686,7 @@
             margin-bottom: 8px;
             animation: commentFadeIn 0.3s ease-out;
             position: relative;
+            min-width: 0;
         }
         @keyframes commentFadeIn {
             from { opacity: 0; transform: translateY(-4px); }
@@ -721,6 +725,7 @@
         .note-comment .comment-author {
             font-size: 12px; font-weight: 800;
             color: #1a1a2e;
+            overflow-wrap: anywhere;
         }
         .note-comment .comment-author.is-me {
             color: rgb(16, 137, 211);
@@ -792,6 +797,7 @@
         .note-comment-input-wrap .my-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .note-comment-input-wrap .input-stack {
             flex: 1; min-width: 0;
+            position: relative;
         }
         .note-comment-input-wrap .replying-to-banner {
             display: none;
@@ -869,6 +875,128 @@
         .note-comment-input-wrap .char-count.warn { color: #f59e0b; }
         .note-comment-input-wrap .char-count.danger { color: #dc2626; }
 
+        /* ===== ★ MENTION AUTOCOMPLETE DROPDOWN ===== */
+        .mention-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 60px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.22), 0 0 0 1px rgba(16, 137, 211, 0.1);
+            border: 1px solid #eef2f7;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            animation: mentionSlideIn 0.18s ease-out;
+        }
+        @keyframes mentionSlideIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .mention-dropdown.show { display: block; }
+        .mention-dropdown-header {
+            font-size: 10px;
+            font-weight: 800;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 14px 4px;
+        }
+        .mention-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
+        }
+        .mention-option:hover,
+        .mention-option.active {
+            background: #f0f9ff;
+        }
+        .mention-option .mention-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .mention-option .mention-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .mention-option .mention-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .mention-option .mention-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a2e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .mention-option .mention-hint {
+            font-size: 10px;
+            color: #aaa;
+            font-weight: 600;
+        }
+        .mention-dropdown-empty {
+            padding: 16px 14px;
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .mention-dropdown-empty i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+            color: #cff0ff;
+        }
+
+        /* ===== MENTION CHIP IN COMMENTS ===== */
+        .mention-chip {
+            display: inline-block;
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 1px 8px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.94em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: 1px solid rgba(16, 137, 211, 0.15);
+        }
+        .mention-chip:hover {
+            background: #bae6fd;
+            transform: translateY(-1px);
+        }
+        .mention-chip.mention-me {
+            background: linear-gradient(45deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border-color: #fcd34d;
+        }
+
         /* ===== LOCKED STATE ===== */
         .note-comments-locked {
             display: flex;
@@ -925,10 +1053,10 @@
         .highlight-detail-modal .hl-author-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
         .highlight-detail-modal .hl-author-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; overflow: hidden; flex-shrink: 0; }
         .highlight-detail-modal .hl-author-avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .highlight-detail-modal .hl-author-info { display: flex; flex-direction: column; gap: 2px; }
-        .highlight-detail-modal .hl-author-name { font-size: 17px; font-weight: 700; color: #1a1a2e; }
+        .highlight-detail-modal .hl-author-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .highlight-detail-modal .hl-author-name { font-size: 17px; font-weight: 700; color: #1a1a2e; overflow-wrap: anywhere; }
         .highlight-detail-modal .hl-author-time { font-size: 12px; color: #888; }
-        .highlight-detail-modal .hl-caption { font-size: 15px; color: #444; line-height: 1.7; padding: 16px 0; border-top: 1px solid #f0f4ff; border-bottom: 1px solid #f0f4ff; margin-bottom: 18px; white-space: pre-wrap; }
+        .highlight-detail-modal .hl-caption { font-size: 15px; color: #444; line-height: 1.7; padding: 16px 0; border-top: 1px solid #f0f4ff; border-bottom: 1px solid #f0f4ff; margin-bottom: 18px; white-space: pre-wrap; overflow-wrap: anywhere; }
         .highlight-detail-modal .hl-stats { display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px; color: #888; margin-bottom: 18px; }
         .highlight-detail-modal .hl-stats .stat { display: flex; align-items: center; gap: 6px; }
         .highlight-detail-modal .hl-stats .stat i { color: rgb(16, 137, 211); }
@@ -938,7 +1066,7 @@
         .gallery-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 1000px; width: 95%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .gallery-modal .gallery-header { padding: 22px 28px; background: white; border-bottom: 1px solid #f0f4ff; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; flex-shrink: 0; }
         .gallery-modal .gallery-header-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
-        .gallery-modal .gallery-title { font-size: 20px; font-weight: 800; color: rgb(16, 137, 211); display: flex; align-items: center; gap: 10px; }
+        .gallery-modal .gallery-title { font-size: 20px; font-weight: 800; color: rgb(16, 137, 211); display: flex; align-items: center; gap: 10px; overflow-wrap: anywhere; }
         .gallery-modal .gallery-subtitle { font-size: 13px; color: #888; }
         .gallery-modal .gallery-header-right { display: flex; gap: 10px; align-items: center; }
         .gallery-modal .gallery-header-right button { padding: 10px 18px; border-radius: 12px; border: none; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 7px; font-family: inherit; }
@@ -1099,6 +1227,8 @@
             .note-modal .note-modal-body { padding: 18px 20px 20px; }
             .note-comments-list { max-height: 220px; }
 
+            .mention-dropdown { right: 56px; max-height: 180px; }
+
             .tita-launcher { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); right: 18px; width: 58px; height: 58px; font-size: 22px; z-index: 2500; }
             .tita-panel { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); right: 14px; left: 14px; width: auto; max-width: none; max-height: calc(100vh - 130px); z-index: 2499; }
         }
@@ -1144,6 +1274,11 @@
             .note-comment.reply-indent { margin-left: 18px; }
             .note-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
             .note-comment .comment-text { font-size: 12px; }
+
+            .mention-dropdown { right: 52px; max-height: 160px; }
+            .mention-option { padding: 7px 12px; }
+            .mention-option .mention-avatar { width: 26px; height: 26px; font-size: 10px; }
+            .mention-option .mention-name { font-size: 12px; }
 
             .tita-launcher { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); right: 16px; width: 56px; height: 56px; font-size: 22px; }
             .tita-panel { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); right: 10px; left: 10px; max-height: calc(100vh - 120px); }
@@ -1587,11 +1722,13 @@
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
 
         const NOTE_COMMENT_MAX_LEN = 150;
+        const MENTION_MAX_RESULTS = 6;
+        const MENTION_REGEX = /@([\w\s.'-]{0,30})$/;
 
         // ===== COMMENT CLEANUP CONFIG =====
-        const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // every 10 minutes
-        const COMMENT_CLEANUP_INITIAL_DELAY_MS = 8000;      // 8 seconds after load
-        const COMMENT_CLEANUP_BATCH_LIMIT = 450;             // per run (respect Firestore 500 limit)
+        const COMMENT_CLEANUP_INTERVAL_MS = 10 * 60 * 1000;
+        const COMMENT_CLEANUP_INITIAL_DELAY_MS = 8000;
+        const COMMENT_CLEANUP_BATCH_LIMIT = 450;
 
         function isMobile() { return window.innerWidth <= MOBILE_BREAKPOINT; }
         function getItemsPerSlide() { return isMobile() ? 1 : 3; }
@@ -1627,15 +1764,21 @@
         // ================================================================
         // ===== NOTE COMMENTS STATE =====
         // ================================================================
-        // Aggregated counts per noteUid (for bubble pill on member card)
         const noteCommentCounts = {};
-        // Per-note count listeners (detached on logout)
         let noteCountUnsubscribes = [];
-        // Active comments listener for currently-open note modal
         let activeCommentsUnsubscribe = null;
         let activeCommentsNoteUid = null;
-        // Reply target for threading
         let currentReplyTo = null;
+
+        // ================================================================
+        // ===== ★ MENTION STATE =====
+        // ================================================================
+        // Map of mention displayName -> uid for the currently-typed comment
+        let pendingMentions = new Map();
+        let mentionDropdownIndex = -1;
+        let mentionCandidates = [];
+        let mentionDropdownOpen = false;
+        let mentionAnchorStart = -1;
 
         // ===== COMMENT AUTO-CLEANUP TIMER =====
         let commentCleanupTimer = null;
@@ -1685,6 +1828,10 @@
             return String(text)
                 .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function escapeRegex(str) {
+            return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
         function sanitizeFilename(name) {
@@ -1810,7 +1957,6 @@
                     });
                     notesCache = newCache;
                     renderMembersSection();
-                    // Attach count listeners for the new set of notes
                     attachNoteCountListeners();
                 }, (error) => {
                     console.warn('Notes listener error:', error.message);
@@ -1823,11 +1969,6 @@
             noteCountUnsubscribes = [];
         }
 
-        /**
-         * Attaches one lightweight count listener per active note (only `.size`).
-         * Detaches any previous ones. These power the "N replies" pill on the
-         * note bubble without needing to load all comments for every note.
-         */
         function attachNoteCountListeners() {
             detachAllNoteCountListeners();
             Object.keys(noteCommentCounts).forEach(k => delete noteCommentCounts[k]);
@@ -1858,13 +1999,8 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: COMMENT AUTO-CLEANUP =====
+        // ===== COMMENT AUTO-CLEANUP =====
         // ================================================================
-        /**
-         * Deletes expired comments from Firestore (where expireAt <= now).
-         * Batched, capped at COMMENT_CLEANUP_BATCH_LIMIT per run.
-         * Recursively continues if the batch hit the cap.
-         */
         async function cleanupExpiredComments() {
             try {
                 const now = new Date();
@@ -1874,18 +2010,14 @@
                     .limit(COMMENT_CLEANUP_BATCH_LIMIT)
                     .get();
 
-                if (snapshot.empty) {
-                    return { deleted: 0 };
-                }
+                if (snapshot.empty) return { deleted: 0 };
 
                 const batch = db.batch();
                 snapshot.forEach(doc => batch.delete(doc.ref));
-
                 await batch.commit();
 
                 console.log(`🧹 Comment cleanup: deleted ${snapshot.size} expired comment(s).`);
 
-                // If we hit the cap, schedule another pass shortly after
                 if (snapshot.size === COMMENT_CLEANUP_BATCH_LIMIT) {
                     setTimeout(cleanupExpiredComments, 2000);
                 }
@@ -1900,9 +2032,7 @@
         function startCommentAutoCleanup() {
             if (commentCleanupTimer) clearInterval(commentCleanupTimer);
 
-            setTimeout(() => {
-                cleanupExpiredComments();
-            }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
+            setTimeout(() => { cleanupExpiredComments(); }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
 
             commentCleanupTimer = setInterval(() => {
                 cleanupExpiredComments();
@@ -1927,6 +2057,8 @@
 
             currentNoteUid = uid;
             currentReplyTo = null;
+            pendingMentions.clear();
+            closeMentionDropdown();
 
             const member = carouselItemCache[`users:${uid}`] || {};
             const name = member.displayName || member.email || 'Anonymous';
@@ -1989,6 +2121,8 @@
             }
             activeCommentsNoteUid = null;
             currentReplyTo = null;
+            pendingMentions.clear();
+            closeMentionDropdown();
 
             document.getElementById('noteModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
@@ -2030,6 +2164,7 @@
                 <div class="note-comment-input-wrap">
                     <div class="my-avatar" id="myCommentAvatar"></div>
                     <div class="input-stack">
+                        <div class="mention-dropdown" id="mentionDropdown"></div>
                         <div class="replying-to-banner" id="replyingToBanner">
                             <span>Replying to <strong id="replyingToName"></strong></span>
                             <button type="button" onclick="cancelReplyTo()" title="Cancel reply">
@@ -2037,7 +2172,7 @@
                             </button>
                         </div>
                         <div class="input-row">
-                            <textarea id="noteCommentInput" placeholder="Write a reply..." maxlength="${NOTE_COMMENT_MAX_LEN}" rows="1"></textarea>
+                            <textarea id="noteCommentInput" placeholder="Write a reply... (type @ to mention)" maxlength="${NOTE_COMMENT_MAX_LEN}" rows="1"></textarea>
                             <button class="send-btn" id="noteCommentSendBtn" onclick="postNoteComment()" title="Send">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
@@ -2062,12 +2197,11 @@
 
             const input = document.getElementById('noteCommentInput');
             if (input) {
-                input.addEventListener('input', updateCommentCharCount);
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        postNoteComment();
-                    }
+                input.addEventListener('input', handleCommentInput);
+                input.addEventListener('keydown', handleCommentKeydown);
+                input.addEventListener('blur', () => {
+                    // Delay hiding so click on mention option registers
+                    setTimeout(closeMentionDropdown, 180);
                 });
             }
 
@@ -2085,11 +2219,269 @@
             else if (len > NOTE_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
         }
 
+        // ================================================================
+        // ===== ★ MENTION AUTOCOMPLETE =====
+        // ================================================================
+        function handleCommentInput(e) {
+            updateCommentCharCount();
+            detectMentionQuery(e.target);
+        }
+
+        function handleCommentKeydown(e) {
+            // Handle mention dropdown navigation
+            if (mentionDropdownOpen) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    mentionDropdownIndex = (mentionDropdownIndex + 1) % mentionCandidates.length;
+                    renderMentionDropdown();
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    mentionDropdownIndex = mentionDropdownIndex <= 0
+                        ? mentionCandidates.length - 1
+                        : mentionDropdownIndex - 1;
+                    renderMentionDropdown();
+                    return;
+                }
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    if (mentionCandidates[mentionDropdownIndex]) {
+                        insertMention(mentionCandidates[mentionDropdownIndex]);
+                    }
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeMentionDropdown();
+                    return;
+                }
+            }
+
+            // Normal Enter = send
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                postNoteComment();
+            }
+        }
+
+        function detectMentionQuery(input) {
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const beforeCursor = value.slice(0, cursorPos);
+
+            // Match @ followed by word characters/space at the end
+            const match = beforeCursor.match(MENTION_REGEX);
+
+            if (!match) {
+                closeMentionDropdown();
+                return;
+            }
+
+            const query = match[1].toLowerCase().trim();
+
+            // Get all members (excluding self)
+            const myUid = titaCurrentUser?.uid;
+            const allMembers = Object.values(userProfileCache)
+                .filter(u => u.id !== myUid && (u.displayName || u.email));
+
+            if (allMembers.length === 0) {
+                closeMentionDropdown();
+                return;
+            }
+
+            // Filter by query
+            let filtered;
+            if (!query) {
+                // Show first N members alphabetically
+                filtered = allMembers
+                    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
+                    .slice(0, MENTION_MAX_RESULTS);
+            } else {
+                filtered = allMembers
+                    .filter(u => {
+                        const name = (u.displayName || u.email || '').toLowerCase();
+                        return name.includes(query);
+                    })
+                    .sort((a, b) => {
+                        const aName = (a.displayName || '').toLowerCase();
+                        const bName = (b.displayName || '').toLowerCase();
+                        // Prioritize names that START with the query
+                        const aStarts = aName.startsWith(query) ? 0 : 1;
+                        const bStarts = bName.startsWith(query) ? 0 : 1;
+                        if (aStarts !== bStarts) return aStarts - bStarts;
+                        return aName.localeCompare(bName);
+                    })
+                    .slice(0, MENTION_MAX_RESULTS);
+            }
+
+            if (filtered.length === 0) {
+                mentionCandidates = [];
+                mentionDropdownOpen = true;
+                mentionAnchorStart = cursorPos - match[0].length;
+                renderMentionDropdown();
+                return;
+            }
+
+            mentionCandidates = filtered;
+            mentionDropdownIndex = 0;
+            mentionDropdownOpen = true;
+            mentionAnchorStart = cursorPos - match[0].length;
+            renderMentionDropdown();
+        }
+
+        function renderMentionDropdown() {
+            const dropdown = document.getElementById('mentionDropdown');
+            if (!dropdown) return;
+
+            if (!mentionDropdownOpen) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            if (mentionCandidates.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="mention-dropdown-empty">
+                        <i class="fas fa-user-slash"></i>
+                        No members found
+                    </div>
+                `;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '<div class="mention-dropdown-header"><i class="fas fa-at"></i> Mention a member</div>';
+            mentionCandidates.forEach((user, idx) => {
+                const name = user.displayName || user.email || 'Anonymous';
+                const photoUrl = user.photoURL || '';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const isActive = idx === mentionDropdownIndex;
+
+                const avatarContent = photoUrl
+                    ? `<img src="${cloudinaryAvatar(photoUrl, 80)}" alt="${escapeAttr(name)}" loading="lazy" />`
+                    : escapeHtml(initials);
+
+                const locationHint = user.location ? ` · ${escapeHtml(user.location)}` : '';
+
+                html += `
+                    <button type="button"
+                            class="mention-option ${isActive ? 'active' : ''}"
+                            onmousedown="event.preventDefault(); selectMentionByIndex(${idx})">
+                        <div class="mention-avatar">${avatarContent}</div>
+                        <div class="mention-info">
+                            <div class="mention-name">${escapeHtml(name)}</div>
+                            <div class="mention-hint">Tap to mention${locationHint}</div>
+                        </div>
+                    </button>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+
+            // Scroll active into view
+            const activeEl = dropdown.querySelector('.mention-option.active');
+            if (activeEl) {
+                activeEl.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function selectMentionByIndex(idx) {
+            const user = mentionCandidates[idx];
+            if (user) insertMention(user);
+        }
+
+        function insertMention(user) {
+            const input = document.getElementById('noteCommentInput');
+            if (!input) return;
+
+            const name = user.displayName || user.email || 'Anonymous';
+            const uid = user.id || user.uid;
+
+            if (!uid) return;
+
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const beforeCursor = value.slice(0, cursorPos);
+            const afterCursor = value.slice(cursorPos);
+
+            // Replace the @query with @DisplayName
+            const match = beforeCursor.match(MENTION_REGEX);
+            if (!match) return;
+
+            const startIdx = cursorPos - match[0].length;
+            const before = value.slice(0, startIdx);
+            const mentionText = `@${name} `;
+            const newValue = before + mentionText + afterCursor;
+
+            input.value = newValue;
+
+            // Record the mention
+            pendingMentions.set(name.toLowerCase(), { uid, name });
+
+            // Position cursor after the inserted mention
+            const newCursorPos = startIdx + mentionText.length;
+            input.setSelectionRange(newCursorPos, newCursorPos);
+
+            // Reset state
+            closeMentionDropdown();
+            updateCommentCharCount();
+            input.focus();
+        }
+
+        function closeMentionDropdown() {
+            const dropdown = document.getElementById('mentionDropdown');
+            if (dropdown) dropdown.classList.remove('show');
+            mentionDropdownOpen = false;
+            mentionCandidates = [];
+            mentionDropdownIndex = -1;
+            mentionAnchorStart = -1;
+        }
+
+        // ================================================================
+        // ===== MENTION PARSING & NOTIFICATION =====
+        // ================================================================
         /**
-         * Live listener for the currently-open note's comments.
-         * Uses composite index (noteUid ASC, createdAt ASC).
-         * Detached automatically when the modal closes.
+         * Extract @DisplayName references from text and return the matching
+         * uids using the current userProfileCache. Names must match exactly
+         * (case-insensitive) and be present in pendingMentions or cache.
+         *
+         * Returns an array of unique uids.
          */
+        function resolveMentions(text) {
+            const found = new Set();
+
+            // First: any mention the user explicitly picked from the dropdown
+            pendingMentions.forEach((info) => {
+                if (text.toLowerCase().includes(`@${info.name.toLowerCase()}`)) {
+                    found.add(info.uid);
+                }
+            });
+
+            // Second: scan the text for @Name patterns that match a cached user
+            // Sort by name length (longest first) to avoid partial matches
+            const cachedUsers = Object.values(userProfileCache)
+                .filter(u => u.displayName)
+                .sort((a, b) => b.displayName.length - a.displayName.length);
+
+            cachedUsers.forEach(u => {
+                const pattern = `@${u.displayName}`;
+                // Match @Name followed by whitespace, punctuation, or end-of-string
+                const regex = new RegExp(
+                    escapeRegex(pattern) + '(?=\\s|[.,!?;:]|$)',
+                    'i'
+                );
+                if (regex.test(text)) {
+                    if (u.id) found.add(u.id);
+                }
+            });
+
+            return [...found];
+        }
+
+        // ================================================================
+        // ===== COMMENT LISTENER & RENDER =====
+        // ================================================================
         function attachCommentsListener(uid) {
             if (activeCommentsUnsubscribe) {
                 activeCommentsUnsubscribe();
@@ -2117,7 +2509,6 @@
                     console.warn('Comments listener error:', err.message);
                     const list = document.getElementById('noteCommentsList');
                     if (list) {
-                        // Detect index-missing error specifically
                         const isIndexError = /index/i.test(err.message) || /requires an index/i.test(err.message);
                         list.innerHTML = `
                             <div class="note-comments-empty">
@@ -2160,13 +2551,67 @@
                 });
             });
 
-            // Orphan replies (parent deleted) → show as top-level
             const orphanReplies = comments.filter(c => c.replyToId && !topLevel.find(t => t.id === c.replyToId));
             orphanReplies.forEach(r => {
                 html += renderCommentItem(r, false);
             });
 
             list.innerHTML = html;
+        }
+
+        /**
+         * Turns a plain text string into HTML with @mention chips.
+         * Uses the mentions array on the comment (source of truth) plus
+         * a fallback scan against the userProfileCache.
+         */
+        function renderTextWithMentions(text, mentionUids) {
+            if (!text) return '';
+
+            const safeText = escapeHtml(text);
+            const myUid = titaCurrentUser?.uid;
+
+            // Build name -> uid map
+            const nameMap = new Map();
+            const allUids = new Set(mentionUids || []);
+
+            // From explicit mentions array
+            allUids.forEach(uid => {
+                const user = userProfileCache[uid];
+                if (user && user.displayName) {
+                    nameMap.set(user.displayName, uid);
+                }
+            });
+
+            // Also scan for any @DisplayName in the text that matches a cached user
+            const cachedUsers = Object.values(userProfileCache)
+                .filter(u => u.displayName && u.id)
+                .sort((a, b) => b.displayName.length - a.displayName.length);
+
+            cachedUsers.forEach(u => {
+                if (!safeText.toLowerCase().includes(`@${u.displayName.toLowerCase()}`)) return;
+                nameMap.set(u.displayName, u.id);
+            });
+
+            if (nameMap.size === 0) return safeText;
+
+            // Sort names by length desc to avoid partial overlaps
+            const names = [...nameMap.keys()].sort((a, b) => b.length - a.length);
+
+            let result = safeText;
+            names.forEach(name => {
+                const uid = nameMap.get(name);
+                const isMe = uid === myUid;
+                const safeName = escapeHtml(name);
+                const replacement = `<span class="mention-chip ${isMe ? 'mention-me' : ''}" data-mention-uid="${escapeAttr(uid)}">@${safeName}</span>`;
+
+                const regex = new RegExp(
+                    `@${escapeRegex(safeName)}(?=\\s|[.,!?;:]|&nbsp;|$)`,
+                    'g'
+                );
+                result = result.replace(regex, replacement);
+            });
+
+            return result;
         }
 
         function renderCommentItem(comment, isReply) {
@@ -2194,6 +2639,8 @@
                 ? `<button onclick="startReplyTo('${safeCommentId}', '${safeAuthorName}')"><i class="fas fa-reply"></i> Reply</button>`
                 : '';
 
+            const textHtml = renderTextWithMentions(comment.text || '', comment.mentions);
+
             return `
                 <div class="note-comment ${isReply ? 'reply-indent' : ''}" data-comment-id="${safeCommentId}">
                     <div class="comment-avatar">${avatarContent}</div>
@@ -2202,7 +2649,7 @@
                             <span class="comment-author ${isMe ? 'is-me' : ''}">${escapeHtml(authorName)}</span>
                             <span class="comment-time">${formatRelativeTime(createdDate)}</span>
                         </div>
-                        <div class="comment-text">${escapeHtml(comment.text || '')}</div>
+                        <div class="comment-text">${textHtml}</div>
                         <div class="comment-actions">
                             ${replyBtn}
                             ${deleteBtn}
@@ -2222,7 +2669,7 @@
             }
             const input = document.getElementById('noteCommentInput');
             if (input) {
-                input.placeholder = `Reply to ${authorName}...`;
+                input.placeholder = `Reply to ${authorName}... (type @ to mention)`;
                 input.focus();
             }
         }
@@ -2233,7 +2680,180 @@
             if (banner) banner.classList.remove('show');
             const input = document.getElementById('noteCommentInput');
             if (input) {
-                input.placeholder = 'Write a reply...';
+                input.placeholder = 'Write a reply... (type @ to mention)';
+            }
+        }
+
+        // ================================================================
+        // ===== PURGE COMMENTS when a NOTE changes =====
+        // ================================================================
+        async function purgeCommentsForNote(noteUid) {
+            try {
+                const snap = await db.collection('noteComments')
+                    .where('noteUid', '==', noteUid)
+                    .get();
+
+                if (snap.empty) return { deleted: 0 };
+
+                const refs = [];
+                snap.forEach(doc => refs.push(doc.ref));
+
+                const CHUNK = 450;
+                let deleted = 0;
+                for (let i = 0; i < refs.length; i += CHUNK) {
+                    const batch = db.batch();
+                    refs.slice(i, i + CHUNK).forEach(ref => batch.delete(ref));
+                    await batch.commit();
+                    deleted += Math.min(CHUNK, refs.length - i);
+                }
+
+                console.log(`🧹 Purged ${deleted} comment(s) for note ${noteUid}.`);
+                return { deleted };
+            } catch (err) {
+                console.warn('purgeCommentsForNote error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        async function deleteCommentAndChildren(commentId) {
+            try {
+                const refs = [db.collection('noteComments').doc(commentId)];
+                const childrenSnap = await db.collection('noteComments')
+                    .where('replyToId', '==', commentId)
+                    .get();
+                childrenSnap.forEach(doc => refs.push(doc.ref));
+
+                const batch = db.batch();
+                refs.forEach(ref => batch.delete(ref));
+                await batch.commit();
+
+                return { deleted: refs.length };
+            } catch (err) {
+                console.warn('deleteCommentAndChildren error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        // ================================================================
+        // ===== REPLY + MENTION NOTIFICATIONS (BATCHED) =====
+        // ================================================================
+        /**
+         * Creates notifications for:
+         *   1. The note owner (if not replying to own note)
+         *   2. The parent comment author (if this is a reply-to-comment)
+         *   3. Any @mentioned users
+         *
+         * Uses ONE batched write for all notifications — Firebase-optimized.
+         * Skips the replier themselves and any duplicate recipients.
+         */
+        async function createReplyAndMentionNotifications({
+            noteUid,
+            noteOwnerUid,
+            noteOwnerName,
+            noteText,
+            parentCommentId,
+            parentCommentAuthorUid,
+            parentCommentAuthorName,
+            replierUid,
+            replierName,
+            replyText,
+            isReplyToComment,
+            mentionedUids
+        }) {
+            try {
+                const now = Date.now();
+                const expiresAt = new Date(now + 3 * 24 * 60 * 60 * 1000);
+
+                // Track who we've already queued to avoid duplicate notifications
+                const queued = new Set();
+                const notifications = [];
+                const replySnippet = (replyText || '').slice(0, 80) + ((replyText || '').length > 80 ? '...' : '');
+                const noteSnippet = (noteText || '').slice(0, 60) + ((noteText || '').length > 60 ? '...' : '');
+
+                // 1. Reply notification to note owner
+                if (!isReplyToComment && noteOwnerUid && noteOwnerUid !== replierUid) {
+                    if (!queued.has(noteOwnerUid)) {
+                        queued.add(noteOwnerUid);
+                        notifications.push({
+                            type: 'reply',
+                            title: `💬 ${replierName} replied to your note`,
+                            message: `"${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '💬',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Reply',
+                            targetUid: noteOwnerUid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    }
+                }
+
+                // 2. Reply-to-comment notification to parent author
+                if (isReplyToComment && parentCommentAuthorUid && parentCommentAuthorUid !== replierUid) {
+                    if (!queued.has(parentCommentAuthorUid)) {
+                        queued.add(parentCommentAuthorUid);
+                        notifications.push({
+                            type: 'reply',
+                            title: `💬 ${replierName} replied to your reply`,
+                            message: `On ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '💬',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Reply',
+                            targetUid: parentCommentAuthorUid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    }
+                }
+
+                // 3. Mention notifications — batch these too
+                if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
+                    mentionedUids.forEach(uid => {
+                        if (!uid) return;
+                        if (uid === replierUid) return; // don't notify self
+                        if (queued.has(uid)) return;      // already getting a reply notification
+                        queued.add(uid);
+                        notifications.push({
+                            type: 'mention',
+                            title: `@ ${replierName} mentioned you`,
+                            message: `In ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '📣',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Mention',
+                            targetUid: uid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    });
+                }
+
+                if (notifications.length === 0) return;
+
+                // ★ Single batched write — Firebase-optimized
+                const batch = db.batch();
+                notifications.forEach(n => {
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, n);
+                });
+                await batch.commit();
+
+            } catch (err) {
+                console.warn('createReplyAndMentionNotifications error:', err);
             }
         }
 
@@ -2264,7 +2884,6 @@
                 const authorName = me.displayName || titaCurrentUser.displayName || titaCurrentUser.email || 'Anonymous';
                 const authorPhoto = me.photoURL || '';
 
-                // Match the note's expiry (24h from now, capped by note's own expiry)
                 const note = notesCache[currentNoteUid];
                 let expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
                 if (note && note.expireAt) {
@@ -2274,6 +2893,27 @@
                     if (noteExp < expireAt) expireAt = noteExp;
                 }
 
+                // Snapshot parent comment info + resolve mentions in one pass
+                let parentCommentAuthorUid = null;
+                let parentCommentAuthorName = null;
+                let parentCommentId = null;
+
+                if (currentReplyTo && currentReplyTo.id) {
+                    parentCommentId = currentReplyTo.id;
+                    try {
+                        const parentDoc = await db.collection('noteComments').doc(parentCommentId).get();
+                        if (parentDoc.exists) {
+                            const p = parentDoc.data();
+                            parentCommentAuthorUid = p.authorUid || null;
+                            parentCommentAuthorName = p.authorName || null;
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                // ★ Resolve mentions from text BEFORE writing
+                const mentionedUids = resolveMentions(text);
+
+                // ★ Write the comment with mentions array
                 await db.collection('noteComments').add({
                     noteUid: currentNoteUid,
                     text,
@@ -2281,13 +2921,37 @@
                     authorName,
                     authorPhoto,
                     replyToId: currentReplyTo ? currentReplyTo.id : null,
+                    mentions: mentionedUids,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
                 });
 
+                // ★ Fire off batched notifications (non-blocking)
+                const noteOwnerUid = currentNoteUid;
+                const noteOwnerName = carouselItemCache[`users:${noteOwnerUid}`]?.displayName
+                    || note?.displayName
+                    || 'someone';
+
+                createReplyAndMentionNotifications({
+                    noteUid: currentNoteUid,
+                    noteOwnerUid,
+                    noteOwnerName,
+                    noteText: note?.text || '',
+                    parentCommentId,
+                    parentCommentAuthorUid,
+                    parentCommentAuthorName,
+                    replierUid: titaCurrentUser.uid,
+                    replierName: authorName,
+                    replyText: text,
+                    isReplyToComment: !!parentCommentId,
+                    mentionedUids
+                });
+
                 input.value = '';
+                pendingMentions.clear();
                 updateCommentCharCount();
                 cancelReplyTo();
+                closeMentionDropdown();
 
             } catch (err) {
                 console.error('Post comment error:', err);
@@ -2303,7 +2967,7 @@
             if (!confirm('Delete this reply?')) return;
 
             try {
-                await db.collection('noteComments').doc(commentId).delete();
+                await deleteCommentAndChildren(commentId);
             } catch (err) {
                 console.error('Delete comment error:', err);
                 alert('❌ Could not delete reply: ' + err.message);
@@ -2318,7 +2982,9 @@
             'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
             'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
             'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
-            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' },
+            'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
+            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' }
         };
 
         function getAnnouncementMeta(type) {
@@ -2893,17 +3559,9 @@
             if (!needsAnyAutogen(user.uid)) return;
 
             setTimeout(async () => {
-                try {
-                    await autoGenerateBirthdayAnnouncementsForEveryone(user);
-                } catch (e) { console.warn('birthday gen:', e.message); }
-
-                try {
-                    await autoGenerateEventReminders(user);
-                } catch (e) { console.warn('event gen:', e.message); }
-
-                try {
-                    await autoGenerateHighlightAnnouncements(user);
-                } catch (e) { console.warn('highlight gen:', e.message); }
+                try { await autoGenerateBirthdayAnnouncementsForEveryone(user); } catch (e) { console.warn('birthday gen:', e.message); }
+                try { await autoGenerateEventReminders(user); } catch (e) { console.warn('event gen:', e.message); }
+                try { await autoGenerateHighlightAnnouncements(user); } catch (e) { console.warn('highlight gen:', e.message); }
             }, 1500);
         }
 
@@ -3628,7 +4286,7 @@
 
                     snapshot.forEach(doc => {
                         const data = doc.data();
-                        userProfileCache[doc.id] = data;
+                        userProfileCache[doc.id] = { id: doc.id, ...data };
                         carouselItemCache[`users:${doc.id}`] = { id: doc.id, ...data };
                     });
 
@@ -3735,7 +4393,6 @@
                     ? `<div class="member-locked-hint"><i class="fas fa-lock"></i> Sign in to see more</div>`
                     : '';
 
-                // ===== NOTE BUBBLE with comment count =====
                 const note = notesCache[member.id];
                 let noteBubbleHtml = '';
                 if (note && note.text) {
@@ -4311,9 +4968,16 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
-                // Save or delete note
+                // ===== Save or delete note =====
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
                 const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
+                const existingNote = notesCache[titaCurrentUser.uid];
+                const oldText = existingNote?.text || '';
+                const textChanged = noteText !== oldText;
+
+                if (textChanged) {
+                    await purgeCommentsForNote(titaCurrentUser.uid);
+                }
 
                 if (noteText) {
                     const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -4331,7 +4995,7 @@
                 }
 
                 titaUserData = { ...titaUserData, ...updateData };
-                userProfileCache[titaCurrentUser.uid] = titaUserData;
+                userProfileCache[titaCurrentUser.uid] = { id: titaCurrentUser.uid, ...titaUserData };
                 carouselItemCache[`users:${titaCurrentUser.uid}`] = { id: titaCurrentUser.uid, ...titaUserData };
 
                 try {
@@ -4402,7 +5066,6 @@
             loadMembersFromFirestore();
             loadNotes();
 
-            // Start the comment auto-cleanup timer
             startCommentAutoCleanup();
 
             setTimeout(() => { initHighlightsCarousel(); }, 500);
@@ -4419,7 +5082,6 @@
             });
         });
 
-        // Stop cleanup when leaving the page
         window.addEventListener('beforeunload', function() {
             stopCommentAutoCleanup();
             detachAllNoteCountListeners();
@@ -4451,7 +5113,6 @@
                 : '0 2px 20px rgba(0,0,0,0.04)';
         });
 
-        // Close popups on outside click
         window.addEventListener('click', function(event) {
             const itemModal = document.getElementById('itemModal');
             const memberModal = document.getElementById('memberModal');

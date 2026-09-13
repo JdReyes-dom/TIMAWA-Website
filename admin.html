@@ -334,6 +334,8 @@
         .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
         .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+        .announcement-icon.type-reply { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
+        .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
 
         .announcement-body {
             flex: 1;
@@ -566,6 +568,7 @@
             color: #1a1a2e;
             line-height: 1.3;
             margin-bottom: 14px;
+            overflow-wrap: anywhere;
         }
 
         .announcement-view-message {
@@ -929,6 +932,7 @@
             border: 1px solid #eef2f7;
             transition: all 0.3s ease;
             position: relative;
+            min-width: 0;
         }
 
         .item-card:hover {
@@ -966,18 +970,21 @@
             color: #1a1a2e;
             margin-bottom: 4px;
             padding-right: 70px;
+            overflow-wrap: anywhere;
         }
 
         .item-card .item-subtitle {
             font-size: 13px;
             color: #888;
             margin-bottom: 4px;
+            overflow-wrap: anywhere;
         }
 
         .item-card .item-description {
             font-size: 13px;
             color: #555;
             margin-top: 4px;
+            overflow-wrap: anywhere;
         }
 
         .item-card .item-tags {
@@ -1006,6 +1013,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
+            min-width: 0;
         }
 
         .announcement-card:hover {
@@ -1060,6 +1068,7 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            overflow-wrap: anywhere;
         }
 
         .announcement-card .announcement-card-priority {
@@ -1094,6 +1103,7 @@
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            overflow-wrap: anywhere;
         }
 
         .announcement-card .announcement-card-meta {
@@ -1165,6 +1175,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
+            min-width: 0;
         }
 
         .user-card:hover {
@@ -1216,6 +1227,7 @@
             gap: 8px;
             margin-bottom: 2px;
             flex-wrap: wrap;
+            overflow-wrap: anywhere;
         }
 
         .user-card .user-card-name .admin-mini-badge {
@@ -1241,6 +1253,7 @@
             display: inline-flex;
             align-items: center;
             gap: 4px;
+            overflow-wrap: anywhere;
         }
 
         .user-card .user-card-meta i {
@@ -1257,6 +1270,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            overflow-wrap: anywhere;
         }
 
         .user-card .user-card-tags {
@@ -1337,6 +1351,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
+            min-width: 0;
         }
 
         .note-card:hover {
@@ -1391,6 +1406,7 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            overflow-wrap: anywhere;
         }
 
         .note-card .note-card-text {
@@ -1404,6 +1420,7 @@
             border: 1.5px solid #eef2f7;
             margin-bottom: 8px;
             word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         .note-card .note-card-meta {
@@ -1491,6 +1508,7 @@
             display: flex;
             gap: 14px;
             align-items: flex-start;
+            min-width: 0;
         }
 
         .comment-card:hover {
@@ -1548,6 +1566,7 @@
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+            overflow-wrap: anywhere;
         }
 
         .comment-card .comment-card-text {
@@ -1561,6 +1580,7 @@
             border: 1.5px solid #eef2f7;
             margin-bottom: 8px;
             word-break: break-word;
+            overflow-wrap: anywhere;
             white-space: pre-wrap;
         }
 
@@ -1573,6 +1593,7 @@
             border-left: 3px solid #7c3aed;
             margin-bottom: 8px;
             line-height: 1.5;
+            overflow-wrap: anywhere;
         }
 
         .comment-card .comment-card-context strong {
@@ -2129,6 +2150,7 @@
             color: #333;
             cursor: pointer;
             transition: all 0.25s ease;
+            max-width: 260px;
         }
 
         .comments-filter-bar select:focus {
@@ -2585,7 +2607,7 @@
             </div>
         </div>
 
-        <!-- ===== NEW: COMMENTS / REPLIES TAB ===== -->
+        <!-- ===== COMMENTS / REPLIES TAB ===== -->
         <div id="tab-comments" class="tab-content">
             <div class="admin-card">
                 <div class="card-header">
@@ -2709,6 +2731,8 @@
                             <option value="highlight">📸 Highlight</option>
                             <option value="birthday">🎂 Birthday</option>
                             <option value="member">👥 New Member</option>
+                            <option value="reply">💬 Reply</option>
+                            <option value="mention">📣 Mention</option>
                         </select>
                     </div>
                     <div class="input-group">
@@ -2876,6 +2900,9 @@
                     <label>Note Text <span class="required-star">*</span></label>
                     <textarea id="editNoteText" placeholder="Enter note text..." maxlength="60" style="min-height:80px;"></textarea>
                     <span style="font-size:11px;color:#999;display:block;margin-top:4px;"><span id="editNoteCharCount">0</span>/60 characters</span>
+                    <span style="font-size:11px;color:#dc2626;display:block;margin-top:4px;">
+                        <i class="fas fa-exclamation-triangle"></i> Changing the text will delete all existing replies to this note.
+                    </span>
                 </div>
 
                 <div class="modal-actions">
@@ -2895,7 +2922,7 @@
 
                 <div class="input-group" id="commentContextGroup">
                     <label>Replying to Note</label>
-                    <div id="editCommentContext" style="font-size:13px;color:#555;background:#f0f4ff;padding:12px 14px;border-radius:12px;border-left:3px solid #7c3aed;line-height:1.5;"></div>
+                    <div id="editCommentContext" style="font-size:13px;color:#555;background:#f0f4ff;padding:12px 14px;border-radius:12px;border-left:3px solid #7c3aed;line-height:1.5;overflow-wrap:anywhere;"></div>
                 </div>
 
                 <div class="input-group">
@@ -2942,19 +2969,13 @@
 
     <script>
         /* ============================================================
-           ===== CHANGES FROM PREVIOUS VERSION =====
+           ===== WHAT'S NEW IN THIS VERSION =====
            ============================================================
-           1. NEW: Comment/Reply management tab (tab-comments)
-           2. NEW: Live comment listener (unsubscribeAdminComments)
-           3. NEW: filterComments() with note + status filters
-           4. NEW: renderCommentCard() with reply context
-           5. NEW: editComment() / saveCommentEdit() / deleteComment()
-           6. NEW: deleteAllExpiredComments() with chunked batches
-           7. NEW: Comment cleanup config + auto-cleanup timer
-           8. NEW: Comment count badge on tab
-           9. NEW: Comment count per note shown in Notes tab
-           10. NEW: Data cache for comments
-           11. NEW: Batch selection support for comments
+           1. NEW: 'mention' announcement type in the dropdown and meta.
+           2. NEW: Editing a note's text purges all its old replies.
+           3. NEW: Deleting a note also deletes its replies.
+           4. NEW: 'reply' and 'mention' types appear with proper icons.
+           5. NEW: Comment cards show note context and mention chips.
            ============================================================ */
 
         const firebaseConfig = {
@@ -3025,11 +3046,11 @@
         let editingNoteUid = null;
         let noteUserCache = {};
 
-        // ===== NEW: COMMENTS STATE =====
+        // ===== COMMENTS STATE =====
         let allComments = [];
         let unsubscribeAdminComments = null;
         let editingCommentId = null;
-        let commentAuthorCache = {};  // uid -> { displayName, photoURL }
+        let commentAuthorCache = {};
 
         let allAnnouncements = [];
         let unsubscribeAdminAnnouncements = null;
@@ -3086,7 +3107,9 @@
             'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
             'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
             'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
-            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' },
+            'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
+            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' }
         };
 
         const SEED_DATA = {
@@ -3200,6 +3223,29 @@
             }
 
             return { deleted, errors };
+        }
+
+        // ================================================================
+        // ===== ★ NEW: PURGE COMMENTS helper =====
+        // ================================================================
+        async function purgeCommentsForNote(noteUid) {
+            try {
+                const snap = await db.collection('noteComments')
+                    .where('noteUid', '==', noteUid)
+                    .get();
+
+                if (snap.empty) return { deleted: 0 };
+
+                const refs = [];
+                snap.forEach(doc => refs.push({ collection: 'noteComments', id: doc.id }));
+
+                const result = await chunkedBatchDelete(refs);
+                console.log(`🧹 Purged ${result.deleted} comment(s) for note ${noteUid}.`);
+                return result;
+            } catch (err) {
+                console.warn('purgeCommentsForNote error:', err);
+                return { deleted: 0, errors: 1, error: err };
+            }
         }
 
         // ================================================================
@@ -3722,7 +3768,7 @@
         }
 
         // ================================================================
-        // ===== NEW: COMMENT AUTO-CLEANUP =====
+        // ===== COMMENT AUTO-CLEANUP =====
         // ================================================================
         async function cleanupExpiredComments() {
             try {
@@ -3928,7 +3974,6 @@
         }
 
         function getCommentCountForNote(noteUid) {
-            // Count comments for a given note uid from allComments
             return allComments.filter(c => c.noteUid === noteUid).length;
         }
 
@@ -3978,7 +4023,7 @@
                     </div>
                     <div class="note-card-body">
                         <div class="note-card-author">
-                            <span style="display:inline-flex;align-items:center;gap:8px;">
+                            <span style="display:inline-flex;align-items:center;gap:8px;min-width:0;">
                                 <span style="width:24px;height:24px;border-radius:50%;overflow:hidden;background:linear-gradient(45deg,#7c3aed,#8b5cf6);display:inline-flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;flex-shrink:0;">
                                     ${avatarContent}
                                 </span>
@@ -4003,14 +4048,12 @@
         }
 
         function viewNoteComments(noteUid) {
-            // Switch to comments tab + filter by note
             document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
             document.querySelector('.admin-tab[data-tab="comments"]').classList.add('active');
 
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.getElementById('tab-comments').classList.add('active');
 
-            // Set filter to this note's uid
             const filterSelect = document.getElementById('commentsNoteFilter');
             if (filterSelect) {
                 filterSelect.value = noteUid;
@@ -4053,18 +4096,38 @@
                 return;
             }
 
+            // Check if text actually changed
+            const existing = allNotes.find(n => n.uid === uid);
+            const oldText = existing?.text || '';
+            const textChanged = text !== oldText;
+
+            if (textChanged) {
+                const replyCount = getCommentCountForNote(uid);
+                if (replyCount > 0) {
+                    if (!confirm(`⚠️ This note has ${replyCount} repl${replyCount === 1 ? 'y' : 'ies'}.\n\nChanging the note text will DELETE all existing replies.\n\nContinue?`)) {
+                        return;
+                    }
+                }
+            }
+
             const btn = document.getElementById('noteSaveBtn');
             const originalHtml = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<span class="spinner"></span> Saving...';
 
             try {
+                // ★ If text changed → purge old replies first
+                if (textChanged) {
+                    await purgeCommentsForNote(uid);
+                }
+
                 await db.collection('notes').doc(uid).update({
                     text: text,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                alert('✅ Note updated successfully!');
+                const replyMsg = textChanged ? ' (old replies removed)' : '';
+                alert(`✅ Note updated successfully!${replyMsg}`);
                 closeNoteEditModal();
             } catch (err) {
                 console.error('Error updating note:', err);
@@ -4086,12 +4149,22 @@
             const user = noteUserCache[note?.uid] || {};
             const name = user.displayName || note?.uid || 'this user';
             const textPreview = note?.text ? `"${note.text.slice(0, 40)}${note.text.length > 40 ? '...' : ''}"` : '';
+            const replyCount = note?.uid ? getCommentCountForNote(note.uid) : 0;
 
-            if (!confirm(`Delete note ${textPreview} from ${name}?\n\nThis will remove it from Firestore permanently.`)) return;
+            const replyMsg = replyCount > 0
+                ? `\n\n⚠️ This will also delete ${replyCount} repl${replyCount === 1 ? 'y' : 'ies'} on this note.`
+                : '';
+
+            if (!confirm(`Delete note ${textPreview} from ${name}?${replyMsg}\n\nThis will remove it from Firestore permanently.`)) return;
 
             try {
+                // ★ Purge replies first
+                if (note?.uid) {
+                    await purgeCommentsForNote(note.uid);
+                }
+
                 await db.collection('notes').doc(noteId).delete();
-                alert('✅ Note deleted.');
+                alert('✅ Note and its replies deleted.');
             } catch (err) {
                 console.error('Error deleting note:', err);
                 alert('❌ Error deleting note: ' + err.message);
@@ -4112,7 +4185,7 @@
                 return;
             }
 
-            if (!confirm(`Delete all ${expiredNotes.length} expired note${expiredNotes.length !== 1 ? 's' : ''}?\n\nThis will remove them from Firestore permanently.`)) return;
+            if (!confirm(`Delete all ${expiredNotes.length} expired note${expiredNotes.length !== 1 ? 's' : ''}?\n\nThis will remove them from Firestore permanently. Their replies will be deleted too.`)) return;
 
             const btn = document.querySelector('#tab-notes .btn-danger');
             const originalHtml = btn.innerHTML;
@@ -4120,10 +4193,19 @@
             btn.innerHTML = '<span class="spinner"></span> Deleting...';
 
             try {
+                // ★ Purge replies for each expired note first
+                let purgedReplies = 0;
+                for (const n of expiredNotes) {
+                    if (n.uid) {
+                        const r = await purgeCommentsForNote(n.uid);
+                        purgedReplies += (r.deleted || 0);
+                    }
+                }
+
                 const refs = expiredNotes.map(n => ({ collection: 'notes', id: n.id }));
                 const result = await chunkedBatchDelete(refs);
 
-                alert(`✅ Deleted ${result.deleted} expired note${result.deleted !== 1 ? 's' : ''}.`);
+                alert(`✅ Deleted ${result.deleted} expired note${result.deleted !== 1 ? 's' : ''} and ${purgedReplies} repl${purgedReplies === 1 ? 'y' : 'ies'}.`);
             } catch (err) {
                 console.error('Error deleting expired notes:', err);
                 alert('❌ Error deleting expired notes: ' + err.message);
@@ -4134,7 +4216,7 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: COMMENTS (REPLIES) MANAGEMENT =====
+        // ===== COMMENTS (REPLIES) MANAGEMENT =====
         // ================================================================
         function loadCommentsAdmin(showToast = false) {
             const grid = document.getElementById('commentsGrid');
@@ -4213,10 +4295,8 @@
 
             const currentValue = select.value;
 
-            // Collect unique note UIDs from comments
             const noteUids = [...new Set(allComments.map(c => c.noteUid).filter(Boolean))];
 
-            // Build options
             let html = '<option value="">All Notes</option>';
             noteUids.forEach(uid => {
                 const note = allNotes.find(n => n.uid === uid);
@@ -4230,7 +4310,6 @@
 
             select.innerHTML = html;
 
-            // Restore selection if still valid
             if (currentValue && noteUids.includes(currentValue)) {
                 select.value = currentValue;
             }
@@ -4248,12 +4327,10 @@
 
             let filtered = allComments;
 
-            // Filter by note
             if (noteFilter) {
                 filtered = filtered.filter(c => c.noteUid === noteFilter);
             }
 
-            // Filter by status
             if (statusFilter === 'active') {
                 filtered = filtered.filter(c => {
                     if (!c.expireAt) return true;
@@ -4276,7 +4353,6 @@
                 filtered = filtered.filter(c => !c.replyToId);
             }
 
-            // Filter by search term
             if (term) {
                 filtered = filtered.filter(c => {
                     const author = commentAuthorCache[c.authorUid] || {};
@@ -4348,13 +4424,11 @@
                 timeLabel = `<span><i class="fas fa-clock"></i> Expiring soon</span>`;
             }
 
-            // Find the note this reply belongs to
             const note = allNotes.find(n => n.uid === comment.noteUid);
             const noteAuthor = noteUserCache[comment.noteUid] || { displayName: 'Unknown' };
             const noteText = note?.text || '(note deleted)';
             const notePreview = noteText.length > 80 ? noteText.slice(0, 80) + '...' : noteText;
 
-            // Reply-to context (if this is a threaded reply)
             let replyContext = '';
             if (comment.replyToId) {
                 const parent = allComments.find(c => c.id === comment.replyToId);
@@ -4411,7 +4485,6 @@
             document.getElementById('editCommentText').value = comment.text || '';
             document.getElementById('editCommentCharCount').textContent = (comment.text || '').length;
 
-            // Show note context
             const note = allNotes.find(n => n.uid === comment.noteUid);
             const noteAuthor = noteUserCache[comment.noteUid] || { displayName: 'Unknown' };
             const contextEl = document.getElementById('editCommentContext');
@@ -4478,11 +4551,23 @@
             const name = author.displayName || comment?.authorName || 'this user';
             const textPreview = comment?.text ? `"${comment.text.slice(0, 50)}${comment.text.length > 50 ? '...' : ''}"` : '';
 
-            if (!confirm(`Delete reply ${textPreview} from ${name}?\n\nThis will remove it from Firestore permanently.`)) return;
+            // Check for child replies
+            const childCount = allComments.filter(c => c.replyToId === commentId).length;
+            const childMsg = childCount > 0
+                ? `\n\n⚠️ This will also delete ${childCount} nested repl${childCount === 1 ? 'y' : 'ies'} that replied to it.`
+                : '';
+
+            if (!confirm(`Delete reply ${textPreview} from ${name}?${childMsg}\n\nThis will remove it from Firestore permanently.`)) return;
 
             try {
-                await db.collection('noteComments').doc(commentId).delete();
-                alert('✅ Reply deleted.');
+                // Delete the comment and any children pointing to it
+                const refs = [{ collection: 'noteComments', id: commentId }];
+                allComments.filter(c => c.replyToId === commentId).forEach(c => {
+                    refs.push({ collection: 'noteComments', id: c.id });
+                });
+
+                const result = await chunkedBatchDelete(refs);
+                alert(`✅ Deleted ${result.deleted} repl${result.deleted !== 1 ? 'ies' : 'y'}.`);
             } catch (err) {
                 console.error('Error deleting reply:', err);
                 alert('❌ Error deleting reply: ' + err.message);
@@ -5060,17 +5145,9 @@
             if (!needsAnyAutogen(user.uid)) return;
 
             setTimeout(async () => {
-                try {
-                    await autoGenerateBirthdayAnnouncementsForEveryone(user);
-                } catch (e) { console.warn('birthday gen:', e.message); }
-
-                try {
-                    await autoGenerateEventReminders(user);
-                } catch (e) { console.warn('event gen:', e.message); }
-
-                try {
-                    await autoGenerateHighlightAnnouncements(user);
-                } catch (e) { console.warn('highlight gen:', e.message); }
+                try { await autoGenerateBirthdayAnnouncementsForEveryone(user); } catch (e) { console.warn('birthday gen:', e.message); }
+                try { await autoGenerateEventReminders(user); } catch (e) { console.warn('event gen:', e.message); }
+                try { await autoGenerateHighlightAnnouncements(user); } catch (e) { console.warn('highlight gen:', e.message); }
             }, 1500);
         }
 
@@ -5397,25 +5474,23 @@
                 loadAppUsers();
                 loadAnnouncementsAdmin();
                 loadNotesAdmin();
-                loadCommentsAdmin();  // ★ NEW
+                loadCommentsAdmin();
 
                 loadAnnouncements(user);
                 runAutoGeneration(user, data);
 
-                // ★ Start auto-cleanup timers
                 startAnnouncementAutoCleanup();
                 startHighlightAutoCleanup();
-                startCommentAutoCleanup();  // ★ NEW
+                startCommentAutoCleanup();
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
         });
 
-        // ★ Stop cleanup timers when leaving
         window.addEventListener('beforeunload', function() {
             stopAnnouncementAutoCleanup();
             stopHighlightAutoCleanup();
-            stopCommentAutoCleanup();  // ★ NEW
+            stopCommentAutoCleanup();
         });
 
         // ===== LOAD ALL DATA =====
@@ -5925,7 +6000,7 @@
             loadAppUsers(true);
             loadAnnouncementsAdmin(true);
             loadNotesAdmin(true);
-            loadCommentsAdmin(true);  // ★ NEW
+            loadCommentsAdmin(true);
             alert('🔄 All content refreshed!');
         }
 
@@ -5973,6 +6048,10 @@
 
         async function logout() {
             try {
+                stopAnnouncementAutoCleanup();
+                stopHighlightAutoCleanup();
+                stopCommentAutoCleanup();
+
                 if (auth.currentUser) {
                     try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
                 }
@@ -6057,7 +6136,6 @@
             document.getElementById('editNoteCharCount').textContent = this.value.length;
         });
 
-        // ★ NEW: Character counter for comment edit
         document.getElementById('editCommentText')?.addEventListener('input', function() {
             document.getElementById('editCommentCharCount').textContent = this.value.length;
         });

@@ -347,6 +347,8 @@
         .announcement-icon.type-event { background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); }
         .announcement-icon.type-highlight { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+        .announcement-icon.type-reply { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
+        .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
 
         .announcement-body {
             flex: 1;
@@ -363,6 +365,7 @@
             align-items: center;
             gap: 6px;
             flex-wrap: wrap;
+            overflow-wrap: anywhere;
         }
 
         .announcement-priority-badge {
@@ -385,6 +388,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            overflow-wrap: anywhere;
         }
 
         .announcement-time {
@@ -582,6 +586,7 @@
             color: #1a1a2e;
             line-height: 1.3;
             margin-bottom: 14px;
+            overflow-wrap: anywhere;
         }
 
         .announcement-view-message {
@@ -680,6 +685,7 @@
             line-height: 1.1;
             color: #1a1a2e;
             margin-bottom: 10px;
+            overflow-wrap: anywhere;
         }
 
         .hero-content .subtitle {
@@ -732,6 +738,7 @@
             border: 2px solid #f0f4ff;
             transition: all 0.3s ease;
             margin: 0 auto;
+            min-width: 0;
         }
 
         .hero-image .profile-card:hover {
@@ -795,6 +802,7 @@
             font-size: 22px;
             font-weight: 700;
             color: #1a1a2e;
+            overflow-wrap: anywhere;
         }
 
         .hero-image .profile-card .role {
@@ -802,12 +810,14 @@
             font-weight: 600;
             font-size: 13px;
             margin-bottom: 8px;
+            overflow-wrap: anywhere;
         }
 
         .hero-image .profile-card .mini-bio {
             color: #666;
             font-size: 13px;
             line-height: 1.6;
+            overflow-wrap: anywhere;
         }
 
         .status-badge {
@@ -885,6 +895,7 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            min-width: 0;
         }
 
         .form-group label {
@@ -912,6 +923,7 @@
             transition: all 0.3s ease;
             font-family: inherit;
             color: #333;
+            min-width: 0;
         }
 
         .form-group input:focus,
@@ -950,6 +962,7 @@
             border-radius: 15px;
             margin-bottom: 15px;
             display: none;
+            overflow-wrap: anywhere;
         }
 
         .message.success { background: #dcfce7; color: #16a34a; border: 1px solid #bbf7d0; display: block; }
@@ -1561,7 +1574,9 @@
             'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
             'event':     { icon: '📅', cls: 'type-event',     label: 'Event' },
             'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
-            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' }
+            'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' },
+            'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
+            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' }
         };
 
         function getAnnouncementMeta(type) {
@@ -1945,9 +1960,6 @@
             );
         }
 
-        // ================================================================
-        // ===== FIX #1: Generate birthday announcements for EVERYONE =====
-        // ================================================================
         async function autoGenerateBirthdayAnnouncementsForEveryone(currentUser) {
             if (hasAutogenRunToday(currentUser.uid, 'birthdays_all')) return;
 
@@ -1956,7 +1968,6 @@
                 const todayMonth = today.getMonth();
                 const todayDate = today.getDate();
 
-                // Fetch users (limit 200 — enough for a small squad app)
                 const snap = await db.collection('users').limit(200).get();
 
                 const todayBirthdayUsers = [];
@@ -1983,7 +1994,6 @@
                     return;
                 }
 
-                // Check which birthday people already have an announcement today
                 const todayStart = new Date();
                 todayStart.setHours(0, 0, 0, 0);
 
@@ -2032,7 +2042,7 @@
                         priority: 'urgent',
                         link: 'calendar.html',
                         linkLabel: 'View Calendar',
-                        targetUid: '', // 🌐 visible to everyone
+                        targetUid: '',
                         referenceId: person.uid,
                         readBy: [],
                         createdBy: 'system',
@@ -2196,6 +2206,127 @@
                 markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
             } catch (e) {
                 console.warn('welcome gen:', e.message);
+            }
+        }
+
+        // ================================================================
+        // ===== ★ NEW: REPLY & MENTION NOTIFICATIONS =====
+        // ================================================================
+        /**
+         * Creates notifications for:
+         *   1. The note owner (if not replying to own note)
+         *   2. The parent comment author (if this is a reply-to-comment)
+         *   3. Any @mentioned users
+         *
+         * Uses ONE batched write for all notifications — Firebase-optimized.
+         * Exposed here for parity with index.html.
+         */
+        async function createReplyAndMentionNotifications({
+            noteUid,
+            noteOwnerUid,
+            noteOwnerName,
+            noteText,
+            parentCommentId,
+            parentCommentAuthorUid,
+            parentCommentAuthorName,
+            replierUid,
+            replierName,
+            replyText,
+            isReplyToComment,
+            mentionedUids
+        }) {
+            try {
+                const now = Date.now();
+                const expiresAt = new Date(now + 3 * 24 * 60 * 60 * 1000);
+
+                const queued = new Set();
+                const notifications = [];
+                const replySnippet = (replyText || '').slice(0, 80) + ((replyText || '').length > 80 ? '...' : '');
+                const noteSnippet = (noteText || '').slice(0, 60) + ((noteText || '').length > 60 ? '...' : '');
+
+                // 1. Reply notification to note owner
+                if (!isReplyToComment && noteOwnerUid && noteOwnerUid !== replierUid) {
+                    if (!queued.has(noteOwnerUid)) {
+                        queued.add(noteOwnerUid);
+                        notifications.push({
+                            type: 'reply',
+                            title: `💬 ${replierName} replied to your note`,
+                            message: `"${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '💬',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Reply',
+                            targetUid: noteOwnerUid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    }
+                }
+
+                // 2. Reply-to-comment notification to parent author
+                if (isReplyToComment && parentCommentAuthorUid && parentCommentAuthorUid !== replierUid) {
+                    if (!queued.has(parentCommentAuthorUid)) {
+                        queued.add(parentCommentAuthorUid);
+                        notifications.push({
+                            type: 'reply',
+                            title: `💬 ${replierName} replied to your reply`,
+                            message: `On ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '💬',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Reply',
+                            targetUid: parentCommentAuthorUid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    }
+                }
+
+                // 3. Mention notifications — batch these too
+                if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
+                    mentionedUids.forEach(uid => {
+                        if (!uid) return;
+                        if (uid === replierUid) return;
+                        if (queued.has(uid)) return;
+                        queued.add(uid);
+                        notifications.push({
+                            type: 'mention',
+                            title: `@ ${replierName} mentioned you`,
+                            message: `In ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
+                            icon: '📣',
+                            priority: 'info',
+                            link: 'index.html#members-section',
+                            linkLabel: 'View Mention',
+                            targetUid: uid,
+                            referenceId: noteUid,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
+                    });
+                }
+
+                if (notifications.length === 0) return;
+
+                const batch = db.batch();
+                notifications.forEach(n => {
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, n);
+                });
+                await batch.commit();
+
+            } catch (err) {
+                console.warn('createReplyAndMentionNotifications error:', err);
             }
         }
 
