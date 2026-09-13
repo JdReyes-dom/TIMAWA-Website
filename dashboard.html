@@ -1104,15 +1104,16 @@
             font-size: 13px;
         }
 
-        /* ===== CHAT UI ===== */
+        /* ===== CHAT UI (★ EXPANDED HEIGHT) ===== */
         .chat-container {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 300px 1fr;
             gap: 0;
             border: 1px solid #eef2f7;
             border-radius: 18px;
             overflow: hidden;
-            height: 580px;
+            height: clamp(560px, calc(100vh - 220px), 900px);
+            min-height: 560px;
             background: white;
             position: relative;
         }
@@ -1160,6 +1161,36 @@
 
         .chat-sidebar-header h4 i {
             color: rgb(16, 137, 211);
+        }
+
+        /* ★ NEW: New Message button */
+        .chat-new-msg-btn {
+            width: 100%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .chat-new-msg-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 18px rgba(16, 137, 211, 0.45);
+        }
+
+        .chat-new-msg-btn i {
+            font-size: 13px;
         }
 
         .chat-search-wrap {
@@ -1221,6 +1252,30 @@
             box-shadow: inset 3px 0 0 rgb(16, 137, 211);
         }
 
+        /* ★ NEW: Highlight for unread conversations */
+        .chat-user-item.has-new-message {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid rgba(16, 137, 211, 0.2);
+            box-shadow: 0 2px 8px rgba(16, 137, 211, 0.08);
+        }
+
+        .chat-user-item.has-new-message:hover {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        }
+
+        .chat-user-item.has-new-message.active {
+            background: linear-gradient(135deg, rgba(16, 137, 211, 0.18) 0%, rgba(18, 177, 209, 0.18) 100%);
+        }
+
+        .chat-user-item.has-new-message .chat-user-name {
+            color: #0c4a6e;
+        }
+
+        .chat-user-item.has-new-message .chat-user-preview {
+            color: #0369a1;
+            font-weight: 700;
+        }
+
         .chat-user-item.group-item {
             background: linear-gradient(135deg, rgba(16, 137, 211, 0.06) 0%, rgba(18, 177, 209, 0.06) 100%);
             border: 1px solid rgba(16, 137, 211, 0.12);
@@ -1236,9 +1291,18 @@
             box-shadow: inset 3px 0 0 rgb(16, 137, 211);
         }
 
+        .chat-user-item.group-item.has-new-message {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 1px solid rgba(217, 119, 6, 0.2);
+        }
+
+        .chat-user-item.group-item.has-new-message:hover {
+            background: linear-gradient(135deg, #fde68a 0%, #fcd34d 100%);
+        }
+
         .chat-user-item .chat-user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             display: flex;
@@ -1246,7 +1310,7 @@
             justify-content: center;
             color: white;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 15px;
             flex-shrink: 0;
             overflow: hidden;
             border: 2px solid white;
@@ -1262,7 +1326,7 @@
 
         .chat-user-item .chat-user-avatar.group-avatar {
             background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-            font-size: 18px;
+            font-size: 20px;
         }
 
         .chat-user-item .chat-user-avatar .status-dot {
@@ -1273,6 +1337,26 @@
             height: 12px;
             border-radius: 50%;
             border: 2px solid white;
+        }
+
+        /* ★ NEW: Red dot indicator on avatar when unread */
+        .chat-user-item .chat-user-avatar.has-new::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ef4444;
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+            animation: pulseDot 1.6s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2); }
+            50% { transform: scale(1.15); box-shadow: 0 0 0 5px rgba(239, 68, 68, 0); }
         }
 
         .chat-user-item .chat-user-info {
@@ -1869,6 +1953,212 @@
             background: rgba(255, 255, 255, 0.3);
             color: #fef3c7;
             border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== ★ NEW: New Message Modal ===== */
+        .new-msg-modal .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 0;
+            max-width: 460px;
+            width: 100%;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 25px 70px rgba(16, 137, 211, 0.3);
+        }
+
+        .new-msg-modal .new-msg-header {
+            padding: 22px 24px 16px;
+            background: linear-gradient(135deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .new-msg-modal .new-msg-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .new-msg-modal .new-msg-header p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .new-msg-modal .new-msg-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .new-msg-modal .new-msg-close:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
+        }
+
+        .new-msg-modal .new-msg-search {
+            padding: 14px 20px;
+            border-bottom: 1px solid #eef2f7;
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .new-msg-modal .new-msg-search-wrap {
+            position: relative;
+        }
+
+        .new-msg-modal .new-msg-search-wrap input {
+            width: 100%;
+            padding: 11px 14px 11px 40px;
+            border-radius: 50px;
+            border: 1.5px solid #e0e7ff;
+            background: #f8faff;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .new-msg-modal .new-msg-search-wrap input:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+
+        .new-msg-modal .new-msg-search-wrap i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .new-msg-modal .new-msg-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .new-msg-modal .new-msg-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+        }
+
+        .new-msg-modal .new-msg-user:hover {
+            background: #f0f7ff;
+            transform: translateX(2px);
+        }
+
+        .new-msg-modal .new-msg-user .nm-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(16, 137, 211, 0.15);
+            position: relative;
+        }
+
+        .new-msg-modal .new-msg-user .nm-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .new-msg-modal .new-msg-user .nm-avatar .status-dot {
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .new-msg-modal .new-msg-user .nm-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .new-msg-modal .new-msg-user .nm-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .new-msg-modal .new-msg-user .nm-meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .new-msg-modal .new-msg-user .nm-action {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .new-msg-modal .new-msg-user:hover .nm-action {
+            background: rgb(16, 137, 211);
+            color: white;
+        }
+
+        .new-msg-modal .new-msg-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #aaa;
+        }
+
+        .new-msg-modal .new-msg-empty i {
+            font-size: 36px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
         }
 
         /* ================================================================
@@ -3307,6 +3597,248 @@
         .note-comment-input-wrap .char-count.danger { color: #dc2626; }
 
         /* ================================================================
+           ===== HIGHLIGHT COMMENTS =====
+           ================================================================ */
+        .highlight-comments-section {
+            border-top: 1px solid #f0f4ff;
+            padding-top: 18px;
+            margin-top: 4px;
+        }
+
+        .highlight-comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .highlight-comments-header .title-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .highlight-comments-header .title-group i {
+            color: rgb(16, 137, 211);
+            font-size: 13px;
+        }
+
+        .highlight-comments-header .comment-count-pill {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 1px 10px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .highlight-comments-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 4px;
+            margin-bottom: 12px;
+        }
+        .highlight-comments-list::-webkit-scrollbar { width: 5px; }
+        .highlight-comments-list::-webkit-scrollbar-track { background: #f0f4ff; border-radius: 10px; }
+        .highlight-comments-list::-webkit-scrollbar-thumb { background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%); border-radius: 10px; }
+
+        .highlight-comment {
+            display: flex;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f8faff;
+            border: 1px solid #eef2f7;
+            margin-bottom: 8px;
+            animation: commentFadeIn 0.3s ease-out;
+            position: relative;
+            min-width: 0;
+        }
+        .highlight-comment.reply-indent {
+            margin-left: 28px;
+            background: #fafcff;
+            border-color: #e0f2fe;
+        }
+        .highlight-comment.reply-indent::before {
+            content: '';
+            position: absolute;
+            left: -14px; top: 50%;
+            width: 12px; height: 2px;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .highlight-comment .comment-avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            flex-shrink: 0; overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .highlight-comment .comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .highlight-comment .comment-main {
+            flex: 1; min-width: 0; text-align: left;
+        }
+        .highlight-comment .comment-top-row {
+            display: flex; align-items: baseline; gap: 8px;
+            flex-wrap: wrap; margin-bottom: 2px;
+        }
+        .highlight-comment .comment-author {
+            font-size: 12px; font-weight: 800;
+            color: #1a1a2e;
+            overflow-wrap: anywhere;
+        }
+        .highlight-comment .comment-author.is-me {
+            color: rgb(16, 137, 211);
+        }
+        .highlight-comment .comment-author.is-me::after {
+            content: ' (you)';
+            font-size: 10px; font-weight: 600;
+            color: #888;
+        }
+        .highlight-comment .comment-time {
+            font-size: 10px; color: #aaa;
+            font-weight: 600;
+        }
+        .highlight-comment .comment-text {
+            font-size: 13px; color: #444;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+        .highlight-comment .comment-actions {
+            display: flex; gap: 4px;
+            margin-top: 4px;
+        }
+        .highlight-comment .comment-actions button {
+            background: none; border: none;
+            color: rgb(16, 137, 211);
+            font-size: 11px; font-weight: 700;
+            cursor: pointer; padding: 2px 6px;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+        .highlight-comment .comment-actions button:hover { background: rgba(16, 137, 211, 0.1); }
+        .highlight-comment .comment-actions button.delete-btn { color: #dc2626; }
+        .highlight-comment .comment-actions button.delete-btn:hover { background: rgba(220, 38, 38, 0.1); }
+
+        .highlight-comments-empty {
+            text-align: center;
+            padding: 22px 12px;
+            color: #aaa;
+            font-size: 13px;
+        }
+        .highlight-comments-empty i {
+            font-size: 28px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .highlight-comment-input-wrap {
+            display: flex; gap: 8px; align-items: flex-start;
+            padding-top: 12px;
+            border-top: 1px solid #f0f4ff;
+        }
+        .highlight-comment-input-wrap .my-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 12px; font-weight: 800;
+            flex-shrink: 0; overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(16, 137, 211, 0.15);
+        }
+        .highlight-comment-input-wrap .my-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .highlight-comment-input-wrap .input-stack {
+            flex: 1; min-width: 0;
+            position: relative;
+        }
+        .highlight-comment-input-wrap .replying-to-banner {
+            display: none;
+            font-size: 11px;
+            color: rgb(16, 137, 211);
+            background: #e0f2fe;
+            padding: 4px 10px;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-weight: 700;
+        }
+        .highlight-comment-input-wrap .replying-to-banner.show { display: flex; }
+        .highlight-comment-input-wrap .replying-to-banner button {
+            background: none; border: none;
+            color: #dc2626; cursor: pointer;
+            font-size: 12px; padding: 0 4px;
+            font-family: inherit;
+        }
+        .highlight-comment-input-wrap .input-row {
+            display: flex; gap: 8px; align-items: flex-end;
+        }
+        .highlight-comment-input-wrap textarea {
+            flex: 1;
+            min-height: 40px;
+            max-height: 100px;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #e0e7ff;
+            background: #f8faff;
+            font-size: 13px;
+            font-family: inherit;
+            color: #333;
+            resize: none;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+        .highlight-comment-input-wrap textarea:focus {
+            outline: none;
+            border-color: rgb(16, 137, 211);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+        }
+        .highlight-comment-input-wrap .send-btn {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            color: white;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(16, 137, 211, 0.3);
+        }
+        .highlight-comment-input-wrap .send-btn:hover:not(:disabled) {
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px rgba(16, 137, 211, 0.45);
+        }
+        .highlight-comment-input-wrap .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .highlight-comment-input-wrap .char-count {
+            font-size: 10px;
+            color: #aaa;
+            text-align: right;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+        .highlight-comment-input-wrap .char-count.warn { color: #f59e0b; }
+        .highlight-comment-input-wrap .char-count.danger { color: #dc2626; }
+
+        /* ================================================================
            ===== TITA TIMA =====
            ================================================================ */
         .tita-launcher {
@@ -3602,7 +4134,7 @@
         @media (max-width: 1024px) {
             .highlights-carousel-wrapper { padding: 0 40px; }
             .highlights-carousel-btn { width: 42px; height: 42px; font-size: 16px; }
-            .chat-container { grid-template-columns: 240px 1fr; }
+            .chat-container { grid-template-columns: 260px 1fr; }
         }
 
         @media (max-width: 768px) {
@@ -3721,8 +4253,8 @@
             .chat-container {
                 grid-template-columns: 1fr;
                 height: auto;
-                min-height: 480px;
-                max-height: 70vh;
+                min-height: 520px;
+                max-height: 78vh;
                 display: block;
                 position: relative;
                 overflow: hidden;
@@ -3873,6 +4405,11 @@
             .note-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
             .note-comment .comment-text { font-size: 12px; }
 
+            .highlight-comments-list { max-height: 200px; }
+            .highlight-comment.reply-indent { margin-left: 16px; }
+            .highlight-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
+            .highlight-comment .comment-text { font-size: 12px; }
+
             .gallery-grid {
                 grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
             }
@@ -3897,6 +4434,12 @@
                 max-width: none;
                 max-height: calc(100vh - 110px);
                 z-index: 2499;
+            }
+
+            /* ★ New Message modal mobile */
+            .new-msg-modal .modal-content {
+                max-width: calc(100vw - 20px);
+                max-height: 88vh;
             }
         }
 
@@ -3976,8 +4519,8 @@
             .mention-option .mention-name { font-size: 12px; }
 
             .chat-container {
-                min-height: 400px;
-                max-height: 65vh;
+                min-height: 460px;
+                max-height: 72vh;
             }
 
             .tita-launcher {
@@ -4174,9 +4717,13 @@
                                         <i class="fas fa-chevron-left"></i>
                                     </button>
                                 </h4>
+                                <!-- ★ NEW: New Message button -->
+                                <button class="chat-new-msg-btn" onclick="openNewMessageModal()">
+                                    <i class="fas fa-plus"></i> New Message
+                                </button>
                                 <div class="chat-search-wrap">
                                     <i class="fas fa-search"></i>
-                                    <input type="text" id="chatSearchInput" placeholder="Search members..." oninput="filterChatUsers()" />
+                                    <input type="text" id="chatSearchInput" placeholder="Search conversations..." oninput="filterChatUsers()" />
                                 </div>
                             </div>
                             <div class="chat-user-list" id="chatUserList"></div>
@@ -4214,6 +4761,26 @@
                 </div>
             </div>
         </section>
+    </div>
+
+    <!-- ===== ★ NEW MESSAGE MODAL ===== -->
+    <div id="newMessageModal" class="modal new-msg-modal">
+        <div class="modal-content">
+            <div class="new-msg-header">
+                <button class="new-msg-close" onclick="closeNewMessageModal()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h3><i class="fas fa-paper-plane"></i> New Message</h3>
+                <p>Choose someone from the squad to start chatting with.</p>
+            </div>
+            <div class="new-msg-search">
+                <div class="new-msg-search-wrap">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="newMsgSearchInput" placeholder="Search squad members..." oninput="filterNewMessageUsers()" />
+                </div>
+            </div>
+            <div class="new-msg-list" id="newMsgList"></div>
+        </div>
     </div>
 
     <!-- Upload Modal -->
@@ -4277,6 +4844,8 @@
                     </button>
                     <button class="btn-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
                 </div>
+                <!-- ===== HIGHLIGHT COMMENTS SECTION ===== -->
+                <div class="highlight-comments-section" id="highlightCommentsSection"></div>
             </div>
         </div>
     </div>
@@ -4574,6 +5143,10 @@
         const SQUAD_MENTION_LABEL = 'Squad';
         const SQUAD_MENTION_REGEX = /@squad(?=\s|[.,!?;:]|$)/i;
 
+        // ===== HIGHLIGHT COMMENTS CONSTANTS =====
+        const HIGHLIGHT_COMMENT_MAX_LEN = 200;
+        const HIGHLIGHT_COMMENT_CLEANUP_BATCH = 450;
+
         let currentUser = null;
         let currentUserData = null;
         let selectedFiles = [];
@@ -4616,6 +5189,13 @@
         let activeCommentsNoteUid = null;
         let currentReplyTo = null;
 
+        // ===== HIGHLIGHT COMMENTS STATE =====
+        let activeHighlightCommentsUnsubscribe = null;
+        let activeHighlightCommentsId = null;
+        let currentHighlightReplyTo = null;
+        let highlightCommentCounts = {};
+        let highlightCommentCountUnsubscribes = [];
+
         // ===== MENTION (notes) STATE =====
         let pendingMentions = new Map();
         let mentionDropdownIndex = -1;
@@ -4640,6 +5220,14 @@
         let chatSearchTerm = '';
         let chatSending = false;
         let chatTotalUnread = 0;
+
+        // ★ NEW: Track last message per conversation for sorting
+        let chatLastMessages = {};        // { uid: { text, senderUid, senderName, createdAt, isMine } }
+        let chatConversationsUnsubscribe = null;
+
+        // ★ NEW: New Message modal state
+        let newMsgSearchTerm = '';
+        let newMsgModalOpen = false;
 
         // Chat mention state
         let chatPendingMentions = new Map();
@@ -4743,6 +5331,27 @@
             return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         }
 
+        function formatChatListTime(date) {
+            if (!date) return '';
+            const now = new Date();
+            const d = new Date(date);
+            const diffMs = now - d;
+            const diffMin = Math.floor(diffMs / 60000);
+            const diffHr = Math.floor(diffMin / 60);
+            const diffDay = Math.floor(diffHr / 24);
+
+            if (diffMin < 1) return 'now';
+            if (diffMin < 60) return `${diffMin}m`;
+            if (diffHr < 24 && d.toDateString() === now.toDateString()) {
+                return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            }
+            const yest = new Date(now);
+            yest.setDate(yest.getDate() - 1);
+            if (d.toDateString() === yest.toDateString()) return 'Yesterday';
+            if (diffDay < 7) return d.toLocaleDateString('en-US', { weekday: 'short' });
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
         function formatChatDateDivider(date) {
             const now = new Date();
             const d = new Date(date);
@@ -4763,6 +5372,13 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        }
+
+        function toJsDate(timestamp) {
+            if (!timestamp) return null;
+            if (timestamp.seconds !== undefined) return new Date(timestamp.seconds * 1000);
+            if (timestamp.toDate) return timestamp.toDate();
+            return new Date(timestamp);
         }
 
         async function getCurrentUserProfileCached(user) {
@@ -4876,10 +5492,10 @@
 
         function ensureChatListenersAttached() {
             if (!chatFeatureEnabled) return;
-            if (chatMessagesUnsubscribe && activeChatUid) return;
             loadChatUserList();
             loadChatUnreadCounts();
             loadGroupMentionCount();
+            loadChatConversationsSummary();
         }
 
         function detachChatListeners() {
@@ -4887,10 +5503,15 @@
                 chatMessagesUnsubscribe();
                 chatMessagesUnsubscribe = null;
             }
+            if (chatConversationsUnsubscribe) {
+                chatConversationsUnsubscribe();
+                chatConversationsUnsubscribe = null;
+            }
             detachAllChatUnreadListeners();
             activeChatUid = null;
             activeChatIsGroup = false;
             chatMessages = [];
+            chatLastMessages = {};
         }
 
         function restoreActiveSocialTab() {
@@ -4900,6 +5521,102 @@
                 if (v === 'chats' || v === 'members') saved = v;
             } catch (e) { /* ignore */ }
             switchSocialTab(saved);
+        }
+
+        // ================================================================
+        // ===== ★ NEW: LOAD LAST MESSAGE PER CONVERSATION (for sorting + previews)
+        // ================================================================
+        function loadChatConversationsSummary() {
+            if (!chatFeatureEnabled || !currentUser) return;
+            if (chatConversationsUnsubscribe) chatConversationsUnsubscribe();
+
+            const myUid = currentUser.uid;
+
+            // Fetch recent messages where I'm the sender OR receiver
+            // We can't do OR queries directly, so we fetch two listeners and merge
+            const seenMessages = new Map(); // msgId -> msgData
+
+            function processSnapshot() {
+                // Group by conversation partner / group
+                const summaries = {};
+
+                seenMessages.forEach((msg) => {
+                    let convKey;
+                    if (msg.isGroup || msg.participantsKey === GROUP_CHAT_KEY) {
+                        convKey = GROUP_CHAT_KEY;
+                    } else {
+                        // Direct: partner is the other uid
+                        convKey = msg.senderUid === myUid ? msg.receiverUid : msg.senderUid;
+                    }
+                    if (!convKey) return;
+
+                    const createdDate = toJsDate(msg.createdAt) || new Date(0);
+
+                    if (!summaries[convKey] || createdDate > (summaries[convKey]._date || new Date(0))) {
+                        summaries[convKey] = {
+                            text: msg.text || '',
+                            senderUid: msg.senderUid,
+                            senderName: msg.senderName || 'Someone',
+                            createdAt: msg.createdAt,
+                            _date: createdDate,
+                            isGroup: msg.isGroup === true || msg.participantsKey === GROUP_CHAT_KEY,
+                            isMine: msg.senderUid === myUid
+                        };
+                    }
+                });
+
+                // Strip the helper _date field
+                const clean = {};
+                Object.keys(summaries).forEach(k => {
+                    const { _date, ...rest } = summaries[k];
+                    clean[k] = rest;
+                });
+
+                chatLastMessages = clean;
+                renderChatUserList();
+            }
+
+            // Listener 1: messages I sent
+            const unsubSent = db.collection('chatMessages')
+                .where('senderUid', '==', myUid)
+                .orderBy('createdAt', 'desc')
+                .limit(60)
+                .onSnapshot((snap) => {
+                    snap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
+                    processSnapshot();
+                }, (err) => {
+                    console.warn('Conv summary (sent) error:', err.message);
+                });
+
+            // Listener 2: messages I received
+            const unsubReceived = db.collection('chatMessages')
+                .where('receiverUid', '==', myUid)
+                .orderBy('createdAt', 'desc')
+                .limit(60)
+                .onSnapshot((snap) => {
+                    snap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
+                    processSnapshot();
+                }, (err) => {
+                    console.warn('Conv summary (received) error:', err.message);
+                });
+
+            // Listener 3: group messages
+            const unsubGroup = db.collection('chatMessages')
+                .where('participantsKey', '==', GROUP_CHAT_KEY)
+                .orderBy('createdAt', 'desc')
+                .limit(30)
+                .onSnapshot((snap) => {
+                    snap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
+                    processSnapshot();
+                }, (err) => {
+                    console.warn('Conv summary (group) error:', err.message);
+                });
+
+            chatConversationsUnsubscribe = () => {
+                try { unsubSent(); } catch (e) {}
+                try { unsubReceived(); } catch (e) {}
+                try { unsubGroup(); } catch (e) {}
+            };
         }
 
         // ================================================================
@@ -4933,7 +5650,7 @@
         }
 
         // ================================================================
-        // ===== CHAT: USER LIST =====
+        // ===== CHAT: USER LIST (★ SORTED BY LAST CHAT)
         // ================================================================
         function loadChatUserList() {
             const listEl = document.getElementById('chatUserList');
@@ -4946,105 +5663,143 @@
             if (!listEl) return;
 
             const term = (chatSearchTerm || '').toLowerCase().trim();
-
             const myUid = currentUser ? currentUser.uid : null;
-            const allMembers = Object.values(userProfileCache)
+
+            // Build a unified list: group + all members, with their last-message metadata
+            const allItems = [];
+
+            // === GROUP CHAT ITEM ===
+            const groupLast = chatLastMessages[GROUP_CHAT_KEY];
+            const groupUnread = chatGroupUnreadMentions || 0;
+            const groupMemberCount = Object.keys(userProfileCache).length;
+            const groupMemberCountText = groupMemberCount > 0
+                ? `${groupMemberCount} member${groupMemberCount !== 1 ? 's' : ''}`
+                : 'Squad-wide chat';
+
+            allItems.push({
+                uid: GROUP_CHAT_KEY,
+                isGroup: true,
+                name: 'Squad Group Chat',
+                avatarHtml: '<i class="fas fa-users"></i>',
+                avatarClass: 'group-avatar',
+                status: null,
+                unread: groupUnread,
+                last: groupLast,
+                previewFallback: groupMemberCountText
+            });
+
+            // === MEMBERS ===
+            const members = Object.values(userProfileCache)
                 .filter(u => u.id && u.id !== myUid)
                 .filter(u => u.displayName || u.email);
 
-            let filtered = allMembers;
+            members.forEach(member => {
+                const name = member.displayName || member.email || 'Anonymous';
+                const photoUrl = member.photoURL || '';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const status = member.status || 'offline';
+                const unread = chatUnreadByUser[member.id] || 0;
+                const last = chatLastMessages[member.id];
+
+                const avatarContent = photoUrl
+                    ? `<img src="${cloudinaryAvatar(photoUrl, 100)}" alt="${escapeAttr(name)}" loading="lazy" />`
+                    : escapeHtml(initials);
+
+                allItems.push({
+                    uid: member.id,
+                    isGroup: false,
+                    name: name,
+                    avatarHtml: avatarContent + `<span class="status-dot ${status}"></span>`,
+                    avatarClass: '',
+                    status: status,
+                    unread: unread,
+                    last: last,
+                    previewFallback: status === 'available' ? '🟢 Online' : 'Tap to message'
+                });
+            });
+
+            // === SORT: latest activity first ===
+            allItems.sort((a, b) => {
+                const aDate = a.last ? (toJsDate(a.last.createdAt) || new Date(0)) : new Date(0);
+                const bDate = b.last ? (toJsDate(b.last.createdAt) || new Date(0)) : new Date(0);
+                const diff = bDate - aDate;
+                if (diff !== 0) return diff;
+                // Tie-breaker: unread first, then alpha
+                if (a.unread !== b.unread) return b.unread - a.unread;
+                return (a.name || '').localeCompare(b.name || '');
+            });
+
+            // === FILTER ===
+            let filtered = allItems;
             if (term) {
-                filtered = allMembers.filter(u => {
-                    const name = (u.displayName || u.email || '').toLowerCase();
-                    return name.includes(term);
+                filtered = allItems.filter(item => {
+                    const nameMatch = (item.name || '').toLowerCase().includes(term);
+                    const lastText = item.last ? (item.last.text || '').toLowerCase() : '';
+                    return nameMatch || lastText.includes(term);
                 });
             }
 
-            filtered.sort((a, b) => {
-                const an = (a.displayName || a.email || '').toLowerCase();
-                const bn = (b.displayName || b.email || '').toLowerCase();
-                return an.localeCompare(bn);
-            });
-
-            let html = '';
-
-            // === GROUP CHAT ITEM ===
-            const groupUnread = chatGroupUnreadMentions || 0;
-            const isGroupActive = activeChatUid === GROUP_CHAT_KEY;
-            const groupMemberCount = Object.keys(userProfileCache).length;
-            const groupPreviewText = groupMemberCount > 0
-                ? `${groupMemberCount} member${groupMemberCount !== 1 ? 's' : ''} • Squad-wide chat`
-                : 'Squad-wide chat';
-
-            html += `
-                <div class="chat-user-item group-item ${isGroupActive ? 'active' : ''}" data-uid="${GROUP_CHAT_KEY}" onclick="openGroupChat()">
-                    <div class="chat-user-avatar group-avatar">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="chat-user-info">
-                        <div class="chat-user-name">
-                            ${escapeHtml('Squad Group Chat')}
-                        </div>
-                        <div class="chat-user-preview">${escapeHtml(groupPreviewText)}</div>
-                    </div>
-                    <div class="chat-user-meta">
-                        ${groupUnread > 0 ? `<span class="chat-user-badge">${groupUnread > 99 ? '99+' : groupUnread}</span>` : ''}
-                    </div>
-                </div>
-                <div style="height:1px;background:#eef2f7;margin:4px 8px 6px;"></div>
-            `;
-
-            // === DIRECT CHAT ITEMS ===
-            if (filtered.length === 0 && !term) {
-                if (allMembers.length === 0) {
-                    html += `
-                        <div class="empty-state" style="padding:20px 12px;">
-                            <i class="fas fa-users" style="font-size:26px;"></i>
-                            <p style="font-size:12px;color:#888;margin-top:6px;">
-                                No other members yet — start a group message!
-                            </p>
-                        </div>
-                    `;
-                }
-            } else if (filtered.length === 0 && term) {
-                html += `
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
                     <div class="empty-state" style="padding:20px 12px;">
-                        <i class="fas fa-users" style="font-size:26px;"></i>
+                        <i class="fas fa-search" style="font-size:26px;"></i>
                         <p style="font-size:12px;color:#888;margin-top:6px;">
-                            No members match your search
+                            ${term ? 'No conversations match your search' : 'No conversations yet'}
                         </p>
                     </div>
                 `;
-            } else {
-                filtered.forEach(member => {
-                    const name = member.displayName || member.email || 'Anonymous';
-                    const photoUrl = member.photoURL || '';
-                    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                    const status = member.status || 'offline';
-                    const unread = chatUnreadByUser[member.id] || 0;
-                    const isActive = activeChatUid === member.id && !activeChatIsGroup;
-
-                    const avatarContent = photoUrl
-                        ? `<img src="${cloudinaryAvatar(photoUrl, 100)}" alt="${escapeAttr(name)}" loading="lazy" />`
-                        : escapeHtml(initials);
-
-                    html += `
-                        <div class="chat-user-item ${isActive ? 'active' : ''}" data-uid="${escapeAttr(member.id)}" onclick="openChatWith('${escapeAttr(member.id)}')">
-                            <div class="chat-user-avatar">
-                                ${avatarContent}
-                                <span class="status-dot ${status}"></span>
-                            </div>
-                            <div class="chat-user-info">
-                                <div class="chat-user-name">${escapeHtml(name)}</div>
-                                <div class="chat-user-preview">${status === 'available' ? '🟢 Online' : 'Tap to message'}</div>
-                            </div>
-                            <div class="chat-user-meta">
-                                ${unread > 0 ? `<span class="chat-user-badge">${unread > 99 ? '99+' : unread}</span>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
+                return;
             }
+
+            let html = '';
+            filtered.forEach((item, idx) => {
+                const isActive = item.isGroup
+                    ? activeChatUid === GROUP_CHAT_KEY
+                    : (activeChatUid === item.uid && !activeChatIsGroup);
+
+                // Determine if this conversation has a "new message" highlight
+                const hasNew = item.unread > 0;
+
+                // Preview text — use last message if available, otherwise fallback
+                let previewText = item.previewFallback;
+                if (item.last) {
+                    const snippet = (item.last.text || '').slice(0, 60);
+                    const prefix = item.last.isMine
+                        ? 'You: '
+                        : (item.isGroup ? `${item.last.senderName}: ` : '');
+                    previewText = prefix + snippet;
+                }
+
+                // Time label
+                const timeLabel = item.last ? formatChatListTime(toJsDate(item.last.createdAt)) : '';
+
+                const classes = [
+                    'chat-user-item',
+                    item.isGroup ? 'group-item' : '',
+                    isActive ? 'active' : '',
+                    hasNew ? 'has-new-message' : ''
+                ].filter(Boolean).join(' ');
+
+                // Insert a separator after group item only if group is rendered in non-sorted position
+                // (we skip separator now since sorting handles it naturally)
+
+                html += `
+                    <div class="${classes}" data-uid="${escapeAttr(item.uid)}"
+                         onclick="${item.isGroup ? 'openGroupChat()' : `openChatWith('${escapeAttr(item.uid)}')`}">
+                        <div class="chat-user-avatar ${item.avatarClass} ${hasNew ? 'has-new' : ''}">
+                            ${item.avatarHtml}
+                        </div>
+                        <div class="chat-user-info">
+                            <div class="chat-user-name">${escapeHtml(item.name)}</div>
+                            <div class="chat-user-preview">${escapeHtml(previewText || '')}</div>
+                        </div>
+                        <div class="chat-user-meta">
+                            ${timeLabel ? `<span class="chat-user-time">${escapeHtml(timeLabel)}</span>` : ''}
+                            ${item.unread > 0 ? `<span class="chat-user-badge">${item.unread > 99 ? '99+' : item.unread}</span>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
 
             listEl.innerHTML = html;
         }
@@ -5245,6 +6000,7 @@
             const emptyEl = document.getElementById('chatMainEmpty');
             const bodyEl = document.getElementById('chatBody');
             const inputEl = document.getElementById('chatInputWrap');
+            const inputTextarea = document.getElementById('chatInput');
 
             if (!activeChatUid) {
                 headerEl.style.display = 'none';
@@ -5265,6 +6021,10 @@
                     <span class="status-dot available" style="background:#22c55e;"></span>
                     ${memberCount} member${memberCount !== 1 ? 's' : ''} • Everyone
                 `;
+
+                if (inputTextarea) {
+                    inputTextarea.placeholder = 'Type a message... (use @ to mention)';
+                }
 
                 headerEl.style.display = 'flex';
                 emptyEl.style.display = 'none';
@@ -5300,6 +6060,10 @@
                   status === 'away' ? 'Away' :
                   status === 'dnd' ? 'Do Not Disturb' : 'Offline'}
             `;
+
+            if (inputTextarea) {
+                inputTextarea.placeholder = 'Type a message...';
+            }
 
             headerEl.style.display = 'flex';
             emptyEl.style.display = 'none';
@@ -5438,7 +6202,9 @@
                     <div class="chat-main-empty">
                         <i class="fas fa-comment-dots"></i>
                         <h3>No messages yet</h3>
-                        <p>Say hi to start the conversation. Type @ to mention anyone in the squad, or <strong>@squad</strong> to notify everyone.</p>
+                        <p>${activeChatIsGroup
+                            ? 'Say hi to start the conversation. Type @ to mention anyone in the squad, or <strong>@squad</strong> to notify everyone.'
+                            : 'Say hi to start the conversation.'}</p>
                     </div>
                 `;
                 return;
@@ -5532,8 +6298,8 @@
                 const senderName = me.displayName || currentUser.displayName || currentUser.email || 'Someone';
                 const senderPhoto = me.photoURL || '';
 
-                const mentionedUids = resolveChatMentions(text);
-                const hasSquadMention = SQUAD_MENTION_REGEX.test(text);
+                const mentionedUids = activeChatIsGroup ? resolveChatMentions(text) : [];
+                const hasSquadMention = activeChatIsGroup && SQUAD_MENTION_REGEX.test(text);
 
                 const myUid = currentUser.uid;
                 const participantsKey = activeChatIsGroup
@@ -5564,13 +6330,15 @@
 
                 await msgRef.set(msgData);
 
-                input.value = '';
-                chatPendingMentions.clear();
-                chatSquadMentionPending = false;
-                autoResizeChatInput();
-                closeChatMentionDropdown();
+                if (!activeChatIsGroup) {
+                    createDirectMessageNotification({
+                        receiverUid: activeChatUid,
+                        senderUid: myUid,
+                        senderName,
+                        text
+                    });
+                }
 
-                // Notify mentioned users
                 if (mentionedUids.length > 0) {
                     createChatMentionNotifications({
                         mentionedUids,
@@ -5582,7 +6350,6 @@
                     });
                 }
 
-                // Notify ALL members for @squad (only in group chat)
                 if (hasSquadMention && activeChatIsGroup) {
                     createSquadMentionNotifications({
                         senderUid: myUid,
@@ -5591,6 +6358,12 @@
                         groupName: 'Squad Group Chat'
                     });
                 }
+
+                input.value = '';
+                chatPendingMentions.clear();
+                chatSquadMentionPending = false;
+                autoResizeChatInput();
+                closeChatMentionDropdown();
             } catch (e) {
                 console.error('sendChatMessage error:', e);
                 alert('❌ Could not send message: ' + e.message);
@@ -5610,9 +6383,167 @@
         }
 
         // ================================================================
-        // ===== CHAT: MENTION AUTOCOMPLETE (with @squad) =====
+        // ===== ★ NEW: DIRECT MESSAGE NOTIFICATIONS =====
+        // ================================================================
+        async function createDirectMessageNotification({
+            receiverUid,
+            senderUid,
+            senderName,
+            text
+        }) {
+            if (!receiverUid || !senderUid) return;
+            if (receiverUid === senderUid) return;
+
+            try {
+                const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                const snippet = (text || '').slice(0, 80) + ((text || '').length > 80 ? '...' : '');
+
+                await db.collection('announcements').add({
+                    type: 'chat',
+                    title: `💬 ${senderName} sent you a message`,
+                    message: `"${snippet}"`,
+                    icon: '💬',
+                    priority: 'info',
+                    link: 'dashboard.html',
+                    linkLabel: 'Open Chat',
+                    targetUid: receiverUid,
+                    referenceId: `dm_${senderUid}`,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt
+                });
+            } catch (err) {
+                console.warn('createDirectMessageNotification error:', err);
+            }
+        }
+
+        // ================================================================
+        // ===== ★ NEW: NEW MESSAGE MODAL =====
+        // ================================================================
+        function openNewMessageModal() {
+            if (!chatFeatureEnabled) return;
+            if (!currentUser) return;
+
+            newMsgModalOpen = true;
+            newMsgSearchTerm = '';
+
+            const modal = document.getElementById('newMessageModal');
+            const input = document.getElementById('newMsgSearchInput');
+            if (input) input.value = '';
+
+            renderNewMessageList();
+            modal.classList.add('active');
+
+            setTimeout(() => {
+                if (input) input.focus();
+            }, 150);
+        }
+
+        function closeNewMessageModal() {
+            newMsgModalOpen = false;
+            newMsgSearchTerm = '';
+            const modal = document.getElementById('newMessageModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function filterNewMessageUsers() {
+            newMsgSearchTerm = (document.getElementById('newMsgSearchInput')?.value || '').toLowerCase().trim();
+            renderNewMessageList();
+        }
+
+        function renderNewMessageList() {
+            const listEl = document.getElementById('newMsgList');
+            if (!listEl) return;
+
+            const myUid = currentUser ? currentUser.uid : null;
+
+            // All members except me, sorted by name
+            const members = Object.values(userProfileCache)
+                .filter(u => u.id && u.id !== myUid)
+                .filter(u => u.displayName || u.email)
+                .sort((a, b) => {
+                    const an = (a.displayName || a.email || '').toLowerCase();
+                    const bn = (b.displayName || b.email || '').toLowerCase();
+                    return an.localeCompare(bn);
+                });
+
+            let filtered = members;
+            if (newMsgSearchTerm) {
+                filtered = members.filter(u => {
+                    const name = (u.displayName || u.email || '').toLowerCase();
+                    return name.includes(newMsgSearchTerm);
+                });
+            }
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `
+                    <div class="new-msg-empty">
+                        <i class="fas fa-user-slash"></i>
+                        <p>${newMsgSearchTerm ? 'No members match your search' : 'No other squad members yet'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(member => {
+                const name = member.displayName || member.email || 'Anonymous';
+                const photoUrl = member.photoURL || '';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const status = member.status || 'offline';
+                const location = member.location || '';
+                const occupation = member.occupation || '';
+                const metaParts = [];
+                if (occupation) metaParts.push(escapeHtml(occupation));
+                if (location) metaParts.push(escapeHtml(location));
+                const metaText = metaParts.join(' · ') || (
+                    status === 'available' ? '🟢 Available' :
+                    status === 'busy' ? '🔴 Busy' :
+                    status === 'away' ? '🟡 Away' :
+                    status === 'dnd' ? '🟣 Do Not Disturb' : 'Offline'
+                );
+
+                const avatarContent = photoUrl
+                    ? `<img src="${cloudinaryAvatar(photoUrl, 100)}" alt="${escapeAttr(name)}" loading="lazy" />`
+                    : escapeHtml(initials);
+
+                html += `
+                    <div class="new-msg-user" onclick="startNewMessageWith('${escapeAttr(member.id)}')">
+                        <div class="nm-avatar">
+                            ${avatarContent}
+                            <span class="status-dot ${status}"></span>
+                        </div>
+                        <div class="nm-info">
+                            <div class="nm-name">${escapeHtml(name)}</div>
+                            <div class="nm-meta">${metaText}</div>
+                        </div>
+                        <div class="nm-action">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listEl.innerHTML = html;
+        }
+
+        function startNewMessageWith(uid) {
+            if (!uid) return;
+            closeNewMessageModal();
+            switchSocialTab('chats');
+            setTimeout(() => {
+                openChatWith(uid);
+            }, 150);
+        }
+
+        // ================================================================
+        // ===== CHAT: MENTION AUTOCOMPLETE (GROUP ONLY) =====
         // ================================================================
         function resolveChatMentions(text) {
+            if (!activeChatIsGroup) return [];
+
             const found = new Set();
             chatPendingMentions.forEach((info) => {
                 if (text.toLowerCase().includes(`@${info.name.toLowerCase()}`)) {
@@ -5682,6 +6613,11 @@
         }
 
         function detectChatMentionQuery(input) {
+            if (!activeChatIsGroup) {
+                closeChatMentionDropdown();
+                return;
+            }
+
             const value = input.value;
             const cursorPos = input.selectionStart;
             const beforeCursor = value.slice(0, cursorPos);
@@ -5695,23 +6631,18 @@
             const query = match[1].toLowerCase().trim();
             const myUid = currentUser?.uid;
 
-            // Build candidate list: @squad (only in group chat) + members
             const candidates = [];
 
-            // Add @squad option only in group chat
-            if (activeChatIsGroup) {
-                const squadName = 'squad';
-                if (!query || squadName.includes(query)) {
-                    candidates.push({
-                        id: '__SQUAD__',
-                        displayName: 'Squad',
-                        isSquad: true,
-                        photoURL: ''
-                    });
-                }
+            const squadName = 'squad';
+            if (!query || squadName.includes(query)) {
+                candidates.push({
+                    id: '__SQUAD__',
+                    displayName: 'Squad',
+                    isSquad: true,
+                    photoURL: ''
+                });
             }
 
-            // Add individual members
             const members = Object.values(userProfileCache)
                 .filter(u => u.id && u.id !== myUid && (u.displayName || u.email));
 
@@ -5816,6 +6747,8 @@
         }
 
         function insertChatMention(user) {
+            if (!activeChatIsGroup) return;
+
             const input = document.getElementById('chatInput');
             if (!input) return;
 
@@ -5919,7 +6852,6 @@
                 const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
                 const snippet = (text || '').slice(0, 80) + ((text || '').length > 80 ? '...' : '');
 
-                // Get all members except the sender
                 const allUids = Object.keys(userProfileCache).filter(uid => uid && uid !== senderUid);
 
                 if (allUids.length === 0) return;
@@ -5941,7 +6873,6 @@
                     expiresAt
                 }));
 
-                // Batch in chunks of 450 (Firestore limit is 500)
                 const CHUNK = 450;
                 for (let i = 0; i < notifications.length; i += CHUNK) {
                     const batch = db.batch();
@@ -5964,7 +6895,6 @@
             const safeText = escapeHtml(text);
             const myUid = currentUser?.uid;
 
-            // First, handle @squad (case-insensitive) — render as a special chip
             let result = safeText.replace(
                 /@squad(?=\s|[.,!?;:]|&nbsp;|$)/gi,
                 '<span class="mention-chip mention-squad">@squad</span>'
@@ -6217,6 +7147,426 @@
         }
 
         // ================================================================
+        // ===== HIGHLIGHT COMMENTS =====
+        // ================================================================
+        function attachHighlightCommentsListener(highlightId) {
+            detachHighlightCommentsListener();
+            activeHighlightCommentsId = highlightId;
+
+            activeHighlightCommentsUnsubscribe = db.collection('highlightComments')
+                .where('highlightId', '==', highlightId)
+                .orderBy('createdAt', 'asc')
+                .onSnapshot((snapshot) => {
+                    if (activeHighlightCommentsId !== highlightId) return;
+                    const comments = [];
+                    snapshot.forEach(doc => comments.push({ id: doc.id, ...doc.data() }));
+                    renderHighlightComments(highlightId, comments);
+                }, (err) => {
+                    console.warn('Highlight comments listener error:', err.message);
+                    const list = document.getElementById('highlightCommentsList');
+                    if (list) {
+                        const isIndexError = /index/i.test(err.message);
+                        list.innerHTML = `
+                            <div class="highlight-comments-empty">
+                                <i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i>
+                                <p>${isIndexError ? 'Missing Firestore index for comments.' : 'Could not load comments.'}</p>
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        function detachHighlightCommentsListener() {
+            if (activeHighlightCommentsUnsubscribe) {
+                activeHighlightCommentsUnsubscribe();
+                activeHighlightCommentsUnsubscribe = null;
+            }
+            activeHighlightCommentsId = null;
+        }
+
+        function renderHighlightCommentsSection(highlightId) {
+            const section = document.getElementById('highlightCommentsSection');
+            if (!section) return;
+
+            const myName = titaUserData?.displayName || currentUser?.displayName || currentUser?.email || 'Me';
+            const myPhoto = titaUserData?.photoURL || '';
+            const myInitials = myName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            const avatarContent = myPhoto
+                ? `<img src="${cloudinaryAvatar(myPhoto, 80)}" alt="Me" />`
+                : escapeHtml(myInitials);
+
+            section.innerHTML = `
+                <div class="highlight-comments-header">
+                    <span class="title-group">
+                        <i class="fas fa-comments"></i>
+                        Comments
+                        <span class="comment-count-pill" id="highlightCommentCountPill">0</span>
+                    </span>
+                </div>
+                <div class="highlight-comments-list" id="highlightCommentsList">
+                    <div class="highlight-comments-empty">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>Loading comments...</p>
+                    </div>
+                </div>
+                <div class="highlight-comment-input-wrap">
+                    <div class="my-avatar">${avatarContent}</div>
+                    <div class="input-stack">
+                        <div class="replying-to-banner" id="highlightReplyingToBanner">
+                            <span>Replying to <strong id="highlightReplyingToName"></strong></span>
+                            <button type="button" onclick="cancelHighlightReply()" title="Cancel reply">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div class="input-row">
+                            <textarea id="highlightCommentInput" placeholder="Write a comment..." maxlength="${HIGHLIGHT_COMMENT_MAX_LEN}" rows="1"></textarea>
+                            <button class="send-btn" id="highlightCommentSendBtn" onclick="postHighlightComment()" title="Send">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="char-count" id="highlightCommentCharCount">0/${HIGHLIGHT_COMMENT_MAX_LEN}</div>
+                    </div>
+                </div>
+            `;
+
+            const input = document.getElementById('highlightCommentInput');
+            if (input) {
+                input.addEventListener('input', updateHighlightCommentCharCount);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        postHighlightComment();
+                    }
+                });
+            }
+
+            updateHighlightCommentCharCount();
+            attachHighlightCommentsListener(highlightId);
+        }
+
+        function updateHighlightCommentCharCount() {
+            const input = document.getElementById('highlightCommentInput');
+            const counter = document.getElementById('highlightCommentCharCount');
+            if (!input || !counter) return;
+            const len = input.value.length;
+            counter.textContent = `${len}/${HIGHLIGHT_COMMENT_MAX_LEN}`;
+            counter.classList.remove('warn', 'danger');
+            if (len > HIGHLIGHT_COMMENT_MAX_LEN * 0.9) counter.classList.add('danger');
+            else if (len > HIGHLIGHT_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
+        }
+
+        function renderHighlightComments(highlightId, comments) {
+            const list = document.getElementById('highlightCommentsList');
+            if (!list) return;
+
+            const pill = document.getElementById('highlightCommentCountPill');
+            if (pill) pill.textContent = comments.length;
+
+            if (!comments || comments.length === 0) {
+                list.innerHTML = `
+                    <div class="highlight-comments-empty">
+                        <i class="fas fa-comment-dots"></i>
+                        <p>No comments yet. Be the first!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const topLevel = comments.filter(c => !c.replyToId);
+            const repliesByParent = {};
+            comments.filter(c => c.replyToId).forEach(c => {
+                if (!repliesByParent[c.replyToId]) repliesByParent[c.replyToId] = [];
+                repliesByParent[c.replyToId].push(c);
+            });
+
+            let html = '';
+            topLevel.forEach(c => {
+                html += renderHighlightCommentItem(c, false);
+                const replies = repliesByParent[c.id] || [];
+                replies.forEach(r => { html += renderHighlightCommentItem(r, true); });
+            });
+
+            const orphanReplies = comments.filter(c => c.replyToId && !topLevel.find(t => t.id === c.replyToId));
+            orphanReplies.forEach(r => { html += renderHighlightCommentItem(r, false); });
+
+            list.innerHTML = html;
+        }
+
+        function renderHighlightCommentItem(comment, isReply) {
+            const authorName = comment.authorName || 'Anonymous';
+            const authorPhoto = comment.authorPhoto || '';
+            const initials = authorName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const isMe = currentUser && comment.authorUid === currentUser.uid;
+
+            const createdDate = comment.createdAt
+                ? (comment.createdAt.seconds ? new Date(comment.createdAt.seconds * 1000) : new Date(comment.createdAt))
+                : new Date();
+
+            const avatarContent = authorPhoto
+                ? `<img src="${cloudinaryAvatar(authorPhoto, 80)}" alt="${escapeAttr(authorName)}" loading="lazy" />`
+                : escapeHtml(initials);
+
+            const safeCommentId = escapeAttr(comment.id);
+            const safeAuthorName = escapeAttr(authorName);
+
+            const deleteBtn = isMe
+                ? `<button class="delete-btn" onclick="deleteHighlightComment('${safeCommentId}')"><i class="fas fa-trash"></i> Delete</button>`
+                : '';
+
+            const replyBtn = !isReply
+                ? `<button onclick="startHighlightReply('${safeCommentId}', '${safeAuthorName}')"><i class="fas fa-reply"></i> Reply</button>`
+                : '';
+
+            return `
+                <div class="highlight-comment ${isReply ? 'reply-indent' : ''}" data-comment-id="${safeCommentId}">
+                    <div class="comment-avatar">${avatarContent}</div>
+                    <div class="comment-main">
+                        <div class="comment-top-row">
+                            <span class="comment-author ${isMe ? 'is-me' : ''}">${escapeHtml(authorName)}</span>
+                            <span class="comment-time">${formatRelativeTime(createdDate)}</span>
+                        </div>
+                        <div class="comment-text">${escapeHtml(comment.text || '')}</div>
+                        <div class="comment-actions">
+                            ${replyBtn}
+                            ${deleteBtn}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startHighlightReply(commentId, authorName) {
+            currentHighlightReplyTo = { id: commentId, authorName };
+            const banner = document.getElementById('highlightReplyingToBanner');
+            const nameEl = document.getElementById('highlightReplyingToName');
+            if (banner && nameEl) {
+                nameEl.textContent = authorName;
+                banner.classList.add('show');
+            }
+            const input = document.getElementById('highlightCommentInput');
+            if (input) {
+                input.placeholder = `Reply to ${authorName}...`;
+                input.focus();
+            }
+        }
+
+        function cancelHighlightReply() {
+            currentHighlightReplyTo = null;
+            const banner = document.getElementById('highlightReplyingToBanner');
+            if (banner) banner.classList.remove('show');
+            const input = document.getElementById('highlightCommentInput');
+            if (input) input.placeholder = 'Write a comment...';
+        }
+
+        async function postHighlightComment() {
+            if (!currentUser || !titaUserData) {
+                alert('Please sign in to comment.');
+                return;
+            }
+
+            const input = document.getElementById('highlightCommentInput');
+            const btn = document.getElementById('highlightCommentSendBtn');
+            if (!input || !btn) return;
+
+            const text = input.value.trim().slice(0, HIGHLIGHT_COMMENT_MAX_LEN);
+            if (!text) { input.focus(); return; }
+            if (!currentHighlightDetailId) return;
+
+            btn.disabled = true;
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            try {
+                const authorName = titaUserData.displayName || currentUser.displayName || currentUser.email || 'Anonymous';
+                const authorPhoto = titaUserData.photoURL || '';
+
+                const expireAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+                await db.collection('highlightComments').add({
+                    highlightId: currentHighlightDetailId,
+                    text,
+                    authorUid: currentUser.uid,
+                    authorName,
+                    authorPhoto,
+                    replyToId: currentHighlightReplyTo ? currentHighlightReplyTo.id : null,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
+                });
+
+                // ★ NEW: Send notifications to uploader & parent commenter
+                try {
+                    const hlDoc = await db.collection('highlights').doc(currentHighlightDetailId).get();
+                    if (hlDoc.exists) {
+                        const hlData = hlDoc.data();
+                        createHighlightCommentNotification({
+                            highlightId: currentHighlightDetailId,
+                            highlightOwnerUid: hlData.authorUid,
+                            highlightOwnerName: hlData.authorName || 'Someone',
+                            highlightCaption: hlData.caption || '',
+                            parentCommentId: currentHighlightReplyTo ? currentHighlightReplyTo.id : null,
+                            parentCommentAuthorUid: currentHighlightReplyTo ? currentHighlightReplyTo.authorUid : null,
+                            parentCommentAuthorName: currentHighlightReplyTo ? currentHighlightReplyTo.authorName : null,
+                            commenterUid: currentUser.uid,
+                            commenterName: authorName,
+                            commentText: text,
+                            isReply: !!currentHighlightReplyTo,
+                            mentionedUids: []
+                        });
+                    }
+                } catch (e) { console.warn('Notification error:', e); }
+
+                input.value = '';
+                updateHighlightCommentCharCount();
+                cancelHighlightReply();
+            } catch (err) {
+                console.error('Post highlight comment error:', err);
+                alert('❌ Could not post comment: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ★ NEW: HIGHLIGHT COMMENT NOTIFICATION FUNCTION
+        async function createHighlightCommentNotification({
+            highlightId, highlightOwnerUid, highlightOwnerName, highlightCaption,
+            parentCommentId, parentCommentAuthorUid, parentCommentAuthorName,
+            commenterUid, commenterName, commentText, isReply, mentionedUids
+        }) {
+            try {
+                const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                const snippet = (commentText || '').slice(0, 80) + ((commentText || '').length > 80 ? '...' : '');
+                const captionSnippet = (highlightCaption || '').slice(0, 60) + ((highlightCaption || '').length > 60 ? '...' : '');
+
+                const queued = new Set();
+                const notifications = [];
+
+                // Notify uploader (if not the commenter)
+                if (highlightOwnerUid && highlightOwnerUid !== commenterUid && !queued.has(highlightOwnerUid)) {
+                    queued.add(highlightOwnerUid);
+                    notifications.push({
+                        type: 'comment',
+                        title: `💬 ${commenterName} commented on your highlight`,
+                        message: `"${snippet}"\n\nOn: "${captionSnippet}"`,
+                        icon: '💬',
+                        priority: 'info',
+                        link: 'index.html#highlights',
+                        linkLabel: 'View Comment',
+                        targetUid: highlightOwnerUid,
+                        referenceId: highlightId,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt
+                    });
+                }
+
+                // Notify parent comment author (if reply and not the commenter)
+                if (isReply && parentCommentAuthorUid && parentCommentAuthorUid !== commenterUid && !queued.has(parentCommentAuthorUid)) {
+                    queued.add(parentCommentAuthorUid);
+                    notifications.push({
+                        type: 'reply',
+                        title: `💬 ${commenterName} replied to your comment`,
+                        message: `"${snippet}"\n\nOn: "${captionSnippet}"`,
+                        icon: '💬',
+                        priority: 'info',
+                        link: 'index.html#highlights',
+                        linkLabel: 'View Reply',
+                        targetUid: parentCommentAuthorUid,
+                        referenceId: highlightId,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt
+                    });
+                }
+
+                if (notifications.length === 0) return;
+
+                const batch = db.batch();
+                notifications.forEach(n => {
+                    const ref = db.collection('announcements').doc();
+                    batch.set(ref, n);
+                });
+                await batch.commit();
+            } catch (err) {
+                console.warn('createHighlightCommentNotification error:', err);
+            }
+        }
+
+        async function deleteHighlightComment(commentId) {
+            if (!currentUser) return;
+            if (!confirm('Delete this comment?')) return;
+            try {
+                const refs = [db.collection('highlightComments').doc(commentId)];
+                const childrenSnap = await db.collection('highlightComments')
+                    .where('replyToId', '==', commentId)
+                    .get();
+                childrenSnap.forEach(doc => refs.push(doc.ref));
+
+                const batch = db.batch();
+                refs.forEach(ref => batch.delete(ref));
+                await batch.commit();
+            } catch (err) {
+                alert('❌ Could not delete comment: ' + err.message);
+            }
+        }
+
+        async function cleanupExpiredHighlightComments() {
+            try {
+                const now = new Date();
+                const snapshot = await db.collection('highlightComments')
+                    .where('expireAt', '<=', now)
+                    .limit(HIGHLIGHT_COMMENT_CLEANUP_BATCH)
+                    .get();
+                if (snapshot.empty) return { deleted: 0 };
+
+                const batch = db.batch();
+                snapshot.forEach(doc => batch.delete(doc.ref));
+                await batch.commit();
+
+                if (snapshot.size === HIGHLIGHT_COMMENT_CLEANUP_BATCH) {
+                    setTimeout(cleanupExpiredHighlightComments, 2000);
+                }
+                return { deleted: snapshot.size };
+            } catch (err) {
+                console.warn('Highlight comment cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function updateHighlightCommentCounts(highlightId, count) {
+            highlightCommentCounts[highlightId] = count;
+            const bubble = document.querySelector(`[data-hl-comment-count="${CSS.escape(highlightId)}"]`);
+            if (bubble) {
+                bubble.textContent = count;
+                bubble.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+        }
+
+        function detachHighlightCommentCountListeners() {
+            highlightCommentCountUnsubscribes.forEach(fn => { try { fn(); } catch (e) {} });
+            highlightCommentCountUnsubscribes = [];
+        }
+
+        function attachHighlightCommentCountListeners(highlightIds) {
+            detachHighlightCommentCountListeners();
+            highlightIds.forEach(id => {
+                const unsub = db.collection('highlightComments')
+                    .where('highlightId', '==', id)
+                    .onSnapshot(snap => {
+                        updateHighlightCommentCounts(id, snap.size);
+                    }, err => {
+                        console.warn('Highlight comment count listener error:', err.message);
+                    });
+                highlightCommentCountUnsubscribes.push(unsub);
+            });
+        }
+
+        // ================================================================
         // ===== COMMENT AUTO-CLEANUP =====
         // ================================================================
         async function cleanupExpiredComments() {
@@ -6246,6 +7596,9 @@
             if (commentCleanupTimer) clearInterval(commentCleanupTimer);
             setTimeout(() => { cleanupExpiredComments(); }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
             commentCleanupTimer = setInterval(() => { cleanupExpiredComments(); }, COMMENT_CLEANUP_INTERVAL_MS);
+            // Also clean highlight comments on same timer
+            setTimeout(() => { cleanupExpiredHighlightComments(); }, COMMENT_CLEANUP_INITIAL_DELAY_MS + 1500);
+            setInterval(() => { cleanupExpiredHighlightComments(); }, COMMENT_CLEANUP_INTERVAL_MS + 1500);
         }
 
         function stopCommentAutoCleanup() {
@@ -7465,6 +8818,8 @@
             stopCommentAutoCleanup();
             detachAllNoteCountListeners();
             detachChatListeners();
+            detachHighlightCommentsListener();
+            detachHighlightCommentCountListeners();
             if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
             if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
         });
@@ -7520,6 +8875,16 @@
                     if (url && url.includes('cloudinary')) await deleteFromCloudinary(url);
                 }
                 await db.collection('highlights').doc(id).delete();
+                // Also delete associated comments
+                try {
+                    const commentsSnap = await db.collection('highlightComments')
+                        .where('highlightId', '==', id).get();
+                    if (!commentsSnap.empty) {
+                        const batch = db.batch();
+                        commentsSnap.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    }
+                } catch (e) {}
                 selectedHighlights.delete(id);
                 updateSelectionUI();
                 alert('✅ Highlight deleted successfully!');
@@ -7532,6 +8897,16 @@
                     if (url && url.includes('cloudinary')) await deleteFromCloudinary(url);
                 }
                 await db.collection('highlights').doc(id).delete();
+                // Also clean up comments
+                try {
+                    const commentsSnap = await db.collection('highlightComments')
+                        .where('highlightId', '==', id).get();
+                    if (!commentsSnap.empty) {
+                        const batch = db.batch();
+                        commentsSnap.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    }
+                } catch (e) {}
             } catch (e) {}
         }
 
@@ -7629,6 +9004,10 @@
                         if (countBadge) countBadge.textContent = `${validHighlights.length}`;
                         updateSelectionUI();
 
+                        // Attach comment count listeners for visible highlights
+                        const visibleIds = validHighlights.map(h => h.id);
+                        attachHighlightCommentCountListeners(visibleIds);
+
                         if (expiredIds.length) {
                             setTimeout(() => {
                                 expiredIds.forEach(({ id, imageURLs }) => deleteHighlightSilent(id, imageURLs));
@@ -7693,6 +9072,8 @@
                     const hasImages = imageUrls.length > 0;
                     const isSelected = selectedHighlights.has(item.id);
 
+                    const commentCount = highlightCommentCounts[item.id] || 0;
+
                     const avatarContent = authorPhoto
                         ? `<img src="${cloudinaryThumb(authorPhoto, 60)}" alt="${escapeAttr(authorName)}" loading="lazy" decoding="async" />`
                         : initials;
@@ -7729,6 +9110,12 @@
                                 <div class="meta">
                                     <span class="author"><span class="avatar-small">${avatarContent}</span> ${escapeHtml(authorName)}</span>
                                     <span class="expiry-time ${isUrgent ? 'urgent' : ''}"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
+                                </div>
+                                <div class="meta" style="margin-top:6px; padding-top:6px; border-top:1px solid #f0f4ff;">
+                                    <span style="font-size:11px; color:#888; display:flex; align-items:center; gap:4px;">
+                                        <i class="fas fa-comment"></i>
+                                        <span data-hl-comment-count="${safeId}" style="display:${commentCount > 0 ? 'inline-flex' : 'none'}; font-weight:700; color:rgb(16,137,211);">${commentCount}</span>
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -7813,6 +9200,7 @@
 
                 currentHighlightDetailId = highlightId;
                 currentHighlightDetailImageIndex = 0;
+                currentHighlightReplyTo = null;
 
                 const imageUrls = item.imageURLs || [];
                 const mainImage = imageUrls[0] || '';
@@ -7868,6 +9256,9 @@
                 if (hasMulti) viewAllBtn.style.display = 'inline-flex';
                 else viewAllBtn.style.display = 'none';
 
+                // Render comments section
+                renderHighlightCommentsSection(highlightId);
+
                 document.getElementById('highlightDetailModal').classList.add('active');
                 document.body.style.overflow = 'hidden';
             }).catch(err => {
@@ -7877,6 +9268,8 @@
         }
 
         function closeHighlightDetail() {
+            detachHighlightCommentsListener();
+            currentHighlightReplyTo = null;
             document.getElementById('highlightDetailModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('hlDetailImage').src = '';
@@ -8114,6 +9507,16 @@
                         if (url && url.includes('cloudinary')) await deleteFromCloudinary(url);
                     }
                     await db.collection('highlights').doc(id).delete();
+                    // Delete associated comments
+                    try {
+                        const commentsSnap = await db.collection('highlightComments')
+                            .where('highlightId', '==', id).get();
+                        if (!commentsSnap.empty) {
+                            const batch = db.batch();
+                            commentsSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                        }
+                    } catch (e) {}
                     selectedHighlights.delete(id);
                     deletedCount++;
                 }
@@ -8570,7 +9973,7 @@
         // ===== MODAL STATE =====
         // ================================================================
         function anyModalOpen() {
-            return ['uploadModal', 'galleryModal', 'lightboxModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal']
+            return ['uploadModal', 'galleryModal', 'lightboxModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal', 'newMessageModal']
                 .some(id => {
                     const el = document.getElementById(id);
                     return el && el.classList.contains('active');
@@ -8596,6 +9999,8 @@
                 stopCommentAutoCleanup();
                 detachAllNoteCountListeners();
                 detachChatListeners();
+                detachHighlightCommentsListener();
+                detachHighlightCommentCountListeners();
                 if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
                 if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
 
@@ -8617,6 +10022,7 @@
             const titaPanel = document.getElementById('titaPanel');
             const announcementPopup = document.getElementById('announcementPopup');
             const announcementViewModal = document.getElementById('announcementViewModal');
+            const newMessageModal = document.getElementById('newMessageModal');
 
             if (event.target === uploadModal) closeUploadModal();
             if (event.target === galleryModal) closeGallery();
@@ -8625,6 +10031,7 @@
             if (event.target === memberDetailModal) closeMemberDetail();
             if (event.target === noteModal) closeNoteModal();
             if (event.target === announcementViewModal) closeAnnouncementView();
+            if (event.target === newMessageModal) closeNewMessageModal();
 
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
@@ -8645,7 +10052,8 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (document.getElementById('lightboxModal').classList.contains('active')) closeLightbox();
+                if (document.getElementById('newMessageModal').classList.contains('active')) closeNewMessageModal();
+                else if (document.getElementById('lightboxModal').classList.contains('active')) closeLightbox();
                 else if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
                 else if (document.getElementById('uploadModal').classList.contains('active')) closeUploadModal();
                 else if (document.getElementById('highlightDetailModal').classList.contains('active')) closeHighlightDetail();

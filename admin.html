@@ -2099,6 +2099,533 @@
             border-top: 1px solid #eef2f7;
         }
 
+        /* ===== HIGHLIGHT CARDS ===== */
+        .highlight-card {
+            background: #f8faff;
+            border-radius: 16px;
+            padding: 0;
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .highlight-card:hover {
+            border-color: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .highlight-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+
+        .highlight-card.expired {
+            opacity: 0.65;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .highlight-card .highlight-card-image {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            display: block;
+            flex-shrink: 0;
+        }
+
+        .highlight-card .highlight-card-image-placeholder {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #7c3aed;
+            font-size: 36px;
+            flex-shrink: 0;
+        }
+
+        .highlight-card .highlight-card-body {
+            padding: 14px 16px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .highlight-card .highlight-card-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a2e;
+            overflow-wrap: anywhere;
+        }
+
+        .highlight-card .highlight-card-author-avatar {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .highlight-card .highlight-card-author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .highlight-card .highlight-card-caption {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.45;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            overflow-wrap: anywhere;
+        }
+
+        .highlight-card .highlight-card-meta {
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: auto;
+            padding-top: 8px;
+            border-top: 1px solid #f0f4ff;
+        }
+
+        .highlight-card .highlight-card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .highlight-card .highlight-card-meta i {
+            color: #7c3aed;
+            font-size: 10px;
+        }
+
+        .highlight-card .highlight-card-expired-badge {
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 50px;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .highlight-card .highlight-card-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            z-index: 3;
+        }
+
+        .highlight-card:hover .highlight-card-actions {
+            opacity: 1;
+        }
+
+        .highlight-card .highlight-card-actions button {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .highlight-card .highlight-card-actions .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .highlight-card .highlight-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
+
+        .highlight-card .highlight-card-actions .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .highlight-card .highlight-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
+
+        .highlight-card .highlight-card-actions .btn-success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+        .highlight-card .highlight-card-actions .btn-success:hover { background: #bbf7d0; transform: scale(1.05); }
+
+        /* ===== NOTES CARDS ===== */
+        .note-card {
+            background: #f8faff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            min-width: 0;
+        }
+
+        .note-card:hover {
+            border-color: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .note-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+
+        .note-card.expired {
+            opacity: 0.65;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .note-card.expired:hover {
+            opacity: 1;
+        }
+
+        .note-card .note-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            background: #ede9fe;
+        }
+
+        .note-card .note-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .note-card .note-card-author {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .note-card .note-card-text {
+            font-size: 15px;
+            color: #333;
+            font-weight: 600;
+            line-height: 1.5;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 8px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+        }
+
+        .note-card .note-card-meta {
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .note-card .note-card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .note-card .note-card-meta i {
+            color: #7c3aed;
+            font-size: 10px;
+        }
+
+        .note-card .note-card-meta .expired-label {
+            color: #dc2626;
+            font-weight: 800;
+        }
+
+        .note-card .note-card-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .note-card:hover .note-card-actions {
+            opacity: 1;
+        }
+
+        .note-card .note-card-actions button {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .note-card .note-card-actions .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .note-card .note-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
+
+        .note-card .note-card-actions .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .note-card .note-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
+
+        .note-card .note-card-actions .btn-view-comments {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+        .note-card .note-card-actions .btn-view-comments:hover { background: #ddd6fe; transform: scale(1.05); }
+
+        /* ===== COMMENT CARDS ===== */
+        .comment-card {
+            background: #f8faff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid #eef2f7;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            min-width: 0;
+        }
+
+        .comment-card:hover {
+            border-color: #7c3aed;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .comment-card.selected {
+            border-color: #7c3aed;
+            background: #f5f3ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.25);
+        }
+
+        .comment-card.expired {
+            opacity: 0.65;
+            border-color: #fecaca;
+            background: #fef2f2;
+        }
+
+        .comment-card.expired:hover {
+            opacity: 1;
+        }
+
+        .comment-card .comment-card-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #7c3aed 0%, #8b5cf6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15);
+        }
+
+        .comment-card .comment-card-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .comment-card .comment-card-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .comment-card .comment-card-author {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .comment-card .comment-card-reply-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #dbeafe;
+            color: #2563eb;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 50px;
+            letter-spacing: 0.3px;
+        }
+
+        .comment-card .comment-card-reply-indicator i {
+            font-size: 9px;
+        }
+
+        .comment-card .comment-card-context {
+            font-size: 11px;
+            color: #888;
+            padding: 8px 12px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            border-left: 3px solid #c7d2fe;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .comment-card .comment-card-context strong {
+            color: #7c3aed;
+            font-weight: 700;
+        }
+
+        .comment-card .comment-card-text {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            line-height: 1.5;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid #eef2f7;
+            margin-bottom: 8px;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .comment-card .comment-card-meta {
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .comment-card .comment-card-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .comment-card .comment-card-meta i {
+            color: #7c3aed;
+            font-size: 10px;
+        }
+
+        .comment-card .comment-card-meta .expired-label {
+            color: #dc2626;
+            font-weight: 800;
+        }
+
+        .comment-card .comment-card-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .comment-card:hover .comment-card-actions {
+            opacity: 1;
+        }
+
+        .comment-card .comment-card-actions button {
+            padding: 5px 10px;
+            font-size: 11px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .comment-card .comment-card-actions .btn-edit {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        .comment-card .comment-card-actions .btn-edit:hover { background: #bfdbfe; transform: scale(1.05); }
+
+        .comment-card .comment-card-actions .btn-danger {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .comment-card .comment-card-actions .btn-danger:hover { background: #fecaca; transform: scale(1.05); }
+
         @media (max-width: 768px) {
             .navbar {
                 padding: 12px 20px;
@@ -2414,6 +2941,7 @@
             <button class="admin-tab active" data-tab="coffee"><i class="fas fa-coffee"></i> Coffee Shops</button>
             <button class="admin-tab" data-tab="places"><i class="fas fa-map-marked-alt"></i> Places</button>
             <button class="admin-tab" data-tab="activities"><i class="fas fa-gamepad"></i> Activities</button>
+            <button class="admin-tab" data-tab="highlights"><i class="fas fa-images"></i> Highlights</button>
             <button class="admin-tab" data-tab="announcements"><i class="fas fa-bullhorn"></i> Announcements</button>
             <button class="admin-tab" data-tab="users"><i class="fas fa-user-friends"></i> App Users</button>
             <button class="admin-tab" data-tab="notes"><i class="fas fa-sticky-note"></i> Notes</button>
@@ -2490,6 +3018,50 @@
                     </div>
                 </div>
                 <div class="items-grid" id="activitiesGrid"></div>
+            </div>
+        </div>
+
+        <!-- ===== HIGHLIGHTS TAB ===== -->
+        <div id="tab-highlights" class="tab-content">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-images" style="color: #7c3aed;"></i> Highlights Management</h3>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;width:100%;margin-top:10px;">
+                        <div class="user-search-wrap">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="highlightsSearchInput" placeholder="Search by caption, author, or ID..." oninput="filterHighlights()" />
+                        </div>
+                        <span class="count" id="highlightsCount">0 highlights</span>
+                        <button class="batch-toggle-btn" onclick="toggleBatchMode('highlights')"><i class="fas fa-check-square"></i> Select</button>
+                        <button class="btn-danger" onclick="deleteAllExpiredHighlights()"><i class="fas fa-trash-alt"></i> Delete Expired</button>
+                        <button class="btn-secondary" onclick="loadHighlightsAdmin(true)"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                </div>
+
+                <div class="comments-filter-bar">
+                    <label><i class="fas fa-filter"></i> Filter:</label>
+                    <select id="highlightsStatusFilter" onchange="filterHighlights()">
+                        <option value="">All Highlights</option>
+                        <option value="active">✅ Active (not expired)</option>
+                        <option value="expiring">⏰ Expiring Soon (≤1 day)</option>
+                        <option value="expired">🗑️ Expired</option>
+                        <option value="multi">🖼️ Multi-photo only</option>
+                        <option value="single">📷 Single photo only</option>
+                    </select>
+                    <select id="highlightsAuthorFilter" onchange="filterHighlights()">
+                        <option value="">All Authors</option>
+                    </select>
+                </div>
+
+                <div class="batch-toolbar" id="batchToolbar-highlights">
+                    <span class="batch-count" id="batchCount-highlights">0 selected</span>
+                    <div class="batch-actions">
+                        <button class="btn-batch-select-all" onclick="selectAll('highlights')"><i class="fas fa-check-double"></i> Select All</button>
+                        <button class="btn-batch-delete" onclick="batchDelete('highlights')"><i class="fas fa-trash-alt"></i> Delete Selected</button>
+                        <button class="btn-batch-cancel" onclick="cancelBatchMode('highlights')"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+                </div>
+                <div class="items-grid" id="highlightsGrid"></div>
             </div>
         </div>
 
@@ -2731,6 +3303,57 @@
                 <div class="modal-actions">
                     <button type="button" class="btn-primary" id="submitBtn" onclick="saveItem()"><i class="fas fa-save"></i> Save</button>
                     <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== HIGHLIGHT EDIT MODAL ===== -->
+    <div id="highlightEditModal" class="modal">
+        <div class="modal-content" style="max-width:560px;">
+            <h2><i class="fas fa-images"></i> Edit Highlight</h2>
+            <form id="highlightEditForm" onsubmit="return false;">
+                <input type="hidden" id="editHighlightId" />
+
+                <div class="input-group" id="highlightImagePreviewGroup">
+                    <label>Current Image</label>
+                    <div style="text-align:center;background:#f8faff;border-radius:12px;padding:12px;border:2px solid #e0e7ff;">
+                        <img id="editHighlightImage" src="" alt="Highlight preview" style="max-width:100%;max-height:220px;border-radius:8px;display:block;margin:0 auto;" />
+                        <div id="editHighlightMultiCount" style="font-size:11px;color:#7c3aed;font-weight:700;margin-top:8px;display:none;"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Caption</label>
+                    <textarea id="editHighlightCaption" placeholder="What's happening?" maxlength="500" style="min-height:80px;"></textarea>
+                    <span style="font-size:11px;color:#999;display:block;margin-top:4px;"><span id="editHighlightCharCount">0</span>/500 characters</span>
+                </div>
+
+                <div class="input-group">
+                    <label>Author</label>
+                    <input type="text" id="editHighlightAuthor" placeholder="Author name" />
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Expiry Date</label>
+                        <input type="date" id="editHighlightExpiry" />
+                        <span style="font-size:11px;color:#999;display:block;margin-top:4px;">Highlights auto-delete after this date</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Days Left (computed)</label>
+                        <input type="text" id="editHighlightDaysLeft" disabled />
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Image URLs (read-only)</label>
+                    <div id="editHighlightUrls" style="font-size:11px;color:#666;background:#f8faff;padding:10px 12px;border-radius:10px;border:1px solid #eef2f7;max-height:100px;overflow-y:auto;overflow-wrap:anywhere;line-height:1.6;"></div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-primary" id="highlightSaveBtn" onclick="saveHighlightEdit()"><i class="fas fa-save"></i> Save Changes</button>
+                    <button type="button" class="btn-secondary" onclick="closeHighlightEditModal()">Cancel</button>
                 </div>
             </form>
         </div>
@@ -3006,10 +3629,13 @@
            ============================================================
            1. Chats tab — moderate all squad chat messages (direct + group).
            2. Chat feature toggle via settings/features.chatEnabled.
-           3. NEW: Group chat support — group messages now show a
+           3. Group chat support — group messages now show a
               👥 GROUP badge instead of "→ Unknown", and filter dropdown
               includes "Group only" / "Direct only" options.
            4. Direct messages continue to render exactly as before.
+           5. ★ NEW: Highlights tab — manage all highlights from the admin
+              panel: edit caption/author/expiry, delete single or batch,
+              filter by status/author, and delete all expired highlights.
            ============================================================ */
 
         const firebaseConfig = {
@@ -3044,6 +3670,7 @@
         const NOTES_LIMIT = 200;
         const COMMENTS_LIMIT = 500;
         const CHATS_LIMIT = 100;
+        const HIGHLIGHTS_ADMIN_LIMIT = 200;
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
 
         // ===== BATCH DELETE CONFIG =====
@@ -3100,6 +3727,12 @@
         let chatFeatureUnsubscribe = null;
         let chatFeatureBusy = false;
 
+        // ===== HIGHLIGHTS STATE =====
+        let allHighlights = [];
+        let unsubscribeAdminHighlights = null;
+        let editingHighlightId = null;
+        let highlightAuthorCache = {};
+
         let allAnnouncements = [];
         let unsubscribeAdminAnnouncements = null;
         let editingAnnouncementId = null;
@@ -3128,6 +3761,7 @@
             coffee: { active: false, selected: new Set() },
             places: { active: false, selected: new Set() },
             activities: { active: false, selected: new Set() },
+            highlights: { active: false, selected: new Set() },
             announcements: { active: false, selected: new Set() },
             users: { active: false, selected: new Set() },
             notes: { active: false, selected: new Set() },
@@ -3139,6 +3773,7 @@
             coffee: [],
             places: [],
             activities: [],
+            highlights: [],
             announcements: [],
             users: [],
             notes: [],
@@ -3334,6 +3969,8 @@
                 filterComments();
             } else if (tab === 'chats') {
                 filterChats();
+            } else if (tab === 'highlights') {
+                filterHighlights();
             } else {
                 renderItemsFromCache(tab);
             }
@@ -3367,6 +4004,8 @@
                 filterComments();
             } else if (tab === 'chats') {
                 filterChats();
+            } else if (tab === 'highlights') {
+                filterHighlights();
             } else {
                 renderItemsFromCache(tab);
             }
@@ -3409,7 +4048,7 @@
                 grid.querySelectorAll('.select-checkbox').forEach(cb => {
                     cb.checked = state.selected.size === items.length;
                 });
-                grid.querySelectorAll('.item-card, .announcement-card, .user-card, .note-card, .comment-card, .chat-card').forEach(card => {
+                grid.querySelectorAll('.item-card, .announcement-card, .user-card, .note-card, .comment-card, .chat-card, .highlight-card').forEach(card => {
                     const id = card.dataset.id;
                     if (id) card.classList.toggle('selected', state.selected.has(id));
                 });
@@ -3447,6 +4086,7 @@
             else if (tab === 'notes') collectionName = 'notes';
             else if (tab === 'comments') collectionName = 'noteComments';
             else if (tab === 'chats') collectionName = 'chatMessages';
+            else if (tab === 'highlights') collectionName = 'highlights';
             else collectionName = COLLECTIONS[tab];
 
             if (!collectionName) {
@@ -3510,6 +4150,8 @@
                     html += renderCommentCard(item);
                 } else if (tab === 'chats') {
                     html += renderChatCard(item);
+                } else if (tab === 'highlights') {
+                    html += renderHighlightCard(item);
                 }
             });
             grid.innerHTML = html;
@@ -3744,6 +4386,518 @@
             } finally {
                 chatFeatureBusy = false;
                 if (toggle) toggle.disabled = false;
+            }
+        }
+
+        // ================================================================
+        // ===== ★ HIGHLIGHTS MANAGEMENT (ADMIN) =====
+        // ================================================================
+        function loadHighlightsAdmin(showToast = false) {
+            const grid = document.getElementById('highlightsGrid');
+            const countEl = document.getElementById('highlightsCount');
+            if (!grid) return;
+
+            if (unsubscribeAdminHighlights) unsubscribeAdminHighlights();
+
+            unsubscribeAdminHighlights = db.collection('highlights')
+                .orderBy('createdAt', 'desc')
+                .limit(HIGHLIGHTS_ADMIN_LIMIT)
+                .onSnapshot((snapshot) => {
+                    allHighlights = [];
+                    snapshot.forEach(doc => {
+                        allHighlights.push({ id: doc.id, ...doc.data() });
+                    });
+
+                    dataCache.highlights = allHighlights.slice();
+
+                    if (countEl) countEl.textContent = `${allHighlights.length} highlight${allHighlights.length !== 1 ? 's' : ''}`;
+
+                    loadHighlightAuthorInfo();
+                    populateHighlightsAuthorFilter();
+                    filterHighlights();
+
+                    if (showToast) console.log('Highlights refreshed:', allHighlights.length);
+                }, (error) => {
+                    console.error('Error loading highlights:', error);
+                    if (grid) {
+                        grid.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Could not load highlights</h3>
+                                <p>${escapeHtml(error.message)}</p>
+                            </div>
+                        `;
+                    }
+                });
+        }
+
+        async function loadHighlightAuthorInfo() {
+            const uids = [...new Set(allHighlights.map(h => h.authorUid).filter(Boolean))];
+            const missing = uids.filter(uid => !highlightAuthorCache[uid]);
+
+            for (const uid of missing) {
+                try {
+                    const doc = await db.collection('users').doc(uid).get();
+                    if (doc.exists) {
+                        const data = doc.data();
+                        highlightAuthorCache[uid] = {
+                            displayName: data.displayName || data.email || 'Unknown',
+                            photoURL: data.photoURL || ''
+                        };
+                    } else {
+                        highlightAuthorCache[uid] = { displayName: 'Unknown User', photoURL: '' };
+                    }
+                } catch (e) {
+                    highlightAuthorCache[uid] = { displayName: 'Unknown User', photoURL: '' };
+                }
+            }
+        }
+
+        function populateHighlightsAuthorFilter() {
+            const select = document.getElementById('highlightsAuthorFilter');
+            if (!select) return;
+
+            const currentValue = select.value;
+
+            const authorUids = [...new Set(allHighlights.map(h => h.authorUid).filter(Boolean))];
+
+            let html = '<option value="">All Authors</option>';
+            authorUids.forEach(uid => {
+                const user = highlightAuthorCache[uid];
+                const name = user?.displayName || uid.slice(0, 8);
+                html += `<option value="${escapeAttr(uid)}">👤 ${escapeHtml(name)}</option>`;
+            });
+
+            select.innerHTML = html;
+
+            if (currentValue && authorUids.includes(currentValue)) {
+                select.value = currentValue;
+            }
+        }
+
+        function filterHighlights() {
+            const grid = document.getElementById('highlightsGrid');
+            if (!grid) return;
+
+            const term = (document.getElementById('highlightsSearchInput')?.value || '').trim().toLowerCase();
+            const statusFilter = document.getElementById('highlightsStatusFilter')?.value || '';
+            const authorFilter = document.getElementById('highlightsAuthorFilter')?.value || '';
+
+            const now = new Date();
+
+            let filtered = allHighlights;
+
+            if (authorFilter) {
+                filtered = filtered.filter(h => h.authorUid === authorFilter);
+            }
+
+            if (statusFilter === 'active') {
+                filtered = filtered.filter(h => {
+                    if (!h.expiresAt) return true;
+                    const exp = h.expiresAt.seconds ? new Date(h.expiresAt.seconds * 1000) : new Date(h.expiresAt);
+                    return exp > now;
+                });
+            } else if (statusFilter === 'expiring') {
+                filtered = filtered.filter(h => {
+                    if (!h.expiresAt) return false;
+                    const exp = h.expiresAt.seconds ? new Date(h.expiresAt.seconds * 1000) : new Date(h.expiresAt);
+                    const diffMs = exp - now;
+                    return diffMs > 0 && diffMs <= 24 * 60 * 60 * 1000;
+                });
+            } else if (statusFilter === 'expired') {
+                filtered = filtered.filter(h => {
+                    if (!h.expiresAt) return false;
+                    const exp = h.expiresAt.seconds ? new Date(h.expiresAt.seconds * 1000) : new Date(h.expiresAt);
+                    return exp <= now;
+                });
+            } else if (statusFilter === 'multi') {
+                filtered = filtered.filter(h => Array.isArray(h.imageURLs) && h.imageURLs.length > 1);
+            } else if (statusFilter === 'single') {
+                filtered = filtered.filter(h => Array.isArray(h.imageURLs) && h.imageURLs.length === 1);
+            }
+
+            if (term) {
+                filtered = filtered.filter(h => {
+                    const author = highlightAuthorCache[h.authorUid] || {};
+                    const haystack = [
+                        h.caption || '',
+                        h.authorName || '',
+                        author.displayName || '',
+                        h.id || '',
+                        (h.imageURLs || []).join(' ')
+                    ].join(' ').toLowerCase();
+                    return haystack.includes(term);
+                });
+            }
+
+            if (filtered.length === 0) {
+                const hasFilters = term || statusFilter || authorFilter;
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-images"></i>
+                        <h3>${hasFilters ? 'No highlights match your filters' : 'No highlights yet'}</h3>
+                        <p>${hasFilters ? 'Try adjusting the filters or search term.' : 'Highlights will appear here once users share moments.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            filtered.forEach(h => {
+                html += renderHighlightCard(h);
+            });
+            grid.innerHTML = html;
+
+            grid.classList.toggle('batch-mode', batchState.highlights.active);
+        }
+
+        function renderHighlightCard(h) {
+            const author = highlightAuthorCache[h.authorUid] || {
+                displayName: h.authorName || 'Unknown',
+                photoURL: ''
+            };
+
+            const now = new Date();
+            const expiresAt = h.expiresAt
+                ? new Date(h.expiresAt.seconds ? h.expiresAt.seconds * 1000 : h.expiresAt)
+                : null;
+            const createdAt = h.createdAt
+                ? new Date(h.createdAt.seconds ? h.createdAt.seconds * 1000 : h.createdAt)
+                : null;
+
+            const isExpired = expiresAt ? expiresAt < now : false;
+            const daysLeft = expiresAt ? Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24)) : 0;
+            const hoursLeft = expiresAt ? Math.ceil((expiresAt - now) / (1000 * 60 * 60)) : 0;
+
+            const imageUrls = Array.isArray(h.imageURLs) ? h.imageURLs : [];
+            const firstImage = imageUrls[0] || '';
+            const thumb = firstImage ? cloudinaryThumb(firstImage, 400) : '';
+            const imageCount = imageUrls.length;
+
+            const initials = (author.displayName || '?').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+            const authorAvatar = author.photoURL
+                ? `<img src="${cloudinaryThumb(author.photoURL, 60)}" alt="${escapeAttr(author.displayName)}" loading="lazy" />`
+                : escapeHtml(initials);
+
+            let timeLabel = '';
+            if (isExpired) {
+                timeLabel = `<span class="highlight-card-expired-badge">Expired</span>`;
+            } else if (daysLeft > 1) {
+                timeLabel = `<span><i class="fas fa-clock"></i> ${daysLeft}d left</span>`;
+            } else if (hoursLeft > 1) {
+                timeLabel = `<span><i class="fas fa-clock"></i> ${hoursLeft}h left</span>`;
+            } else {
+                timeLabel = `<span><i class="fas fa-clock"></i> Expiring soon</span>`;
+            }
+
+            const isSelected = batchState.highlights.active && batchState.highlights.selected.has(h.id);
+
+            const imageHtml = thumb
+                ? `<img src="${thumb}" alt="Highlight" class="highlight-card-image" loading="lazy" />`
+                : `<div class="highlight-card-image-placeholder"><i class="fas fa-image"></i></div>`;
+
+            return `
+                <div class="highlight-card ${isExpired ? 'expired' : ''} ${isSelected ? 'selected' : ''}" data-id="${escapeAttr(h.id)}">
+                    <input type="checkbox" class="select-checkbox" ${isSelected ? 'checked' : ''} onclick="event.stopPropagation(); toggleItemSelection('highlights', '${escapeAttr(h.id)}', this.checked)" />
+                    ${imageHtml}
+                    <div class="highlight-card-actions">
+                        <button class="btn-edit" onclick="editHighlight('${escapeAttr(h.id)}')" title="Edit"><i class="fas fa-edit"></i></button>
+                        <button class="btn-danger" onclick="deleteHighlight('${escapeAttr(h.id)}')" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                    <div class="highlight-card-body">
+                        <div class="highlight-card-author">
+                            <span class="highlight-card-author-avatar">${authorAvatar}</span>
+                            ${escapeHtml(author.displayName)}
+                        </div>
+                        <div class="highlight-card-caption">${escapeHtml(h.caption || 'No caption')}</div>
+                        <div class="highlight-card-meta">
+                            ${createdAt ? `<span><i class="fas fa-calendar-plus"></i> ${formatRelativeTime(createdAt)}</span>` : ''}
+                            <span><i class="fas fa-images"></i> ${imageCount} photo${imageCount !== 1 ? 's' : ''}</span>
+                            ${timeLabel}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editHighlight(id) {
+            const h = allHighlights.find(x => x.id === id);
+            if (!h) {
+                alert('Highlight not found.');
+                return;
+            }
+
+            editingHighlightId = id;
+
+            const imageUrls = Array.isArray(h.imageURLs) ? h.imageURLs : [];
+            const firstImage = imageUrls[0] || '';
+
+            const imgEl = document.getElementById('editHighlightImage');
+            if (firstImage) {
+                imgEl.src = firstImage;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.src = '';
+                imgEl.style.display = 'none';
+            }
+
+            const multiCount = document.getElementById('editHighlightMultiCount');
+            if (imageUrls.length > 1) {
+                multiCount.textContent = `+ ${imageUrls.length - 1} more photo${imageUrls.length - 1 !== 1 ? 's' : ''}`;
+                multiCount.style.display = 'block';
+            } else {
+                multiCount.style.display = 'none';
+            }
+
+            document.getElementById('editHighlightId').value = id;
+            document.getElementById('editHighlightCaption').value = h.caption || '';
+            document.getElementById('editHighlightCharCount').textContent = (h.caption || '').length;
+            document.getElementById('editHighlightAuthor').value = h.authorName || '';
+
+            const expiryInput = document.getElementById('editHighlightExpiry');
+            if (h.expiresAt) {
+                const exp = h.expiresAt.seconds
+                    ? new Date(h.expiresAt.seconds * 1000)
+                    : new Date(h.expiresAt);
+                const yyyy = exp.getFullYear();
+                const mm = String(exp.getMonth() + 1).padStart(2, '0');
+                const dd = String(exp.getDate()).padStart(2, '0');
+                expiryInput.value = `${yyyy}-${mm}-${dd}`;
+                updateEditHighlightDaysLeft();
+            } else {
+                expiryInput.value = '';
+                document.getElementById('editHighlightDaysLeft').value = 'No expiry';
+            }
+
+            const urlsEl = document.getElementById('editHighlightUrls');
+            if (imageUrls.length > 0) {
+                urlsEl.innerHTML = imageUrls.map((url, i) => `<div>${i + 1}. ${escapeHtml(url)}</div>`).join('');
+            } else {
+                urlsEl.innerHTML = '<em>No images</em>';
+            }
+
+            document.getElementById('highlightEditModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function updateEditHighlightDaysLeft() {
+            const expiryInput = document.getElementById('editHighlightExpiry');
+            const daysLeftInput = document.getElementById('editHighlightDaysLeft');
+            if (!expiryInput.value) {
+                daysLeftInput.value = 'No expiry';
+                return;
+            }
+            const exp = new Date(expiryInput.value + 'T23:59:59');
+            const now = new Date();
+            const diffDays = Math.ceil((exp - now) / (1000 * 60 * 60 * 24));
+            if (diffDays < 0) {
+                daysLeftInput.value = `Expired (${Math.abs(diffDays)}d ago)`;
+            } else if (diffDays === 0) {
+                daysLeftInput.value = 'Expires today';
+            } else {
+                daysLeftInput.value = `${diffDays} day${diffDays !== 1 ? 's' : ''} left`;
+            }
+        }
+
+        function closeHighlightEditModal() {
+            document.getElementById('highlightEditModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            editingHighlightId = null;
+        }
+
+        async function saveHighlightEdit() {
+            if (!editingHighlightId) return;
+
+            const btn = document.getElementById('highlightSaveBtn');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Saving...';
+
+            try {
+                const caption = document.getElementById('editHighlightCaption').value.trim();
+                const authorName = document.getElementById('editHighlightAuthor').value.trim();
+                const expiryValue = document.getElementById('editHighlightExpiry').value;
+
+                let expiresAt = null;
+                if (expiryValue) {
+                    expiresAt = new Date(expiryValue + 'T23:59:59');
+                }
+
+                const updateData = {
+                    caption: caption,
+                    authorName: authorName,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (expiresAt) {
+                    updateData.expiresAt = firebase.firestore.Timestamp.fromDate(expiresAt);
+                }
+
+                await db.collection('highlights').doc(editingHighlightId).update(updateData);
+
+                alert('✅ Highlight updated successfully!');
+                closeHighlightEditModal();
+            } catch (err) {
+                console.error('Error saving highlight:', err);
+                alert('❌ Error saving highlight: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        async function deleteHighlight(id) {
+            const h = allHighlights.find(x => x.id === id);
+            const preview = h?.caption ? `"${h.caption.slice(0, 50)}${h.caption.length > 50 ? '...' : ''}"` : '';
+            const author = highlightAuthorCache[h?.authorUid]?.displayName || h?.authorName || 'this user';
+
+            if (!confirm(`Delete highlight ${preview} by ${author}?\n\nThis will also remove any comments on it. Cannot be undone.`)) return;
+
+            try {
+                // Delete any comments on this highlight
+                const commentsSnap = await db.collection('highlightComments')
+                    .where('highlightId', '==', id)
+                    .get();
+
+                if (!commentsSnap.empty) {
+                    const commentRefs = [];
+                    commentsSnap.forEach(doc => commentRefs.push({ collection: 'highlightComments', id: doc.id }));
+                    await chunkedBatchDelete(commentRefs);
+                }
+
+                await db.collection('highlights').doc(id).delete();
+                alert('✅ Highlight deleted.');
+            } catch (err) {
+                console.error('Error deleting highlight:', err);
+                alert('❌ Error deleting highlight: ' + err.message);
+            }
+        }
+
+        async function deleteAllExpiredHighlights() {
+            const now = new Date();
+
+            const expiredCount = allHighlights.filter(h => {
+                if (!h.expiresAt) return false;
+                const exp = h.expiresAt.seconds
+                    ? new Date(h.expiresAt.seconds * 1000)
+                    : new Date(h.expiresAt);
+                return exp < now;
+            }).length;
+
+            if (expiredCount === 0) {
+                alert('✨ No expired highlights to clean up.');
+                return;
+            }
+
+            if (!confirm(`Delete ${expiredCount} expired highlight${expiredCount !== 1 ? 's' : ''}?\n\nThis will also delete their comments. Cannot be undone.`)) {
+                return;
+            }
+
+            const btn = document.querySelector('#tab-highlights .btn-danger');
+            const originalHtml = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Deleting...';
+
+            try {
+                const result = await cleanupOldHighlights(true);
+
+                if (result.deleted === 0) {
+                    alert('✨ Nothing to delete (already cleaned up).');
+                } else {
+                    alert(`✅ Deleted ${result.deleted} expired highlight${result.deleted !== 1 ? 's' : ''}.`);
+                }
+            } catch (err) {
+                console.error('Manual highlight cleanup error:', err);
+                alert('❌ Error cleaning up: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalHtml;
+            }
+        }
+
+        // ================================================================
+        // ===== HIGHLIGHTS AUTO-CLEANUP =====
+        // ================================================================
+        async function cleanupOldHighlights(onlyExpired = false) {
+            try {
+                let snapshot;
+
+                if (onlyExpired) {
+                    // Only delete highlights past their expiresAt
+                    const now = new Date();
+                    snapshot = await db.collection('highlights')
+                        .where('expiresAt', '<=', now)
+                        .limit(HIGHLIGHT_CLEANUP_BATCH_LIMIT)
+                        .get();
+                } else {
+                    // Auto-cleanup: delete highlights older than HIGHLIGHT_MAX_AGE_DAYS
+                    const cutoff = new Date(Date.now() - HIGHLIGHT_MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
+                    snapshot = await db.collection('highlights')
+                        .where('createdAt', '<=', cutoff)
+                        .limit(HIGHLIGHT_CLEANUP_BATCH_LIMIT)
+                        .get();
+                }
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                // Also delete associated comments for each highlight
+                const highlightIds = [];
+                snapshot.forEach(doc => highlightIds.push(doc.id));
+
+                for (const hid of highlightIds) {
+                    try {
+                        const commentsSnap = await db.collection('highlightComments')
+                            .where('highlightId', '==', hid)
+                            .get();
+                        if (!commentsSnap.empty) {
+                            const commentRefs = [];
+                            commentsSnap.forEach(doc => commentRefs.push({ collection: 'highlightComments', id: doc.id }));
+                            await chunkedBatchDelete(commentRefs);
+                        }
+                    } catch (e) {
+                        console.warn('Could not delete comments for highlight', hid, e.message);
+                    }
+                }
+
+                const refs = [];
+                snapshot.forEach(doc => refs.push({ collection: 'highlights', id: doc.id }));
+
+                const result = await chunkedBatchDelete(refs);
+
+                console.log(`🧹 Highlight cleanup: deleted ${result.deleted} highlight(s).`);
+
+                if (snapshot.size === HIGHLIGHT_CLEANUP_BATCH_LIMIT) {
+                    setTimeout(() => cleanupOldHighlights(onlyExpired), 2000);
+                }
+
+                return { deleted: result.deleted, errors: result.errors };
+            } catch (err) {
+                console.warn('Highlight auto-cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        function startHighlightAutoCleanup() {
+            if (highlightCleanupTimer) clearInterval(highlightCleanupTimer);
+
+            setTimeout(() => {
+                cleanupOldHighlights(false);
+            }, HIGHLIGHT_CLEANUP_INITIAL_DELAY_MS);
+
+            highlightCleanupTimer = setInterval(() => {
+                cleanupOldHighlights(false);
+            }, HIGHLIGHT_CLEANUP_INTERVAL_MS);
+
+            console.log('🧹 Highlight auto-cleanup started (every 15 min).');
+        }
+
+        function stopHighlightAutoCleanup() {
+            if (highlightCleanupTimer) {
+                clearInterval(highlightCleanupTimer);
+                highlightCleanupTimer = null;
             }
         }
 
@@ -4230,61 +5384,6 @@
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
-            }
-        }
-
-        // ================================================================
-        // ===== HIGHLIGHT AUTO-CLEANUP =====
-        // ================================================================
-        async function cleanupOldHighlights() {
-            try {
-                const cutoff = new Date(Date.now() - HIGHLIGHT_MAX_AGE_DAYS * 24 * 60 * 60 * 1000);
-
-                const snapshot = await db.collection('highlights')
-                    .where('createdAt', '<=', cutoff)
-                    .limit(HIGHLIGHT_CLEANUP_BATCH_LIMIT)
-                    .get();
-
-                if (snapshot.empty) {
-                    return { deleted: 0 };
-                }
-
-                const refs = [];
-                snapshot.forEach(doc => refs.push({ collection: 'highlights', id: doc.id }));
-
-                const result = await chunkedBatchDelete(refs);
-
-                console.log(`🧹 Highlight cleanup: deleted ${result.deleted} old highlight(s).`);
-
-                if (snapshot.size === HIGHLIGHT_CLEANUP_BATCH_LIMIT) {
-                    setTimeout(cleanupOldHighlights, 2000);
-                }
-
-                return { deleted: result.deleted, errors: result.errors };
-            } catch (err) {
-                console.warn('Highlight auto-cleanup error:', err);
-                return { deleted: 0, error: err };
-            }
-        }
-
-        function startHighlightAutoCleanup() {
-            if (highlightCleanupTimer) clearInterval(highlightCleanupTimer);
-
-            setTimeout(() => {
-                cleanupOldHighlights();
-            }, HIGHLIGHT_CLEANUP_INITIAL_DELAY_MS);
-
-            highlightCleanupTimer = setInterval(() => {
-                cleanupOldHighlights();
-            }, HIGHLIGHT_CLEANUP_INTERVAL_MS);
-
-            console.log('🧹 Highlight auto-cleanup started (every 15 min).');
-        }
-
-        function stopHighlightAutoCleanup() {
-            if (highlightCleanupTimer) {
-                clearInterval(highlightCleanupTimer);
-                highlightCleanupTimer = null;
             }
         }
 
@@ -5989,6 +7088,7 @@
                 loadNotesAdmin();
                 loadCommentsAdmin();
                 loadChatsAdmin();
+                loadHighlightsAdmin();
                 loadChatFeatureFlag();
 
                 loadAnnouncements(user);
@@ -6520,6 +7620,7 @@
             loadNotesAdmin(true);
             loadCommentsAdmin(true);
             loadChatsAdmin(true);
+            loadHighlightsAdmin(true);
             alert('🔄 All content refreshed!');
         }
 
@@ -6584,7 +7685,7 @@
         }
 
         function anyModalOpen() {
-            return ['itemModal', 'previewModal', 'userEditModal', 'announcementModal', 'noteEditModal', 'commentEditModal', 'announcementViewModal']
+            return ['itemModal', 'previewModal', 'userEditModal', 'announcementModal', 'noteEditModal', 'commentEditModal', 'announcementViewModal', 'highlightEditModal']
                 .some(id => {
                     const el = document.getElementById(id);
                     return el && el.classList.contains('active');
@@ -6600,6 +7701,7 @@
             const commentEditModal = document.getElementById('commentEditModal');
             const announcementPopup = document.getElementById('announcementPopup');
             const announcementViewModal = document.getElementById('announcementViewModal');
+            const highlightEditModal = document.getElementById('highlightEditModal');
 
             if (event.target === itemModal) closeModal();
             if (event.target === previewModal) closePreview();
@@ -6608,6 +7710,7 @@
             if (event.target === noteEditModal) closeNoteEditModal();
             if (event.target === commentEditModal) closeCommentEditModal();
             if (event.target === announcementViewModal) closeAnnouncementView();
+            if (event.target === highlightEditModal) closeHighlightEditModal();
 
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
@@ -6629,6 +7732,7 @@
                 else if (document.getElementById('noteEditModal').classList.contains('active')) closeNoteEditModal();
                 else if (document.getElementById('commentEditModal').classList.contains('active')) closeCommentEditModal();
                 else if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
+                else if (document.getElementById('highlightEditModal').classList.contains('active')) closeHighlightEditModal();
                 else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
             }
         });
@@ -6660,6 +7764,12 @@
         document.getElementById('editCommentText')?.addEventListener('input', function() {
             document.getElementById('editCommentCharCount').textContent = this.value.length;
         });
+
+        document.getElementById('editHighlightCaption')?.addEventListener('input', function() {
+            document.getElementById('editHighlightCharCount').textContent = this.value.length;
+        });
+
+        document.getElementById('editHighlightExpiry')?.addEventListener('change', updateEditHighlightDaysLeft);
     </script>
 
     <script src="idle-logout.js"></script>
