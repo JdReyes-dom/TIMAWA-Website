@@ -987,7 +987,7 @@
         }
 
         /* ================================================================
-           ===== SOCIAL SECTION =====
+           ===== SOCIAL SECTION (optimized tabs) =====
            ================================================================ */
         .social-section {
             background: white;
@@ -1007,30 +1007,50 @@
             margin-bottom: 20px;
         }
 
+        /* --- NEW TAB DESIGN: pill toggle group --- */
         .social-section .section-header .tab-pills {
             display: flex;
-            gap: 8px;
+            gap: 4px;
             background: #f0f7ff;
-            padding: 6px;
-            border-radius: 50px;
-            flex-wrap: wrap;
+            padding: 5px;
+            border-radius: 60px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            max-width: 100%;
+            width: fit-content;
+        }
+
+        .social-section .section-header .tab-pills::-webkit-scrollbar {
+            display: none;
         }
 
         .social-section .section-header .tab-pill {
-            padding: 9px 20px;
+            padding: 10px 18px;
             border-radius: 50px;
             border: none;
             background: transparent;
             color: #555;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 13px;
             cursor: pointer;
             transition: all 0.25s ease;
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
             font-family: inherit;
             white-space: nowrap;
+            flex-shrink: 0;
+            line-height: 1.2;
+            min-height: 42px;
+        }
+
+        .social-section .section-header .tab-pill i {
+            font-size: 14px;
+            width: 18px;
+            text-align: center;
         }
 
         .social-section .section-header .tab-pill:hover {
@@ -1065,6 +1085,7 @@
         .social-section .section-header .count {
             font-size: 14px;
             color: #888;
+            font-weight: 500;
         }
 
         .social-section .panel-view {
@@ -4338,7 +4359,7 @@
         .tita-status-msg.info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
 
         /* ================================================================
-           ===== RESPONSIVE =====
+           ===== RESPONSIVE — optimized for mobile =====
            ================================================================ */
         @media (max-width: 1024px) {
             .highlights-carousel-wrapper { padding: 0 40px; }
@@ -4432,7 +4453,12 @@
             .highlights-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
             .highlights-carousel-item .image-container .hl-actions { opacity: 1; }
 
-            .social-section { padding: 14px 12px; border-radius: 16px; margin-bottom: 20px; }
+            /* ===== SOCIAL SECTION — cleaner mobile layout ===== */
+            .social-section { 
+                padding: 16px 14px; 
+                border-radius: 16px; 
+                margin-bottom: 20px; 
+            }
 
             .social-section .section-header {
                 flex-direction: column;
@@ -4441,23 +4467,44 @@
                 margin-bottom: 14px;
             }
 
+            /* New tab design: full-width segmented control */
             .social-section .section-header .tab-pills {
                 width: 100%;
-                justify-content: center;
-                padding: 5px;
+                justify-content: space-between;
+                padding: 4px;
+                gap: 2px;
+                border-radius: 50px;
+                background: #f0f7ff;
+                overflow-x: visible;
+                flex-wrap: nowrap;
             }
 
             .social-section .section-header .tab-pill {
-                flex: 1;
-                justify-content: center;
-                font-size: 12px;
-                padding: 8px 10px;
+                flex: 1 1 0;
                 min-width: 0;
+                padding: 8px 8px;
+                font-size: 12px;
+                gap: 5px;
+                border-radius: 50px;
+                min-height: 38px;
+                white-space: nowrap;
+                justify-content: center;
+            }
+
+            .social-section .section-header .tab-pill i {
+                font-size: 13px;
+                width: 16px;
+            }
+
+            /* Hide text on very small screens, keep icon + badge */
+            .social-section .section-header .tab-pill .tab-text {
+                display: inline;
             }
 
             .social-section .section-header .count {
                 text-align: center;
                 font-size: 13px;
+                margin-top: -4px;
             }
 
             .members-grid { grid-template-columns: 1fr; }
@@ -4774,6 +4821,42 @@
                 max-height: calc(100vh - 100px);
                 max-height: calc(100dvh - 100px);
             }
+
+            /* Even more compact tabs for very small screens */
+            .social-section .section-header .tab-pill {
+                padding: 7px 6px;
+                font-size: 11px;
+                gap: 3px;
+                min-height: 34px;
+            }
+            .social-section .section-header .tab-pill i {
+                font-size: 12px;
+                width: 14px;
+            }
+            .social-section .section-header .tab-pill .tab-text {
+                font-size: 11px;
+            }
+        }
+
+        /* Extra small devices: hide tab text, show only icons + badges */
+        @media (max-width: 380px) {
+            .social-section .section-header .tab-pill .tab-text {
+                display: none;
+            }
+            .social-section .section-header .tab-pill {
+                padding: 8px 6px;
+                min-height: 36px;
+            }
+            .social-section .section-header .tab-pill i {
+                font-size: 15px;
+                width: auto;
+            }
+            .social-section .section-header .tab-pill .tab-pill-badge {
+                min-width: 16px;
+                height: 16px;
+                font-size: 9px;
+                padding: 0 5px;
+            }
         }
 
         ::-webkit-scrollbar {
@@ -4918,15 +5001,18 @@
             <div class="section-header">
                 <div class="tab-pills" role="tablist">
                     <button class="tab-pill active" data-tab="members" role="tab" onclick="switchSocialTab('members')">
-                        <i class="fas fa-users"></i> Squad Members
+                        <i class="fas fa-users"></i>
+                        <span class="tab-text">Squad Members</span>
                         <span class="tab-pill-badge" id="membersTabCountBadge" style="display:none;">0</span>
                     </button>
                     <button class="tab-pill" data-tab="chats" role="tab" onclick="switchSocialTab('chats')">
-                        <i class="fas fa-comments"></i> Chats
+                        <i class="fas fa-comments"></i>
+                        <span class="tab-text">Chats</span>
                         <span class="tab-pill-badge" id="chatsTabUnreadBadge" style="display:none;">0</span>
                     </button>
                     <button class="tab-pill" data-tab="activity" role="tab" onclick="switchSocialTab('activity')">
-                        <i class="fas fa-clock-rotate-left"></i> Activity Tracker
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <span class="tab-text">Activity</span>
                     </button>
                 </div>
                 <span class="count" id="memberCountLabel">(0)</span>
