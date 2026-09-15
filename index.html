@@ -28,6 +28,14 @@
         }
 
         /* ================================================================
+           ===== MODAL-OPEN STATE: HIDE TITA LAUNCHER =====
+           ================================================================ */
+        body.modal-open .tita-launcher,
+        body.modal-open .tita-panel {
+            display: none !important;
+        }
+
+        /* ================================================================
            ===== NAVBAR =====
            ================================================================ */
         .navbar {
@@ -1064,6 +1072,15 @@
         .highlight-detail-modal .hl-stats .stat.urgent { color: #ef4444; }
         .highlight-detail-modal .hl-stats .stat.urgent i { color: #ef4444; }
 
+        /* ★ NEW: reorder — comments section now sits ABOVE the modal-actions */
+        .highlight-detail-modal .hl-comments-wrap {
+            margin-bottom: 22px;
+        }
+        .highlight-detail-modal .hl-actions-row {
+            padding-top: 20px;
+            border-top: 1px solid #f0f4ff;
+        }
+
         .gallery-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 1000px; width: 95%; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .gallery-modal .gallery-header { padding: 22px 28px; background: white; border-bottom: 1px solid #f0f4ff; display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; flex-shrink: 0; }
         .gallery-modal .gallery-header-left { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
@@ -1089,7 +1106,7 @@
         .gallery-modal .gallery-item .image-index { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.65); color: white; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; }
 
         /* ================================================================
-           ===== HIGHLIGHT COMMENTS =====
+           ===== HIGHLIGHT COMMENTS (with mention chips) =====
            ================================================================ */
         .highlight-comments-section {
             border-top: 1px solid #f0f4ff;
@@ -1305,6 +1322,25 @@
         .highlight-comment-input-wrap .char-count.warn { color: #f59e0b; }
         .highlight-comment-input-wrap .char-count.danger { color: #dc2626; }
 
+        /* ===== ★ MENTION DROPDOWN FOR HIGHLIGHT COMMENTS ===== */
+        .highlight-mention-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 60px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 12px 40px rgba(16, 137, 211, 0.22), 0 0 0 1px rgba(16, 137, 211, 0.1);
+            border: 1px solid #eef2f7;
+            max-height: 220px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            animation: mentionSlideIn 0.18s ease-out;
+        }
+        .highlight-mention-dropdown.show { display: block; }
+
         /* ================================================================
            ===== TITA TIMA =====
            ================================================================ */
@@ -1450,7 +1486,7 @@
             .highlight-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
             .highlight-comment .comment-text { font-size: 12px; }
 
-            .mention-dropdown { right: 56px; max-height: 180px; }
+            .mention-dropdown, .highlight-mention-dropdown { right: 56px; max-height: 180px; }
 
             .tita-launcher { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); right: 18px; width: 58px; height: 58px; font-size: 22px; z-index: 2500; }
             .tita-panel { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); right: 14px; left: 14px; width: auto; max-width: none; max-height: calc(100vh - 130px); z-index: 2499; }
@@ -1498,7 +1534,7 @@
             .note-comment .comment-avatar { width: 28px; height: 28px; font-size: 11px; }
             .note-comment .comment-text { font-size: 12px; }
 
-            .mention-dropdown { right: 52px; max-height: 160px; }
+            .mention-dropdown, .highlight-mention-dropdown { right: 52px; max-height: 160px; }
             .mention-option { padding: 7px 12px; }
             .mention-option .mention-avatar { width: 26px; height: 26px; font-size: 10px; }
             .mention-option .mention-name { font-size: 12px; }
@@ -1783,17 +1819,24 @@
                     <div class="stat" id="hlDetailPhotoCount"><i class="fas fa-images"></i> <span>1 photo</span></div>
                     <div class="stat" id="hlDetailExpiry"><i class="fas fa-clock"></i> <span>X days left</span></div>
                 </div>
-                <div class="modal-actions" id="hlDetailActions">
-                    <button class="modal-download" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="modal-download" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
-                        <i class="fas fa-expand"></i> View All Photos
-                    </button>
-                    <button class="modal-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
+
+                <!-- ===== HIGHLIGHT COMMENTS SECTION (MOVED ABOVE ACTIONS) ===== -->
+                <div class="hl-comments-wrap">
+                    <div class="highlight-comments-section" id="highlightCommentsSection"></div>
                 </div>
-                <!-- ===== HIGHLIGHT COMMENTS SECTION ===== -->
-                <div class="highlight-comments-section" id="highlightCommentsSection"></div>
+
+                <!-- ===== ACTION BUTTONS (MOVED BELOW COMMENTS) ===== -->
+                <div class="hl-actions-row">
+                    <div class="modal-actions" id="hlDetailActions">
+                        <button class="modal-download" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="modal-download" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
+                            <i class="fas fa-expand"></i> View All Photos
+                        </button>
+                        <button class="modal-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2006,13 +2049,19 @@
         let currentHighlightReplyTo = null;
 
         // ================================================================
-        // ===== ★ MENTION STATE =====
+        // ===== ★ MENTION STATE (shared for notes + highlights) =====
         // ================================================================
         let pendingMentions = new Map();
         let mentionDropdownIndex = -1;
         let mentionCandidates = [];
         let mentionDropdownOpen = false;
         let mentionAnchorStart = -1;
+
+        // ★ Highlight mention state (separate for its input)
+        let highlightPendingMentions = new Map();
+        let highlightMentionCandidates = [];
+        let highlightMentionDropdownOpen = false;
+        let highlightMentionDropdownIndex = -1;
 
         // ================================================================
         // ===== COMMENT AUTO-CLEANUP TIMER =====
@@ -2167,6 +2216,18 @@
             } catch (e) {
                 console.warn('getCurrentUserProfileCached failed:', e);
                 return {};
+            }
+        }
+
+        // ================================================================
+        // ===== ★ MODAL-OPEN STATE MANAGER =====
+        // ================================================================
+        function syncModalOpenState() {
+            const anyOpen = anyModalOpen();
+            if (anyOpen) {
+                document.body.classList.add('modal-open');
+            } else {
+                document.body.classList.remove('modal-open');
             }
         }
 
@@ -2393,6 +2454,7 @@
 
             document.getElementById('noteModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeNoteModal() {
@@ -2408,6 +2470,7 @@
             document.getElementById('noteModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentNoteUid = null;
+            syncModalOpenState();
         }
 
         function renderNoteCommentsSection(uid) {
@@ -2500,7 +2563,7 @@
         }
 
         // ================================================================
-        // ===== ★ MENTION AUTOCOMPLETE =====
+        // ===== ★ MENTION AUTOCOMPLETE (NOTE COMMENTS) =====
         // ================================================================
         function handleCommentInput(e) {
             updateCommentCharCount();
@@ -2709,10 +2772,11 @@
         // ================================================================
         // ===== MENTION PARSING =====
         // ================================================================
-        function resolveMentions(text) {
+        function resolveMentions(text, mentionMap) {
             const found = new Set();
+            const map = mentionMap || pendingMentions;
 
-            pendingMentions.forEach((info) => {
+            map.forEach((info) => {
                 if (text.toLowerCase().includes(`@${info.name.toLowerCase()}`)) {
                     found.add(info.uid);
                 }
@@ -3204,7 +3268,7 @@
         }
 
         // ================================================================
-        // ===== HIGHLIGHT COMMENTS (★ NEW FEATURE) =====
+        // ===== HIGHLIGHT COMMENTS =====
         // ================================================================
         function attachHighlightCommentsListener(highlightId) {
             detachHighlightCommentsListener();
@@ -3285,6 +3349,7 @@
                 <div class="highlight-comment-input-wrap">
                     <div class="my-avatar">${avatarContent}</div>
                     <div class="input-stack">
+                        <div class="highlight-mention-dropdown" id="highlightMentionDropdown"></div>
                         <div class="replying-to-banner" id="highlightReplyingToBanner">
                             <span>Replying to <strong id="highlightReplyingToName"></strong></span>
                             <button type="button" onclick="cancelHighlightReply()" title="Cancel reply">
@@ -3292,7 +3357,7 @@
                             </button>
                         </div>
                         <div class="input-row">
-                            <textarea id="highlightCommentInput" placeholder="Write a comment..." maxlength="${HIGHLIGHT_COMMENT_MAX_LEN}" rows="1"></textarea>
+                            <textarea id="highlightCommentInput" placeholder="Write a comment... (type @ to mention)" maxlength="${HIGHLIGHT_COMMENT_MAX_LEN}" rows="1"></textarea>
                             <button class="send-btn" id="highlightCommentSendBtn" onclick="postHighlightComment()" title="Send">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
@@ -3304,12 +3369,10 @@
 
             const input = document.getElementById('highlightCommentInput');
             if (input) {
-                input.addEventListener('input', updateHighlightCommentCharCount);
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        postHighlightComment();
-                    }
+                input.addEventListener('input', handleHighlightCommentInput);
+                input.addEventListener('keydown', handleHighlightCommentKeydown);
+                input.addEventListener('blur', () => {
+                    setTimeout(closeHighlightMentionDropdown, 180);
                 });
             }
 
@@ -3328,6 +3391,211 @@
             else if (len > HIGHLIGHT_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
         }
 
+        // ================================================================
+        // ===== ★ MENTION AUTOCOMPLETE (HIGHLIGHT COMMENTS) =====
+        // ================================================================
+        function handleHighlightCommentInput(e) {
+            updateHighlightCommentCharCount();
+            detectHighlightMentionQuery(e.target);
+        }
+
+        function handleHighlightCommentKeydown(e) {
+            if (highlightMentionDropdownOpen) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    highlightMentionDropdownIndex = (highlightMentionDropdownIndex + 1) % highlightMentionCandidates.length;
+                    renderHighlightMentionDropdown();
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlightMentionDropdownIndex = highlightMentionDropdownIndex <= 0
+                        ? highlightMentionCandidates.length - 1
+                        : highlightMentionDropdownIndex - 1;
+                    renderHighlightMentionDropdown();
+                    return;
+                }
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    if (highlightMentionCandidates[highlightMentionDropdownIndex]) {
+                        insertHighlightMention(highlightMentionCandidates[highlightMentionDropdownIndex]);
+                    }
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeHighlightMentionDropdown();
+                    return;
+                }
+            }
+
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                postHighlightComment();
+            }
+        }
+
+        function detectHighlightMentionQuery(input) {
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const beforeCursor = value.slice(0, cursorPos);
+
+            const match = beforeCursor.match(MENTION_REGEX);
+
+            if (!match) {
+                closeHighlightMentionDropdown();
+                return;
+            }
+
+            const query = match[1].toLowerCase().trim();
+
+            const myUid = titaCurrentUser?.uid;
+            const allMembers = Object.values(userProfileCache)
+                .filter(u => u.id !== myUid && (u.displayName || u.email));
+
+            if (allMembers.length === 0) {
+                closeHighlightMentionDropdown();
+                return;
+            }
+
+            let filtered;
+            if (!query) {
+                filtered = allMembers
+                    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
+                    .slice(0, MENTION_MAX_RESULTS);
+            } else {
+                filtered = allMembers
+                    .filter(u => {
+                        const name = (u.displayName || u.email || '').toLowerCase();
+                        return name.includes(query);
+                    })
+                    .sort((a, b) => {
+                        const aName = (a.displayName || '').toLowerCase();
+                        const bName = (b.displayName || '').toLowerCase();
+                        const aStarts = aName.startsWith(query) ? 0 : 1;
+                        const bStarts = bName.startsWith(query) ? 0 : 1;
+                        if (aStarts !== bStarts) return aStarts - bStarts;
+                        return aName.localeCompare(bName);
+                    })
+                    .slice(0, MENTION_MAX_RESULTS);
+            }
+
+            if (filtered.length === 0) {
+                highlightMentionCandidates = [];
+                highlightMentionDropdownOpen = true;
+                renderHighlightMentionDropdown();
+                return;
+            }
+
+            highlightMentionCandidates = filtered;
+            highlightMentionDropdownIndex = 0;
+            highlightMentionDropdownOpen = true;
+            renderHighlightMentionDropdown();
+        }
+
+        function renderHighlightMentionDropdown() {
+            const dropdown = document.getElementById('highlightMentionDropdown');
+            if (!dropdown) return;
+
+            if (!highlightMentionDropdownOpen) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            if (highlightMentionCandidates.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="mention-dropdown-empty">
+                        <i class="fas fa-user-slash"></i>
+                        No members found
+                    </div>
+                `;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '<div class="mention-dropdown-header"><i class="fas fa-at"></i> Mention a member</div>';
+            highlightMentionCandidates.forEach((user, idx) => {
+                const name = user.displayName || user.email || 'Anonymous';
+                const photoUrl = user.photoURL || '';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const isActive = idx === highlightMentionDropdownIndex;
+
+                const avatarContent = photoUrl
+                    ? `<img src="${cloudinaryAvatar(photoUrl, 80)}" alt="${escapeAttr(name)}" loading="lazy" />`
+                    : escapeHtml(initials);
+
+                html += `
+                    <button type="button"
+                            class="mention-option ${isActive ? 'active' : ''}"
+                            onmousedown="event.preventDefault(); selectHighlightMentionByIndex(${idx})">
+                        <div class="mention-avatar">${avatarContent}</div>
+                        <div class="mention-info">
+                            <div class="mention-name">${escapeHtml(name)}</div>
+                            <div class="mention-hint">Tap to mention</div>
+                        </div>
+                    </button>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+
+            const activeEl = dropdown.querySelector('.mention-option.active');
+            if (activeEl) {
+                activeEl.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function selectHighlightMentionByIndex(idx) {
+            const user = highlightMentionCandidates[idx];
+            if (user) insertHighlightMention(user);
+        }
+
+        function insertHighlightMention(user) {
+            const input = document.getElementById('highlightCommentInput');
+            if (!input) return;
+
+            const name = user.displayName || user.email || 'Anonymous';
+            const uid = user.id || user.uid;
+
+            if (!uid) return;
+
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const beforeCursor = value.slice(0, cursorPos);
+            const afterCursor = value.slice(cursorPos);
+
+            const match = beforeCursor.match(MENTION_REGEX);
+            if (!match) return;
+
+            const startIdx = cursorPos - match[0].length;
+            const before = value.slice(0, startIdx);
+            const mentionText = `@${name} `;
+            const newValue = before + mentionText + afterCursor;
+
+            input.value = newValue;
+
+            highlightPendingMentions.set(name.toLowerCase(), { uid, name });
+
+            const newCursorPos = startIdx + mentionText.length;
+            input.setSelectionRange(newCursorPos, newCursorPos);
+
+            closeHighlightMentionDropdown();
+            updateHighlightCommentCharCount();
+            input.focus();
+        }
+
+        function closeHighlightMentionDropdown() {
+            const dropdown = document.getElementById('highlightMentionDropdown');
+            if (dropdown) dropdown.classList.remove('show');
+            highlightMentionDropdownOpen = false;
+            highlightMentionCandidates = [];
+            highlightMentionDropdownIndex = -1;
+        }
+
+        // ================================================================
+        // ===== HIGHLIGHT COMMENTS: RENDER =====
+        // ================================================================
         function renderHighlightComments(highlightId, comments) {
             const list = document.getElementById('highlightCommentsList');
             if (!list) return;
@@ -3420,7 +3688,7 @@
             }
             const input = document.getElementById('highlightCommentInput');
             if (input) {
-                input.placeholder = `Reply to ${authorName}...`;
+                input.placeholder = `Reply to ${authorName}... (type @ to mention)`;
                 input.focus();
             }
         }
@@ -3430,7 +3698,7 @@
             const banner = document.getElementById('highlightReplyingToBanner');
             if (banner) banner.classList.remove('show');
             const input = document.getElementById('highlightCommentInput');
-            if (input) input.placeholder = 'Write a comment...';
+            if (input) input.placeholder = 'Write a comment... (type @ to mention)';
         }
 
         async function postHighlightComment() {
@@ -3456,7 +3724,6 @@
                 const authorName = me.displayName || titaCurrentUser.displayName || titaCurrentUser.email || 'Anonymous';
                 const authorPhoto = me.photoURL || '';
 
-                // Align with highlight expiry (3 days from creation)
                 const highlightItem = highlightsData.find(h => h.id === currentHighlightDetailId);
                 let expireAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
                 if (highlightItem && highlightItem.expiresAt) {
@@ -3482,7 +3749,8 @@
                     } catch (e) { /* ignore */ }
                 }
 
-                const mentionedUids = resolveMentions(text);
+                // ★ Resolve mentions using highlightPendingMentions
+                const mentionedUids = resolveMentions(text, highlightPendingMentions);
 
                 await db.collection('highlightComments').add({
                     highlightId: currentHighlightDetailId,
@@ -3496,7 +3764,6 @@
                     expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
                 });
 
-                // ★ SEND NOTIFICATION TO HIGHLIGHT UPLOADER
                 if (highlightItem) {
                     const highlightOwnerUid = highlightItem.authorUid;
                     const highlightOwnerName = highlightItem.authorName || 'Someone';
@@ -3519,8 +3786,10 @@
                 }
 
                 input.value = '';
+                highlightPendingMentions.clear();
                 updateHighlightCommentCharCount();
                 cancelHighlightReply();
+                closeHighlightMentionDropdown();
 
             } catch (err) {
                 console.error('Post highlight comment error:', err);
@@ -3552,7 +3821,7 @@
         }
 
         // ================================================================
-        // ===== ★ HIGHLIGHT COMMENT NOTIFICATIONS =====
+        // ===== ★ HIGHLIGHT COMMENT NOTIFICATIONS (with mentions) =====
         // ================================================================
         async function createHighlightCommentNotification({
             highlightId,
@@ -3984,12 +4253,14 @@
 
             document.getElementById('announcementViewModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeAnnouncementView() {
             document.getElementById('announcementViewModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentAnnouncementViewId = null;
+            syncModalOpenState();
         }
 
         function loadAnnouncements(user) {
@@ -4452,6 +4723,7 @@
 
             document.getElementById('itemModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function defaultTagFor(type) {
@@ -4466,6 +4738,7 @@
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('itemModalImage').src = '';
             currentItem = null;
+            syncModalOpenState();
         }
 
         async function downloadCurrentItem() {
@@ -4734,6 +5007,7 @@
 
             document.getElementById('memberModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeMemberModal() {
@@ -4742,6 +5016,7 @@
             const avatarCircleEl = document.getElementById('memberModalAvatarCircle');
             if (avatarCircleEl) avatarCircleEl.innerHTML = '<span class="member-modal-initials" id="memberModalInitials"></span>';
             currentMember = null;
+            syncModalOpenState();
         }
 
         async function downloadCurrentMemberAvatar() {
@@ -4768,6 +5043,8 @@
             currentHighlightDetailId = highlightId;
             currentHighlightDetailImageIndex = 0;
             currentHighlightReplyTo = null;
+            highlightPendingMentions.clear();
+            closeHighlightMentionDropdown();
 
             const imageUrls = item.imageURLs || [];
             const mainImage = imageUrls[0] || '';
@@ -4835,21 +5112,24 @@
                 viewAllBtn.style.display = 'none';
             }
 
-            // Render comments section
             renderHighlightCommentsSection(highlightId);
 
             document.getElementById('highlightDetailModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeHighlightDetail() {
             detachHighlightCommentsListener();
             currentHighlightReplyTo = null;
+            highlightPendingMentions.clear();
+            closeHighlightMentionDropdown();
             document.getElementById('highlightDetailModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('hlDetailImage').src = '';
             currentHighlightDetailId = null;
             currentHighlightDetailImageIndex = 0;
+            syncModalOpenState();
         }
 
         async function downloadCurrentHighlightDetail() {
@@ -4917,6 +5197,7 @@
 
             document.getElementById('galleryModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeGallery() {
@@ -4926,6 +5207,7 @@
             currentGalleryCaption = '';
             currentGalleryAuthor = '';
             document.getElementById('galleryGrid').innerHTML = '';
+            syncModalOpenState();
         }
 
         async function downloadGalleryImage(index) {

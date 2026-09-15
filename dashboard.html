@@ -36,10 +36,19 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             min-height: 100vh;
+            min-height: 100dvh;
             background: #f8faff;
             color: #1a1a2e;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================================================================
+           ===== MODAL-OPEN STATE: HIDE TITA LAUNCHER =====
+           ================================================================ */
+        body.modal-open .tita-launcher,
+        body.modal-open .tita-panel {
+            display: none !important;
         }
 
         /* ================================================================
@@ -399,6 +408,7 @@
         .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
         .announcement-icon.type-chat { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
         .announcement-icon.type-squad { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .announcement-icon.type-comment { background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%); }
 
         .announcement-body {
             flex: 1;
@@ -1104,7 +1114,7 @@
             font-size: 13px;
         }
 
-        /* ===== CHAT UI (★ EXPANDED HEIGHT) ===== */
+        /* ===== CHAT UI (★ EXPANDED HEIGHT + DVH) ===== */
         .chat-container {
             display: grid;
             grid-template-columns: 300px 1fr;
@@ -1113,6 +1123,7 @@
             border-radius: 18px;
             overflow: hidden;
             height: clamp(560px, calc(100vh - 220px), 900px);
+            height: clamp(560px, calc(100dvh - 220px), 900px);
             min-height: 560px;
             background: white;
             position: relative;
@@ -1163,7 +1174,6 @@
             color: rgb(16, 137, 211);
         }
 
-        /* ★ NEW: New Message button */
         .chat-new-msg-btn {
             width: 100%;
             display: inline-flex;
@@ -1252,7 +1262,6 @@
             box-shadow: inset 3px 0 0 rgb(16, 137, 211);
         }
 
-        /* ★ NEW: Highlight for unread conversations */
         .chat-user-item.has-new-message {
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
             border: 1px solid rgba(16, 137, 211, 0.2);
@@ -1339,7 +1348,6 @@
             border: 2px solid white;
         }
 
-        /* ★ NEW: Red dot indicator on avatar when unread */
         .chat-user-item .chat-user-avatar.has-new::after {
             content: '';
             position: absolute;
@@ -2834,6 +2842,15 @@
         .highlight-detail-modal .hl-stats .stat.urgent { color: #ef4444; }
         .highlight-detail-modal .hl-stats .stat.urgent i { color: #ef4444; }
 
+        /* ★ NEW: reorder — comments section now sits ABOVE the modal-actions */
+        .highlight-detail-modal .hl-comments-wrap {
+            margin-bottom: 22px;
+        }
+        .highlight-detail-modal .hl-actions-row {
+            padding-top: 20px;
+            border-top: 1px solid #f0f4ff;
+        }
+
         .highlight-detail-modal .modal-close {
             position: absolute;
             top: 16px;
@@ -3597,7 +3614,7 @@
         .note-comment-input-wrap .char-count.danger { color: #dc2626; }
 
         /* ================================================================
-           ===== HIGHLIGHT COMMENTS =====
+           ===== HIGHLIGHT COMMENTS (with mention chips) =====
            ================================================================ */
         .highlight-comments-section {
             border-top: 1px solid #f0f4ff;
@@ -3904,6 +3921,7 @@
             width: 380px;
             max-width: calc(100vw - 40px);
             max-height: calc(100vh - 140px);
+            max-height: calc(100dvh - 140px);
             background: white;
             border-radius: 22px;
             box-shadow: 0 20px 60px rgba(16, 137, 211, 0.28);
@@ -4167,6 +4185,7 @@
                 box-shadow: 0 20px 30px rgba(0,0,0,0.05);
                 width: 100%;
                 max-height: calc(100vh - 56px);
+                max-height: calc(100dvh - 56px);
                 overflow-y: auto;
             }
 
@@ -4186,15 +4205,18 @@
             .announcement-popup::before { display: none; }
             .announcement-list { max-height: 60vh; }
 
+            /* ★ Reduced top margin: navbar is shorter now */
             .main-container {
                 padding: 0 16px;
                 margin-top: 68px;
+                margin-bottom: 24px;
             }
 
             .hero-banner {
                 padding: 22px 18px;
                 flex-direction: column;
                 text-align: center;
+                margin-bottom: 20px;
             }
 
             .hero-banner .content h1 { font-size: 20px; }
@@ -4220,12 +4242,14 @@
             .highlights-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
             .highlights-carousel-item .image-container .hl-actions { opacity: 1; }
 
-            .social-section { padding: 18px 14px; border-radius: 16px; }
+            /* ★ Tighter social-section on mobile */
+            .social-section { padding: 14px 12px; border-radius: 16px; margin-bottom: 20px; }
 
             .social-section .section-header {
                 flex-direction: column;
                 align-items: stretch;
-                gap: 12px;
+                gap: 10px;
+                margin-bottom: 14px;
             }
 
             .social-section .section-header .tab-pills {
@@ -4238,7 +4262,7 @@
                 flex: 1;
                 justify-content: center;
                 font-size: 12px;
-                padding: 8px 12px;
+                padding: 8px 10px;
                 min-width: 0;
             }
 
@@ -4249,12 +4273,12 @@
 
             .members-grid { grid-template-columns: 1fr; }
 
-            /* ===== MOBILE CHAT DRAWER ===== */
+            /* ===== MOBILE CHAT DRAWER — BIGGER, TALLER, DVH-AWARE ===== */
             .chat-container {
                 grid-template-columns: 1fr;
                 height: auto;
-                min-height: 520px;
-                max-height: 78vh;
+                min-height: 560px;
+                max-height: none;
                 display: block;
                 position: relative;
                 overflow: hidden;
@@ -4433,13 +4457,25 @@
                 width: auto;
                 max-width: none;
                 max-height: calc(100vh - 110px);
+                max-height: calc(100dvh - 110px);
                 z-index: 2499;
             }
 
-            /* ★ New Message modal mobile */
             .new-msg-modal .modal-content {
                 max-width: calc(100vw - 20px);
                 max-height: 88vh;
+            }
+        }
+
+        /* ★ EXTRA MOBILE TWEAKS: taller chat, DVH, less chrome */
+        @media (max-width: 768px) and (min-height: 640px) {
+            .chat-container {
+                min-height: calc(100dvh - 200px);
+                height: calc(100dvh - 200px);
+            }
+
+            .social-section .panel-view.active {
+                min-height: calc(100dvh - 260px);
             }
         }
 
@@ -4519,8 +4555,8 @@
             .mention-option .mention-name { font-size: 12px; }
 
             .chat-container {
-                min-height: 460px;
-                max-height: 72vh;
+                min-height: calc(100dvh - 180px);
+                max-height: none;
             }
 
             .tita-launcher {
@@ -4535,6 +4571,7 @@
                 right: 8px;
                 left: 8px;
                 max-height: calc(100vh - 100px);
+                max-height: calc(100dvh - 100px);
             }
         }
 
@@ -4717,7 +4754,6 @@
                                         <i class="fas fa-chevron-left"></i>
                                     </button>
                                 </h4>
-                                <!-- ★ NEW: New Message button -->
                                 <button class="chat-new-msg-btn" onclick="openNewMessageModal()">
                                     <i class="fas fa-plus"></i> New Message
                                 </button>
@@ -4763,7 +4799,7 @@
         </section>
     </div>
 
-    <!-- ===== ★ NEW MESSAGE MODAL ===== -->
+    <!-- ===== NEW MESSAGE MODAL ===== -->
     <div id="newMessageModal" class="modal new-msg-modal">
         <div class="modal-content">
             <div class="new-msg-header">
@@ -4832,20 +4868,27 @@
                     <div class="stat" id="hlDetailPhotoCount"><i class="fas fa-images"></i> <span>1 photo</span></div>
                     <div class="stat" id="hlDetailExpiry"><i class="fas fa-clock"></i> <span>X days left</span></div>
                 </div>
-                <div class="modal-actions" id="hlDetailActions">
-                    <button class="btn-primary" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
-                        <i class="fas fa-download"></i> Download
-                    </button>
-                    <button class="btn-primary" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
-                        <i class="fas fa-expand"></i> View All Photos
-                    </button>
-                    <button class="btn-danger" id="hlDetailDeleteBtn" onclick="deleteCurrentHighlightDetail()">
-                        <i class="fas fa-trash"></i> Delete
-                    </button>
-                    <button class="btn-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
+
+                <!-- ===== HIGHLIGHT COMMENTS SECTION (ABOVE ACTIONS) ===== -->
+                <div class="hl-comments-wrap">
+                    <div class="highlight-comments-section" id="highlightCommentsSection"></div>
                 </div>
-                <!-- ===== HIGHLIGHT COMMENTS SECTION ===== -->
-                <div class="highlight-comments-section" id="highlightCommentsSection"></div>
+
+                <!-- ===== ACTION BUTTONS (BELOW COMMENTS) ===== -->
+                <div class="hl-actions-row">
+                    <div class="modal-actions" id="hlDetailActions">
+                        <button class="btn-primary" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="btn-primary" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
+                            <i class="fas fa-expand"></i> View All Photos
+                        </button>
+                        <button class="btn-danger" id="hlDetailDeleteBtn" onclick="deleteCurrentHighlightDetail()">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                        <button class="btn-secondary" onclick="closeHighlightDetail()"><i class="fas fa-times"></i> Close</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -5138,12 +5181,10 @@
         const CHAT_MSG_MAX_LEN = 500;
         const CHAT_MENTION_REGEX = /@([\w\s.'-]{0,30})$/;
 
-        // ===== @squad MENTION =====
         const SQUAD_MENTION_KEY = 'squad';
         const SQUAD_MENTION_LABEL = 'Squad';
         const SQUAD_MENTION_REGEX = /@squad(?=\s|[.,!?;:]|$)/i;
 
-        // ===== HIGHLIGHT COMMENTS CONSTANTS =====
         const HIGHLIGHT_COMMENT_MAX_LEN = 200;
         const HIGHLIGHT_COMMENT_CLEANUP_BATCH = 450;
 
@@ -5203,33 +5244,36 @@
         let mentionDropdownOpen = false;
         let mentionAnchorStart = -1;
 
+        // ★ HIGHLIGHT MENTION STATE (separate)
+        let highlightPendingMentions = new Map();
+        let highlightMentionCandidates = [];
+        let highlightMentionDropdownOpen = false;
+        let highlightMentionDropdownIndex = -1;
+
         // ===== CHAT STATE =====
         let chatFeatureEnabled = false;
         let chatFeatureUnsubscribe = null;
-        let activeChatUid = null;           // For direct: user uid. For group: GROUP_CHAT_KEY
+        let activeChatUid = null;
         let activeChatIsGroup = false;
         let chatMessagesUnsubscribe = null;
         let chatMessages = [];
         let chatAllMessagesCount = 0;
         let chatHasMoreOlder = false;
         let chatOldestDoc = null;
-        let chatUnreadByUser = {}; // { uid: count } — only direct messages
-        let chatGroupUnreadMentions = 0; // group mention count for me
+        let chatUnreadByUser = {};
+        let chatGroupUnreadMentions = 0;
         let chatUnreadUnsubscribes = [];
         let chatGroupMentionsUnsubscribe = null;
         let chatSearchTerm = '';
         let chatSending = false;
         let chatTotalUnread = 0;
 
-        // ★ NEW: Track last message per conversation for sorting
-        let chatLastMessages = {};        // { uid: { text, senderUid, senderName, createdAt, isMine } }
+        let chatLastMessages = {};
         let chatConversationsUnsubscribe = null;
 
-        // ★ NEW: New Message modal state
         let newMsgSearchTerm = '';
         let newMsgModalOpen = false;
 
-        // Chat mention state
         let chatPendingMentions = new Map();
         let chatMentionDropdownIndex = -1;
         let chatMentionCandidates = [];
@@ -5411,6 +5455,18 @@
         }
 
         // ================================================================
+        // ===== ★ MODAL-OPEN STATE MANAGER =====
+        // ================================================================
+        function syncModalOpenState() {
+            const anyOpen = anyModalOpen();
+            if (anyOpen) {
+                document.body.classList.add('modal-open');
+            } else {
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        // ================================================================
         // ===== CHAT: FEATURE FLAG =====
         // ================================================================
         function loadChatFeatureFlag() {
@@ -5524,7 +5580,7 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: LOAD LAST MESSAGE PER CONVERSATION (for sorting + previews)
+        // ===== LOAD LAST MESSAGE PER CONVERSATION =====
         // ================================================================
         function loadChatConversationsSummary() {
             if (!chatFeatureEnabled || !currentUser) return;
@@ -5532,12 +5588,9 @@
 
             const myUid = currentUser.uid;
 
-            // Fetch recent messages where I'm the sender OR receiver
-            // We can't do OR queries directly, so we fetch two listeners and merge
-            const seenMessages = new Map(); // msgId -> msgData
+            const seenMessages = new Map();
 
             function processSnapshot() {
-                // Group by conversation partner / group
                 const summaries = {};
 
                 seenMessages.forEach((msg) => {
@@ -5545,7 +5598,6 @@
                     if (msg.isGroup || msg.participantsKey === GROUP_CHAT_KEY) {
                         convKey = GROUP_CHAT_KEY;
                     } else {
-                        // Direct: partner is the other uid
                         convKey = msg.senderUid === myUid ? msg.receiverUid : msg.senderUid;
                     }
                     if (!convKey) return;
@@ -5565,7 +5617,6 @@
                     }
                 });
 
-                // Strip the helper _date field
                 const clean = {};
                 Object.keys(summaries).forEach(k => {
                     const { _date, ...rest } = summaries[k];
@@ -5576,7 +5627,6 @@
                 renderChatUserList();
             }
 
-            // Listener 1: messages I sent
             const unsubSent = db.collection('chatMessages')
                 .where('senderUid', '==', myUid)
                 .orderBy('createdAt', 'desc')
@@ -5588,7 +5638,6 @@
                     console.warn('Conv summary (sent) error:', err.message);
                 });
 
-            // Listener 2: messages I received
             const unsubReceived = db.collection('chatMessages')
                 .where('receiverUid', '==', myUid)
                 .orderBy('createdAt', 'desc')
@@ -5600,7 +5649,6 @@
                     console.warn('Conv summary (received) error:', err.message);
                 });
 
-            // Listener 3: group messages
             const unsubGroup = db.collection('chatMessages')
                 .where('participantsKey', '==', GROUP_CHAT_KEY)
                 .orderBy('createdAt', 'desc')
@@ -5650,7 +5698,7 @@
         }
 
         // ================================================================
-        // ===== CHAT: USER LIST (★ SORTED BY LAST CHAT)
+        // ===== CHAT: USER LIST =====
         // ================================================================
         function loadChatUserList() {
             const listEl = document.getElementById('chatUserList');
@@ -5665,10 +5713,8 @@
             const term = (chatSearchTerm || '').toLowerCase().trim();
             const myUid = currentUser ? currentUser.uid : null;
 
-            // Build a unified list: group + all members, with their last-message metadata
             const allItems = [];
 
-            // === GROUP CHAT ITEM ===
             const groupLast = chatLastMessages[GROUP_CHAT_KEY];
             const groupUnread = chatGroupUnreadMentions || 0;
             const groupMemberCount = Object.keys(userProfileCache).length;
@@ -5688,7 +5734,6 @@
                 previewFallback: groupMemberCountText
             });
 
-            // === MEMBERS ===
             const members = Object.values(userProfileCache)
                 .filter(u => u.id && u.id !== myUid)
                 .filter(u => u.displayName || u.email);
@@ -5718,18 +5763,15 @@
                 });
             });
 
-            // === SORT: latest activity first ===
             allItems.sort((a, b) => {
                 const aDate = a.last ? (toJsDate(a.last.createdAt) || new Date(0)) : new Date(0);
                 const bDate = b.last ? (toJsDate(b.last.createdAt) || new Date(0)) : new Date(0);
                 const diff = bDate - aDate;
                 if (diff !== 0) return diff;
-                // Tie-breaker: unread first, then alpha
                 if (a.unread !== b.unread) return b.unread - a.unread;
                 return (a.name || '').localeCompare(b.name || '');
             });
 
-            // === FILTER ===
             let filtered = allItems;
             if (term) {
                 filtered = allItems.filter(item => {
@@ -5752,15 +5794,13 @@
             }
 
             let html = '';
-            filtered.forEach((item, idx) => {
+            filtered.forEach((item) => {
                 const isActive = item.isGroup
                     ? activeChatUid === GROUP_CHAT_KEY
                     : (activeChatUid === item.uid && !activeChatIsGroup);
 
-                // Determine if this conversation has a "new message" highlight
                 const hasNew = item.unread > 0;
 
-                // Preview text — use last message if available, otherwise fallback
                 let previewText = item.previewFallback;
                 if (item.last) {
                     const snippet = (item.last.text || '').slice(0, 60);
@@ -5770,7 +5810,6 @@
                     previewText = prefix + snippet;
                 }
 
-                // Time label
                 const timeLabel = item.last ? formatChatListTime(toJsDate(item.last.createdAt)) : '';
 
                 const classes = [
@@ -5779,9 +5818,6 @@
                     isActive ? 'active' : '',
                     hasNew ? 'has-new-message' : ''
                 ].filter(Boolean).join(' ');
-
-                // Insert a separator after group item only if group is rendered in non-sorted position
-                // (we skip separator now since sorting handles it naturally)
 
                 html += `
                     <div class="${classes}" data-uid="${escapeAttr(item.uid)}"
@@ -6383,7 +6419,7 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: DIRECT MESSAGE NOTIFICATIONS =====
+        // ===== DIRECT MESSAGE NOTIFICATIONS =====
         // ================================================================
         async function createDirectMessageNotification({
             receiverUid,
@@ -6420,7 +6456,7 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: NEW MESSAGE MODAL =====
+        // ===== NEW MESSAGE MODAL =====
         // ================================================================
         function openNewMessageModal() {
             if (!chatFeatureEnabled) return;
@@ -6435,6 +6471,7 @@
 
             renderNewMessageList();
             modal.classList.add('active');
+            syncModalOpenState();
 
             setTimeout(() => {
                 if (input) input.focus();
@@ -6446,6 +6483,7 @@
             newMsgSearchTerm = '';
             const modal = document.getElementById('newMessageModal');
             if (modal) modal.classList.remove('active');
+            syncModalOpenState();
         }
 
         function filterNewMessageUsers() {
@@ -6459,7 +6497,6 @@
 
             const myUid = currentUser ? currentUser.uid : null;
 
-            // All members except me, sorted by name
             const members = Object.values(userProfileCache)
                 .filter(u => u.id && u.id !== myUid)
                 .filter(u => u.displayName || u.email)
@@ -7213,6 +7250,7 @@
                 <div class="highlight-comment-input-wrap">
                     <div class="my-avatar">${avatarContent}</div>
                     <div class="input-stack">
+                        <div class="mention-dropdown" id="highlightMentionDropdown"></div>
                         <div class="replying-to-banner" id="highlightReplyingToBanner">
                             <span>Replying to <strong id="highlightReplyingToName"></strong></span>
                             <button type="button" onclick="cancelHighlightReply()" title="Cancel reply">
@@ -7220,7 +7258,7 @@
                             </button>
                         </div>
                         <div class="input-row">
-                            <textarea id="highlightCommentInput" placeholder="Write a comment..." maxlength="${HIGHLIGHT_COMMENT_MAX_LEN}" rows="1"></textarea>
+                            <textarea id="highlightCommentInput" placeholder="Write a comment... (type @ to mention)" maxlength="${HIGHLIGHT_COMMENT_MAX_LEN}" rows="1"></textarea>
                             <button class="send-btn" id="highlightCommentSendBtn" onclick="postHighlightComment()" title="Send">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
@@ -7232,12 +7270,10 @@
 
             const input = document.getElementById('highlightCommentInput');
             if (input) {
-                input.addEventListener('input', updateHighlightCommentCharCount);
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        postHighlightComment();
-                    }
+                input.addEventListener('input', handleHighlightCommentInput);
+                input.addEventListener('keydown', handleHighlightCommentKeydown);
+                input.addEventListener('blur', () => {
+                    setTimeout(closeHighlightMentionDropdown, 180);
                 });
             }
 
@@ -7256,6 +7292,204 @@
             else if (len > HIGHLIGHT_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
         }
 
+        // ================================================================
+        // ===== ★ HIGHLIGHT MENTION AUTOCOMPLETE =====
+        // ================================================================
+        function handleHighlightCommentInput(e) {
+            updateHighlightCommentCharCount();
+            detectHighlightMentionQuery(e.target);
+        }
+
+        function handleHighlightCommentKeydown(e) {
+            if (highlightMentionDropdownOpen) {
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    highlightMentionDropdownIndex = (highlightMentionDropdownIndex + 1) % highlightMentionCandidates.length;
+                    renderHighlightMentionDropdown();
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    highlightMentionDropdownIndex = highlightMentionDropdownIndex <= 0
+                        ? highlightMentionCandidates.length - 1
+                        : highlightMentionDropdownIndex - 1;
+                    renderHighlightMentionDropdown();
+                    return;
+                }
+                if (e.key === 'Enter' || e.key === 'Tab') {
+                    e.preventDefault();
+                    if (highlightMentionCandidates[highlightMentionDropdownIndex]) {
+                        insertHighlightMention(highlightMentionCandidates[highlightMentionDropdownIndex]);
+                    }
+                    return;
+                }
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeHighlightMentionDropdown();
+                    return;
+                }
+            }
+
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                postHighlightComment();
+            }
+        }
+
+        function detectHighlightMentionQuery(input) {
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const beforeCursor = value.slice(0, cursorPos);
+            const match = beforeCursor.match(MENTION_REGEX);
+
+            if (!match) {
+                closeHighlightMentionDropdown();
+                return;
+            }
+
+            const query = match[1].toLowerCase().trim();
+            const myUid = currentUser?.uid;
+
+            const allMembers = Object.values(userProfileCache)
+                .filter(u => u.id !== myUid && (u.displayName || u.email));
+
+            if (allMembers.length === 0) {
+                closeHighlightMentionDropdown();
+                return;
+            }
+
+            let filtered;
+            if (!query) {
+                filtered = allMembers
+                    .sort((a, b) => (a.displayName || '').localeCompare(b.displayName || ''))
+                    .slice(0, MENTION_MAX_RESULTS);
+            } else {
+                filtered = allMembers
+                    .filter(u => {
+                        const name = (u.displayName || u.email || '').toLowerCase();
+                        return name.includes(query);
+                    })
+                    .sort((a, b) => {
+                        const aName = (a.displayName || '').toLowerCase();
+                        const bName = (b.displayName || '').toLowerCase();
+                        const aStarts = aName.startsWith(query) ? 0 : 1;
+                        const bStarts = bName.startsWith(query) ? 0 : 1;
+                        if (aStarts !== bStarts) return aStarts - bStarts;
+                        return aName.localeCompare(bName);
+                    })
+                    .slice(0, MENTION_MAX_RESULTS);
+            }
+
+            if (filtered.length === 0) {
+                highlightMentionCandidates = [];
+                highlightMentionDropdownOpen = true;
+                renderHighlightMentionDropdown();
+                return;
+            }
+
+            highlightMentionCandidates = filtered;
+            highlightMentionDropdownIndex = 0;
+            highlightMentionDropdownOpen = true;
+            renderHighlightMentionDropdown();
+        }
+
+        function renderHighlightMentionDropdown() {
+            const dropdown = document.getElementById('highlightMentionDropdown');
+            if (!dropdown) return;
+
+            if (!highlightMentionDropdownOpen) {
+                dropdown.classList.remove('show');
+                return;
+            }
+
+            if (highlightMentionCandidates.length === 0) {
+                dropdown.innerHTML = `
+                    <div class="mention-dropdown-empty">
+                        <i class="fas fa-user-slash"></i>
+                        No members found
+                    </div>
+                `;
+                dropdown.classList.add('show');
+                return;
+            }
+
+            let html = '<div class="mention-dropdown-header"><i class="fas fa-at"></i> Mention a member</div>';
+            highlightMentionCandidates.forEach((user, idx) => {
+                const name = user.displayName || user.email || 'Anonymous';
+                const photoUrl = user.photoURL || '';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const isActive = idx === highlightMentionDropdownIndex;
+
+                const avatarContent = photoUrl
+                    ? `<img src="${cloudinaryAvatar(photoUrl, 80)}" alt="${escapeAttr(name)}" loading="lazy" />`
+                    : escapeHtml(initials);
+
+                html += `
+                    <button type="button" class="mention-option ${isActive ? 'active' : ''}"
+                            onmousedown="event.preventDefault(); selectHighlightMentionByIndex(${idx})">
+                        <div class="mention-avatar">${avatarContent}</div>
+                        <div class="mention-info">
+                            <div class="mention-name">${escapeHtml(name)}</div>
+                            <div class="mention-hint">Tap to mention</div>
+                        </div>
+                    </button>
+                `;
+            });
+
+            dropdown.innerHTML = html;
+            dropdown.classList.add('show');
+
+            const activeEl = dropdown.querySelector('.mention-option.active');
+            if (activeEl) activeEl.scrollIntoView({ block: 'nearest' });
+        }
+
+        function selectHighlightMentionByIndex(idx) {
+            const user = highlightMentionCandidates[idx];
+            if (user) insertHighlightMention(user);
+        }
+
+        function insertHighlightMention(user) {
+            const input = document.getElementById('highlightCommentInput');
+            if (!input) return;
+
+            const name = user.displayName || user.email || 'Anonymous';
+            const uid = user.id || user.uid;
+            if (!uid) return;
+
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+            const beforeCursor = value.slice(0, cursorPos);
+            const afterCursor = value.slice(cursorPos);
+
+            const match = beforeCursor.match(MENTION_REGEX);
+            if (!match) return;
+
+            const startIdx = cursorPos - match[0].length;
+            const before = value.slice(0, startIdx);
+            const mentionText = `@${name} `;
+            input.value = before + mentionText + afterCursor;
+
+            highlightPendingMentions.set(name.toLowerCase(), { uid, name });
+
+            const newCursorPos = startIdx + mentionText.length;
+            input.setSelectionRange(newCursorPos, newCursorPos);
+
+            closeHighlightMentionDropdown();
+            updateHighlightCommentCharCount();
+            input.focus();
+        }
+
+        function closeHighlightMentionDropdown() {
+            const dropdown = document.getElementById('highlightMentionDropdown');
+            if (dropdown) dropdown.classList.remove('show');
+            highlightMentionDropdownOpen = false;
+            highlightMentionCandidates = [];
+            highlightMentionDropdownIndex = -1;
+        }
+
+        // ================================================================
+        // ===== HIGHLIGHT COMMENTS: RENDER =====
+        // ================================================================
         function renderHighlightComments(highlightId, comments) {
             const list = document.getElementById('highlightCommentsList');
             if (!list) return;
@@ -7318,6 +7552,8 @@
                 ? `<button onclick="startHighlightReply('${safeCommentId}', '${safeAuthorName}')"><i class="fas fa-reply"></i> Reply</button>`
                 : '';
 
+            const textHtml = renderTextWithMentions(comment.text || '', comment.mentions);
+
             return `
                 <div class="highlight-comment ${isReply ? 'reply-indent' : ''}" data-comment-id="${safeCommentId}">
                     <div class="comment-avatar">${avatarContent}</div>
@@ -7326,7 +7562,7 @@
                             <span class="comment-author ${isMe ? 'is-me' : ''}">${escapeHtml(authorName)}</span>
                             <span class="comment-time">${formatRelativeTime(createdDate)}</span>
                         </div>
-                        <div class="comment-text">${escapeHtml(comment.text || '')}</div>
+                        <div class="comment-text">${textHtml}</div>
                         <div class="comment-actions">
                             ${replyBtn}
                             ${deleteBtn}
@@ -7346,7 +7582,7 @@
             }
             const input = document.getElementById('highlightCommentInput');
             if (input) {
-                input.placeholder = `Reply to ${authorName}...`;
+                input.placeholder = `Reply to ${authorName}... (type @ to mention)`;
                 input.focus();
             }
         }
@@ -7356,7 +7592,7 @@
             const banner = document.getElementById('highlightReplyingToBanner');
             if (banner) banner.classList.remove('show');
             const input = document.getElementById('highlightCommentInput');
-            if (input) input.placeholder = 'Write a comment...';
+            if (input) input.placeholder = 'Write a comment... (type @ to mention)';
         }
 
         async function postHighlightComment() {
@@ -7381,7 +7617,34 @@
                 const authorName = titaUserData.displayName || currentUser.displayName || currentUser.email || 'Anonymous';
                 const authorPhoto = titaUserData.photoURL || '';
 
-                const expireAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                let expireAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+                const hlDoc = await db.collection('highlights').doc(currentHighlightDetailId).get();
+                if (hlDoc.exists) {
+                    const hlData = hlDoc.data();
+                    if (hlData.expiresAt) {
+                        const hlExp = hlData.expiresAt.seconds
+                            ? new Date(hlData.expiresAt.seconds * 1000)
+                            : new Date(hlData.expiresAt);
+                        if (hlExp > new Date()) expireAt = hlExp;
+                    }
+                }
+
+                let parentCommentAuthorUid = null;
+                let parentCommentId = null;
+
+                if (currentHighlightReplyTo && currentHighlightReplyTo.id) {
+                    parentCommentId = currentHighlightReplyTo.id;
+                    try {
+                        const parentDoc = await db.collection('highlightComments').doc(parentCommentId).get();
+                        if (parentDoc.exists) {
+                            const p = parentDoc.data();
+                            parentCommentAuthorUid = p.authorUid || null;
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                // ★ Resolve mentions using highlightPendingMentions
+                const mentionedUids = resolveHighlightMentions(text);
 
                 await db.collection('highlightComments').add({
                     highlightId: currentHighlightDetailId,
@@ -7390,35 +7653,34 @@
                     authorName,
                     authorPhoto,
                     replyToId: currentHighlightReplyTo ? currentHighlightReplyTo.id : null,
+                    mentions: mentionedUids,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expireAt: firebase.firestore.Timestamp.fromDate(expireAt)
                 });
 
-                // ★ NEW: Send notifications to uploader & parent commenter
-                try {
-                    const hlDoc = await db.collection('highlights').doc(currentHighlightDetailId).get();
-                    if (hlDoc.exists) {
-                        const hlData = hlDoc.data();
-                        createHighlightCommentNotification({
-                            highlightId: currentHighlightDetailId,
-                            highlightOwnerUid: hlData.authorUid,
-                            highlightOwnerName: hlData.authorName || 'Someone',
-                            highlightCaption: hlData.caption || '',
-                            parentCommentId: currentHighlightReplyTo ? currentHighlightReplyTo.id : null,
-                            parentCommentAuthorUid: currentHighlightReplyTo ? currentHighlightReplyTo.authorUid : null,
-                            parentCommentAuthorName: currentHighlightReplyTo ? currentHighlightReplyTo.authorName : null,
-                            commenterUid: currentUser.uid,
-                            commenterName: authorName,
-                            commentText: text,
-                            isReply: !!currentHighlightReplyTo,
-                            mentionedUids: []
-                        });
-                    }
-                } catch (e) { console.warn('Notification error:', e); }
+                if (hlDoc.exists) {
+                    const hlData = hlDoc.data();
+                    createHighlightCommentNotification({
+                        highlightId: currentHighlightDetailId,
+                        highlightOwnerUid: hlData.authorUid,
+                        highlightOwnerName: hlData.authorName || 'Someone',
+                        highlightCaption: hlData.caption || '',
+                        parentCommentId,
+                        parentCommentAuthorUid,
+                        parentCommentAuthorName: null,
+                        commenterUid: currentUser.uid,
+                        commenterName: authorName,
+                        commentText: text,
+                        isReply: !!parentCommentId,
+                        mentionedUids
+                    });
+                }
 
                 input.value = '';
+                highlightPendingMentions.clear();
                 updateHighlightCommentCharCount();
                 cancelHighlightReply();
+                closeHighlightMentionDropdown();
             } catch (err) {
                 console.error('Post highlight comment error:', err);
                 alert('❌ Could not post comment: ' + err.message);
@@ -7428,7 +7690,30 @@
             }
         }
 
-        // ★ NEW: HIGHLIGHT COMMENT NOTIFICATION FUNCTION
+        function resolveHighlightMentions(text) {
+            const found = new Set();
+            highlightPendingMentions.forEach((info) => {
+                if (text.toLowerCase().includes(`@${info.name.toLowerCase()}`)) {
+                    found.add(info.uid);
+                }
+            });
+
+            const cached = Object.values(userProfileCache)
+                .filter(u => u.displayName && u.id)
+                .sort((a, b) => b.displayName.length - a.displayName.length);
+
+            cached.forEach(u => {
+                const pattern = `@${u.displayName}`;
+                const regex = new RegExp(escapeRegex(pattern) + '(?=\\s|[.,!?;:]|$)', 'i');
+                if (regex.test(text)) found.add(u.id);
+            });
+
+            return [...found];
+        }
+
+        // ================================================================
+        // ===== HIGHLIGHT COMMENT NOTIFICATIONS (with mentions) =====
+        // ================================================================
         async function createHighlightCommentNotification({
             highlightId, highlightOwnerUid, highlightOwnerName, highlightCaption,
             parentCommentId, parentCommentAuthorUid, parentCommentAuthorName,
@@ -7442,7 +7727,6 @@
                 const queued = new Set();
                 const notifications = [];
 
-                // Notify uploader (if not the commenter)
                 if (highlightOwnerUid && highlightOwnerUid !== commenterUid && !queued.has(highlightOwnerUid)) {
                     queued.add(highlightOwnerUid);
                     notifications.push({
@@ -7463,7 +7747,6 @@
                     });
                 }
 
-                // Notify parent comment author (if reply and not the commenter)
                 if (isReply && parentCommentAuthorUid && parentCommentAuthorUid !== commenterUid && !queued.has(parentCommentAuthorUid)) {
                     queued.add(parentCommentAuthorUid);
                     notifications.push({
@@ -7481,6 +7764,34 @@
                         createdByName: 'System',
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         expiresAt
+                    });
+                }
+
+                // ★ Mention notifications
+                if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
+                    mentionedUids.forEach(uid => {
+                        if (!uid) return;
+                        if (uid === commenterUid) return;
+                        if (queued.has(uid)) return;
+                        queued.add(uid);
+                        notifications.push({
+                            type: 'mention',
+                            title: `📣 ${commenterName} mentioned you`,
+                            message: captionSnippet
+                                ? `On ${highlightOwnerName}'s highlight: "${captionSnippet}"\n\n"${snippet}"`
+                                : `"${snippet}"`,
+                            icon: '📣',
+                            priority: 'info',
+                            link: 'index.html#highlights',
+                            linkLabel: 'View Mention',
+                            targetUid: uid,
+                            referenceId: highlightId,
+                            readBy: [],
+                            createdBy: 'system',
+                            createdByName: 'System',
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                            expiresAt
+                        });
                     });
                 }
 
@@ -7596,7 +7907,6 @@
             if (commentCleanupTimer) clearInterval(commentCleanupTimer);
             setTimeout(() => { cleanupExpiredComments(); }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
             commentCleanupTimer = setInterval(() => { cleanupExpiredComments(); }, COMMENT_CLEANUP_INTERVAL_MS);
-            // Also clean highlight comments on same timer
             setTimeout(() => { cleanupExpiredHighlightComments(); }, COMMENT_CLEANUP_INITIAL_DELAY_MS + 1500);
             setInterval(() => { cleanupExpiredHighlightComments(); }, COMMENT_CLEANUP_INTERVAL_MS + 1500);
         }
@@ -7672,6 +7982,7 @@
 
             document.getElementById('noteModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeNoteModal() {
@@ -7687,6 +7998,7 @@
             document.getElementById('noteModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentNoteUid = null;
+            syncModalOpenState();
         }
 
         function renderNoteCommentsSection(uid) {
@@ -8202,7 +8514,8 @@
             'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
             'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' },
             'chat':      { icon: '💬', cls: 'type-chat',      label: 'Chat' },
-            'squad':     { icon: '📢', cls: 'type-squad',     label: 'Squad Alert' }
+            'squad':     { icon: '📢', cls: 'type-squad',     label: 'Squad Alert' },
+            'comment':   { icon: '💬', cls: 'type-comment',   label: 'Comment' }
         };
 
         function getAnnouncementMeta(type) {
@@ -8472,12 +8785,14 @@
 
             document.getElementById('announcementViewModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeAnnouncementView() {
             document.getElementById('announcementViewModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentAnnouncementViewId = null;
+            syncModalOpenState();
         }
 
         function loadAnnouncements(user) {
@@ -8875,7 +9190,6 @@
                     if (url && url.includes('cloudinary')) await deleteFromCloudinary(url);
                 }
                 await db.collection('highlights').doc(id).delete();
-                // Also delete associated comments
                 try {
                     const commentsSnap = await db.collection('highlightComments')
                         .where('highlightId', '==', id).get();
@@ -8897,7 +9211,6 @@
                     if (url && url.includes('cloudinary')) await deleteFromCloudinary(url);
                 }
                 await db.collection('highlights').doc(id).delete();
-                // Also clean up comments
                 try {
                     const commentsSnap = await db.collection('highlightComments')
                         .where('highlightId', '==', id).get();
@@ -9004,7 +9317,6 @@
                         if (countBadge) countBadge.textContent = `${validHighlights.length}`;
                         updateSelectionUI();
 
-                        // Attach comment count listeners for visible highlights
                         const visibleIds = validHighlights.map(h => h.id);
                         attachHighlightCommentCountListeners(visibleIds);
 
@@ -9256,11 +9568,11 @@
                 if (hasMulti) viewAllBtn.style.display = 'inline-flex';
                 else viewAllBtn.style.display = 'none';
 
-                // Render comments section
                 renderHighlightCommentsSection(highlightId);
 
                 document.getElementById('highlightDetailModal').classList.add('active');
                 document.body.style.overflow = 'hidden';
+                syncModalOpenState();
             }).catch(err => {
                 console.error('openHighlightDetail error:', err);
                 alert('Could not load highlight.');
@@ -9275,6 +9587,7 @@
             document.getElementById('hlDetailImage').src = '';
             currentHighlightDetailId = null;
             currentHighlightDetailImageIndex = 0;
+            syncModalOpenState();
         }
 
         async function downloadCurrentHighlightDetail() {
@@ -9317,6 +9630,7 @@
 
             document.getElementById('galleryModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
             grid.innerHTML = `<div class="gallery-loading"><span class="spinner"></span><p style="margin-top:10px;font-size:13px;">Loading photos…</p></div>`;
 
             try {
@@ -9378,6 +9692,7 @@
             currentGalleryImages = [];
             currentGalleryCaption = '';
             currentGalleryAuthor = '';
+            syncModalOpenState();
         }
 
         async function downloadGalleryImage(index) {
@@ -9446,6 +9761,7 @@
             document.getElementById('lightboxImage').src = url;
             document.getElementById('lightboxModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeLightbox() {
@@ -9455,6 +9771,7 @@
             if (!document.getElementById('galleryModal').classList.contains('active')) {
                 document.body.style.overflow = 'auto';
             }
+            syncModalOpenState();
         }
 
         async function downloadCurrentLightboxImage() {
@@ -9507,7 +9824,6 @@
                         if (url && url.includes('cloudinary')) await deleteFromCloudinary(url);
                     }
                     await db.collection('highlights').doc(id).delete();
-                    // Delete associated comments
                     try {
                         const commentsSnap = await db.collection('highlightComments')
                             .where('highlightId', '==', id).get();
@@ -9579,6 +9895,7 @@
         function showUploadModal() {
             document.getElementById('uploadModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
             selectedFiles = [];
             document.getElementById('fileList').innerHTML = '';
             document.getElementById('fileInput').value = '';
@@ -9591,6 +9908,7 @@
             selectedFiles = [];
             document.getElementById('fileList').innerHTML = '';
             document.getElementById('fileInput').value = '';
+            syncModalOpenState();
         }
 
         document.getElementById('uploadArea').addEventListener('click', function() {
@@ -9948,6 +10266,7 @@
 
             document.getElementById('memberDetailModal').classList.add('active');
             document.body.style.overflow = 'hidden';
+            syncModalOpenState();
         }
 
         function closeMemberDetail() {
@@ -9955,6 +10274,7 @@
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('memberDetailAvatar').innerHTML = '';
             currentMemberDetail = null;
+            syncModalOpenState();
         }
 
         async function downloadCurrentMemberDetail() {

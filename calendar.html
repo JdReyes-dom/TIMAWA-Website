@@ -162,7 +162,7 @@
             transform: scale(1.03);
         }
 
-        /* ===== NAVBAR RIGHT WRAPPER (holds mobile bell + burger) ===== */
+        /* ===== NAVBAR RIGHT WRAPPER ===== */
         .navbar-right {
             display: flex;
             align-items: center;
@@ -170,7 +170,6 @@
             flex-shrink: 0;
         }
 
-        /* Mobile bell — hidden on desktop, shown on mobile only */
         .navbar-mobile-bell {
             display: none;
             position: relative;
@@ -191,9 +190,7 @@
             padding: 4px 8px;
         }
 
-        /* ================================================================
-           ===== ANNOUNCEMENT BELL =====
-           ================================================================ */
+        /* ===== ANNOUNCEMENT BELL ===== */
         .announcement-wrapper {
             display: flex;
             align-items: center;
@@ -258,9 +255,7 @@
 
         .announcement-badge.show { display: flex; }
 
-        /* ================================================================
-           ===== ANNOUNCEMENT POPUP =====
-           ================================================================ */
+        /* ===== ANNOUNCEMENT POPUP ===== */
         .announcement-popup {
             position: fixed;
             width: 380px;
@@ -473,9 +468,7 @@
             font-size: 13px;
         }
 
-        /* ================================================================
-           ===== ANNOUNCEMENT VIEW MODAL =====
-           ================================================================ */
+        /* ===== ANNOUNCEMENT VIEW MODAL ===== */
         .announcement-view-modal {
             display: none;
             position: fixed;
@@ -906,41 +899,92 @@
             transform: scale(1.03);
         }
 
-        /* ===== BIRTHDAY SECTION ===== */
-        .birthday-section {
+        /* ================================================================
+           ===== BIRTHDAY & EVENTS TAB SECTION =====
+           ================================================================ */
+        .list-section {
             background: white;
             border-radius: 24px;
-            padding: 25px 30px;
             margin-top: 30px;
             border: 1px solid #eef2f7;
             box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            overflow: hidden;
         }
 
-        .birthday-section .section-header {
+        .list-tabs {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            border-bottom: 1px solid #eef2f7;
+            background: #f8faff;
         }
 
-        .birthday-section .section-header h3 {
-            font-size: 18px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .birthday-section .section-header h3 i {
-            color: #f5576c;
-        }
-
-        .birthday-section .section-header .count {
-            font-size: 13px;
+        .list-tab {
+            flex: 1;
+            padding: 16px 20px;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 600;
             color: #888;
-            font-weight: 400;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
         }
 
+        .list-tab:hover {
+            color: rgb(16, 137, 211);
+            background: rgba(16, 137, 211, 0.04);
+        }
+
+        .list-tab.active {
+            color: rgb(16, 137, 211);
+            background: white;
+        }
+
+        .list-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, rgb(16, 137, 211), rgb(18, 177, 209));
+            border-radius: 3px 3px 0 0;
+        }
+
+        .list-tab i {
+            font-size: 14px;
+        }
+
+        .list-tab .tab-count {
+            background: #eef2f7;
+            color: #888;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 50px;
+            transition: all 0.25s ease;
+        }
+
+        .list-tab.active .tab-count {
+            background: rgba(16, 137, 211, 0.12);
+            color: rgb(16, 137, 211);
+        }
+
+        .tab-pane {
+            display: none;
+            padding: 24px 30px 30px;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* Birthday list */
         .birthday-list {
             display: flex;
             flex-direction: column;
@@ -1014,6 +1058,92 @@
         }
 
         .no-birthdays i {
+            font-size: 32px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        /* Events list (upcoming) */
+        .events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .event-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: #f8faff;
+            border-left: 4px solid rgb(16, 137, 211);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            border-left-width: 4px;
+        }
+
+        .event-list-item:hover {
+            background: #eef6ff;
+            transform: translateX(4px);
+            border-color: rgb(16, 137, 211);
+            border-left-width: 4px;
+        }
+
+        .event-list-item .event-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .event-list-item .event-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .event-list-item .event-info .event-title {
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-list-item .event-info .event-meta {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .event-list-item .event-info .event-meta i {
+            color: rgb(16, 137, 211);
+            font-size: 11px;
+            width: 14px;
+        }
+
+        .event-list-item .event-badge {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 50px;
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            flex-shrink: 0;
+        }
+
+        .no-events {
+            text-align: center;
+            color: #888;
+            padding: 20px 0;
+        }
+
+        .no-events i {
             font-size: 32px;
             color: #cff0ff;
             display: block;
@@ -1246,10 +1376,7 @@
             color: #888;
         }
 
-        /* ================================================================
-           ===== TITA TIMA AI ASSISTANT (FLOATING) =====
-           ================================================================ */
-
+        /* ===== TITA TIMA AI ASSISTANT (FLOATING) ===== */
         .tita-launcher {
             position: fixed;
             bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -1550,11 +1677,9 @@
                 font-size: 22px;
             }
 
-            /* ===== MOBILE BELL: next to burger, outside collapsible menu ===== */
             .navbar-mobile-bell { display: block; }
             .navbar .mobile-toggle { display: block; }
 
-            /* Hide the bell that lives inside the collapsible menu on mobile */
             .navbar .nav-links > li.announcement-li .announcement-wrapper { display: none; }
 
             .navbar .nav-links {
@@ -1581,7 +1706,6 @@
             .navbar .nav-links > li { width: 100%; justify-content: center; }
             .navbar .nav-links > li > a { font-size: 14px; width: 100%; text-align: center; display: block; }
 
-            /* Popup on mobile: fixed below navbar, full-width */
             .announcement-popup {
                 position: fixed !important;
                 top: 70px !important;
@@ -1650,9 +1774,13 @@
                 min-height: 16px;
             }
 
-            .birthday-section {
-                padding: 20px;
+            /* Tabs responsive */
+            .list-tab {
+                padding: 14px 12px;
+                font-size: 13px;
             }
+            .list-tab i { font-size: 12px; }
+            .tab-pane { padding: 18px 16px 22px; }
 
             .birthday-item {
                 flex-wrap: wrap;
@@ -1660,6 +1788,13 @@
             }
 
             .birthday-item .badge {
+                margin-left: 0;
+            }
+
+            .event-list-item {
+                flex-wrap: wrap;
+            }
+            .event-list-item .event-badge {
                 margin-left: 0;
             }
 
@@ -1682,7 +1817,6 @@
                 justify-content: center;
             }
 
-            /* Announcement view modal on mobile */
             .announcement-view-modal .modal-content { max-width: calc(100vw - 24px); max-height: 94vh; }
             .announcement-view-header { padding: 24px 22px 18px; }
             .announcement-view-icon { width: 64px; height: 64px; font-size: 30px; border-radius: 18px; }
@@ -1746,11 +1880,13 @@
                 font-size: 12px;
             }
 
-            .birthday-section .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
+            .list-tab {
+                padding: 12px 8px;
+                font-size: 12px;
+                gap: 4px;
             }
+            .list-tab i { font-size: 11px; }
+            .list-tab .tab-count { font-size: 10px; padding: 1px 6px; }
 
             .date-popup .modal-content {
                 padding: 20px;
@@ -1813,7 +1949,6 @@
         <a href="index.html" class="logo">TIMAWA <span>HUB</span></a>
 
         <div class="navbar-right">
-            <!-- Mobile-only bell (hidden on desktop) -->
             <div class="navbar-mobile-bell">
                 <button class="announcement-bell" id="announcementBellMobile" onclick="toggleAnnouncementPopup(event, 'mobile')" aria-label="Announcements">
                     <i class="fas fa-bell"></i>
@@ -1845,7 +1980,7 @@
         </ul>
     </nav>
 
-    <!-- Announcement popup (only rendered when logged in) -->
+    <!-- Announcement popup -->
     <div class="announcement-popup" id="announcementPopup" role="dialog" aria-labelledby="announcementTitle" style="display:none;">
         <div class="announcement-popup-header">
             <h4 id="announcementTitle"><i class="fas fa-bullhorn"></i> Announcements</h4>
@@ -1912,16 +2047,36 @@
             <div id="calendar"></div>
         </div>
 
-        <!-- ===== BIRTHDAY SECTION ===== -->
-        <div class="birthday-section" id="birthdaySection">
-            <div class="section-header">
-                <h3><i class="fas fa-birthday-cake"></i> Upcoming Birthdays</h3>
-                <span class="count" id="birthdayCount">0</span>
+        <!-- ===== BIRTHDAYS & EVENTS TAB SECTION ===== -->
+        <div class="list-section">
+            <div class="list-tabs">
+                <button class="list-tab active" id="tabBirthdays" onclick="switchListTab('birthdays')">
+                    <i class="fas fa-birthday-cake"></i> Birthdays
+                    <span class="tab-count" id="birthdayTabCount">0</span>
+                </button>
+                <button class="list-tab" id="tabEvents" onclick="switchListTab('events')">
+                    <i class="fas fa-calendar-check"></i> Upcoming Events
+                    <span class="tab-count" id="eventsTabCount">0</span>
+                </button>
             </div>
-            <div class="birthday-list" id="birthdayList">
-                <div class="no-birthdays">
-                    <i class="fas fa-birthday-cake"></i>
-                    <p>No birthdays scheduled. Update your profile to show your birthday!</p>
+
+            <!-- Birthdays Pane -->
+            <div class="tab-pane active" id="paneBirthdays">
+                <div class="birthday-list" id="birthdayList">
+                    <div class="no-birthdays">
+                        <i class="fas fa-birthday-cake"></i>
+                        <p>No birthdays scheduled. Update your profile to show your birthday!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events Pane -->
+            <div class="tab-pane" id="paneEvents">
+                <div class="events-list" id="eventsList">
+                    <div class="no-events">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>No upcoming events. Create one!</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -2102,7 +2257,6 @@
                 <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
             </div>
 
-            <!-- ===== QUICK NOTE FIELD ===== -->
             <div class="tita-field">
                 <label>
                     <i class="fas fa-comment-dots"></i> Quick Note
@@ -2174,7 +2328,6 @@
         let unsubscribeNotes = null;
 
         const BIRTHDAY_YEARS_AHEAD = 20;
-
         const EVENTS_LIMIT = 50;
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
 
@@ -2586,7 +2739,7 @@
         }
 
         // ================================================================
-        // ===== CLICK HANDLER (opens full view modal) =====
+        // ===== CLICK HANDLER =====
         // ================================================================
         async function handleAnnouncementClick(id) {
             const item = announcementItems.find(a => a.id === id);
@@ -2728,9 +2881,6 @@
             );
         }
 
-        // ================================================================
-        // ===== FIX #1: Generate birthday announcements for EVERYONE =====
-        // ================================================================
         async function autoGenerateBirthdayAnnouncementsForEveryone(currentUser) {
             if (hasAutogenRunToday(currentUser.uid, 'birthdays_all')) return;
 
@@ -2739,7 +2889,6 @@
                 const todayMonth = today.getMonth();
                 const todayDate = today.getDate();
 
-                // Fetch users (limit 200 — enough for a small squad app)
                 const snap = await db.collection('users').limit(200).get();
 
                 const todayBirthdayUsers = [];
@@ -2766,7 +2915,6 @@
                     return;
                 }
 
-                // Check which birthday people already have an announcement today
                 const todayStart = new Date();
                 todayStart.setHours(0, 0, 0, 0);
 
@@ -2815,7 +2963,7 @@
                         priority: 'urgent',
                         link: 'calendar.html',
                         linkLabel: 'View Calendar',
-                        targetUid: '', // 🌐 visible to everyone
+                        targetUid: '',
                         referenceId: person.uid,
                         readBy: [],
                         createdBy: 'system',
@@ -2983,17 +3131,8 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: REPLY & MENTION NOTIFICATIONS =====
+        // ===== REPLY & MENTION NOTIFICATIONS =====
         // ================================================================
-        /**
-         * Creates notifications for:
-         *   1. The note owner (if not replying to own note)
-         *   2. The parent comment author (if this is a reply-to-comment)
-         *   3. Any @mentioned users
-         *
-         * Uses ONE batched write for all notifications — Firebase-optimized.
-         * Exposed here for parity with index.html.
-         */
         async function createReplyAndMentionNotifications({
             noteUid,
             noteOwnerUid,
@@ -3017,7 +3156,6 @@
                 const replySnippet = (replyText || '').slice(0, 80) + ((replyText || '').length > 80 ? '...' : '');
                 const noteSnippet = (noteText || '').slice(0, 60) + ((noteText || '').length > 60 ? '...' : '');
 
-                // 1. Reply notification to note owner
                 if (!isReplyToComment && noteOwnerUid && noteOwnerUid !== replierUid) {
                     if (!queued.has(noteOwnerUid)) {
                         queued.add(noteOwnerUid);
@@ -3040,7 +3178,6 @@
                     }
                 }
 
-                // 2. Reply-to-comment notification to parent author
                 if (isReplyToComment && parentCommentAuthorUid && parentCommentAuthorUid !== replierUid) {
                     if (!queued.has(parentCommentAuthorUid)) {
                         queued.add(parentCommentAuthorUid);
@@ -3063,7 +3200,6 @@
                     }
                 }
 
-                // 3. Mention notifications — batch these too
                 if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
                     mentionedUids.forEach(uid => {
                         if (!uid) return;
@@ -3202,6 +3338,7 @@
                     if (calendar) {
                         updateCalendarEvents();
                     }
+                    renderEventsList(); // update events tab
                 }, (error) => {
                     console.error('Error listening to events:', error);
                 });
@@ -3275,10 +3412,10 @@
             birthdayEvents.sort((a, b) => a.date - b.date);
         }
 
-        // ===== RENDER BIRTHDAY LIST =====
+        // ===== RENDER BIRTHDAY LIST (in tab) =====
         function renderBirthdayList() {
             const container = document.getElementById('birthdayList');
-            const countEl = document.getElementById('birthdayCount');
+            const tabCount = document.getElementById('birthdayTabCount');
 
             if (birthdayEvents.length === 0) {
                 container.innerHTML = `
@@ -3287,13 +3424,13 @@
                         <p>No birthdays scheduled. Update your profile to show your birthday!</p>
                     </div>
                 `;
-                countEl.textContent = '0';
+                if (tabCount) tabCount.textContent = '0';
                 return;
             }
 
             const now = new Date();
             const sortedBirthdays = [...birthdayEvents].sort((a, b) => a.date - b.date);
-            countEl.textContent = `${sortedBirthdays.length}`;
+            if (tabCount) tabCount.textContent = `${sortedBirthdays.length}`;
 
             let html = '';
             sortedBirthdays.forEach(item => {
@@ -3337,6 +3474,115 @@
             });
 
             container.innerHTML = html;
+        }
+
+        // ===== RENDER UPCOMING EVENTS LIST (in tab) =====
+        function renderEventsList() {
+            const container = document.getElementById('eventsList');
+            const tabCount = document.getElementById('eventsTabCount');
+            if (!container) return;
+
+            const now = new Date();
+            // Filter events that are in the future (or today) and sort by dateTime
+            const upcoming = currentEvents
+                .filter(ev => {
+                    if (!ev.dateTime) return false;
+                    const d = convertTimestampToDate(ev.dateTime);
+                    return d >= new Date(now.getFullYear(), now.getMonth(), now.getDate()); // today or future
+                })
+                .sort((a, b) => {
+                    const da = convertTimestampToDate(a.dateTime);
+                    const dbb = convertTimestampToDate(b.dateTime);
+                    return da - dbb;
+                });
+
+            if (tabCount) tabCount.textContent = `${upcoming.length}`;
+
+            if (upcoming.length === 0) {
+                container.innerHTML = `
+                    <div class="no-events">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>No upcoming events. Create one!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            upcoming.forEach(event => {
+                const eventDate = convertTimestampToDate(event.dateTime);
+                const dateStr = eventDate.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+                const timeStr = eventDate.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                const color = getEventColor(event.type || 'Other');
+                const typeLabel = event.type || 'Event';
+
+                html += `
+                    <div class="event-list-item" onclick="viewEventFromList('${event.id}')">
+                        <div class="event-color" style="background: ${color};"></div>
+                        <div class="event-info">
+                            <div class="event-title">${escapeHtml(event.title || 'Untitled')}</div>
+                            <div class="event-meta">
+                                <span><i class="fas fa-calendar-day"></i> ${dateStr}</span>
+                                <span><i class="fas fa-clock"></i> ${timeStr}</span>
+                                ${event.location ? `<span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.location)}</span>` : ''}
+                            </div>
+                        </div>
+                        <span class="event-badge">${typeLabel}</span>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Helper to view event from the events tab
+        function viewEventFromList(eventId) {
+            const ev = currentEvents.find(e => e.id === eventId);
+            if (!ev) return;
+            // Create a temporary calendar event object to pass to showEventDetail
+            const fakeEvent = {
+                id: ev.id,
+                title: ev.title || 'Untitled',
+                start: convertTimestampToDate(ev.dateTime),
+                extendedProps: {
+                    type: ev.type || 'Other',
+                    location: ev.location || '',
+                    description: ev.description || '',
+                    createdBy: ev.createdBy || 'Unknown',
+                    createdByUid: ev.createdByUid || ''
+                }
+            };
+            selectedEventId = ev.id;
+            showEventDetail(fakeEvent);
+        }
+
+        // ===== TAB SWITCHER =====
+        function switchListTab(tab) {
+            const tabBirthdays = document.getElementById('tabBirthdays');
+            const tabEvents = document.getElementById('tabEvents');
+            const paneBirthdays = document.getElementById('paneBirthdays');
+            const paneEvents = document.getElementById('paneEvents');
+
+            if (tab === 'birthdays') {
+                tabBirthdays.classList.add('active');
+                tabEvents.classList.remove('active');
+                paneBirthdays.classList.add('active');
+                paneEvents.classList.remove('active');
+            } else {
+                tabEvents.classList.add('active');
+                tabBirthdays.classList.remove('active');
+                paneEvents.classList.add('active');
+                paneBirthdays.classList.remove('active');
+                // Refresh events list when switching to events tab
+                renderEventsList();
+            }
         }
 
         // ===== INIT CALENDAR =====
@@ -3424,6 +3670,7 @@
             });
             calendar.render();
             updateCalendarEvents();
+            renderEventsList(); // also render events tab
         }
 
         // ===== SHOW DATE POPUP =====
@@ -3674,6 +3921,7 @@
                 listenToBirthdays();
             }
             updateCalendarEvents();
+            renderEventsList();
             alert('🔄 Calendar refreshed!');
         }
 
@@ -3905,7 +4153,6 @@
                 customEl.style.display = 'block';
             }
 
-            // ===== Load existing note =====
             const note = notesCache[titaCurrentUser.uid];
             const noteInput = document.getElementById('titaNote');
             const noteCount = document.getElementById('titaNoteCount');
@@ -4009,7 +4256,6 @@
 
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
-                // ===== Save or delete note =====
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
                 const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
 
