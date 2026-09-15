@@ -5499,6 +5499,12 @@
 
         const ACTIVITY_LIMIT = 50;
 
+        // ================================================================
+        // ===== ★ NEW: PERFORMANCE OPTIMIZATION CONSTANTS =====
+        // ================================================================
+        const CHAT_POLL_INTERVAL_MS = 5000;       // 5 seconds
+        const LAST_VISIT_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
+
         let currentUser = null;
         let currentUserData = null;
         let selectedFiles = [];
@@ -5566,13 +5572,17 @@
         let chatFeatureUnsubscribe = null;
         let activeChatUid = null;
         let activeChatIsGroup = false;
-        let chatMessagesUnsubscribe = null;
+        let chatMessagesUnsubscribe = null;  // kept for compatibility, used as poll interval holder
         let chatMessages = [];
+        let chatMessagesSignatureCache = '';
         let chatAllMessagesCount = 0;
         let chatHasMoreOlder = false;
         let chatOldestDoc = null;
         let chatUnreadByUser = {};
         let chatGroupUnreadMentions = 0;
+        let chatGroupMessageUnread = 0;
+        let chatGroupUnreadUnsubscribe = null;
+        let currentUserLastSeenGroupAt = null;
         let chatUnreadUnsubscribes = [];
         let chatGroupMentionsUnsubscribe = null;
         let chatSearchTerm = '';
@@ -5580,7 +5590,7 @@
         let chatTotalUnread = 0;
 
         let chatLastMessages = {};
-        let chatConversationsUnsubscribe = null;
+        let chatConversationsUnsubscribe = null;  // kept for compatibility
 
         let newMsgSearchTerm = '';
         let newMsgModalOpen = false;
@@ -5590,6 +5600,10 @@
         let chatMentionCandidates = [];
         let chatMentionDropdownOpen = false;
         let chatSquadMentionPending = false;
+
+        // ===== ★ NEW: CHAT POLLING STATE =====
+        let chatPollTimer = null;
+        let chatPollInFlight = false;
 
         // ===== ACTIVITY TRACKER STATE =====
         let activityLoaded = false;
@@ -5857,10 +5871,11 @@
 
             if (tab === 'chats') {
                 ensureChatListenersAttached();
-                markAllChatUnreadRead();
                 if (isMobile()) {
                     showChatSidebar();
                 }
+                // ★ OPTIMIZATION 5: refresh conversation summaries once when opening Chat tab
+                loadChatConversationsSummary();
                 // Hide member count label when not on members tab
                 const countLabel = document.getElementById('memberCountLabel');
                 if (countLabel) countLabel.style.display = 'none';
@@ -5881,10 +5896,13 @@
             loadChatUserList();
             loadChatUnreadCounts();
             loadGroupMentionCount();
-            loadChatConversationsSummary();
+            loadGroupUnreadCount(); 
+            loadChatConversationsSummary();   // ★ one-shot, safe to call on tab open
         }
 
         function detachChatListeners() {
+            // Stop chat polling
+            stopChatPolling();
             if (chatMessagesUnsubscribe) {
                 chatMessagesUnsubscribe();
                 chatMessagesUnsubscribe = null;
@@ -6047,14 +6065,12 @@
         }
 
         // ================================================================
-        // ===== LOAD LAST MESSAGE PER CONVERSATION =====
+        // ===== ★ OPTIMIZATION 5: ONE-SHOT CONVERSATION SUMMARIES =====
         // ================================================================
         function loadChatConversationsSummary() {
             if (!chatFeatureEnabled || !currentUser) return;
-            if (chatConversationsUnsubscribe) chatConversationsUnsubscribe();
 
             const myUid = currentUser.uid;
-
             const seenMessages = new Map();
 
             function processSnapshot() {
@@ -6094,44 +6110,31 @@
                 renderChatUserList();
             }
 
-            const unsubSent = db.collection('chatMessages')
-                .where('senderUid', '==', myUid)
-                .orderBy('createdAt', 'desc')
-                .limit(60)
-                .onSnapshot((snap) => {
-                    snap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
-                    processSnapshot();
-                }, (err) => {
-                    console.warn('Conv summary (sent) error:', err.message);
-                });
-
-            const unsubReceived = db.collection('chatMessages')
-                .where('receiverUid', '==', myUid)
-                .orderBy('createdAt', 'desc')
-                .limit(60)
-                .onSnapshot((snap) => {
-                    snap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
-                    processSnapshot();
-                }, (err) => {
-                    console.warn('Conv summary (received) error:', err.message);
-                });
-
-            const unsubGroup = db.collection('chatMessages')
-                .where('participantsKey', '==', GROUP_CHAT_KEY)
-                .orderBy('createdAt', 'desc')
-                .limit(30)
-                .onSnapshot((snap) => {
-                    snap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
-                    processSnapshot();
-                }, (err) => {
-                    console.warn('Conv summary (group) error:', err.message);
-                });
-
-            chatConversationsUnsubscribe = () => {
-                try { unsubSent(); } catch (e) {}
-                try { unsubReceived(); } catch (e) {}
-                try { unsubGroup(); } catch (e) {}
-            };
+            // ★ OPTIMIZATION 5: one-shot .get() calls instead of live listeners
+            Promise.all([
+                db.collection('chatMessages')
+                    .where('senderUid', '==', myUid)
+                    .orderBy('createdAt', 'desc')
+                    .limit(60)
+                    .get(),
+                db.collection('chatMessages')
+                    .where('receiverUid', '==', myUid)
+                    .orderBy('createdAt', 'desc')
+                    .limit(60)
+                    .get(),
+                db.collection('chatMessages')
+                    .where('participantsKey', '==', GROUP_CHAT_KEY)
+                    .orderBy('createdAt', 'desc')
+                    .limit(30)
+                    .get()
+            ]).then(([sentSnap, receivedSnap, groupSnap]) => {
+                sentSnap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
+                receivedSnap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
+                groupSnap.forEach(doc => seenMessages.set(doc.id, { id: doc.id, ...doc.data() }));
+                processSnapshot();
+            }).catch(err => {
+                console.warn('Conv summary (one-shot) error:', err.message);
+            });
         }
 
         // ================================================================
@@ -6183,7 +6186,7 @@
             const allItems = [];
 
             const groupLast = chatLastMessages[GROUP_CHAT_KEY];
-            const groupUnread = chatGroupUnreadMentions || 0;
+            const groupUnread = (chatGroupUnreadMentions || 0) + (chatGroupMessageUnread || 0);
             const groupMemberCount = Object.keys(userProfileCache).length;
             const groupMemberCountText = groupMemberCount > 0
                 ? `${groupMemberCount} member${groupMemberCount !== 1 ? 's' : ''}`
@@ -6373,6 +6376,51 @@
                 });
         }
 
+        function loadGroupUnreadCount() {
+            if (!chatFeatureEnabled || !currentUser) return;
+
+            if (chatGroupUnreadUnsubscribe) {
+                try { chatGroupUnreadUnsubscribe(); } catch (e) {}
+                chatGroupUnreadUnsubscribe = null;
+            }
+
+            // Fetch current user's lastSeenGroupAt once, then listen to group messages.
+            db.collection('users').doc(currentUser.uid).get().then(doc => {
+                const data = doc.data() || {};
+                currentUserLastSeenGroupAt = data.lastSeenGroupAt || null;
+
+                // Live listener on the most recent group messages.
+                chatGroupUnreadUnsubscribe = db.collection('chatMessages')
+                    .where('participantsKey', '==', GROUP_CHAT_KEY)
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .onSnapshot((snap) => {
+                        let count = 0;
+                        const myUid = currentUser.uid;
+                        const lastSeenMs = currentUserLastSeenGroupAt && currentUserLastSeenGroupAt.seconds
+                            ? currentUserLastSeenGroupAt.seconds * 1000
+                            : 0;
+
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            if (!d.senderUid || d.senderUid === myUid) return; // skip own messages
+                            const createdMs = d.createdAt && d.createdAt.seconds
+                                ? d.createdAt.seconds * 1000
+                                : 0;
+                            if (createdMs > lastSeenMs) count++;
+                        });
+
+                        chatGroupMessageUnread = count;
+                        updateChatUnreadBadges();
+                        renderChatUserList();
+                    }, (err) => {
+                        console.warn('Group unread listener error:', err.message);
+                    });
+            }).catch(err => {
+                console.warn('loadGroupUnreadCount user fetch error:', err.message);
+            });
+        }
+
         function detachAllChatUnreadListeners() {
             chatUnreadUnsubscribes.forEach(fn => { try { fn(); } catch (e) {} });
             chatUnreadUnsubscribes = [];
@@ -6381,11 +6429,17 @@
                 chatGroupMentionsUnsubscribe = null;
             }
             chatGroupUnreadMentions = 0;
+
+            if (chatGroupUnreadUnsubscribe) {
+                try { chatGroupUnreadUnsubscribe(); } catch (e) {}
+                chatGroupUnreadUnsubscribe = null;
+            }
+            chatGroupMessageUnread = 0;
         }
 
         function updateChatUnreadBadges() {
             const directUnread = Object.values(chatUnreadByUser).reduce((a, b) => a + b, 0);
-            chatTotalUnread = directUnread + (chatGroupUnreadMentions || 0);
+            chatTotalUnread = directUnread + (chatGroupUnreadMentions || 0) + (chatGroupMessageUnread || 0);
 
             const badge = document.getElementById('chatsTabUnreadBadge');
             if (!badge) return;
@@ -6445,6 +6499,15 @@
         // ================================================================
         // ===== CHAT: OPEN CONVERSATION =====
         // ================================================================
+
+        function chatMessagesSignature(messages) {
+        if (!messages || messages.length === 0) return '';
+        // Cheap signature: count + first id + last id
+        const first = messages[0]?.id || '';
+        const last = messages[messages.length - 1]?.id || '';
+        return `${messages.length}|${first}|${last}`;
+}
+
         function openChatWith(uid) {
             if (!chatFeatureEnabled) return;
             if (!uid || !currentUser) return;
@@ -6453,11 +6516,12 @@
             activeChatUid = uid;
             activeChatIsGroup = false;
             chatMessages = [];
+            chatMessagesSignatureCache = '';
             chatHasMoreOlder = false;
             chatOldestDoc = null;
 
             renderChatUserList();
-            attachChatMessagesListener();
+            attachChatMessagesListener();   // now starts polling
             renderChatHeader();
             renderChatMessages();
 
@@ -6475,15 +6539,17 @@
             activeChatUid = GROUP_CHAT_KEY;
             activeChatIsGroup = true;
             chatMessages = [];
+            chatMessagesSignatureCache = '';
             chatHasMoreOlder = false;
             chatOldestDoc = null;
 
             renderChatUserList();
-            attachChatMessagesListener();
+            attachChatMessagesListener();   // now starts polling
             renderChatHeader();
             renderChatMessages();
 
             markAllChatUnreadRead();
+            markGroupMessagesRead();
 
             if (isMobile()) {
                 hideChatSidebar();
@@ -6575,59 +6641,99 @@
         }
 
         // ================================================================
-        // ===== CHAT: MESSAGES LISTENER =====
+        // ===== ★ OPTIMIZATION 1 & 4: CHAT POLLING (5s, visibility-aware) =====
         // ================================================================
         function attachChatMessagesListener() {
-            if (chatMessagesUnsubscribe) {
-                chatMessagesUnsubscribe();
-                chatMessagesUnsubscribe = null;
-            }
+            // Clear any existing polling
+            stopChatPolling();
+
             if (!activeChatUid || !currentUser) return;
+
+            // Start polling
+            startChatPolling();
+        }
+
+        function startChatPolling() {
+            if (chatPollTimer) clearInterval(chatPollTimer);
+
+            // Initial fetch immediately
+            fetchChatMessagesOnce();
+
+            // Set up interval
+            chatPollTimer = setInterval(() => {
+                // ★ OPTIMIZATION 4: skip fetch if tab is hidden
+                if (document.visibilityState === 'hidden') return;
+                fetchChatMessagesOnce();
+            }, CHAT_POLL_INTERVAL_MS);
+        }
+
+        function stopChatPolling() {
+            if (chatPollTimer) {
+                clearInterval(chatPollTimer);
+                chatPollTimer = null;
+            }
+            chatPollInFlight = false;
+        }
+
+        async function fetchChatMessagesOnce() {
+            // ★ Avoid overlapping requests
+            if (chatPollInFlight) return;
+            if (!activeChatUid || !currentUser) return;
+
+            chatPollInFlight = true;
 
             const myUid = currentUser.uid;
 
-            if (activeChatIsGroup) {
-                chatMessagesUnsubscribe = db.collection('chatMessages')
-                    .where('participantsKey', '==', GROUP_CHAT_KEY)
-                    .orderBy('createdAt', 'desc')
-                    .limit(CHAT_PAGE_SIZE)
-                    .onSnapshot((snap) => {
-                        const items = [];
-                        snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
-                        chatMessages = items;
+            try {
+                let query;
+                if (activeChatIsGroup) {
+                    query = db.collection('chatMessages')
+                        .where('participantsKey', '==', GROUP_CHAT_KEY)
+                        .orderBy('createdAt', 'desc')
+                        .limit(CHAT_PAGE_SIZE);
+                } else {
+                    const key = [myUid, activeChatUid].sort().join('_');
+                    query = db.collection('chatMessages')
+                        .where('participantsKey', '==', key)
+                        .orderBy('createdAt', 'desc')
+                        .limit(CHAT_PAGE_SIZE);
+                }
 
-                        chatOldestDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
-                        chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
+                const snap = await query.get();
+                const items = [];
+                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                chatMessages = items;
 
-                        renderChatMessages();
-                    }, (err) => {
-                        console.warn('Group chat listener error:', err.message);
-                    });
-                return;
-            }
+                chatOldestDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
+                chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
 
-            const otherUid = activeChatUid;
-            const key = [myUid, otherUid].sort().join('_');
-
-            chatMessagesUnsubscribe = db.collection('chatMessages')
-                .where('participantsKey', '==', key)
-                .orderBy('createdAt', 'desc')
-                .limit(CHAT_PAGE_SIZE)
-                .onSnapshot((snap) => {
-                    const items = [];
-                    snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
-                    chatMessages = items;
-
-                    chatOldestDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
-                    chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
-
+                const newSig = chatMessagesSignature(items);
+                if (newSig !== chatMessagesSignatureCache) {
+                    chatMessagesSignatureCache = newSig;
                     renderChatMessages();
+                }
 
-                    markChatReadFrom(otherUid);
-                }, (err) => {
-                    console.warn('Chat messages listener error:', err.message);
-                });
+                if (!activeChatIsGroup && activeChatUid) {
+                    markChatReadFrom(activeChatUid);
+                }
+            } catch (err) {
+                console.warn('Chat poll fetch error:', err.message);
+            } finally {
+                chatPollInFlight = false;
+            }
         }
+
+        // ================================================================
+        // ===== ★ OPTIMIZATION 4: RESUME POLLING WHEN TAB BECOMES VISIBLE =====
+        // ================================================================
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // ★ OPTIMIZATION 4: resume polling immediately
+                if (activeChatUid && chatPollTimer) {
+                    fetchChatMessagesOnce();
+                }
+            }
+        });
 
         async function markChatReadFrom(uid) {
             if (!currentUser || !uid || activeChatIsGroup) return;
@@ -6645,6 +6751,23 @@
                 await batch.commit();
             } catch (e) {
                 // Silent
+            }
+        }
+
+        async function markGroupMessagesRead() {
+            if (!currentUser) return;
+            try {
+                await db.collection('users').doc(currentUser.uid).set({
+                    lastSeenGroupAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                // Update local cache immediately so UI clears without waiting for a refetch.
+                currentUserLastSeenGroupAt = { seconds: Math.floor(Date.now() / 1000) };
+                chatGroupMessageUnread = 0;
+                updateChatUnreadBadges();
+                renderChatUserList();
+            } catch (err) {
+                console.warn('markGroupMessagesRead error:', err.message);
             }
         }
 
@@ -6867,6 +6990,14 @@
                 chatSquadMentionPending = false;
                 autoResizeChatInput();
                 closeChatMentionDropdown();
+
+                // ★ OPTIMIZATION 5: refresh conversation summaries after sending
+                loadChatConversationsSummary();
+
+                // Immediately refresh the message list so sender sees their own message
+                // Force render so sender sees their own message immediately
+                chatMessagesSignatureCache = '';
+                fetchChatMessagesOnce();
             } catch (e) {
                 console.error('sendChatMessage error:', e);
                 alert('❌ Could not send message: ' + e.message);
@@ -6880,6 +7011,9 @@
             if (!confirm('Delete this message?')) return;
             try {
                 await db.collection('chatMessages').doc(id).delete();
+                // Force render so sender sees their own message immediately
+                chatMessagesSignatureCache = '';
+                fetchChatMessagesOnce();
             } catch (e) {
                 alert('❌ Could not delete message: ' + e.message);
             }
@@ -7349,7 +7483,7 @@
         }
 
         // ================================================================
-        // ===== CHAT: @SQUAD NOTIFICATIONS (notify EVERYONE) =====
+        // ===== ★ OPTIMIZATION 3: CONSOLIDATED @SQUAD NOTIFICATIONS =====
         // ================================================================
         async function createSquadMentionNotifications({ senderUid, senderName, text, groupName }) {
             try {
@@ -7360,7 +7494,8 @@
 
                 if (allUids.length === 0) return;
 
-                const notifications = allUids.map(uid => ({
+                // ★ Write ONE announcement document with targetUids array
+                await db.collection('announcements').add({
                     type: 'squad',
                     title: `📢 ${senderName} called the whole squad!`,
                     message: `"${snippet}"`,
@@ -7368,24 +7503,15 @@
                     priority: 'urgent',
                     link: 'dashboard.html',
                     linkLabel: 'Open Group Chat',
-                    targetUid: uid,
-                    referenceId: `squad_${uid}`,
+                    targetUids: allUids,          // ★ array of recipient UIDs
+                    targetUid: '',                 // legacy empty for backward compat
+                    referenceId: `squad_all`,
                     readBy: [],
                     createdBy: 'system',
                     createdByName: 'System',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expiresAt
-                }));
-
-                const CHUNK = 450;
-                for (let i = 0; i < notifications.length; i += CHUNK) {
-                    const batch = db.batch();
-                    notifications.slice(i, i + CHUNK).forEach(n => {
-                        const ref = db.collection('announcements').doc();
-                        batch.set(ref, n);
-                    });
-                    await batch.commit();
-                }
+                });
             } catch (err) {
                 console.warn('createSquadMentionNotifications error:', err);
             }
@@ -8110,7 +8236,6 @@
                     } catch (e) { /* ignore */ }
                 }
 
-                // ★ Resolve mentions using highlightPendingMentions
                 const mentionedUids = resolveHighlightMentions(text);
 
                 await db.collection('highlightComments').add({
@@ -8234,7 +8359,6 @@
                     });
                 }
 
-                // ★ Mention notifications
                 if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
                     mentionedUids.forEach(uid => {
                         if (!uid) return;
@@ -9295,6 +9419,8 @@
                             if (exp < now) return;
                         }
                         if (data.targetUid && data.targetUid !== '' && data.targetUid !== user.uid) return;
+                        // ★ OPTIMIZATION 3: if targetUids array exists and doesn't include current user, skip
+                        if (Array.isArray(data.targetUids) && !data.targetUids.includes(user.uid)) return;
 
                         items.push({ id: doc.id, ...data });
                         if (Array.isArray(data.readBy) && data.readBy.includes(user.uid)) {
@@ -9542,6 +9668,41 @@
         }
 
         // ================================================================
+        // ===== ★ OPTIMIZATION 2: THROTTLE lastVisit WRITES (5 minutes) =====
+        // ================================================================
+        async function updateLastVisitThrottled(user) {
+            if (!user) return;
+            const now = Date.now();
+            const key = 'timawa_last_visit_' + user.uid;
+            try {
+                const lastWrite = parseInt(sessionStorage.getItem(key) || '0', 10);
+                if (now - lastWrite < LAST_VISIT_THROTTLE_MS) {
+                    // ★ Skip write — less than 5 minutes since last visit write
+                    return;
+                }
+            } catch (e) { /* ignore */ }
+
+            // Proceed with write
+            try {
+                // Capture the current page info so the activity tracker is meaningful
+                const pageTitle = document.title || 'Dashboard';
+                const pageUrl = window.location.pathname.split('/').pop() || 'dashboard.html';
+
+                await db.collection('users').doc(user.uid).set({
+                    lastVisit: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastVisitPage: pageUrl,
+                    lastVisitTitle: pageTitle,
+                    visitCount: firebase.firestore.FieldValue.increment(1)
+                }, { merge: true });
+
+                // Mark successful write time
+                try { sessionStorage.setItem(key, String(now)); } catch (e) { /* ignore */ }
+            } catch (e) {
+                console.warn('updateLastVisitThrottled write failed:', e.message);
+            }
+        }
+
+        // ================================================================
         // ===== AUTH STATE =====
         // ================================================================
         auth.onAuthStateChanged(async (user) => {
@@ -9578,6 +9739,9 @@
 
                 loadAnnouncements(user);
                 runAutoGeneration(user);
+
+                // ★ OPTIMIZATION 2: throttled lastVisit write
+                await updateLastVisitThrottled(user);
             } catch (error) {
                 console.error('Error loading user data:', error);
             }
@@ -9635,8 +9799,6 @@
         // ================================================================
         async function deleteFromCloudinary(imageUrl, publicIdHint) {
             try {
-                // ★ Prefer the stored public_id when we have it. Fallback to old
-                // filename-derived logic so legacy deletes still work.
                 let publicId = publicIdHint;
                 if (!publicId) {
                     const urlParts = imageUrl.split('/');
@@ -10371,16 +10533,12 @@
         // ================================================================
         // ===== UPLOAD =====
         // ================================================================
-        // ★ UPDATED: accepts an expiryDateStr (YYYY-MM-DD), sets a custom
-        //    public_id + tags so Cloudinary Bulk Delete can filter expired
-        //    assets by prefix or tag.
         async function uploadToCloudinary(file, expiryDateStr) {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
             formData.append('folder', 't-imawa/highlights');
 
-            // ★ Method 1: custom public_id + tags tied to expiry date
             const uniqueSuffix = Math.random().toString(36).slice(2, 10);
             const customPublicId = `exp_${expiryDateStr}_${uniqueSuffix}`;
             formData.append('public_id', customPublicId);
@@ -10474,7 +10632,6 @@
                 const userData = userDoc.data();
                 const authorName = userData?.displayName || user.displayName || user.email || 'Someone';
 
-                // ★ Compute the expiry date string once (YYYY-MM-DD)
                 const expiresAt = new Date();
                 expiresAt.setDate(expiresAt.getDate() + HIGHLIGHT_EXPIRY_DAYS);
                 const expiryDateStr = expiresAt.toISOString().slice(0, 10);
@@ -10497,8 +10654,8 @@
 
                 await db.collection('highlights').add({
                     imageURLs: imageUrls,
-                    imagePublicIds: imagePublicIds,     // ★ store for reliable deletes
-                    imageExpiryTag: `expires_${expiryDateStr}`, // ★ handy for admin search
+                    imagePublicIds: imagePublicIds,
+                    imageExpiryTag: `expires_${expiryDateStr}`,
                     caption: caption,
                     authorName: authorName,
                     authorUid: user.uid,
@@ -10847,6 +11004,7 @@
 
                 if (auth.currentUser) {
                     try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                    try { sessionStorage.removeItem('timawa_last_visit_' + auth.currentUser.uid); } catch (e) {}
                 }
                 await auth.signOut();
                 window.location.href = 'index.html';
@@ -11172,6 +11330,6 @@
     </script>
 
     <script src="idle-logout.js"></script>
-    <script src="visit-tracker.js"></script>
+    
 </body>
 </html>
