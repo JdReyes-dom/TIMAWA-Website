@@ -2170,6 +2170,198 @@
         }
 
         /* ================================================================
+           ===== ★ ACTIVITY TRACKER PANEL =====
+           ================================================================ */
+        .activity-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .activity-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .activity-toolbar .activity-count {
+            font-size: 13px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .activity-toolbar .activity-refresh {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            border: 1.5px solid #e0e7ff;
+            color: rgb(16, 137, 211);
+            padding: 7px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+
+        .activity-toolbar .activity-refresh:hover {
+            background: #f0f7ff;
+            border-color: rgb(16, 137, 211);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .activity-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: #fafcff;
+            border: 1px solid #f0f4ff;
+            transition: all 0.2s ease;
+            min-width: 0;
+        }
+
+        .activity-row:hover {
+            background: #f0f7ff;
+            border-color: rgba(16, 137, 211, 0.2);
+        }
+
+        .activity-row .activity-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(16, 137, 211, 0.15);
+            position: relative;
+        }
+
+        .activity-row .activity-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .activity-row .activity-avatar .status-dot {
+            position: absolute;
+            bottom: -1px;
+            right: -1px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .activity-row .activity-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .activity-row .activity-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a1a2e;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .activity-row .activity-sub {
+            font-size: 12px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-top: 2px;
+        }
+
+        .activity-row .activity-sub i {
+            color: rgb(16, 137, 211);
+            font-size: 11px;
+        }
+
+        .activity-row .activity-sub .page-pill {
+            background: #e0f2fe;
+            color: rgb(16, 137, 211);
+            padding: 1px 8px;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
+        }
+
+        .activity-row .activity-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+            flex-shrink: 0;
+        }
+
+        .activity-row .activity-time {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgb(16, 137, 211);
+            white-space: nowrap;
+        }
+
+        .activity-row .activity-count-badge {
+            font-size: 10px;
+            color: #888;
+            font-weight: 600;
+            background: #f0f7ff;
+            padding: 2px 8px;
+            border-radius: 50px;
+        }
+
+        .activity-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .activity-empty i {
+            font-size: 40px;
+            color: #cff0ff;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .activity-empty h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .activity-empty p {
+            color: #999;
+            font-size: 13px;
+        }
+
+        /* ================================================================
            ===== MEMBERS GRID =====
            ================================================================ */
         .members-grid {
@@ -2842,7 +3034,6 @@
         .highlight-detail-modal .hl-stats .stat.urgent { color: #ef4444; }
         .highlight-detail-modal .hl-stats .stat.urgent i { color: #ef4444; }
 
-        /* ★ NEW: reorder — comments section now sits ABOVE the modal-actions */
         .highlight-detail-modal .hl-comments-wrap {
             margin-bottom: 22px;
         }
@@ -4205,7 +4396,6 @@
             .announcement-popup::before { display: none; }
             .announcement-list { max-height: 60vh; }
 
-            /* ★ Reduced top margin: navbar is shorter now */
             .main-container {
                 padding: 0 16px;
                 margin-top: 68px;
@@ -4242,7 +4432,6 @@
             .highlights-carousel-btn { width: 36px; height: 36px; font-size: 14px; }
             .highlights-carousel-item .image-container .hl-actions { opacity: 1; }
 
-            /* ★ Tighter social-section on mobile */
             .social-section { padding: 14px 12px; border-radius: 16px; margin-bottom: 20px; }
 
             .social-section .section-header {
@@ -4273,7 +4462,6 @@
 
             .members-grid { grid-template-columns: 1fr; }
 
-            /* ===== MOBILE CHAT DRAWER — BIGGER, TALLER, DVH-AWARE ===== */
             .chat-container {
                 grid-template-columns: 1fr;
                 height: auto;
@@ -4465,9 +4653,22 @@
                 max-width: calc(100vw - 20px);
                 max-height: 88vh;
             }
+
+            .activity-row {
+                flex-wrap: wrap;
+            }
+            .activity-row .activity-meta {
+                flex-direction: row;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                justify-content: flex-start;
+                margin-top: 4px;
+                padding-top: 4px;
+                border-top: 1px solid #f0f4ff;
+            }
         }
 
-        /* ★ EXTRA MOBILE TWEAKS: taller chat, DVH, less chrome */
         @media (max-width: 768px) and (min-height: 640px) {
             .chat-container {
                 min-height: calc(100dvh - 200px);
@@ -4711,7 +4912,7 @@
         </section>
 
         <!-- ================================================================
-             ===== SOCIAL SECTION WITH TABS: MEMBERS / CHATS =====
+             ===== SOCIAL SECTION WITH TABS: MEMBERS / CHATS / ACTIVITY =====
              ================================================================ -->
         <section class="social-section" id="socialSection">
             <div class="section-header">
@@ -4723,6 +4924,9 @@
                     <button class="tab-pill" data-tab="chats" role="tab" onclick="switchSocialTab('chats')">
                         <i class="fas fa-comments"></i> Chats
                         <span class="tab-pill-badge" id="chatsTabUnreadBadge" style="display:none;">0</span>
+                    </button>
+                    <button class="tab-pill" data-tab="activity" role="tab" onclick="switchSocialTab('activity')">
+                        <i class="fas fa-clock-rotate-left"></i> Activity Tracker
                     </button>
                 </div>
                 <span class="count" id="memberCountLabel">(0)</span>
@@ -4792,6 +4996,25 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ACTIVITY TRACKER PANEL ===== -->
+            <div class="panel-view" id="panel-activity">
+                <div class="activity-panel">
+                    <div class="activity-toolbar">
+                        <span class="activity-count" id="activityCountLabel">Loading…</span>
+                        <button class="activity-refresh" onclick="loadActivityTracker(true)">
+                            <i class="fas fa-rotate-right"></i> Refresh
+                        </button>
+                    </div>
+                    <div class="activity-list" id="activityList">
+                        <div class="activity-empty">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            <h3>Loading activity…</h3>
+                            <p>Checking who was last seen and where.</p>
                         </div>
                     </div>
                 </div>
@@ -5188,6 +5411,8 @@
         const HIGHLIGHT_COMMENT_MAX_LEN = 200;
         const HIGHLIGHT_COMMENT_CLEANUP_BATCH = 450;
 
+        const ACTIVITY_LIMIT = 50;
+
         let currentUser = null;
         let currentUserData = null;
         let selectedFiles = [];
@@ -5279,6 +5504,10 @@
         let chatMentionCandidates = [];
         let chatMentionDropdownOpen = false;
         let chatSquadMentionPending = false;
+
+        // ===== ACTIVITY TRACKER STATE =====
+        let activityLoaded = false;
+        let activityUnsubscribe = null;
 
         // ================================================================
         // ===== ANNOUNCEMENTS STATE =====
@@ -5517,8 +5746,13 @@
             return chatsPanel && chatsPanel.classList.contains('active');
         }
 
+        function activityTabIsSelected() {
+            const activityPanel = document.getElementById('panel-activity');
+            return activityPanel && activityPanel.classList.contains('active');
+        }
+
         // ================================================================
-        // ===== SOCIAL TABS (Members / Chats) =====
+        // ===== SOCIAL TABS (Members / Chats / Activity) =====
         // ================================================================
         function switchSocialTab(tab) {
             const pills = document.querySelectorAll('.social-section .tab-pill');
@@ -5541,8 +5775,18 @@
                 if (isMobile()) {
                     showChatSidebar();
                 }
+                // Hide member count label when not on members tab
+                const countLabel = document.getElementById('memberCountLabel');
+                if (countLabel) countLabel.style.display = 'none';
+            } else if (tab === 'activity') {
+                detachChatListeners();
+                loadActivityTracker();
+                const countLabel = document.getElementById('memberCountLabel');
+                if (countLabel) countLabel.style.display = 'none';
             } else {
                 detachChatListeners();
+                const countLabel = document.getElementById('memberCountLabel');
+                if (countLabel) countLabel.style.display = '';
             }
         }
 
@@ -5574,9 +5818,146 @@
             let saved = 'members';
             try {
                 const v = localStorage.getItem(CHAT_TAB_KEY);
-                if (v === 'chats' || v === 'members') saved = v;
+                if (v === 'chats' || v === 'members' || v === 'activity') saved = v;
             } catch (e) { /* ignore */ }
             switchSocialTab(saved);
+        }
+
+        // ================================================================
+        // ===== ★ ACTIVITY TRACKER =====
+        // ================================================================
+        function loadActivityTracker(forceRefresh) {
+            const listEl = document.getElementById('activityList');
+            const countEl = document.getElementById('activityCountLabel');
+            if (!listEl) return;
+
+            if (activityUnsubscribe && !forceRefresh) {
+                // already listening, just re-render from cache if needed
+                return;
+            }
+
+            if (activityUnsubscribe) {
+                try { activityUnsubscribe(); } catch (e) {}
+                activityUnsubscribe = null;
+            }
+
+            listEl.innerHTML = `
+                <div class="activity-empty">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <h3>Loading activity…</h3>
+                    <p>Checking who was last seen and where.</p>
+                </div>
+            `;
+            if (countEl) countEl.textContent = 'Loading…';
+
+            activityUnsubscribe = db.collection('users')
+                .orderBy('lastVisit', 'desc')
+                .limit(ACTIVITY_LIMIT)
+                .onSnapshot((snapshot) => {
+                    const rows = [];
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (!data.lastVisit) return;
+
+                        const lastVisitDate = toJsDate(data.lastVisit);
+                        if (!lastVisitDate) return;
+
+                        const name = data.displayName || data.email || 'Anonymous';
+                        const photoUrl = data.photoURL || '';
+                        const status = data.status || 'offline';
+                        const page = data.lastVisitPage || '';
+                        const title = data.lastVisitTitle || '';
+                        const visitCount = data.visitCount || 0;
+
+                        rows.push({
+                            uid: doc.id,
+                            name,
+                            photoUrl,
+                            status,
+                            lastVisitDate,
+                            page,
+                            title,
+                            visitCount
+                        });
+                    });
+
+                    renderActivityTracker(rows);
+                }, (error) => {
+                    console.warn('Activity tracker listener error:', error.message);
+                    if (listEl) {
+                        listEl.innerHTML = `
+                            <div class="activity-empty">
+                                <i class="fas fa-exclamation-triangle" style="color:#f59e0b;"></i>
+                                <h3>Could not load activity</h3>
+                                <p>${escapeHtml(error.message)}</p>
+                            </div>
+                        `;
+                    }
+                    if (countEl) countEl.textContent = 'Error';
+                });
+        }
+
+        function renderActivityTracker(rows) {
+            const listEl = document.getElementById('activityList');
+            const countEl = document.getElementById('activityCountLabel');
+            if (!listEl) return;
+
+            if (!rows || rows.length === 0) {
+                listEl.innerHTML = `
+                    <div class="activity-empty">
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <h3>No activity yet</h3>
+                        <p>Once squad members browse the site, their last visit will show up here.</p>
+                    </div>
+                `;
+                if (countEl) countEl.textContent = '0 active';
+                return;
+            }
+
+            const now = Date.now();
+            let html = '';
+
+            rows.forEach(row => {
+                const initials = row.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const avatarContent = row.photoUrl
+                    ? `<img src="${cloudinaryAvatar(row.photoUrl, 100)}" alt="${escapeAttr(row.name)}" loading="lazy" />`
+                    : escapeHtml(initials);
+
+                const rel = formatRelativeTime(row.lastVisitDate);
+                const exact = formatFullDate(row.lastVisitDate);
+
+                const pageLabel = row.page
+                    ? `<span class="page-pill" title="${escapeAttr(row.title || row.page)}"><i class="fas fa-file"></i> ${escapeHtml(row.page)}</span>`
+                    : '';
+
+                const countBadge = row.visitCount > 0
+                    ? `<span class="activity-count-badge"><i class="fas fa-eye"></i> ${row.visitCount}</span>`
+                    : '';
+
+                html += `
+                    <div class="activity-row" data-uid="${escapeAttr(row.uid)}">
+                        <div class="activity-avatar">
+                            ${avatarContent}
+                            <span class="status-dot ${row.status}"></span>
+                        </div>
+                        <div class="activity-info">
+                            <div class="activity-name">${escapeHtml(row.name)}</div>
+                            <div class="activity-sub">
+                                <i class="fas fa-clock"></i>
+                                <span title="${escapeAttr(exact)}">${escapeHtml(rel)}</span>
+                                ${pageLabel ? `<span style="color:#ccc;">·</span> ${pageLabel}` : ''}
+                            </div>
+                        </div>
+                        <div class="activity-meta">
+                            <span class="activity-time">${escapeHtml(rel)}</span>
+                            ${countBadge}
+                        </div>
+                    </div>
+                `;
+            });
+
+            listEl.innerHTML = html;
+            if (countEl) countEl.textContent = `${rows.length} member${rows.length !== 1 ? 's' : ''} with activity`;
         }
 
         // ================================================================
@@ -9137,6 +9518,7 @@
             detachHighlightCommentCountListeners();
             if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
             if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
+            if (activityUnsubscribe) { try { activityUnsubscribe(); } catch (e) {} activityUnsubscribe = null; }
         });
 
         // ================================================================
@@ -10323,6 +10705,7 @@
                 detachHighlightCommentCountListeners();
                 if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
                 if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
+                if (activityUnsubscribe) { try { activityUnsubscribe(); } catch (e) {} activityUnsubscribe = null; }
 
                 if (auth.currentUser) {
                     try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
@@ -10651,5 +11034,6 @@
     </script>
 
     <script src="idle-logout.js"></script>
+    <script src="visit-tracker.js"></script>
 </body>
 </html>
