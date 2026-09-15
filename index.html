@@ -5603,23 +5603,15 @@
                     });
             }
 
+            // ★ UPDATED: Cloudinary image cleanup is now handled externally via
+            // the Cloudinary Console Bulk Delete tool using the expires_ tag.
+            // This only removes the Firestore doc so we don't orphan docs or
+            // race with the tag-based image cleanup.
             async function deleteHighlight(id, imageUrls) {
                 try {
-                    for (const url of imageUrls) {
-                        try {
-                            const publicId = url.split('/').pop().split('.')[0];
-                            await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/image/destroy`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ public_id: `t-imawa/highlights/${publicId}` })
-                            });
-                        } catch (e) {
-                            console.warn('Error deleting image from Cloudinary:', e);
-                        }
-                    }
                     await db.collection('highlights').doc(id).delete();
                 } catch (error) {
-                    console.error('Error deleting highlight:', error);
+                    console.error('Error deleting highlight doc:', error);
                 }
             }
 
