@@ -330,6 +330,8 @@
         .highlights-carousel-item .image-container .hl-actions button { background: rgba(0,0,0,0.75); color: white; border: none; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
         .highlights-carousel-item .image-container .hl-actions button:hover { transform: scale(1.05); }
         .highlights-carousel-item .image-container .hl-actions .hl-view { background: rgba(16, 137, 211, 0.95); }
+        .highlights-carousel-item .image-container .hl-actions .hl-fullview { background: rgba(139, 92, 246, 0.95); }
+        .highlights-carousel-item .image-container .hl-actions .hl-fullview:hover { background: rgba(124, 58, 237, 1); }
         .highlights-carousel-item .image-container .hl-actions .hl-download { background: rgba(0,0,0,0.75); }
         .highlights-carousel-item .image-container .hl-actions .hl-download:hover { background: rgb(16, 137, 211); }
         .highlights-carousel-item .item-body { padding: 16px 18px 18px; flex: 1; display: flex; flex-direction: column; }
@@ -364,6 +366,8 @@
         .carousel-item .item-actions button { width: 34px; height: 34px; border-radius: 50%; border: none; cursor: pointer; color: white; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .carousel-item .item-actions .item-view { background: rgba(16, 137, 211, 0.95); }
         .carousel-item .item-actions .item-view:hover { background: rgb(13, 107, 158); transform: scale(1.1); }
+        .carousel-item .item-actions .item-fullview { background: rgba(139, 92, 246, 0.95); }
+        .carousel-item .item-actions .item-fullview:hover { background: rgba(124, 58, 237, 1); transform: scale(1.1); }
         .carousel-item .item-actions .item-download { background: rgba(0,0,0,0.75); }
         .carousel-item .item-actions .item-download:hover { background: rgb(16, 137, 211); transform: scale(1.1); }
         .carousel-item .item-body { padding: 18px 20px 20px; flex: 1; display: flex; flex-direction: column; }
@@ -557,6 +561,8 @@
         .modal-actions .modal-download:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .modal-actions .modal-secondary { background: #f3f4f6; color: #555; }
         .modal-actions .modal-secondary:hover { background: #e5e7eb; transform: scale(1.02); }
+        .modal-actions .modal-fullview { background: linear-gradient(45deg, #8b5cf6 0%, #a78bfa 100%); color: white; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.25); }
+        .modal-actions .modal-fullview:hover { transform: scale(1.02); box-shadow: 0 6px 25px rgba(139, 92, 246, 0.45); }
 
         .member-modal .modal-content { background: white; border-radius: 24px; padding: 0; max-width: 560px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
         .member-modal .member-modal-header { position: relative; width: 100%; height: 300px; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); overflow: hidden; border-radius: 24px 24px 0 0; display: flex; align-items: center; justify-content: center; }
@@ -1103,6 +1109,8 @@
         .gallery-modal .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .gallery-modal .gallery-item .gallery-download-btn { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(16, 137, 211, 0.95); color: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .gallery-modal .gallery-item .gallery-download-btn:hover { background: rgb(13, 107, 158); transform: scale(1.1); }
+        .gallery-modal .gallery-item .gallery-fullview-btn { position: absolute; top: 8px; left: 8px; width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(139, 92, 246, 0.95); color: white; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; transition: all 0.25s ease; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .gallery-modal .gallery-item .gallery-fullview-btn:hover { background: rgba(124, 58, 237, 1); transform: scale(1.1); }
         .gallery-modal .gallery-item .image-index { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.65); color: white; padding: 2px 10px; border-radius: 50px; font-size: 11px; font-weight: 600; }
 
         /* ================================================================
@@ -1342,6 +1350,80 @@
         .highlight-mention-dropdown.show { display: block; }
 
         /* ================================================================
+           ===== FULL IMAGE VIEWER MODAL =====
+           ================================================================ */
+        .fullview-modal .modal-content {
+            background: rgba(0, 0, 0, 0.92);
+            border-radius: 24px;
+            padding: 0;
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            height: auto;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .fullview-modal .fullview-image {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 20px;
+        }
+        .fullview-modal .fullview-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+        .fullview-modal .fullview-close:hover {
+            background: rgba(0,0,0,0.85);
+            transform: rotate(90deg);
+        }
+        .fullview-modal .fullview-download {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.45);
+        }
+        .fullview-modal .fullview-download:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.6);
+        }
+
+        /* ================================================================
            ===== TITA TIMA =====
            ================================================================ */
         .tita-launcher {
@@ -1490,6 +1572,10 @@
 
             .tita-launcher { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); right: 18px; width: 58px; height: 58px; font-size: 22px; z-index: 2500; }
             .tita-panel { bottom: calc(90px + env(safe-area-inset-bottom, 0px)); right: 14px; left: 14px; width: auto; max-width: none; max-height: calc(100vh - 130px); z-index: 2499; }
+
+            .fullview-modal .fullview-image { max-width: 98vw; max-height: 98vh; border-radius: 12px; }
+            .fullview-modal .fullview-close { width: 38px; height: 38px; font-size: 18px; top: 10px; right: 10px; }
+            .fullview-modal .fullview-download { width: 42px; height: 42px; font-size: 16px; bottom: 14px; right: 14px; }
         }
 
         @media (max-width: 480px) {
@@ -1541,6 +1627,10 @@
 
             .tita-launcher { bottom: calc(18px + env(safe-area-inset-bottom, 0px)); right: 16px; width: 56px; height: 56px; font-size: 22px; }
             .tita-panel { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); right: 10px; left: 10px; max-height: calc(100vh - 120px); }
+
+            .fullview-modal .fullview-image { max-width: 99vw; max-height: 99vh; border-radius: 8px; }
+            .fullview-modal .fullview-close { width: 34px; height: 34px; font-size: 16px; top: 8px; right: 8px; }
+            .fullview-modal .fullview-download { width: 38px; height: 38px; font-size: 14px; bottom: 10px; right: 10px; }
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -1726,6 +1816,7 @@
                 <div class="modal-tag" id="itemModalTag">Tag</div>
                 <div class="modal-actions">
                     <button class="modal-download" id="itemModalDownloadBtn" onclick="downloadCurrentItem()"><i class="fas fa-download"></i> Download Image</button>
+                    <button class="modal-fullview" id="itemModalFullViewBtn" onclick="fullViewCurrentItem()"><i class="fas fa-search-plus"></i> View Full</button>
                     <button class="modal-secondary" onclick="closeItemModal()"><i class="fas fa-times"></i> Close</button>
                 </div>
             </div>
@@ -1831,6 +1922,9 @@
                         <button class="modal-download" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
                             <i class="fas fa-download"></i> Download
                         </button>
+                        <button class="modal-fullview" id="hlDetailFullViewBtn" onclick="fullViewCurrentHighlightDetail()">
+                            <i class="fas fa-search-plus"></i> View Full
+                        </button>
                         <button class="modal-download" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
                             <i class="fas fa-expand"></i> View All Photos
                         </button>
@@ -1858,6 +1952,15 @@
             <div class="gallery-body">
                 <div class="gallery-grid" id="galleryGrid"></div>
             </div>
+        </div>
+    </div>
+
+    <!-- ===== FULL IMAGE VIEWER MODAL ===== -->
+    <div id="fullViewModal" class="modal fullview-modal">
+        <div class="modal-content">
+            <button class="fullview-close" onclick="closeFullView()" title="Close"><i class="fas fa-times"></i></button>
+            <img id="fullViewImage" class="fullview-image" src="" alt="Full view" />
+            <button class="fullview-download" onclick="downloadFullViewImage()" title="Download"><i class="fas fa-download"></i></button>
         </div>
     </div>
 
@@ -2025,6 +2128,10 @@
         let titaCurrentUser = null;
         let titaUserData = null;
 
+        // ===== FULL VIEW STATE =====
+        let currentFullViewUrl = '';
+        let currentFullViewFilename = '';
+
         // ================================================================
         // ===== NOTES STATE =====
         // ================================================================
@@ -2062,6 +2169,8 @@
         let highlightMentionCandidates = [];
         let highlightMentionDropdownOpen = false;
         let highlightMentionDropdownIndex = -1;
+        let highlightCommentCounts = {};
+        let highlightCommentCountUnsubscribes = [];
 
         // ================================================================
         // ===== COMMENT AUTO-CLEANUP TIMER =====
@@ -2357,6 +2466,49 @@
                 return { deleted: snapshot.size };
             } catch (err) {
                 console.warn('Highlight comment cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        async function cleanupExpiredNotes() {
+            try {
+                const now = new Date();
+                const snapshot = await db.collection('notes')
+                    .where('expireAt', '<=', now)
+                    .limit(100)
+                    .get();
+
+                if (snapshot.empty) return { deleted: 0 };
+
+                let deleted = 0;
+                for (const doc of snapshot.docs) {
+                    // 1. Delete all child comments first (they're orphaned once the note is gone)
+                    try {
+                        const commentsSnap = await db.collection('noteComments')
+                            .where('noteUid', '==', doc.id)
+                            .get();
+                        if (!commentsSnap.empty) {
+                            const batch = db.batch();
+                            commentsSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                        }
+                    } catch (e) {
+                        console.warn('cleanupExpiredNotes: failed to purge comments for', doc.id, e);
+                    }
+
+                    // 2. Delete the note itself
+                    try {
+                        await doc.ref.delete();
+                        deleted++;
+                    } catch (e) {
+                        console.warn('cleanupExpiredNotes: failed to delete note', doc.id, e);
+                    }
+                }
+
+                console.log(`🧹 Note cleanup: deleted ${deleted} expired note(s).`);
+                return { deleted };
+            } catch (err) {
+                console.warn('Note cleanup error:', err);
                 return { deleted: 0, error: err };
             }
         }
@@ -2798,6 +2950,63 @@
             });
 
             return [...found];
+        }
+
+        // ★ Same as resolveMentions, but reads from highlightPendingMentions
+        // Used by postHighlightComment() so highlight @mentions resolve correctly.
+        function resolveHighlightMentions(text) {
+            const found = new Set();
+
+            highlightPendingMentions.forEach((info) => {
+                if (text.toLowerCase().includes(`@${info.name.toLowerCase()}`)) {
+                    found.add(info.uid);
+                }
+            });
+
+            const cachedUsers = Object.values(userProfileCache)
+                .filter(u => u.displayName)
+                .sort((a, b) => b.displayName.length - a.displayName.length);
+
+            cachedUsers.forEach(u => {
+                const pattern = `@${u.displayName}`;
+                const regex = new RegExp(
+                    escapeRegex(pattern) + '(?=\\s|[.,!?;:]|$)',
+                    'i'
+                );
+                if (regex.test(text)) {
+                    if (u.id) found.add(u.id);
+                }
+            });
+
+            return [...found];
+        }
+
+        function updateHighlightCommentCounts(highlightId, count) {
+            highlightCommentCounts[highlightId] = count;
+            const bubble = document.querySelector(`[data-hl-comment-count="${CSS.escape(highlightId)}"]`);
+            if (bubble) {
+                bubble.textContent = count;
+                bubble.style.display = count > 0 ? 'inline-flex' : 'none';
+            }
+        }
+
+        function detachHighlightCommentCountListeners() {
+            highlightCommentCountUnsubscribes.forEach(fn => { try { fn(); } catch (e) {} });
+            highlightCommentCountUnsubscribes = [];
+        }
+
+        function attachHighlightCommentCountListeners(highlightIds) {
+            detachHighlightCommentCountListeners();
+            highlightIds.forEach(id => {
+                const unsub = db.collection('highlightComments')
+                    .where('highlightId', '==', id)
+                    .onSnapshot(snap => {
+                        updateHighlightCommentCounts(id, snap.size);
+                    }, err => {
+                        console.warn('Highlight comment count listener error:', err.message);
+                    });
+                highlightCommentCountUnsubscribes.push(unsub);
+            });
         }
 
         // ================================================================
@@ -3749,8 +3958,8 @@
                     } catch (e) { /* ignore */ }
                 }
 
-                // ★ Resolve mentions using highlightPendingMentions
-                const mentionedUids = resolveMentions(text, highlightPendingMentions);
+                // ★ FIX: use the highlight-specific mention resolver
+                const mentionedUids = resolveHighlightMentions(text);
 
                 await db.collection('highlightComments').add({
                     highlightId: currentHighlightDetailId,
@@ -3801,11 +4010,13 @@
         }
 
         async function deleteHighlightComment(commentId) {
-            if (!isUserLoggedIn) return;
+            if (!isUserLoggedIn || !titaCurrentUser) return;
             if (!confirm('Delete this comment?')) return;
 
             try {
+                // Delete the comment AND any replies to it
                 const refs = [db.collection('highlightComments').doc(commentId)];
+
                 const childrenSnap = await db.collection('highlightComments')
                     .where('replyToId', '==', commentId)
                     .get();
@@ -3814,6 +4025,8 @@
                 const batch = db.batch();
                 refs.forEach(ref => batch.delete(ref));
                 await batch.commit();
+
+                console.log(`🗑️ Deleted ${refs.length} comment(s)`);
             } catch (err) {
                 console.error('Delete highlight comment error:', err);
                 alert('❌ Could not delete comment: ' + err.message);
@@ -4439,8 +4652,7 @@
         }
 
         async function autoGenerateEventReminders(user) {
-            if (hasAutogenRunToday(user.uid, 'events')) return;
-
+                    if (hasAutogenRunToday(user.uid, 'events')) return;
             try {
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -4459,12 +4671,34 @@
                     return;
                 }
 
+                // ★ DUPLICATE GUARD — collect referenceIds that already have announcements
+                const alreadyAnnounced = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'event')
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnounced.add(d.referenceId);
+                    });
+                } catch (guardErr) {
+                    console.warn('event gen guard failed, skipping:', guardErr.message);
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
+
                 const batch = db.batch();
+                let created = 0;
+
                 snap.forEach(doc => {
+                    if (alreadyAnnounced.has(doc.id)) return; // ← skip duplicates
+
                     const data = doc.data();
                     const eventRef = db.collection('announcements').doc();
                     const title = data.title || 'Upcoming Event';
                     const loc = data.location ? ` at ${data.location}` : '';
+
                     batch.set(eventRef, {
                         type: 'event',
                         title: `⏰ Reminder: ${title} is tomorrow!`,
@@ -4481,8 +4715,10 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
                     });
+                    created++;
                 });
-                await batch.commit();
+
+                if (created > 0) await batch.commit();
             } catch (e) {
                 console.warn('event gen:', e.message);
             }
@@ -4491,7 +4727,6 @@
 
         async function autoGenerateHighlightAnnouncements(user) {
             if (hasAutogenRunToday(user.uid, 'highlights')) return;
-
             try {
                 const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -4510,10 +4745,30 @@
                 const firstDoc = snap.docs[0].data();
                 const author = firstDoc.authorName || 'Someone';
                 const latestHighlightId = snap.docs[0].id;
-
                 const titleText = photoCount === 1
                     ? `📸 ${author} shared a new highlight!`
                     : `📸 ${photoCount} new highlights shared!`;
+
+                // ★ DUPLICATE GUARD — check if we already announced this highlight
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'highlight')
+                        .where('referenceId', '==', latestHighlightId)
+                        .limit(1)
+                        .get();
+
+                    if (!existingSnap.empty) {
+                        // Already announced — do not create a duplicate
+                        markAutogenRunToday(user.uid, 'highlights');
+                        return;
+                    }
+                } catch (guardErr) {
+                    // If the guard query fails (e.g. missing index), fall through
+                    // and skip creating a new announcement to avoid duplicates.
+                    console.warn('highlight gen guard failed, skipping:', guardErr.message);
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
 
                 await db.collection('announcements').add({
                     type: 'highlight',
@@ -4689,6 +4944,36 @@
             setTimeout(() => URL.revokeObjectURL(link.href), 1000);
         }
 
+        // ===== FULL VIEW FUNCTIONS =====
+        function openFullView(imageUrl, filename) {
+            if (!imageUrl) return;
+            currentFullViewUrl = imageUrl;
+            currentFullViewFilename = filename || 'TIMAWA_image.jpg';
+            const img = document.getElementById('fullViewImage');
+            img.src = imageUrl;
+            document.getElementById('fullViewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            syncModalOpenState();
+        }
+
+        function closeFullView() {
+            document.getElementById('fullViewModal').classList.remove('active');
+            document.getElementById('fullViewImage').src = '';
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentFullViewUrl = '';
+            currentFullViewFilename = '';
+            syncModalOpenState();
+        }
+
+        async function downloadFullViewImage() {
+            if (!currentFullViewUrl) return;
+            try {
+                await downloadImage(currentFullViewUrl, currentFullViewFilename || 'TIMAWA_image.jpg');
+            } catch (err) {
+                window.open(currentFullViewUrl, '_blank', 'noopener');
+            }
+        }
+
         // ===== ITEM MODAL =====
         function openItemModal(item, type) {
             currentItem = { ...item, _type: type };
@@ -4699,6 +4984,7 @@
             const descEl = document.getElementById('itemModalDescription');
             const tagEl = document.getElementById('itemModalTag');
             const downloadBtn = document.getElementById('itemModalDownloadBtn');
+            const fullViewBtn = document.getElementById('itemModalFullViewBtn');
 
             if (item.imageUrl) {
                 imageEl.src = item.imageUrl;
@@ -4716,14 +5002,23 @@
             if (item.imageUrl) {
                 downloadBtn.disabled = false;
                 downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Image';
+                fullViewBtn.style.display = 'inline-flex';
             } else {
                 downloadBtn.disabled = true;
                 downloadBtn.innerHTML = '<i class="fas fa-ban"></i> No image';
+                fullViewBtn.style.display = 'none';
             }
 
             document.getElementById('itemModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             syncModalOpenState();
+        }
+
+        function fullViewCurrentItem() {
+            if (!currentItem || !currentItem.imageUrl) return;
+            const safeTitle = sanitizeFilename(currentItem.title || 'item');
+            const ext = extFromUrl(currentItem.imageUrl);
+            openFullView(currentItem.imageUrl, `TIMAWA_${safeTitle}.${ext}`);
         }
 
         function defaultTagFor(type) {
@@ -4837,6 +5132,7 @@
                                 ${imageHtml}
                                 <div class="item-actions">
                                     <button class="item-view" title="View details" onclick="event.stopPropagation(); openItemFromCarousel('${collSafe}', '${itemIdSafe}')"><i class="fas fa-expand"></i></button>
+                                    ${hasImage ? `<button class="item-fullview" title="View full image" onclick="event.stopPropagation(); quickFullViewItem('${collSafe}', '${itemIdSafe}')"><i class="fas fa-search-plus"></i></button>` : ''}
                                     ${hasImage ? `<button class="item-download" title="Download image" onclick="event.stopPropagation(); quickDownloadItem('${collSafe}', '${itemIdSafe}')"><i class="fas fa-download"></i></button>` : ''}
                                 </div>
                             </div>
@@ -4897,6 +5193,14 @@
             currentItem = { ...item, _type: collection };
             await downloadCurrentItem();
             currentItem = prev;
+        }
+
+        function quickFullViewItem(collection, itemId) {
+            const item = carouselItemCache[`${collection}:${itemId}`];
+            if (!item || !item.imageUrl) return;
+            const safeTitle = sanitizeFilename(item.title || 'item');
+            const ext = extFromUrl(item.imageUrl);
+            openFullView(item.imageUrl, `TIMAWA_${safeTitle}.${ext}`);
         }
 
         // ===== MEMBER MODAL =====
@@ -5096,14 +5400,17 @@
             expiryEl.classList.toggle('urgent', isUrgent);
 
             const downloadBtn = document.getElementById('hlDetailDownloadBtn');
+            const fullViewBtn = document.getElementById('hlDetailFullViewBtn');
             const viewAllBtn = document.getElementById('hlDetailViewAllBtn');
 
             if (imageUrls.length > 0) {
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = hasMulti ? '<i class="fas fa-download"></i> Download This' : '<i class="fas fa-download"></i> Download';
+                downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download';
+                fullViewBtn.style.display = 'inline-flex';
             } else {
                 downloadBtn.disabled = true;
                 downloadBtn.innerHTML = '<i class="fas fa-ban"></i> No photo';
+                fullViewBtn.style.display = 'none';
             }
 
             if (hasMulti) {
@@ -5148,6 +5455,16 @@
             }
         }
 
+        function fullViewCurrentHighlightDetail() {
+            if (!currentHighlightDetailId) return;
+            const item = highlightsData.find(h => h.id === currentHighlightDetailId);
+            if (!item || !item.imageURLs || !item.imageURLs.length) return;
+            const url = item.imageURLs[currentHighlightDetailImageIndex] || item.imageURLs[0];
+            const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+            const ext = extFromUrl(url);
+            openFullView(url, `TIMAWA_${safeAuthor}_photo_${currentHighlightDetailImageIndex + 1}.${ext}`);
+        }
+
         function viewAllFromHighlightDetail() {
             const id = currentHighlightDetailId;
             if (!id) return;
@@ -5185,6 +5502,7 @@
                 html += `
                     <div class="gallery-item">
                         <img src="${cloudinaryThumb(url, 600)}" alt="Photo ${index + 1}" loading="lazy" decoding="async" />
+                        <button class="gallery-fullview-btn" title="View full image" onclick="fullViewGalleryImage(${index})"><i class="fas fa-search-plus"></i></button>
                         <button class="gallery-download-btn" title="Download this photo" onclick="downloadGalleryImage(${index})"><i class="fas fa-download"></i></button>
                         <span class="image-index">${index + 1}</span>
                     </div>
@@ -5208,6 +5526,14 @@
             currentGalleryAuthor = '';
             document.getElementById('galleryGrid').innerHTML = '';
             syncModalOpenState();
+        }
+
+        function fullViewGalleryImage(index) {
+            const url = currentGalleryImages[index];
+            if (!url) return;
+            const safeAuthor = sanitizeFilename(currentGalleryAuthor);
+            const ext = extFromUrl(url);
+            openFullView(url, `TIMAWA_${safeAuthor}_photo_${index + 1}.${ext}`);
         }
 
         async function downloadGalleryImage(index) {
@@ -5591,6 +5917,9 @@
                         state.highlights = validHighlights;
                         renderHighlights();
 
+                        // ★ Attach live comment count listeners for each visible highlight
+                        attachHighlightCommentCountListeners(validHighlights.map(h => h.id));
+
                         if (expiredIds.length) {
                             setTimeout(() => {
                                 expiredIds.forEach(({ id, imageURLs }) => {
@@ -5603,10 +5932,6 @@
                     });
             }
 
-            // ★ UPDATED: Cloudinary image cleanup is now handled externally via
-            // the Cloudinary Console Bulk Delete tool using the expires_ tag.
-            // This only removes the Firestore doc so we don't orphan docs or
-            // race with the tag-based image cleanup.
             async function deleteHighlight(id, imageUrls) {
                 try {
                     await db.collection('highlights').doc(id).delete();
@@ -5660,11 +5985,40 @@
                         const hasMulti = imageUrls.length > 1;
                         const hasImages = imageUrls.length > 0;
 
+                        // ★ Read the current comment count for this highlight
+                        const commentCount = highlightCommentCounts[item.id] || 0;
+
                         const avatarContent = authorPhoto
                             ? `<img src="${cloudinaryAvatar(authorPhoto, 80)}" alt="${escapeAttr(authorName)}" loading="lazy" decoding="async" />`
                             : initials;
 
                         const safeId = escapeAttr(item.id);
+
+                        let actionButtons = '';
+                        if (hasImages) {
+                            if (hasMulti) {
+                                actionButtons = `
+                                    <button class="hl-view" onclick="event.stopPropagation(); openGallery('${safeId}')">
+                                        <i class="fas fa-expand"></i> View All
+                                    </button>
+                                    <button class="hl-fullview" onclick="event.stopPropagation(); fullViewHighlight('${safeId}')">
+                                        <i class="fas fa-search-plus"></i> Full
+                                    </button>
+                                    <button class="hl-download" onclick="event.stopPropagation(); downloadAllHighlightImages('${safeId}')">
+                                        <i class="fas fa-file-zipper"></i> Zip
+                                    </button>
+                                `;
+                            } else {
+                                actionButtons = `
+                                    <button class="hl-fullview" onclick="event.stopPropagation(); fullViewHighlight('${safeId}')">
+                                        <i class="fas fa-search-plus"></i> Full
+                                    </button>
+                                    <button class="hl-download" onclick="event.stopPropagation(); downloadSingleHighlightImage('${safeId}')">
+                                        <i class="fas fa-download"></i> Download
+                                    </button>
+                                `;
+                            }
+                        }
 
                         html += `
                             <div class="highlights-carousel-item" data-highlight-id="${safeId}">
@@ -5676,18 +6030,7 @@
                                     <span class="expiry-badge"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
                                     ${hasImages ? `
                                         <div class="hl-actions">
-                                            ${hasMulti ? `
-                                                <button class="hl-view" onclick="event.stopPropagation(); openGallery('${safeId}')">
-                                                    <i class="fas fa-expand"></i> View All
-                                                </button>
-                                                <button class="hl-download" onclick="event.stopPropagation(); downloadAllHighlightImages('${safeId}')">
-                                                    <i class="fas fa-file-zipper"></i> Zip
-                                                </button>
-                                            ` : `
-                                                <button class="hl-download" onclick="event.stopPropagation(); downloadSingleHighlightImage('${safeId}')">
-                                                    <i class="fas fa-download"></i> Download
-                                                </button>
-                                            `}
+                                            ${actionButtons}
                                         </div>
                                     ` : ''}
                                 </div>
@@ -5696,6 +6039,12 @@
                                     <div class="meta">
                                         <span class="author"><span class="avatar-small">${avatarContent}</span> ${escapeHtml(authorName)}</span>
                                         <span class="expiry-time ${isUrgent ? 'urgent' : ''}"><i class="fas fa-clock"></i> ${daysLeft}d left</span>
+                                    </div>
+                                    <div class="meta" style="margin-top:6px; padding-top:6px; border-top:1px solid #f0f4ff;">
+                                        <span style="font-size:11px; color:#888; display:flex; align-items:center; gap:4px;">
+                                            <i class="fas fa-comment"></i>
+                                            <span data-hl-comment-count="${safeId}" style="display:${commentCount > 0 ? 'inline-flex' : 'none'}; font-weight:700; color:rgb(16,137,211);">${commentCount}</span>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -5752,6 +6101,15 @@
             }
         }
 
+        function fullViewHighlight(id) {
+            const item = highlightsData.find(h => h.id === id);
+            if (!item || !item.imageURLs || !item.imageURLs.length) return;
+            const url = item.imageURLs[0];
+            const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+            const ext = extFromUrl(url);
+            openFullView(url, `TIMAWA_${safeAuthor}_photo_1.${ext}`);
+        }
+
         async function downloadAllHighlightImages(id) {
             const item = highlightsData.find(h => h.id === id);
             if (!item || !item.imageURLs || !item.imageURLs.length) return;
@@ -5783,7 +6141,7 @@
 
         // ===== MODAL STATE HELPER =====
         function anyModalOpen() {
-            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal', 'noteModal', 'announcementViewModal'].some(id =>
+            return ['itemModal', 'memberModal', 'galleryModal', 'highlightDetailModal', 'noteModal', 'announcementViewModal', 'fullViewModal'].some(id =>
                 document.getElementById(id).classList.contains('active')
             );
         }
@@ -6116,6 +6474,7 @@
             const announcementPopup = document.getElementById('announcementPopup');
             const noteModal = document.getElementById('noteModal');
             const announcementViewModal = document.getElementById('announcementViewModal');
+            const fullViewModal = document.getElementById('fullViewModal');
 
             if (event.target === itemModal) closeItemModal();
             if (event.target === memberModal) closeMemberModal();
@@ -6123,6 +6482,7 @@
             if (event.target === highlightDetailModal) closeHighlightDetail();
             if (event.target === noteModal) closeNoteModal();
             if (event.target === announcementViewModal) closeAnnouncementView();
+            if (event.target === fullViewModal) closeFullView();
 
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
@@ -6144,6 +6504,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key !== 'Escape') return;
             if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
+            else if (document.getElementById('fullViewModal').classList.contains('active')) closeFullView();
             else if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
             else if (document.getElementById('highlightDetailModal').classList.contains('active')) closeHighlightDetail();
             else if (document.getElementById('memberModal').classList.contains('active')) closeMemberModal();

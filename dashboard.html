@@ -934,6 +934,8 @@
 
         .highlights-carousel-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.06); border: 1px solid #eef2f7; transition: all 0.3s ease; display: flex; flex-direction: column; contain: content; cursor: pointer; position: relative; }
         .highlights-carousel-item:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16, 137, 211, 0.08); border-color: rgba(16, 137, 211, 0.2); }
+        .highlights-carousel-item.selected { border-color: rgb(16, 137, 211); box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.25), 0 12px 40px rgba(16, 137, 211, 0.15); }
+        .highlights-carousel-item.selected::after { content: '✓'; position: absolute; top: 10px; right: 10px; width: 28px; height: 28px; border-radius: 50%; background: rgb(16, 137, 211); color: white; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; z-index: 10; box-shadow: 0 2px 8px rgba(16, 137, 211, 0.4); }
         .highlights-carousel-item .image-container { width: 100%; height: 220px; overflow: hidden; background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); position: relative; flex-shrink: 0; }
         .highlights-carousel-item .image-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .highlights-carousel-item .image-container .expiry-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 3px 10px; border-radius: 50px; font-size: 10px; font-weight: 600; }
@@ -944,6 +946,8 @@
         .highlights-carousel-item .image-container .hl-actions button { background: rgba(0,0,0,0.75); color: white; border: none; padding: 6px 12px; border-radius: 50px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; font-family: inherit; }
         .highlights-carousel-item .image-container .hl-actions button:hover { transform: scale(1.05); }
         .highlights-carousel-item .image-container .hl-actions .hl-view { background: rgba(16, 137, 211, 0.95); }
+        .highlights-carousel-item .image-container .hl-actions .hl-fullview { background: rgba(139, 92, 246, 0.95); }
+        .highlights-carousel-item .image-container .hl-actions .hl-fullview:hover { background: rgba(124, 58, 237, 1); }
         .highlights-carousel-item .image-container .hl-actions .hl-download { background: rgba(0,0,0,0.75); }
         .highlights-carousel-item .image-container .hl-actions .hl-download:hover { background: rgb(16, 137, 211); }
 
@@ -4872,6 +4876,90 @@
             background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
             border-radius: 10px;
         }
+
+        /* ===== FULL VIEW MODAL (matches index.html) ===== */
+        .fullview-modal .modal-content {
+            background: rgba(0, 0, 0, 0.92);
+            border-radius: 24px;
+            padding: 0;
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            height: auto;
+            overflow: hidden;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .fullview-modal .fullview-image {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+            border-radius: 20px;
+        }
+        .fullview-modal .fullview-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.6);
+            border: none;
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+        .fullview-modal .fullview-close:hover {
+            background: rgba(0,0,0,0.85);
+            transform: rotate(90deg);
+        }
+        .fullview-modal .fullview-download {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(16, 137, 211, 0.45);
+        }
+        .fullview-modal .fullview-download:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(16, 137, 211, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .fullview-modal .fullview-image { max-width: 98vw; max-height: 98vh; border-radius: 12px; }
+            .fullview-modal .fullview-close { width: 38px; height: 38px; font-size: 18px; top: 10px; right: 10px; }
+            .fullview-modal .fullview-download { width: 42px; height: 42px; font-size: 16px; bottom: 14px; right: 14px; }
+        }
+        @media (max-width: 480px) {
+            .fullview-modal .fullview-image { max-width: 99vw; max-height: 99vh; border-radius: 8px; }
+            .fullview-modal .fullview-close { width: 34px; height: 34px; font-size: 16px; top: 8px; right: 8px; }
+            .fullview-modal .fullview-download { width: 38px; height: 38px; font-size: 14px; bottom: 10px; right: 10px; }
+        }
+
     </style>
 </head>
 <body>
@@ -5189,6 +5277,9 @@
                         <button class="btn-primary" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
                             <i class="fas fa-download"></i> Download
                         </button>
+                        <button class="btn-primary" id="hlDetailFullViewBtn" onclick="fullViewCurrentHighlightDetail()" style="background: linear-gradient(45deg, #8b5cf6 0%, #a78bfa 100%);">
+                            <i class="fas fa-search-plus"></i> View Full
+                        </button>
                         <button class="btn-primary" id="hlDetailViewAllBtn" onclick="viewAllFromHighlightDetail()" style="display:none; background: linear-gradient(45deg, #f5576c 0%, #f093fb 100%);">
                             <i class="fas fa-expand"></i> View All Photos
                         </button>
@@ -5327,6 +5418,19 @@
                     <i class="fas fa-times"></i> Close
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Full Image Viewer Modal (matches index.html) -->
+    <div id="fullViewModal" class="modal fullview-modal">
+        <div class="modal-content">
+            <button class="fullview-close" onclick="closeFullView()" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="fullViewImage" class="fullview-image" src="" alt="Full view" />
+            <button class="fullview-download" onclick="downloadFullViewImage()" title="Download">
+                <i class="fas fa-download"></i>
+            </button>
         </div>
     </div>
 
@@ -8494,6 +8598,49 @@
             }
         }
 
+        async function cleanupExpiredNotes() {
+            try {
+                const now = new Date();
+                const snapshot = await db.collection('notes')
+                    .where('expireAt', '<=', now)
+                    .limit(100)
+                    .get();
+
+                if (snapshot.empty) return { deleted: 0 };
+
+                let deleted = 0;
+                for (const doc of snapshot.docs) {
+                    // 1. Delete all child comments first (they're orphaned once the note is gone)
+                    try {
+                        const commentsSnap = await db.collection('noteComments')
+                            .where('noteUid', '==', doc.id)
+                            .get();
+                        if (!commentsSnap.empty) {
+                            const batch = db.batch();
+                            commentsSnap.forEach(d => batch.delete(d.ref));
+                            await batch.commit();
+                        }
+                    } catch (e) {
+                        console.warn('cleanupExpiredNotes: failed to purge comments for', doc.id, e);
+                    }
+
+                    // 2. Delete the note itself
+                    try {
+                        await doc.ref.delete();
+                        deleted++;
+                    } catch (e) {
+                        console.warn('cleanupExpiredNotes: failed to delete note', doc.id, e);
+                    }
+                }
+
+                console.log(`🧹 Note cleanup: deleted ${deleted} expired note(s).`);
+                return { deleted };
+            } catch (err) {
+                console.warn('Note cleanup error:', err);
+                return { deleted: 0, error: err };
+            }
+        }
+
         function startCommentAutoCleanup() {
             if (commentCleanupTimer) clearInterval(commentCleanupTimer);
             setTimeout(() => { cleanupExpiredComments(); }, COMMENT_CLEANUP_INITIAL_DELAY_MS);
@@ -9549,15 +9696,42 @@
                 const snap = await db.collection('events')
                     .where('dateTime', '>=', tomorrow)
                     .where('dateTime', '<', dayAfter)
-                    .limit(5).get();
-                if (snap.empty) { markAutogenRunToday(user.uid, 'events'); return; }
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
+
+                // ★ DUPLICATE GUARD — collect referenceIds that already have announcements
+                const alreadyAnnounced = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'event')
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnounced.add(d.referenceId);
+                    });
+                } catch (guardErr) {
+                    console.warn('event gen guard failed, skipping:', guardErr.message);
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
 
                 const batch = db.batch();
+                let created = 0;
+
                 snap.forEach(doc => {
+                    if (alreadyAnnounced.has(doc.id)) return; // ← skip duplicates
+
                     const data = doc.data();
                     const eventRef = db.collection('announcements').doc();
                     const title = data.title || 'Upcoming Event';
                     const loc = data.location ? ` at ${data.location}` : '';
+
                     batch.set(eventRef, {
                         type: 'event',
                         title: `⏰ Reminder: ${title} is tomorrow!`,
@@ -9574,21 +9748,31 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
                     });
+                    created++;
                 });
-                await batch.commit();
-            } catch (e) { console.warn('event gen:', e.message); }
+
+                if (created > 0) await batch.commit();
+            } catch (e) {
+                console.warn('event gen:', e.message);
+            }
             markAutogenRunToday(user.uid, 'events');
         }
 
         async function autoGenerateHighlightAnnouncements(user) {
-            if (hasAutogenRunToday(user.uid, 'highlights')) return;
+                    if (hasAutogenRunToday(user.uid, 'highlights')) return;
             try {
                 const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
                 const snap = await db.collection('highlights')
                     .where('createdAt', '>=', yesterday)
                     .orderBy('createdAt', 'desc')
-                    .limit(5).get();
-                if (snap.empty) { markAutogenRunToday(user.uid, 'highlights'); return; }
+                    .limit(5)
+                    .get();
+
+                if (snap.empty) {
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
 
                 const photoCount = snap.size;
                 const firstDoc = snap.docs[0].data();
@@ -9597,6 +9781,27 @@
                 const titleText = photoCount === 1
                     ? `📸 ${author} shared a new highlight!`
                     : `📸 ${photoCount} new highlights shared!`;
+
+                // ★ DUPLICATE GUARD — check if we already announced this highlight
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'highlight')
+                        .where('referenceId', '==', latestHighlightId)
+                        .limit(1)
+                        .get();
+
+                    if (!existingSnap.empty) {
+                        // Already announced — do not create a duplicate
+                        markAutogenRunToday(user.uid, 'highlights');
+                        return;
+                    }
+                } catch (guardErr) {
+                    // If the guard query fails (e.g. missing index), fall through
+                    // and skip creating a new announcement to avoid duplicates.
+                    console.warn('highlight gen guard failed, skipping:', guardErr.message);
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
 
                 await db.collection('announcements').add({
                     type: 'highlight',
@@ -9616,7 +9821,9 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
                 });
-            } catch (e) { console.warn('highlight gen:', e.message); }
+            } catch (e) {
+                console.warn('highlight gen:', e.message);
+            }
             markAutogenRunToday(user.uid, 'highlights');
         }
 
@@ -9659,8 +9866,14 @@
 
         function startAutoCleanup() {
             if (autoCleanupTimer) clearInterval(autoCleanupTimer);
-            setTimeout(() => { cleanupExpiredHighlights(); }, AUTO_CLEANUP_INITIAL_DELAY_MS);
-            autoCleanupTimer = setInterval(() => { cleanupExpiredHighlights(); }, AUTO_CLEANUP_INTERVAL_MS);
+            setTimeout(() => {
+                cleanupExpiredHighlights();
+                cleanupExpiredNotes();          // ← add this
+            }, AUTO_CLEANUP_INITIAL_DELAY_MS);
+            autoCleanupTimer = setInterval(() => {
+                cleanupExpiredHighlights();
+                cleanupExpiredNotes();          // ← and this
+            }, AUTO_CLEANUP_INTERVAL_MS);
         }
 
         function stopAutoCleanup() {
@@ -9909,6 +10122,62 @@
             } catch (error) { alert('❌ Error downloading: ' + error.message); }
         }
 
+        // ===== FULL VIEW (matches index.html) =====
+        let currentFullViewUrl = '';
+        let currentFullViewFilename = '';
+
+        function openFullView(imageUrl, filename) {
+            if (!imageUrl) return;
+            currentFullViewUrl = imageUrl;
+            currentFullViewFilename = filename || 'TIMAWA_image.jpg';
+            const img = document.getElementById('fullViewImage');
+            img.src = imageUrl;
+            document.getElementById('fullViewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            syncModalOpenState();
+        }
+
+        function closeFullView() {
+            document.getElementById('fullViewModal').classList.remove('active');
+            document.getElementById('fullViewImage').src = '';
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            currentFullViewUrl = '';
+            currentFullViewFilename = '';
+            syncModalOpenState();
+        }
+
+        async function downloadFullViewImage() {
+            if (!currentFullViewUrl) return;
+            try {
+                await downloadImage(currentFullViewUrl, currentFullViewFilename || 'TIMAWA_image.jpg');
+            } catch (err) {
+                window.open(currentFullViewUrl, '_blank', 'noopener');
+            }
+        }
+
+        function fullViewHighlight(id) {
+            if (!id) return;
+
+            db.collection('highlights').doc(id).get().then(snap => {
+                if (!snap.exists) {
+                    alert('This highlight no longer exists.');
+                    return;
+                }
+                const item = snap.data();
+                if (!item.imageURLs || item.imageURLs.length === 0) {
+                    alert('No image available to view.');
+                    return;
+                }
+                const url = item.imageURLs[0];
+                const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+                const ext = extFromUrl(url);
+                openFullView(url, `TIMAWA_${safeAuthor}_photo_1.${ext}`);   // ← now uses openFullView
+            }).catch(err => {
+                console.error('fullViewHighlight error:', err);
+                alert('Could not load image.');
+            });
+        }
+
         // ================================================================
         // ===== LOAD HIGHLIGHTS =====
         // ================================================================
@@ -10053,11 +10322,17 @@
                                             <button class="hl-view" onclick="event.stopPropagation(); openGallery('${safeId}')">
                                                 <i class="fas fa-expand"></i> View All
                                             </button>
-                                            <button class="hl-download" onclick="event.stopPropagation(); downloadHighlight('${safeId}')">
+                                            <button class="hl-fullview" onclick="event.stopPropagation(); fullViewHighlight('${safeId}')">
+                                                <i class="fas fa-search-plus"></i> Full
+                                            </button>
+                                            <button class="hl-download" onclick="event.stopPropagation(); downloadAllHighlightImages('${safeId}')">
                                                 <i class="fas fa-file-zipper"></i> Zip
                                             </button>
                                         ` : `
-                                            <button class="hl-download" onclick="event.stopPropagation(); downloadHighlight('${safeId}')">
+                                            <button class="hl-fullview" onclick="event.stopPropagation(); fullViewHighlight('${safeId}')">
+                                                <i class="fas fa-search-plus"></i> Full
+                                            </button>
+                                            <button class="hl-download" onclick="event.stopPropagation(); downloadSingleHighlightImage('${safeId}')">
                                                 <i class="fas fa-download"></i> Download
                                             </button>
                                         `}
@@ -10215,6 +10490,26 @@
                 if (hasMulti) viewAllBtn.style.display = 'inline-flex';
                 else viewAllBtn.style.display = 'none';
 
+                // ★ NEW: Show/hide the View Full button based on whether there's an image
+                const fullViewBtn = document.getElementById('hlDetailFullViewBtn');
+                if (fullViewBtn) {
+                    if (imageUrls.length > 0) {
+                        fullViewBtn.style.display = 'inline-flex';
+                    } else {
+                        fullViewBtn.style.display = 'none';
+                    }
+                }
+
+                // ★ Show delete button only for owner or admin
+                const deleteBtn = document.getElementById('hlDetailDeleteBtn');
+                const isOwner = currentUser && item.authorUid === currentUser.uid;
+                const isAdmin = titaUserData && titaUserData.isAdmin === true;
+                if (isOwner || isAdmin) {
+                    deleteBtn.style.display = 'inline-flex';
+                } else {
+                    deleteBtn.style.display = 'none';
+                }
+
                 renderHighlightCommentsSection(highlightId);
 
                 document.getElementById('highlightDetailModal').classList.add('active');
@@ -10250,6 +10545,29 @@
                 const filename = `TIMAWA_${safeAuthor}_photo_${currentHighlightDetailImageIndex + 1}.${ext}`;
                 await downloadImage(url, filename);
             } catch (err) { alert('❌ Failed to download: ' + err.message); }
+        }
+
+        async function fullViewCurrentHighlightDetail() {
+            if (!currentHighlightDetailId) return;
+            try {
+                const doc = await db.collection('highlights').doc(currentHighlightDetailId).get();
+                if (!doc.exists) {
+                    alert('This highlight no longer exists.');
+                    return;
+                }
+                const item = doc.data();
+                if (!item.imageURLs || !item.imageURLs.length) {
+                    alert('No image available to view.');
+                    return;
+                }
+                const url = item.imageURLs[currentHighlightDetailImageIndex] || item.imageURLs[0];
+                const safeAuthor = sanitizeFilename(item.authorName || 'highlight');
+                const ext = extFromUrl(url);
+                openFullView(url, `TIMAWA_${safeAuthor}_photo_${currentHighlightDetailImageIndex + 1}.${ext}`);
+            } catch (err) {
+                console.error('fullViewCurrentHighlightDetail error:', err);
+                alert('Could not load image.');
+            }
         }
 
         function viewAllFromHighlightDetail() {
@@ -10449,6 +10767,15 @@
                 selectedHighlights.clear();
                 updateSelectionUI();
             }
+
+            // ★ FIX: Change button text based on selection mode
+            const selectBtn = document.querySelector('.btn-secondary[onclick="toggleSelectionMode()"]');
+            if (selectBtn) {
+                selectBtn.innerHTML = selectionMode
+                    ? '<i class="fas fa-times"></i> Deselect'
+                    : '<i class="fas fa-check-square"></i> Select';
+            }
+
             document.getElementById('selectionInfo').textContent = selectionMode ? 'Select highlights to download or delete' : '';
             refreshHighlights();
         }
@@ -10466,6 +10793,18 @@
             });
         }
 
+        // ★ NEW: Toggle individual highlight selection
+        function toggleHighlightSelection(id) {
+            if (!selectionMode) return;
+            if (selectedHighlights.has(id)) {
+                selectedHighlights.delete(id);
+            } else {
+                selectedHighlights.add(id);
+            }
+            refreshHighlights();
+            updateSelectionUI();
+        }
+
         async function batchDelete() {
             if (selectedHighlights.size === 0) { alert('Please select at least one highlight to delete.'); return; }
             if (!confirm(`Delete ${selectedHighlights.size} highlight(s)? This cannot be undone.`)) return;
@@ -10473,8 +10812,17 @@
                 const idsToDelete = [...selectedHighlights];
                 let deletedCount = 0;
                 for (const id of idsToDelete) {
+                    // ★ Check ownership before deleting
                     const doc = await db.collection('highlights').doc(id).get();
+                    if (!doc.exists) continue;
                     const data = doc.data();
+                    const isOwner = currentUser && data.authorUid === currentUser.uid;
+                    const isAdmin = titaUserData && titaUserData.isAdmin === true;
+                    if (!isOwner && !isAdmin) {
+                        alert(`Skipped a highlight — only the owner or admin can delete it.`);
+                        continue;
+                    }
+
                     const imageUrls = data?.imageURLs || [];
                     const publicIds = data?.imagePublicIds || [];
                     for (let i = 0; i < imageUrls.length; i++) {
@@ -10970,7 +11318,7 @@
         // ===== MODAL STATE =====
         // ================================================================
         function anyModalOpen() {
-            return ['uploadModal', 'galleryModal', 'lightboxModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal', 'newMessageModal']
+            return ['uploadModal', 'galleryModal', 'lightboxModal', 'fullViewModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal', 'newMessageModal']
                 .some(id => {
                     const el = document.getElementById(id);
                     return el && el.classList.contains('active');
@@ -11012,46 +11360,49 @@
         }
 
         window.onclick = function(event) {
-            const uploadModal = document.getElementById('uploadModal');
-            const galleryModal = document.getElementById('galleryModal');
-            const lightboxModal = document.getElementById('lightboxModal');
-            const highlightDetailModal = document.getElementById('highlightDetailModal');
-            const memberDetailModal = document.getElementById('memberDetailModal');
-            const noteModal = document.getElementById('noteModal');
-            const titaPanel = document.getElementById('titaPanel');
-            const announcementPopup = document.getElementById('announcementPopup');
-            const announcementViewModal = document.getElementById('announcementViewModal');
-            const newMessageModal = document.getElementById('newMessageModal');
+        const uploadModal = document.getElementById('uploadModal');
+        const galleryModal = document.getElementById('galleryModal');
+        const lightboxModal = document.getElementById('lightboxModal');
+        const fullViewModal = document.getElementById('fullViewModal');   // ← ADD
+        const highlightDetailModal = document.getElementById('highlightDetailModal');
+        const memberDetailModal = document.getElementById('memberDetailModal');
+        const noteModal = document.getElementById('noteModal');
+        const titaPanel = document.getElementById('titaPanel');
+        const announcementPopup = document.getElementById('announcementPopup');
+        const announcementViewModal = document.getElementById('announcementViewModal');
+        const newMessageModal = document.getElementById('newMessageModal');
 
-            if (event.target === uploadModal) closeUploadModal();
-            if (event.target === galleryModal) closeGallery();
-            if (event.target === lightboxModal) closeLightbox();
-            if (event.target === highlightDetailModal) closeHighlightDetail();
-            if (event.target === memberDetailModal) closeMemberDetail();
-            if (event.target === noteModal) closeNoteModal();
-            if (event.target === announcementViewModal) closeAnnouncementView();
-            if (event.target === newMessageModal) closeNewMessageModal();
+        if (event.target === uploadModal) closeUploadModal();
+        if (event.target === galleryModal) closeGallery();
+        if (event.target === lightboxModal) closeLightbox();
+        if (event.target === fullViewModal) closeFullView();             // ← ADD
+        if (event.target === highlightDetailModal) closeHighlightDetail();
+        if (event.target === memberDetailModal) closeMemberDetail();
+        if (event.target === noteModal) closeNoteModal();
+        if (event.target === announcementViewModal) closeAnnouncementView();
+        if (event.target === newMessageModal) closeNewMessageModal();
 
-            if (titaPanel && titaPanel.classList.contains('open') &&
-                !titaPanel.contains(event.target) &&
-                !event.target.closest('#titaLauncher')) {
-                closeTitaPanel();
+        if (titaPanel && titaPanel.classList.contains('open') &&
+            !titaPanel.contains(event.target) &&
+            !event.target.closest('#titaLauncher')) {
+            closeTitaPanel();
+        }
+
+        if (announcementPopup && announcementPopup.classList.contains('open')) {
+            if (!announcementPopup.contains(event.target) &&
+                !event.target.closest('#announcementBell') &&
+                !event.target.closest('#announcementBellMobile') &&
+                !event.target.closest('.announcement-wrapper') &&
+                !event.target.closest('.navbar-mobile-bell')) {
+                closeAnnouncementPopup();
             }
-
-            if (announcementPopup && announcementPopup.classList.contains('open')) {
-                if (!announcementPopup.contains(event.target) &&
-                    !event.target.closest('#announcementBell') &&
-                    !event.target.closest('#announcementBellMobile') &&
-                    !event.target.closest('.announcement-wrapper') &&
-                    !event.target.closest('.navbar-mobile-bell')) {
-                    closeAnnouncementPopup();
-                }
-            }
-        };
+        }
+    };
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (document.getElementById('newMessageModal').classList.contains('active')) closeNewMessageModal();
+                if (document.getElementById('fullViewModal').classList.contains('active')) closeFullView();
+                else if (document.getElementById('newMessageModal').classList.contains('active')) closeNewMessageModal();
                 else if (document.getElementById('lightboxModal').classList.contains('active')) closeLightbox();
                 else if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
                 else if (document.getElementById('uploadModal').classList.contains('active')) closeUploadModal();
@@ -11327,6 +11678,20 @@
                 positionAnnouncementPopup(anchor);
             }
         });
+
+        // ================================================================
+        // ===== SELECTION MODE: Click handler for highlight cards =====
+        // ================================================================
+        document.addEventListener('click', function(e) {
+            const highlightCard = e.target.closest('.highlights-carousel-item');
+            if (!highlightCard) return;
+            if (!selectionMode) return;
+            if (e.target.closest('.hl-actions')) return;
+
+            e.stopPropagation();
+            const id = highlightCard.dataset.highlightId;
+            if (id) toggleHighlightSelection(id);
+        }, true);
     </script>
 
     <script src="idle-logout.js"></script>
