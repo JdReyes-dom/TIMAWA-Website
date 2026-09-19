@@ -2064,7 +2064,6 @@
 
         async function autoGenerateEventReminders(user) {
             if (hasAutogenRunToday(user.uid, 'events')) return;
-
             try {
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -2083,12 +2082,34 @@
                     return;
                 }
 
+                // ★ DUPLICATE GUARD — collect referenceIds already announced
+                const alreadyAnnounced = new Set();
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'event')
+                        .get();
+
+                    existingSnap.forEach(doc => {
+                        const d = doc.data();
+                        if (d.referenceId) alreadyAnnounced.add(d.referenceId);
+                    });
+                } catch (guardErr) {
+                    console.warn('event gen guard failed, skipping:', guardErr.message);
+                    markAutogenRunToday(user.uid, 'events');
+                    return;
+                }
+
                 const batch = db.batch();
+                let created = 0;
+
                 snap.forEach(doc => {
+                    if (alreadyAnnounced.has(doc.id)) return; // skip duplicates
+
                     const data = doc.data();
                     const eventRef = db.collection('announcements').doc();
                     const title = data.title || 'Upcoming Event';
                     const loc = data.location ? ` at ${data.location}` : '';
+
                     batch.set(eventRef, {
                         type: 'event',
                         title: `⏰ Reminder: ${title} is tomorrow!`,
@@ -2105,8 +2126,10 @@
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         expiresAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
                     });
+                    created++;
                 });
-                await batch.commit();
+
+                if (created > 0) await batch.commit();
             } catch (e) {
                 console.warn('event gen:', e.message);
             }
@@ -2115,7 +2138,6 @@
 
         async function autoGenerateHighlightAnnouncements(user) {
             if (hasAutogenRunToday(user.uid, 'highlights')) return;
-
             try {
                 const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -2134,10 +2156,27 @@
                 const firstDoc = snap.docs[0].data();
                 const author = firstDoc.authorName || 'Someone';
                 const latestHighlightId = snap.docs[0].id;
-
                 const titleText = photoCount === 1
                     ? `📸 ${author} shared a new highlight!`
                     : `📸 ${photoCount} new highlights shared!`;
+
+                // ★ DUPLICATE GUARD — skip if this highlight was already announced
+                try {
+                    const existingSnap = await db.collection('announcements')
+                        .where('type', '==', 'highlight')
+                        .where('referenceId', '==', latestHighlightId)
+                        .limit(1)
+                        .get();
+
+                    if (!existingSnap.empty) {
+                        markAutogenRunToday(user.uid, 'highlights');
+                        return;
+                    }
+                } catch (guardErr) {
+                    console.warn('highlight gen guard failed, skipping:', guardErr.message);
+                    markAutogenRunToday(user.uid, 'highlights');
+                    return;
+                }
 
                 await db.collection('announcements').add({
                     type: 'highlight',
