@@ -5602,6 +5602,10 @@
         const HIGHLIGHT_COMMENT_CLEANUP_BATCH = 450;
 
         const ACTIVITY_LIMIT = 50;
+        // ★ NEW: Inactive user cleanup threshold (5 days in milliseconds)
+        const INACTIVE_USER_THRESHOLD_MS = 5 * 24 * 60 * 60 * 1000;
+        // ★ NEW: Batch limit for inactive user cleanup
+        const INACTIVE_USER_CLEANUP_BATCH = 50;
 
         // ================================================================
         // ===== ★ NEW: PERFORMANCE OPTIMIZATION CONSTANTS =====
@@ -6058,11 +6062,16 @@
             `;
             if (countEl) countEl.textContent = 'Loading…';
 
+            // ★ NEW: Calculate cutoff date (5 days ago)
+            const cutoffDate = new Date(Date.now() - INACTIVE_USER_THRESHOLD_MS);
+
             activityUnsubscribe = db.collection('users')
                 .orderBy('lastVisit', 'desc')
                 .limit(ACTIVITY_LIMIT)
                 .onSnapshot((snapshot) => {
                     const rows = [];
+                    const inactiveUserIds = [];
+
                     snapshot.forEach(doc => {
                         const data = doc.data();
                         if (!data.lastVisit) return;
@@ -6070,12 +6079,17 @@
                         const lastVisitDate = toJsDate(data.lastVisit);
                         if (!lastVisitDate) return;
 
+                        // ★ NEW: Check if user is inactive (last visit > 5 days ago)
+                        if (lastVisitDate <= cutoffDate) {
+                            inactiveUserIds.push(doc.id);
+                            return; // Skip inactive users from display
+                        }
+
                         const name = data.displayName || data.email || 'Anonymous';
                         const photoUrl = data.photoURL || '';
                         const status = data.status || 'offline';
                         const page = data.lastVisitPage || '';
                         const title = data.lastVisitTitle || '';
-                        const visitCount = data.visitCount || 0;
 
                         rows.push({
                             uid: doc.id,
@@ -6084,10 +6098,14 @@
                             status,
                             lastVisitDate,
                             page,
-                            title,
-                            visitCount
+                            title
                         });
                     });
+
+                    // ★ NEW: Auto-cleanup inactive users in the background
+                    if (inactiveUserIds.length > 0) {
+                        cleanupInactiveUsers(inactiveUserIds);
+                    }
 
                     renderActivityTracker(rows);
                 }, (error) => {
@@ -6138,9 +6156,7 @@
                     ? `<span class="page-pill" title="${escapeAttr(row.title || row.page)}"><i class="fas fa-file"></i> ${escapeHtml(row.page)}</span>`
                     : '';
 
-                const countBadge = row.visitCount > 0
-                    ? `<span class="activity-count-badge"><i class="fas fa-eye"></i> ${row.visitCount}</span>`
-                    : '';
+                // ★ REMOVED: Visit count badge (view counter) is no longer displayed
 
                 html += `
                     <div class="activity-row" data-uid="${escapeAttr(row.uid)}">
@@ -6158,7 +6174,6 @@
                         </div>
                         <div class="activity-meta">
                             <span class="activity-time">${escapeHtml(rel)}</span>
-                            ${countBadge}
                         </div>
                     </div>
                 `;
@@ -6166,6 +6181,87 @@
 
             listEl.innerHTML = html;
             if (countEl) countEl.textContent = `${rows.length} member${rows.length !== 1 ? 's' : ''} with activity`;
+        }
+
+        // ================================================================
+        // ===== ★ CLEANUP INACTIVE USERS (5+ days no login) =====
+        // ================================================================
+        async function cleanupInactiveUsers(userIds) {
+            if (!userIds || userIds.length === 0) return { deleted: 0 };
+
+            try {
+                const batchSize = INACTIVE_USER_CLEANUP_BATCH;
+                let totalDeleted = 0;
+
+                for (let i = 0; i < userIds.length; i += batchSize) {
+                    const batchIds = userIds.slice(i, i + batchSize);
+                    const batch = db.batch();
+                    let queued = 0;
+
+                    batchIds.forEach(uid => {
+                        // Never delete the currently logged-in user
+                        if (currentUser && uid === currentUser.uid) return;
+                        batch.delete(db.collection('users').doc(uid));
+                        queued++;
+                    });
+
+                    if (queued > 0) {
+                        await batch.commit();
+                        totalDeleted += queued;
+                    }
+                }
+
+                if (totalDeleted > 0) {
+                    console.log(`🧹 Inactive cleanup: removed ${totalDeleted} user(s) from Firebase.`);
+                }
+                return { deleted: totalDeleted };
+            } catch (err) {
+                console.warn('cleanupInactiveUsers error:', err.message);
+                return { deleted: 0, error: err };
+            }
+        }
+
+        // ================================================================
+        // ===== ★ SCHEDULED INACTIVE USER CLEANUP (runs periodically) =====
+        // ================================================================
+        async function scheduledInactiveUserCleanup() {
+            try {
+                const cutoffDate = new Date(Date.now() - INACTIVE_USER_THRESHOLD_MS);
+
+                const snapshot = await db.collection('users')
+                    .where('lastVisit', '<=', cutoffDate)
+                    .limit(INACTIVE_USER_CLEANUP_BATCH)
+                    .get();
+
+                if (snapshot.empty) {
+                    return { deleted: 0 };
+                }
+
+                const batch = db.batch();
+                let deletedCount = 0;
+
+                snapshot.forEach(doc => {
+                    // Never delete the currently logged-in user
+                    if (currentUser && doc.id === currentUser.uid) return;
+                    batch.delete(doc.ref);
+                    deletedCount++;
+                });
+
+                if (deletedCount > 0) {
+                    await batch.commit();
+                    console.log(`🧹 Scheduled inactive cleanup: removed ${deletedCount} user(s).`);
+                }
+
+                // If we hit the batch cap, schedule the next run shortly
+                if (snapshot.size === INACTIVE_USER_CLEANUP_BATCH) {
+                    setTimeout(scheduledInactiveUserCleanup, 3000);
+                }
+
+                return { deleted: deletedCount };
+            } catch (err) {
+                console.warn('scheduledInactiveUserCleanup error:', err.message);
+                return { deleted: 0, error: err };
+            }
         }
 
         // ================================================================
@@ -9866,18 +9962,27 @@
 
         function startAutoCleanup() {
             if (autoCleanupTimer) clearInterval(autoCleanupTimer);
+
             setTimeout(() => {
                 cleanupExpiredHighlights();
-                cleanupExpiredNotes();          // ← add this
+                cleanupExpiredNotes();
+                // ★ NEW: run scheduled inactive-user cleanup on startup
+                scheduledInactiveUserCleanup();
             }, AUTO_CLEANUP_INITIAL_DELAY_MS);
+
             autoCleanupTimer = setInterval(() => {
                 cleanupExpiredHighlights();
-                cleanupExpiredNotes();          // ← and this
+                cleanupExpiredNotes();
+                // ★ NEW: run scheduled inactive-user cleanup periodically
+                scheduledInactiveUserCleanup();
             }, AUTO_CLEANUP_INTERVAL_MS);
         }
 
         function stopAutoCleanup() {
-            if (autoCleanupTimer) { clearInterval(autoCleanupTimer); autoCleanupTimer = null; }
+            if (autoCleanupTimer) {
+                clearInterval(autoCleanupTimer);
+                autoCleanupTimer = null;
+            }
         }
 
         // ================================================================
