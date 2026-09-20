@@ -11,30 +11,21 @@
         ═══════════════════════════════════════════════════════════════════
         This page READS the theme only. It never writes to Firestore.
         The only page that writes theme to Firestore is profile.html.
-
-        Read order:
-          1. localStorage (instant — no flash of default Ocean)
-          2. BroadcastChannel (live cross-tab updates)
-          3. Firestore users/{uid}.theme (new-device case, applied on auth)
         ═══════════════════════════════════════════════════════════════════
     -->
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
-    <!-- FullCalendar -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 
     <style>
         /* ================================================================
            ===== THEME CSS VARIABLES (defaults = Ocean light) =====
-           Overridden at runtime by applyTheme().
            ================================================================ */
         :root {
             --theme-primary: #1089d3;
@@ -312,8 +303,6 @@
         }
 
         /* -------- STARRY (STATIC-FIRST, CHEAP) -------- */
-
-        /* Layer 1: dense small stars — static background, no animation */
         .starfield {
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0.85;
@@ -340,16 +329,12 @@
                 radial-gradient(1.4px 1.4px at 42% 82%, #fff, transparent);
             background-size: 200px 200px;
             background-repeat: repeat;
-            /* NO animation — static pattern is virtually free */
         }
-        /* Layer 2: sparse brighter stars, also static */
         .starfield-2 {
             background-size: 340px 340px;
             background-position: 50px 80px;
             opacity: 0.55;
         }
-
-        /* Shooting stars: keep them but slow + only 1 at a time feels alive */
         .shooting-star {
             width: 3px; height: 3px; background: #fff; border-radius: 50%;
             box-shadow: 0 0 6px 1px rgba(255,255,255,0.6);
@@ -365,13 +350,9 @@
         }
         .shooting-star.sh1 { top: 14%; left: 80%; animation-delay: 2s; }
         .shooting-star.sh2 { top: 48%; left: 85%; animation-delay: 9s; animation-duration: 16s; }
-
-        /* Nebula: NO blur filter. Use radial-gradient falloff instead. */
-        /* radial-gradient with transparent stop = soft edge, free of blur cost */
         .nebula {
             border-radius: 50%;
             opacity: 0.30;
-            /* subtle pulse only on opacity (cheap) — no scale, no blur */
             animation: nebulaPulse 20s ease-in-out infinite;
             will-change: opacity;
         }
@@ -392,24 +373,19 @@
                 transparent 75%);
             animation-delay: 7s;
         }
-
         @keyframes shoot {
             0%   { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
             4%   { opacity: 1; }
             16%  { transform: translate(-260px, 170px) rotate(-35deg); opacity: 0; }
             100% { transform: translate(-260px, 170px) rotate(-35deg); opacity: 0; }
         }
-        /* Opacity-only pulse — GPU cheap, no re-raster, no blur recompute */
         @keyframes nebulaPulse {
             0%, 100% { opacity: 0.22; }
             50%      { opacity: 0.38; }
         }
-
         @media (prefers-reduced-motion: reduce) {
             [data-timawa-theme="starry"] .shooting-star,
-            [data-timawa-theme="starry"] .nebula {
-                animation: none !important;
-            }
+            [data-timawa-theme="starry"] .nebula { animation: none !important; }
             [data-timawa-theme="starry"] .shooting-star { display: none; }
         }
 
@@ -542,7 +518,7 @@
         }
 
         /* ================================================================
-           ===== ALL EXISTING CALENDAR STYLES — now themed =====
+           ===== CALENDAR-SPECIFIC STYLES (redesigned) =====
            ================================================================ */
 
         /* ===== NAVIGATION ===== */
@@ -596,32 +572,6 @@
         .navbar .nav-links a.active {
             color: var(--theme-primary);
             background: color-mix(in srgb, var(--theme-primary) 8%, transparent);
-        }
-        .navbar .user-profile {
-            display: flex; align-items: center; gap: 10px;
-            background: var(--theme-card);
-            padding: 4px 14px 4px 4px;
-            border-radius: 50px;
-            box-shadow: var(--theme-shadow-soft) 0px 4px 10px -4px;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .navbar .user-profile:hover { border-color: var(--theme-primary); }
-        .navbar .user-avatar {
-            width: 34px; height: 34px; border-radius: 50%;
-            background: var(--theme-gradient);
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 700; font-size: 14px;
-            flex-shrink: 0; overflow: hidden;
-        }
-        .navbar .user-avatar img {
-            width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
-        }
-        .navbar .user-name {
-            color: var(--theme-text);
-            font-weight: 600; font-size: 13px;
         }
         .navbar .logout-btn {
             background: var(--theme-card);
@@ -931,7 +881,7 @@
 
         /* ===== MAIN CONTENT ===== */
         .main-content {
-            max-width: 1200px;
+            max-width: 1180px;
             margin: 80px auto 40px;
             padding: 0 40px;
             position: relative;
@@ -941,17 +891,19 @@
         /* ===== HERO BANNER ===== */
         .hero-banner {
             background: linear-gradient(135deg,
-                var(--theme-primary-soft) 0%,
-                color-mix(in srgb, var(--theme-primary) 20%, var(--theme-primary-soft)) 100%);
-            border-radius: 24px;
-            padding: 40px 50px;
-            margin-bottom: 30px;
+                color-mix(in srgb, var(--theme-primary) 10%, var(--theme-card)) 0%,
+                color-mix(in srgb, var(--theme-primary) 20%, var(--theme-card)) 100%);
+            border-radius: 26px;
+            padding: 32px 40px;
+            margin-bottom: 26px;
             display: flex; justify-content: space-between; align-items: center;
             flex-wrap: wrap; gap: 20px;
-            box-shadow: 0 4px 30px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            box-shadow: 0 8px 30px -10px color-mix(in srgb, var(--theme-primary) 25%, transparent);
+            border: 1px solid color-mix(in srgb, var(--theme-primary) 12%, transparent);
         }
         .hero-banner .content h1 {
-            font-size: 28px; font-weight: 800; color: var(--theme-text);
+            font-size: 26px; font-weight: 800; color: var(--theme-text);
+            letter-spacing: -0.3px;
         }
         .hero-banner .content h1 .highlight {
             background: var(--theme-gradient);
@@ -959,131 +911,215 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .hero-banner .content p { color: var(--theme-text-muted); font-size: 15px; }
-        .hero-banner .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .hero-banner .content p { color: var(--theme-text-muted); font-size: 14px; margin-top: 4px; }
+        .hero-banner .actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
         .btn-primary {
             display: inline-flex; align-items: center; gap: 8px;
             background: var(--theme-gradient); color: white;
-            padding: 12px 24px; border-radius: 50px;
-            border: none; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease;
-            box-shadow: 0 4px 15px color-mix(in srgb, var(--theme-primary) 25%, transparent);
+            padding: 11px 20px; border-radius: 50px;
+            border: none; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.25s ease;
+            box-shadow: 0 6px 18px -4px color-mix(in srgb, var(--theme-primary) 50%, transparent);
             font-family: inherit;
+            letter-spacing: 0.2px;
         }
         .btn-primary:hover {
-            transform: scale(1.03);
-            box-shadow: 0 6px 25px color-mix(in srgb, var(--theme-primary) 35%, transparent);
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 10px 24px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
         }
         .btn-secondary {
             display: inline-flex; align-items: center; gap: 8px;
-            background: var(--theme-card); color: var(--theme-primary);
-            padding: 12px 24px; border-radius: 50px;
-            border: 2px solid var(--theme-border-input);
-            font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s ease;
+            background: var(--theme-card); color: var(--theme-text-muted);
+            padding: 10px 20px; border-radius: 50px;
+            border: 1.5px solid var(--theme-border-input);
+            font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.25s ease;
             font-family: inherit;
         }
         .btn-secondary:hover {
             border-color: var(--theme-primary);
+            color: var(--theme-primary);
             background: var(--theme-primary-soft-2);
-            transform: scale(1.03);
         }
 
-        /* ===== CALENDAR ===== */
+        /* ===== CALENDAR WRAPPER ===== */
         .calendar-wrapper {
             background: var(--theme-card);
-            border-radius: 24px;
-            padding: 30px;
+            border-radius: 26px;
+            padding: 22px 22px 26px;
             border: 1px solid var(--theme-border);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            box-shadow: 0 10px 40px -18px rgba(0,0,0,0.15);
             transition: background 0.4s ease, border-color 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .calendar-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--theme-gradient);
         }
         .calendar-wrapper .fc { max-width: 100%; }
-        .calendar-wrapper .fc .fc-toolbar { flex-wrap: wrap; gap: 10px; }
+
+        .calendar-wrapper .fc .fc-toolbar {
+            flex-wrap: wrap; gap: 10px;
+            margin-bottom: 14px !important;
+        }
+        .calendar-wrapper .fc .fc-toolbar.fc-header-toolbar {
+            padding: 4px 0 10px;
+        }
         .calendar-wrapper .fc .fc-toolbar .fc-left,
         .calendar-wrapper .fc .fc-toolbar .fc-center,
         .calendar-wrapper .fc .fc-toolbar .fc-right {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 5px;
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
         }
         .calendar-wrapper .fc-toolbar-title {
             font-size: 20px !important;
-            font-weight: 700 !important;
+            font-weight: 800 !important;
             color: var(--theme-text) !important;
+            letter-spacing: -0.3px;
+        }
+        .calendar-wrapper .fc .fc-button {
+            padding: 6px 12px !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            border-radius: 10px !important;
+            box-shadow: none !important;
+            text-transform: capitalize !important;
+            font-family: inherit !important;
+            transition: all 0.2s ease !important;
         }
         .calendar-wrapper .fc-button-primary {
-            background: var(--theme-primary) !important;
-            border-color: var(--theme-primary) !important;
+            background: var(--theme-card) !important;
+            border: 1.5px solid var(--theme-border-input) !important;
+            color: var(--theme-text-muted) !important;
         }
         .calendar-wrapper .fc-button-primary:hover {
-            background: var(--theme-primary-dark) !important;
-            border-color: var(--theme-primary-dark) !important;
+            background: var(--theme-primary-soft-2) !important;
+            border-color: var(--theme-primary) !important;
+            color: var(--theme-primary) !important;
+        }
+        .calendar-wrapper .fc-button-primary:not(:disabled).fc-button-active,
+        .calendar-wrapper .fc-button-primary:not(:disabled):active {
+            background: var(--theme-gradient) !important;
+            border-color: transparent !important;
+            color: white !important;
+            box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--theme-primary) 50%, transparent) !important;
+        }
+        .calendar-wrapper .fc-button-primary:disabled {
+            opacity: 0.5 !important;
         }
         .calendar-wrapper .fc-day-today {
             background: color-mix(in srgb, var(--theme-primary) 5%, transparent) !important;
         }
         .calendar-wrapper .fc-daygrid-day-number {
             color: var(--theme-text);
-            font-weight: 500; cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 8px !important;
+            transition: all 0.2s ease;
+        }
+        .calendar-wrapper .fc-daygrid-day:hover {
+            background: color-mix(in srgb, var(--theme-primary) 4%, transparent);
         }
         .calendar-wrapper .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-            background: var(--theme-primary);
-            color: white; border-radius: 50%;
-            width: 32px; height: 32px;
+            background: var(--theme-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 30px; height: 30px;
             display: flex; align-items: center; justify-content: center;
-            margin: 2px 4px;
+            margin: 4px;
+            box-shadow: 0 4px 12px -2px color-mix(in srgb, var(--theme-primary) 55%, transparent);
         }
         .calendar-wrapper .fc-col-header-cell {
             background: var(--theme-bg-soft);
-            color: var(--theme-text-muted);
+            padding: 10px 0 !important;
+            border-color: var(--theme-border) !important;
+        }
+        .calendar-wrapper .fc-col-header-cell-cushion {
+            color: var(--theme-text-muted) !important;
+            font-weight: 700 !important;
+            font-size: 11px !important;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
         .calendar-wrapper .fc-theme-standard td,
         .calendar-wrapper .fc-theme-standard th {
             border-color: var(--theme-border) !important;
         }
-        .calendar-wrapper .fc-event {
-            border-radius: 8px !important;
+        .calendar-wrapper .fc-theme-standard .fc-scrollgrid {
             border: none !important;
-            padding: 2px 8px !important;
-            font-size: 12px !important;
+        }
+        .calendar-wrapper .fc-scrollgrid-section-header > td {
+            border-bottom: 1px solid var(--theme-border) !important;
+        }
+        .calendar-wrapper .fc-daygrid-day-frame {
+            min-height: 88px;
+            padding: 2px 2px 4px !important;
+            transition: background 0.2s ease;
+        }
+        .calendar-wrapper .fc-event {
+            border-radius: 6px !important;
+            border: none !important;
+            padding: 2px 6px !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
             cursor: pointer !important;
-            transition: all 0.2s ease;
+            transition: all 0.18s ease;
+            margin-top: 1px !important;
+            line-height: 1.4 !important;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
         }
         .calendar-wrapper .fc-event:hover {
-            transform: scale(1.02); filter: brightness(1.1);
+            transform: translateY(-1px);
+            filter: brightness(1.06);
+            box-shadow: 0 4px 10px -2px rgba(0,0,0,0.18);
         }
-        .calendar-wrapper .fc-event-title { font-weight: 600 !important; }
+        .calendar-wrapper .fc-daygrid-more-link {
+            font-size: 10px !important;
+            font-weight: 800 !important;
+            color: var(--theme-primary) !important;
+            background: var(--theme-primary-soft);
+            padding: 1px 6px;
+            border-radius: 50px;
+            margin-top: 2px;
+            display: inline-block;
+        }
+        .calendar-wrapper .fc-daygrid-more-link:hover {
+            background: var(--theme-primary-soft-2);
+        }
 
         .fc-event.birthday-event {
             background: linear-gradient(135deg, #f093fb, #f5576c) !important;
             border-color: #f5576c !important;
         }
         .fc-event.birthday-event .fc-event-title { font-weight: 700 !important; }
-        .fc-event.birthday-event .fc-event-title:before { content: '🎂 '; }
 
-        .fc-year-nav-btn {
-            background: var(--theme-card) !important;
-            border: 2px solid var(--theme-primary) !important;
-            color: var(--theme-primary) !important;
-            padding: 6px 12px !important;
-            border-radius: 8px !important;
-            font-weight: 600 !important;
-            font-size: 13px !important;
-            transition: all 0.3s ease !important;
+        .fc-event-title::before {
+            content: '●';
+            font-size: 8px;
+            margin-right: 4px;
+            opacity: 0.75;
         }
-        .fc-year-nav-btn:hover {
-            background: var(--theme-primary) !important;
-            color: white !important;
-            transform: scale(1.03);
+        .fc-event.birthday-event .fc-event-title::before {
+            content: '🎂';
+            font-size: 10px;
+            margin-right: 3px;
+            opacity: 1;
         }
 
-        /* ===== BIRTHDAY & EVENTS TAB SECTION ===== */
+        /* ===== SORT BAR ===== */
         .list-section {
             background: var(--theme-card);
-            border-radius: 24px;
-            margin-top: 30px;
+            border-radius: 26px;
+            margin-top: 26px;
             border: 1px solid var(--theme-border);
-            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+            box-shadow: 0 10px 40px -18px rgba(0,0,0,0.12);
             overflow: hidden;
             transition: background 0.4s ease, border-color 0.4s ease;
         }
@@ -1091,133 +1127,273 @@
             display: flex;
             border-bottom: 1px solid var(--theme-border);
             background: var(--theme-bg-soft);
+            position: relative;
         }
         .list-tab {
-            flex: 1; padding: 16px 20px;
+            flex: 1; padding: 18px 20px;
             background: transparent; border: none;
             font-family: inherit;
-            font-size: 15px; font-weight: 600;
+            font-size: 14px; font-weight: 700;
             color: var(--theme-text-dim);
             cursor: pointer; transition: all 0.25s ease;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
             position: relative;
+            letter-spacing: 0.1px;
         }
         .list-tab:hover {
             color: var(--theme-primary);
-            background: color-mix(in srgb, var(--theme-primary) 4%, transparent);
+            background: color-mix(in srgb, var(--theme-primary) 5%, transparent);
         }
-        .list-tab.active { color: var(--theme-primary); background: var(--theme-card); }
+        .list-tab.active {
+            color: var(--theme-primary);
+            background: var(--theme-card);
+        }
         .list-tab.active::after {
             content: ''; position: absolute;
-            bottom: -1px; left: 0; right: 0; height: 3px;
+            bottom: -1px; left: 20%; right: 20%; height: 3px;
             background: var(--theme-gradient);
             border-radius: 3px 3px 0 0;
         }
-        .list-tab i { font-size: 14px; }
+        .list-tab i { font-size: 15px; }
         .list-tab .tab-count {
             background: var(--theme-border);
             color: var(--theme-text-dim);
-            font-size: 11px; font-weight: 700;
-            padding: 2px 8px; border-radius: 50px;
+            font-size: 11px; font-weight: 800;
+            padding: 2px 9px; border-radius: 50px;
             transition: all 0.25s ease;
+            min-width: 22px;
+            text-align: center;
         }
         .list-tab.active .tab-count {
-            background: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+            background: color-mix(in srgb, var(--theme-primary) 14%, transparent);
             color: var(--theme-primary);
         }
-        .tab-pane { display: none; padding: 24px 30px 30px; }
-        .tab-pane.active { display: block; }
 
-        /* Birthday list */
+        .tab-pane { display: none; padding: 22px 26px 26px; }
+        .tab-pane.active { display: block; animation: paneIn 0.28s ease; }
+        @keyframes paneIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sort-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .sort-bar .sort-label {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--theme-text-faint);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sort-bar .sort-label i { font-size: 11px; }
+        .sort-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .sort-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 50px;
+            border: 1.5px solid var(--theme-border-input);
+            background: var(--theme-card);
+            color: var(--theme-text-muted);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            white-space: nowrap;
+        }
+        .sort-chip i { font-size: 11px; }
+        .sort-chip:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+            background: var(--theme-primary-soft-2);
+            transform: translateY(-1px);
+        }
+        .sort-chip.active {
+            background: var(--theme-gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--theme-primary) 50%, transparent);
+        }
+
+        /* ===== BIRTHDAY LIST ===== */
         .birthday-list { display: flex; flex-direction: column; gap: 10px; }
         .birthday-item {
-            display: flex; align-items: center; gap: 15px;
-            padding: 12px 16px; border-radius: 12px;
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
             background: var(--theme-bg-soft);
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
+            transition: all 0.25s ease;
+            border: 1.5px solid transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .birthday-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, #f093fb, #f5576c);
         }
         .birthday-item:hover {
-            border-color: #f5576c;
-            background: color-mix(in srgb, #f5576c 6%, var(--theme-bg-soft));
+            border-color: color-mix(in srgb, #f5576c 35%, transparent);
+            background: color-mix(in srgb, #f5576c 5%, var(--theme-bg-soft));
+            transform: translateX(4px);
+            box-shadow: 0 8px 20px -10px color-mix(in srgb, #f5576c 40%, transparent);
         }
         .birthday-item .avatar {
-            width: 44px; height: 44px; border-radius: 50%;
+            width: 46px; height: 46px; border-radius: 50%;
             background: linear-gradient(135deg, #f093fb, #f5576c);
             display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 18px; font-weight: 700;
+            color: white; font-size: 18px; font-weight: 800;
             flex-shrink: 0; overflow: hidden;
+            box-shadow: 0 6px 16px -6px rgba(245, 87, 108, 0.6);
+            position: relative;
         }
-        .birthday-item .avatar img {
-            width: 100%; height: 100%; object-fit: cover;
+        .birthday-item .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .birthday-item .avatar::after {
+            content: '🎂';
+            position: absolute;
+            bottom: -2px; right: -4px;
+            font-size: 14px;
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
         }
+        .birthday-item .info { flex: 1; min-width: 0; }
         .birthday-item .info .name {
-            font-weight: 600; font-size: 15px; color: var(--theme-text);
+            font-weight: 700; font-size: 14.5px; color: var(--theme-text);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .birthday-item .info .date { font-size: 13px; color: var(--theme-text-dim); }
+        .birthday-item .info .date {
+            font-size: 12.5px; color: var(--theme-text-dim);
+            margin-top: 2px;
+            display: flex; align-items: center; gap: 5px;
+            flex-wrap: wrap;
+        }
+        .birthday-item .info .date .date-sep { color: var(--theme-text-faint); }
         .birthday-item .badge {
-            margin-left: auto; padding: 4px 14px;
-            border-radius: 50px; font-size: 12px;
-            font-weight: 600; flex-shrink: 0;
+            margin-left: auto; padding: 5px 14px;
+            border-radius: 50px; font-size: 11px;
+            font-weight: 800; flex-shrink: 0;
+            letter-spacing: 0.2px;
+            display: inline-flex; align-items: center; gap: 5px;
         }
-        .badge.today { background: #fef3c7; color: #d97706; }
+        .badge.today { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; box-shadow: 0 4px 12px -3px rgba(217, 119, 6, 0.4); }
         .badge.upcoming { background: #dcfce7; color: #16a34a; }
         .badge.past { background: var(--theme-border); color: var(--theme-text-dim); }
+
         .no-birthdays {
-            text-align: center; color: var(--theme-text-dim); padding: 20px 0;
+            text-align: center; color: var(--theme-text-dim); padding: 40px 20px;
         }
         .no-birthdays i {
-            font-size: 32px; color: var(--theme-primary-soft);
-            display: block; margin-bottom: 10px;
+            font-size: 44px; color: var(--theme-primary-soft);
+            display: block; margin-bottom: 12px;
         }
+        .no-birthdays h3 {
+            color: var(--theme-text); font-size: 16px; font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .no-birthdays p { font-size: 13px; color: var(--theme-text-faint); }
 
-        /* Events list */
+        /* ===== EVENTS LIST ===== */
         .events-list { display: flex; flex-direction: column; gap: 10px; }
         .event-list-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 12px;
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 16px; border-radius: 16px;
             background: var(--theme-bg-soft);
-            border-left: 4px solid var(--theme-primary);
-            cursor: pointer; transition: all 0.3s ease;
-            border: 1px solid transparent; border-left-width: 4px;
+            cursor: pointer; transition: all 0.25s ease;
+            border: 1.5px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .event-list-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: var(--event-color, var(--theme-primary));
         }
         .event-list-item:hover {
             background: var(--theme-primary-soft-2);
             transform: translateX(4px);
-            border-color: var(--theme-primary);
-            border-left-width: 4px;
+            border-color: color-mix(in srgb, var(--event-color, var(--theme-primary)) 35%, transparent);
+            box-shadow: 0 8px 20px -10px color-mix(in srgb, var(--event-color, var(--theme-primary)) 45%, transparent);
         }
-        .event-list-item .event-color {
-            width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+        .event-list-item .event-date-box {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: var(--theme-card);
+            border: 1.5px solid var(--theme-border);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .event-list-item .event-date-box .month {
+            font-size: 9px; font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--event-color, var(--theme-primary));
+        }
+        .event-list-item .event-date-box .day {
+            font-size: 18px; font-weight: 800;
+            color: var(--theme-text);
+            margin-top: 2px;
         }
         .event-list-item .event-info { flex: 1; min-width: 0; }
         .event-list-item .event-info .event-title {
-            font-weight: 600; font-size: 14px; color: var(--theme-text);
+            font-weight: 700; font-size: 14.5px; color: var(--theme-text);
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .event-list-item .event-info .event-meta {
             font-size: 12px; color: var(--theme-text-dim);
-            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin-top: 2px;
+        }
+        .event-list-item .event-info .event-meta span {
+            display: inline-flex; align-items: center; gap: 4px;
         }
         .event-list-item .event-info .event-meta i {
-            color: var(--theme-primary); font-size: 11px; width: 14px;
+            color: var(--theme-primary); font-size: 10px;
         }
         .event-list-item .event-badge {
-            font-size: 11px; font-weight: 600;
-            padding: 2px 10px; border-radius: 50px;
-            background: var(--theme-primary-soft);
-            color: var(--theme-primary);
+            font-size: 10.5px; font-weight: 800;
+            padding: 4px 11px; border-radius: 50px;
+            background: color-mix(in srgb, var(--event-color, var(--theme-primary)) 14%, transparent);
+            color: var(--event-color, var(--theme-primary));
             flex-shrink: 0;
-        }
-        .no-events {
-            text-align: center; color: var(--theme-text-dim); padding: 20px 0;
-        }
-        .no-events i {
-            font-size: 32px; color: var(--theme-primary-soft);
-            display: block; margin-bottom: 10px;
+            letter-spacing: 0.2px;
+            text-transform: uppercase;
         }
 
-        /* ===== MODAL ===== */
+        .no-events {
+            text-align: center; color: var(--theme-text-dim); padding: 40px 20px;
+        }
+        .no-events i {
+            font-size: 44px; color: var(--theme-primary-soft);
+            display: block; margin-bottom: 12px;
+        }
+        .no-events h3 {
+            color: var(--theme-text); font-size: 16px; font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .no-events p { font-size: 13px; color: var(--theme-text-faint); }
+
+        /* ===== MODAL (generic) ===== */
         .modal {
             display: none; position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -1227,32 +1403,42 @@
         .modal.active { display: flex; }
         .modal-content {
             background: var(--theme-card);
-            border-radius: 24px; padding: 35px;
+            border-radius: 24px; padding: 30px;
             max-width: 520px; width: 100%; max-height: 90vh;
             overflow-y: auto;
             box-shadow: 0 20px 60px color-mix(in srgb, var(--theme-primary) 20%, transparent);
             color: var(--theme-text);
+            animation: modalPop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.94) translateY(12px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
         }
         .modal-content h2 {
-            color: var(--theme-primary);
-            font-size: 24px; margin-bottom: 20px;
-            display: flex; align-items: center; gap: 12px;
+            color: var(--theme-text);
+            font-size: 20px; font-weight: 800;
+            margin-bottom: 20px;
+            display: flex; align-items: center; gap: 10px;
+            letter-spacing: -0.3px;
         }
+        .modal-content h2 i { color: var(--theme-primary); }
         .modal-content .input-group { margin-bottom: 16px; }
         .modal-content .input-group label {
             color: var(--theme-text-muted);
-            font-size: 13px; font-weight: 600;
-            display: block; margin-bottom: 5px;
+            font-size: 12px; font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block; margin-bottom: 6px;
         }
         .modal-content .input-group input,
         .modal-content .input-group textarea,
         .modal-content .input-group select {
-            width: 100%; padding: 12px 16px;
+            width: 100%; padding: 12px 14px;
             border-radius: 12px;
-            border: 2px solid var(--theme-border-input);
+            border: 1.5px solid var(--theme-border-input);
             background: var(--theme-bg-soft);
             color: var(--theme-text);
-            font-size: 14px; transition: all 0.3s ease;
+            font-size: 14px; transition: all 0.25s ease;
             font-family: inherit;
         }
         .modal-content .input-group input:focus,
@@ -1260,21 +1446,24 @@
         .modal-content .input-group select:focus {
             outline: none;
             border-color: var(--theme-primary);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            background: var(--theme-card);
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-primary) 12%, transparent);
         }
         .modal-content .input-group textarea { min-height: 80px; resize: vertical; }
-        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .modal-actions button {
             flex: 1; padding: 12px; border-radius: 12px;
-            border: none; font-weight: 600; cursor: pointer;
-            transition: all 0.3s ease; font-size: 14px;
+            border: none; font-weight: 700; cursor: pointer;
+            transition: all 0.25s ease; font-size: 13.5px;
             font-family: inherit;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 6px;
         }
         .modal-actions .btn-primary {
             background: var(--theme-gradient); color: white;
-            box-shadow: 0 4px 15px color-mix(in srgb, var(--theme-primary) 25%, transparent);
+            box-shadow: 0 6px 20px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
         }
-        .modal-actions .btn-primary:hover { transform: scale(1.02); }
+        .modal-actions .btn-primary:hover { transform: translateY(-1px); }
         .modal-actions .btn-secondary {
             background: var(--theme-bg-soft); color: var(--theme-text-muted);
         }
@@ -1283,60 +1472,450 @@
             background: var(--theme-danger-soft); color: var(--theme-danger);
         }
         .modal-actions .btn-danger:hover {
-            background: color-mix(in srgb, var(--theme-danger) 25%, var(--theme-danger-soft));
-            transform: scale(1.02);
+            background: color-mix(in srgb, var(--theme-danger) 22%, var(--theme-danger-soft));
+            transform: translateY(-1px);
         }
         .spinner {
-            display: inline-block; width: 16px; height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
+            display: inline-block; width: 14px; height: 14px;
+            border: 2px solid rgba(255,255,255,0.35);
             border-radius: 50%; border-top-color: #fff;
             animation: spin 0.8s ease-in-out infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== DATE POPUP ===== */
-        .date-popup .modal-content { max-width: 450px; }
+        /* ===== DATE POPUP (mini) ===== */
+        .date-popup .modal-content { max-width: 460px; }
+        .date-popup .modal-content h2 { font-size: 18px; }
         .date-popup .event-list {
-            display: flex; flex-direction: column; gap: 10px; margin: 15px 0;
+            display: flex; flex-direction: column; gap: 8px; margin: 15px 0;
+            max-height: 320px; overflow-y: auto;
         }
         .date-popup .event-list-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 12px;
-            background: var(--theme-bg-soft);
-            border-left: 4px solid var(--theme-primary);
-            cursor: pointer; transition: all 0.3s ease;
+            padding: 11px 14px;
+            border-radius: 12px;
+            gap: 12px;
         }
-        .date-popup .event-list-item:hover {
-            background: var(--theme-primary-soft-2);
-            transform: translateX(4px);
-        }
-        .date-popup .event-list-item .event-color {
-            width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
-        }
-        .date-popup .event-list-item .event-info { flex: 1; }
         .date-popup .event-list-item .event-info .event-title {
-            font-weight: 600; font-size: 14px; color: var(--theme-text);
+            font-size: 13.5px;
         }
         .date-popup .event-list-item .event-info .event-time {
-            font-size: 12px; color: var(--theme-text-dim);
-        }
-        .date-popup .event-list-item .event-badge {
-            font-size: 11px; font-weight: 600;
-            padding: 2px 10px; border-radius: 50px;
-            background: var(--theme-primary-soft);
-            color: var(--theme-primary);
+            font-size: 11.5px;
+            color: var(--theme-text-dim);
+            margin-top: 2px;
         }
         .date-popup .no-events-date {
-            text-align: center; color: var(--theme-text-dim); padding: 20px 0;
+            text-align: center; color: var(--theme-text-dim); padding: 26px 16px;
         }
         .date-popup .no-events-date i {
-            font-size: 32px; color: var(--theme-primary-soft);
+            font-size: 34px; color: var(--theme-primary-soft);
             display: block; margin-bottom: 10px;
         }
+        .date-popup .no-events-date p { font-size: 13px; }
+
+        /* ===== MINI EVENT / BIRTHDAY WINDOWS ===== */
+        .mini-event-window,
+        .mini-birthday-window {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 380px;
+            max-width: calc(100vw - 32px);
+            background: var(--theme-card);
+            border-radius: 20px;
+            box-shadow: 0 24px 60px -12px color-mix(in srgb, var(--theme-primary) 35%, transparent),
+                        0 0 0 1px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            z-index: 2600;
+            overflow: hidden;
+            transform: translateY(20px) scale(0.96);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
+            color: var(--theme-text);
+            font-family: inherit;
+        }
+        .mini-event-window.show,
+        .mini-birthday-window.show {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .mini-event-window::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--event-color, var(--theme-primary));
+        }
+        .mini-birthday-window::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+        }
+
+        .mini-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 18px 12px;
+            position: relative;
+        }
+        .mini-icon {
+            width: 46px; height: 46px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            color: white;
+            background: var(--event-color, var(--theme-primary));
+            box-shadow: 0 6px 16px -6px var(--event-color, var(--theme-primary));
+        }
+        .mini-birthday-window .mini-icon {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            box-shadow: 0 6px 16px -6px rgba(245, 87, 108, 0.6);
+        }
+        .mini-header-info { flex: 1; min-width: 0; }
+        .mini-type-tag {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--event-color, var(--theme-primary));
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .mini-birthday-window .mini-type-tag {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .mini-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--theme-text);
+            line-height: 1.25;
+            margin-top: 2px;
+            overflow-wrap: anywhere;
+        }
+        .mini-close {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-dim);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.22s ease;
+            flex-shrink: 0;
+        }
+        .mini-close:hover {
+            background: var(--theme-primary-soft);
+            color: var(--theme-primary);
+            transform: rotate(90deg);
+        }
+
+        .mini-body {
+            padding: 0 18px 14px;
+        }
+        .mini-meta-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 13px;
+            color: var(--theme-text-muted);
+            border-bottom: 1px solid var(--theme-border-soft);
+            overflow-wrap: anywhere;
+        }
+        .mini-meta-row:last-of-type { border-bottom: none; }
+        .mini-meta-row i {
+            color: var(--theme-primary);
+            width: 18px;
+            text-align: center;
+            flex-shrink: 0;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+        .mini-meta-row .meta-value {
+            flex: 1;
+            line-height: 1.45;
+            color: var(--theme-text);
+            font-weight: 500;
+        }
+        .mini-meta-row .meta-value.muted { color: var(--theme-text-muted); font-weight: 400; }
+        .mini-meta-row .meta-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--theme-text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 1px;
+        }
+
+        .mini-actions {
+            display: flex;
+            gap: 8px;
+            padding: 10px 18px 16px;
+            background: var(--theme-bg-soft);
+            border-top: 1px solid var(--theme-border);
+        }
+        .mini-actions button {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .mini-actions .mini-btn-primary {
+            background: var(--theme-gradient); color: white;
+            box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+        }
+        .mini-actions .mini-btn-primary:hover { transform: translateY(-1px); }
+        .mini-actions .mini-btn-secondary {
+            background: var(--theme-card);
+            color: var(--theme-text-muted);
+            border: 1.5px solid var(--theme-border-input);
+        }
+        .mini-actions .mini-btn-secondary:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+        }
+        .mini-actions .mini-btn-danger {
+            background: var(--theme-danger-soft);
+            color: var(--theme-danger);
+            flex: 0 0 auto;
+        }
+        .mini-actions .mini-btn-danger:hover {
+            background: color-mix(in srgb, var(--theme-danger) 22%, var(--theme-danger-soft));
+        }
+
+        .mini-birthday-window .mini-meta-row i { color: #f5576c; }
+
+        /* ===== TOAST NOTIFICATIONS ===== */
+        .toast-stack {
+            position: fixed;
+            top: 90px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            border-radius: 14px;
+            background: var(--theme-card);
+            color: var(--theme-text);
+            box-shadow: 0 14px 40px -10px rgba(0,0,0,0.22),
+                        0 0 0 1px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            font-size: 13.5px;
+            font-weight: 600;
+            min-width: 260px;
+            max-width: 380px;
+            pointer-events: auto;
+            transform: translateX(20px);
+            opacity: 0;
+            animation: toastIn 0.32s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+            overflow-wrap: anywhere;
+        }
+        .toast.leaving { animation: toastOut 0.28s ease forwards; }
+        @keyframes toastIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastOut {
+            to { transform: translateX(20px); opacity: 0; }
+        }
+        .toast-icon {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .toast.success .toast-icon { background: linear-gradient(135deg, #16a34a, #22c55e); }
+        .toast.error .toast-icon { background: linear-gradient(135deg, #dc2626, #ef4444); }
+        .toast.info .toast-icon { background: var(--theme-gradient); }
+        .toast.warn .toast-icon { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+        /* ===== CONFIRM DIALOG ===== */
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .confirm-dialog.active { display: flex; }
+        .confirm-content {
+            background: var(--theme-card);
+            border-radius: 24px;
+            padding: 30px 28px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 30px 80px -20px color-mix(in srgb, var(--theme-primary) 40%, transparent);
+            animation: confirmPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--theme-text);
+            position: relative;
+        }
+        @keyframes confirmPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .confirm-icon-wrap {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+        .confirm-icon-wrap.danger { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
+        .confirm-icon-wrap.info { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb; }
+        .confirm-icon-wrap.warn { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
+        .confirm-title {
+            font-size: 19px; font-weight: 800;
+            color: var(--theme-text);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .confirm-message {
+            font-size: 13.5px;
+            color: var(--theme-text-muted);
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+        .confirm-actions { display: flex; gap: 10px; }
+        .confirm-actions button {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            gap: 6px;
+        }
+        .confirm-actions .confirm-cancel {
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-muted);
+        }
+        .confirm-actions .confirm-cancel:hover { background: var(--theme-primary-soft); }
+        .confirm-actions .confirm-ok {
+            background: var(--theme-gradient);
+            color: white;
+            box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+        }
+        .confirm-actions .confirm-ok.danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            box-shadow: 0 6px 18px -6px rgba(220, 38, 38, 0.5);
+        }
+        .confirm-actions .confirm-ok:hover { transform: translateY(-1px); }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            background: color-mix(in srgb, var(--theme-bg) 88%, transparent);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .loading-overlay .pl {
+            width: 6em;
+            height: 6em;
+            filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--theme-primary) 35%, transparent));
+        }
+        .loading-overlay .pl__ring {
+            stroke: color-mix(in srgb, var(--theme-primary) 15%, transparent);
+            transition: stroke 0.3s;
+        }
+        .loading-overlay .loading-text {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--theme-text-muted);
+            text-transform: uppercase;
+            animation: loadingTextFade 1.6s ease-in-out infinite;
+        }
+        @keyframes loadingTextFade {
+            0%, 100% { opacity: 0.55; }
+            50%      { opacity: 1; }
+        }
+
+        /* Uiverse.io spinner by PhilibertGentien */
+        .pl,
+        .pl__worm {
+            animation-duration: 4s;
+            animation-iteration-count: infinite;
+        }
+        .pl {
+            animation-name: bump5;
+            animation-timing-function: linear;
+        }
+        .pl__worm {
+            animation-name: worm5;
+            animation-timing-function: cubic-bezier(0.42,0.17,0.75,0.83);
+        }
+        @keyframes bump5 {
+            from, 42%, 46%, 51%, 55%, 59%, 63%, 67%, 71%, 74%, 78%, 81%, 85%, 88%, 92%, to {
+                transform: translate(0,0);
+            }
+            44% { transform: translate(1.33%, 6.75%); }
+            53% { transform: translate(-16.67%, -0.54%); }
+            61% { transform: translate(3.66%, -2.46%); }
+            69% { transform: translate(-0.59%, 15.27%); }
+            76% { transform: translate(-1.92%, -4.68%); }
+            83% { transform: translate(9.38%, 0.96%); }
+            90% { transform: translate(-4.55%, 1.98%); }
+        }
+        @keyframes worm5 {
+            from { stroke-dashoffset: 10; }
+            25%  { stroke-dashoffset: 295; }
+            to   { stroke-dashoffset: 1165; }
+        }
+
+        .pl__grad-stop-1 { stop-color: var(--theme-primary); }
+        .pl__grad-stop-2 { stop-color: var(--theme-accent); }
 
         /* ===== FOOTER ===== */
         .footer {
-            max-width: 1200px;
+            max-width: 1180px;
             margin: 30px auto 0;
             padding: 30px 40px;
             text-align: center;
@@ -1558,28 +2137,47 @@
             }
             .announcement-popup::before { display: none; }
             .announcement-list { max-height: 60vh; }
-            .main-content { padding: 0 20px; margin-top: 70px; }
+            .main-content { padding: 0 16px; margin-top: 70px; }
             .hero-banner {
-                padding: 25px 20px; flex-direction: column; text-align: center;
+                padding: 22px 18px; flex-direction: column; text-align: center;
+                border-radius: 20px;
             }
-            .hero-banner .content h1 { font-size: 22px; }
+            .hero-banner .content h1 { font-size: 20px; }
             .hero-banner .actions { justify-content: center; width: 100%; }
-            .calendar-wrapper { padding: 15px; }
-            .calendar-wrapper .fc .fc-toolbar { flex-direction: column; align-items: center; }
-            .calendar-wrapper .fc .fc-toolbar .fc-center { order: -1; width: 100%; text-align: center; }
+            .calendar-wrapper { padding: 14px; border-radius: 20px; }
+            .calendar-wrapper .fc .fc-toolbar { flex-direction: column; align-items: stretch; }
+            .calendar-wrapper .fc .fc-toolbar .fc-left,
+            .calendar-wrapper .fc .fc-toolbar .fc-center,
+            .calendar-wrapper .fc .fc-toolbar .fc-right {
+                width: 100%; justify-content: center;
+            }
+            .calendar-wrapper .fc .fc-toolbar .fc-center { order: -1; }
             .calendar-wrapper .fc-toolbar-title { font-size: 16px !important; }
-            .calendar-wrapper .fc .fc-button { padding: 3px 8px !important; font-size: 11px !important; }
-            .calendar-wrapper .fc .fc-daygrid-day-number { font-size: 12px; }
+            .calendar-wrapper .fc .fc-button {
+                padding: 5px 9px !important;
+                font-size: 11px !important;
+            }
+            .calendar-wrapper .fc-daygrid-day-frame { min-height: 64px; }
+            .calendar-wrapper .fc .fc-daygrid-day-number { font-size: 12px; padding: 4px 6px !important; }
+            .calendar-wrapper .fc-daygrid-day.fc-day-today .fc-daygrid-day-number { width: 26px; height: 26px; margin: 2px; }
             .calendar-wrapper .fc .fc-event { font-size: 10px !important; padding: 1px 4px !important; }
-            .calendar-wrapper .fc .fc-daygrid-day-events { min-height: 16px; }
+            .calendar-wrapper .fc-event-title::before { display: none; }
             .list-tab { padding: 14px 12px; font-size: 13px; }
-            .list-tab i { font-size: 12px; }
-            .tab-pane { padding: 18px 16px 22px; }
-            .birthday-item { flex-wrap: wrap; gap: 10px; }
-            .birthday-item .badge { margin-left: 0; }
-            .event-list-item { flex-wrap: wrap; }
-            .event-list-item .event-badge { margin-left: 0; }
-            .modal-content { padding: 25px; }
+            .list-tab i { font-size: 13px; }
+            .tab-pane { padding: 18px 16px 20px; }
+            .sort-bar { flex-direction: column; align-items: stretch; gap: 8px; }
+            .sort-chips { overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+            .sort-chips::-webkit-scrollbar { display: none; }
+            .birthday-item { padding: 10px 14px; gap: 12px; }
+            .birthday-item .avatar { width: 42px; height: 42px; font-size: 16px; }
+            .birthday-item .info .name { font-size: 14px; }
+            .birthday-item .info .date { font-size: 12px; }
+            .event-list-item { padding: 10px 14px; gap: 12px; }
+            .event-list-item .event-date-box { width: 44px; height: 44px; }
+            .event-list-item .event-date-box .day { font-size: 16px; }
+            .event-list-item .event-info .event-title { font-size: 14px; }
+            .event-list-item .event-badge { display: none; }
+            .modal-content { padding: 24px 20px; border-radius: 20px; }
             .modal-actions { flex-direction: column; }
             .navbar .nav-links a { font-size: 14px; width: 100%; text-align: center; }
             .navbar .nav-links .logout-btn { width: 100%; justify-content: center; }
@@ -1602,22 +2200,33 @@
                 max-height: calc(100vh - 130px);
                 z-index: 2499;
             }
+            .mini-event-window,
+            .mini-birthday-window {
+                bottom: 12px; right: 12px; left: 12px;
+                width: auto; max-width: none;
+            }
+            .toast-stack { top: 70px; right: 12px; left: 12px; }
+            .toast { min-width: 0; max-width: none; }
+            .loading-overlay .pl { width: 5em; height: 5em; }
         }
 
         @media (max-width: 480px) {
-            .hero-banner .content h1 { font-size: 20px; }
+            .hero-banner .content h1 { font-size: 18px; }
             .hero-banner .actions { flex-direction: column; }
             .hero-banner .actions button { width: 100%; justify-content: center; }
             .calendar-wrapper .fc-toolbar-title { font-size: 14px !important; }
-            .calendar-wrapper .fc .fc-button { padding: 2px 6px !important; font-size: 10px !important; }
+            .calendar-wrapper .fc .fc-button {
+                padding: 4px 7px !important;
+                font-size: 10px !important;
+            }
+            .calendar-wrapper .fc-daygrid-day-frame { min-height: 56px; }
             .calendar-wrapper .fc .fc-daygrid-day-number { font-size: 11px; }
-            .birthday-item .info .name { font-size: 14px; }
-            .birthday-item .info .date { font-size: 12px; }
-            .list-tab { padding: 12px 8px; font-size: 12px; gap: 4px; }
-            .list-tab i { font-size: 11px; }
-            .list-tab .tab-count { font-size: 10px; padding: 1px 6px; }
-            .date-popup .modal-content { padding: 20px; }
-            .date-popup .event-list-item { padding: 10px 12px; flex-wrap: wrap; }
+            .birthday-item .info .name { font-size: 13.5px; }
+            .birthday-item .info .date { font-size: 11.5px; }
+            .list-tab { padding: 12px 8px; font-size: 12px; gap: 5px; }
+            .list-tab i { font-size: 12px; }
+            .list-tab .tab-count { font-size: 10px; padding: 1px 7px; }
+            .date-popup .modal-content { padding: 18px; }
             .navbar .nav-links a { font-size: 16px; padding: 8px 16px; }
             .announcement-popup { top: 65px !important; left: 10px !important; right: 10px !important; }
             .announcement-view-header { padding: 20px 18px 16px; }
@@ -1650,6 +2259,21 @@
     </style>
 </head>
 <body>
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay active" id="loadingOverlay" aria-hidden="false">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="pl" aria-hidden="true">
+            <defs>
+                <linearGradient y2="1" x2="0" y1="0" x1="0" id="pl-grad">
+                    <stop class="pl__grad-stop-1" offset="0%"></stop>
+                    <stop class="pl__grad-stop-2" offset="100%"></stop>
+                </linearGradient>
+            </defs>
+            <circle stroke-linecap="round" stroke-width="16" stroke="currentColor" fill="none" cy="64" cx="64" r="56" class="pl__ring" style="color: color-mix(in srgb, var(--theme-primary) 15%, transparent);"></circle>
+            <path stroke-dashoffset="10" stroke-dasharray="44 1111" stroke-linejoin="round" stroke-linecap="round" stroke-width="16" stroke="url(#pl-grad)" fill="none" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" class="pl__worm"></path>
+        </svg>
+        <div class="loading-text" id="loadingText">Loading calendar…</div>
+    </div>
+
     <!-- ===== BACKGROUND LAYERS ===== -->
     <div class="theme-bg-base"></div>
     <div class="theme-bg-shapes" id="themeBgShapes"><!-- Injected by JS --></div>
@@ -1764,20 +2388,58 @@
                 </button>
             </div>
 
+            <!-- BIRTHDAYS PANE -->
             <div class="tab-pane active" id="paneBirthdays">
+                <div class="sort-bar">
+                    <span class="sort-label"><i class="fas fa-arrow-down-short-wide"></i> Sort by</span>
+                    <div class="sort-chips" id="birthdaySortChips">
+                        <button class="sort-chip active" data-sort="soonest" onclick="setBirthdaySort('soonest')">
+                            <i class="fas fa-clock"></i> Soonest
+                        </button>
+                        <button class="sort-chip" data-sort="latest" onclick="setBirthdaySort('latest')">
+                            <i class="fas fa-hourglass-end"></i> Latest
+                        </button>
+                        <button class="sort-chip" data-sort="az" onclick="setBirthdaySort('az')">
+                            <i class="fas fa-arrow-down-a-z"></i> A → Z
+                        </button>
+                        <button class="sort-chip" data-sort="za" onclick="setBirthdaySort('za')">
+                            <i class="fas fa-arrow-down-z-a"></i> Z → A
+                        </button>
+                    </div>
+                </div>
                 <div class="birthday-list" id="birthdayList">
                     <div class="no-birthdays">
                         <i class="fas fa-birthday-cake"></i>
-                        <p>No birthdays scheduled. Update your profile to show your birthday!</p>
+                        <h3>No birthdays yet</h3>
+                        <p>Update your profile to show your birthday!</p>
                     </div>
                 </div>
             </div>
 
+            <!-- EVENTS PANE -->
             <div class="tab-pane" id="paneEvents">
+                <div class="sort-bar">
+                    <span class="sort-label"><i class="fas fa-arrow-down-short-wide"></i> Sort by</span>
+                    <div class="sort-chips" id="eventSortChips">
+                        <button class="sort-chip active" data-sort="soonest" onclick="setEventSort('soonest')">
+                            <i class="fas fa-clock"></i> Soonest
+                        </button>
+                        <button class="sort-chip" data-sort="latest" onclick="setEventSort('latest')">
+                            <i class="fas fa-hourglass-end"></i> Latest
+                        </button>
+                        <button class="sort-chip" data-sort="az" onclick="setEventSort('az')">
+                            <i class="fas fa-arrow-down-a-z"></i> A → Z
+                        </button>
+                        <button class="sort-chip" data-sort="type" onclick="setEventSort('type')">
+                            <i class="fas fa-tag"></i> By Type
+                        </button>
+                    </div>
+                </div>
                 <div class="events-list" id="eventsList">
                     <div class="no-events">
                         <i class="fas fa-calendar-plus"></i>
-                        <p>No upcoming events. Create one!</p>
+                        <h3>No upcoming events</h3>
+                        <p>Create one to get the squad together!</p>
                     </div>
                 </div>
             </div>
@@ -1836,41 +2498,7 @@
         </div>
     </div>
 
-    <!-- ===== EVENT DETAIL MODAL ===== -->
-    <div id="eventDetailModal" class="modal">
-        <div class="modal-content">
-            <h2 id="detailType"><i class="fas fa-calendar-alt"></i> Event Details</h2>
-            <div style="margin-bottom: 15px;">
-                <div style="font-size: 22px; font-weight: 700; color: var(--theme-text);" id="detailTitle">Event Title</div>
-                <div style="color: var(--theme-text-muted); font-size: 14px; margin-top: 5px;">
-                    <i class="fas fa-calendar-day" style="color: var(--theme-primary); width: 20px;"></i>
-                    <span id="detailDate">Date</span>
-                </div>
-                <div style="color: var(--theme-text-muted); font-size: 14px; margin-top: 5px;">
-                    <i class="fas fa-clock" style="color: var(--theme-primary); width: 20px;"></i>
-                    <span id="detailTime">Time</span>
-                </div>
-                <div style="color: var(--theme-text-muted); font-size: 14px; margin-top: 5px;">
-                    <i class="fas fa-map-marker-alt" style="color: var(--theme-primary); width: 20px;"></i>
-                    <span id="detailLocation">Location</span>
-                </div>
-                <div style="color: var(--theme-text-muted); font-size: 14px; margin-top: 5px;">
-                    <i class="fas fa-user" style="color: var(--theme-primary); width: 20px;"></i>
-                    Created by <span id="detailCreator">Someone</span>
-                </div>
-            </div>
-            <div style="padding: 15px 0; border-top: 1px solid var(--theme-border-soft); border-bottom: 1px solid var(--theme-border-soft); margin: 10px 0;">
-                <div style="font-weight: 600; font-size: 14px; color: var(--theme-text);">Description</div>
-                <div style="color: var(--theme-text-muted); font-size: 14px; margin-top: 5px;" id="detailDescription">No description provided.</div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-danger" onclick="deleteEvent()"><i class="fas fa-trash"></i> Delete Event</button>
-                <button class="btn-secondary" onclick="closeEventDetail()">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ===== DATE POPUP MODAL ===== -->
+    <!-- ===== DATE POPUP MODAL (mini) ===== -->
     <div id="datePopupModal" class="modal date-popup">
         <div class="modal-content">
             <h2 id="datePopupTitle"><i class="fas fa-calendar-day"></i> Events on <span id="datePopupDate">Today</span></h2>
@@ -1883,6 +2511,135 @@
             <div class="modal-actions">
                 <button class="btn-primary" onclick="closeDatePopupAndAddEvent()"><i class="fas fa-plus"></i> Add Event</button>
                 <button class="btn-secondary" onclick="closeDatePopup()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MINI EVENT WINDOW ===== -->
+    <div id="miniEventWindow" class="mini-event-window" role="dialog" aria-labelledby="miniEventTitle">
+        <div class="mini-header">
+            <div class="mini-icon" id="miniEventIcon"><i class="fas fa-calendar"></i></div>
+            <div class="mini-header-info">
+                <div class="mini-type-tag" id="miniEventType">Event</div>
+                <div class="mini-title" id="miniEventTitle">Event Title</div>
+            </div>
+            <button class="mini-close" onclick="closeMiniEvent()" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mini-body">
+            <div class="mini-meta-row">
+                <i class="fas fa-calendar-day"></i>
+                <div>
+                    <span class="meta-label">Date</span>
+                    <span class="meta-value" id="miniEventDate">—</span>
+                </div>
+            </div>
+            <div class="mini-meta-row">
+                <i class="fas fa-clock"></i>
+                <div>
+                    <span class="meta-label">Time</span>
+                    <span class="meta-value" id="miniEventTime">—</span>
+                </div>
+            </div>
+            <div class="mini-meta-row" id="miniEventLocationRow">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <span class="meta-label">Location</span>
+                    <span class="meta-value" id="miniEventLocation">—</span>
+                </div>
+            </div>
+            <div class="mini-meta-row" id="miniEventDescRow">
+                <i class="fas fa-align-left"></i>
+                <div>
+                    <span class="meta-label">Description</span>
+                    <span class="meta-value muted" id="miniEventDesc">—</span>
+                </div>
+            </div>
+            <div class="mini-meta-row">
+                <i class="fas fa-user"></i>
+                <div>
+                    <span class="meta-label">Created by</span>
+                    <span class="meta-value muted" id="miniEventCreator">—</span>
+                </div>
+            </div>
+        </div>
+        <div class="mini-actions">
+            <button class="mini-btn-primary" onclick="openDayViewFromMini()">
+                <i class="fas fa-calendar-alt"></i> Day view
+            </button>
+            <button class="mini-btn-danger" onclick="deleteEventFromMini()" title="Delete event">
+                <i class="fas fa-trash"></i>
+            </button>
+            <button class="mini-btn-secondary" onclick="closeMiniEvent()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== MINI BIRTHDAY WINDOW ===== -->
+    <div id="miniBirthdayWindow" class="mini-birthday-window" role="dialog" aria-labelledby="miniBirthdayTitle">
+        <div class="mini-header">
+            <div class="mini-icon"><i class="fas fa-birthday-cake"></i></div>
+            <div class="mini-header-info">
+                <div class="mini-type-tag">🎂 Birthday</div>
+                <div class="mini-title" id="miniBirthdayTitle">Name's Birthday</div>
+            </div>
+            <button class="mini-close" onclick="closeMiniBirthday()" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mini-body">
+            <div class="mini-meta-row">
+                <i class="fas fa-calendar-day"></i>
+                <div>
+                    <span class="meta-label">Date</span>
+                    <span class="meta-value" id="miniBirthdayDate">—</span>
+                </div>
+            </div>
+            <div class="mini-meta-row" id="miniBirthdayLocationRow">
+                <i class="fas fa-map-marker-alt"></i>
+                <div>
+                    <span class="meta-label">Location</span>
+                    <span class="meta-value" id="miniBirthdayLocation">—</span>
+                </div>
+            </div>
+            <div class="mini-meta-row">
+                <i class="fas fa-hourglass-half"></i>
+                <div>
+                    <span class="meta-label">Countdown</span>
+                    <span class="meta-value" id="miniBirthdayCountdown">—</span>
+                </div>
+            </div>
+        </div>
+        <div class="mini-actions">
+            <button class="mini-btn-primary" onclick="viewBirthdayInCalendar()">
+                <i class="fas fa-calendar-alt"></i> Show in calendar
+            </button>
+            <button class="mini-btn-secondary" onclick="closeMiniBirthday()">
+                <i class="fas fa-times"></i> Close
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== TOAST STACK ===== -->
+    <div class="toast-stack" id="toastStack"></div>
+
+    <!-- ===== CONFIRM DIALOG ===== -->
+    <div id="confirmDialog" class="confirm-dialog" role="dialog">
+        <div class="confirm-content">
+            <div class="confirm-icon-wrap danger" id="confirmIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+            <div class="confirm-message" id="confirmMessage">This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="confirm-cancel" onclick="closeConfirmDialog()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="confirm-ok danger" id="confirmOkBtn">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
             </div>
         </div>
     </div>
@@ -1991,7 +2748,7 @@
 
     <script>
         // ================================================================
-        // ===== ★ THEME SYSTEM (READ-ONLY — matching profile/login) =====
+        // ===== ★ THEME SYSTEM (READ-ONLY) =====
         // ================================================================
         const THEME_STORAGE_KEY = 'timawa_theme';
 
@@ -2338,14 +3095,12 @@
             return null;
         }
 
-        // ★ IMMEDIATE: apply cached theme (or Ocean) before auth resolves
         (function() {
             const cached = readThemeFromStorage();
             if (cached) selectedTheme = cached;
             applyTheme(selectedTheme);
         })();
 
-        // ★ CROSS-TAB LIVE SYNC (BroadcastChannel)
         try {
             if ('BroadcastChannel' in window) {
                 const bc = new BroadcastChannel('timawa_theme_sync');
@@ -2374,11 +3129,8 @@
         const db = firebase.firestore();
 
         db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-            if (err.code === 'failed-precondition') {
-                console.warn('Firestore persistence: multiple tabs open, cache disabled for this tab.');
-            } else if (err.code === 'unimplemented') {
-                console.warn('Firestore persistence: not supported in this browser.');
-            }
+            if (err.code === 'failed-precondition') console.warn('Firestore persistence: multiple tabs open.');
+            else if (err.code === 'unimplemented') console.warn('Firestore persistence: not supported.');
         });
 
         let calendar = null;
@@ -2396,6 +3148,9 @@
         let notesCache = {};
         let unsubscribeNotes = null;
 
+        let birthdaySortMode = 'soonest';
+        let eventSortMode = 'soonest';
+
         const BIRTHDAY_YEARS_AHEAD = 20;
         const EVENTS_LIMIT = 50;
         const USER_PROFILE_CACHE_TTL = 5 * 60 * 1000;
@@ -2412,6 +3167,12 @@
         const ANNOUNCEMENT_LIMIT = 30;
         const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
 
+        let miniEventCurrent = null;
+        let miniBirthdayCurrent = null;
+
+        // ================================================================
+        // ===== HELPERS =====
+        // ================================================================
         function convertTimestampToDate(timestamp) {
             if (!timestamp) return new Date();
             if (timestamp instanceof Date) return timestamp;
@@ -2454,6 +3215,28 @@
             });
         }
 
+        function getEventColor(type) {
+            const colors = {
+                'Gala': '#8b5cf6',
+                'Trip': '#3b82f6',
+                'Party': '#ef4444',
+                'Meeting': '#22c55e',
+                'Other': '#6b7280'
+            };
+            return colors[type] || colors['Other'];
+        }
+
+        function getEventTypeIcon(type) {
+            const icons = {
+                'Gala': 'fa-crown',
+                'Trip': 'fa-plane',
+                'Party': 'fa-glass-cheers',
+                'Meeting': 'fa-handshake',
+                'Other': 'fa-thumbtack'
+            };
+            return icons[type] || icons['Other'];
+        }
+
         async function getCurrentUserProfileCached(user) {
             const CACHE_KEY = 'timawa_me_' + user.uid;
             try {
@@ -2479,6 +3262,154 @@
                 console.warn('getCurrentUserProfileCached failed:', e);
                 return {};
             }
+        }
+
+        // ================================================================
+        // ===== TOASTS & CONFIRM DIALOG & LOADING OVERLAY =====
+        // ================================================================
+        function showToast(message, type = 'info', duration = 3200) {
+            const stack = document.getElementById('toastStack');
+            if (!stack) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconMap = {
+                success: 'fa-check',
+                error: 'fa-times',
+                info: 'fa-info',
+                warn: 'fa-exclamation'
+            };
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
+                <div>${escapeHtml(message)}</div>
+            `;
+            stack.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('leaving');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        let _confirmCallback = null;
+        function showConfirm({ title, message, confirmLabel, type, onConfirm }) {
+            const dlg = document.getElementById('confirmDialog');
+            document.getElementById('confirmTitle').textContent = title || 'Are you sure?';
+            document.getElementById('confirmMessage').textContent = message || '';
+            const okBtn = document.getElementById('confirmOkBtn');
+            okBtn.innerHTML = `<i class="fas fa-check"></i> ${confirmLabel || 'Confirm'}`;
+            okBtn.className = 'confirm-ok' + (type === 'danger' ? ' danger' : '');
+            const iconWrap = document.getElementById('confirmIcon');
+            iconWrap.className = 'confirm-icon-wrap ' + (type || 'info');
+            const iconMap = {
+                danger: 'fa-exclamation-triangle',
+                info: 'fa-info-circle',
+                warn: 'fa-exclamation-circle'
+            };
+            iconWrap.innerHTML = `<i class="fas ${iconMap[type] || iconMap.info}"></i>`;
+            _confirmCallback = onConfirm;
+            dlg.classList.add('active');
+        }
+
+        function closeConfirmDialog() {
+            document.getElementById('confirmDialog').classList.remove('active');
+            _confirmCallback = null;
+        }
+
+        document.getElementById('confirmOkBtn').addEventListener('click', () => {
+            const cb = _confirmCallback;
+            closeConfirmDialog();
+            if (typeof cb === 'function') cb();
+        });
+
+        let _loadingHideTimer = null;
+        function showLoadingOverlay(text) {
+            const overlay = document.getElementById('loadingOverlay');
+            const label = document.getElementById('loadingText');
+            if (!overlay) return;
+            if (text && label) label.textContent = text;
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+            if (_loadingHideTimer) {
+                clearTimeout(_loadingHideTimer);
+                _loadingHideTimer = null;
+            }
+        }
+
+        function hideLoadingOverlay(delay = 0) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (!overlay) return;
+            if (_loadingHideTimer) clearTimeout(_loadingHideTimer);
+            _loadingHideTimer = setTimeout(() => {
+                overlay.classList.remove('active');
+                overlay.setAttribute('aria-hidden', 'true');
+            }, Math.max(0, delay));
+        }
+
+        function hideLoadingOverlayWhenReady() {
+            hideLoadingOverlay(420);
+        }
+
+        // ================================================================
+        // ===== SORT =====
+        // ================================================================
+        function setBirthdaySort(mode) {
+            birthdaySortMode = mode;
+            document.querySelectorAll('#birthdaySortChips .sort-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.sort === mode);
+            });
+            renderBirthdayList();
+        }
+
+        function setEventSort(mode) {
+            eventSortMode = mode;
+            document.querySelectorAll('#eventSortChips .sort-chip').forEach(chip => {
+                chip.classList.toggle('active', chip.dataset.sort === mode);
+            });
+            renderEventsList();
+        }
+
+        function sortBirthdaysList(list) {
+            const arr = [...list];
+            switch (birthdaySortMode) {
+                case 'latest':
+                    arr.sort((a, b) => b.date - a.date);
+                    break;
+                case 'az':
+                    arr.sort((a, b) => (a.name || '').toLowerCase().localeCompare((b.name || '').toLowerCase()));
+                    break;
+                case 'za':
+                    arr.sort((a, b) => (b.name || '').toLowerCase().localeCompare((a.name || '').toLowerCase()));
+                    break;
+                case 'soonest':
+                default:
+                    arr.sort((a, b) => a.date - b.date);
+                    break;
+            }
+            return arr;
+        }
+
+        function sortEventsList(list) {
+            const arr = [...list];
+            switch (eventSortMode) {
+                case 'latest':
+                    arr.sort((a, b) => convertTimestampToDate(b.dateTime) - convertTimestampToDate(a.dateTime));
+                    break;
+                case 'az':
+                    arr.sort((a, b) => (a.title || '').toLowerCase().localeCompare((b.title || '').toLowerCase()));
+                    break;
+                case 'type':
+                    arr.sort((a, b) => {
+                        const ta = (a.type || 'Other').toLowerCase();
+                        const tb = (b.type || 'Other').toLowerCase();
+                        if (ta !== tb) return ta.localeCompare(tb);
+                        return convertTimestampToDate(a.dateTime) - convertTimestampToDate(b.dateTime);
+                    });
+                    break;
+                case 'soonest':
+                default:
+                    arr.sort((a, b) => convertTimestampToDate(a.dateTime) - convertTimestampToDate(b.dateTime));
+                    break;
+            }
+            return arr;
         }
 
         // ================================================================
@@ -3082,7 +4013,9 @@
             return select.value || 'No location';
         }
 
+        // ================================================================
         // ===== AUTH STATE =====
+        // ================================================================
         auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -3091,6 +4024,8 @@
 
             currentUser = user;
             titaCurrentUser = user;
+
+            showLoadingOverlay('Loading calendar…');
 
             try {
                 const data = await getCurrentUserProfileCached(user);
@@ -3109,7 +4044,6 @@
                     }
                 }
 
-                // ★ Apply the user's saved Firestore theme (for new devices with empty localStorage)
                 if (data && data.theme && THEMES[data.theme.preset]) {
                     const firestoreTheme = {
                         preset: data.theme.preset,
@@ -3141,7 +4075,11 @@
             listenToEvents();
             listenToBirthdays();
 
-            setTimeout(() => { initCalendar(); }, 500);
+            setTimeout(() => {
+                initCalendar();
+                // Hide loading overlay once calendar is ready
+                hideLoadingOverlayWhenReady();
+            }, 500);
         });
 
         function listenToEvents() {
@@ -3208,35 +4146,56 @@
             birthdayEvents.sort((a, b) => a.date - b.date);
         }
 
+        // ================================================================
+        // ===== BIRTHDAY LIST =====
+        // ================================================================
         function renderBirthdayList() {
             const container = document.getElementById('birthdayList');
             const tabCount = document.getElementById('birthdayTabCount');
+            if (!container) return;
+
             if (birthdayEvents.length === 0) {
-                container.innerHTML = `<div class="no-birthdays"><i class="fas fa-birthday-cake"></i><p>No birthdays scheduled. Update your profile to show your birthday!</p></div>`;
+                container.innerHTML = `
+                    <div class="no-birthdays">
+                        <i class="fas fa-birthday-cake"></i>
+                        <h3>No birthdays yet</h3>
+                        <p>Update your profile to show your birthday!</p>
+                    </div>
+                `;
                 if (tabCount) tabCount.textContent = '0';
                 return;
             }
 
             const now = new Date();
-            const sortedBirthdays = [...birthdayEvents].sort((a, b) => a.date - b.date);
-            if (tabCount) tabCount.textContent = `${sortedBirthdays.length}`;
+            const sorted = sortBirthdaysList(birthdayEvents);
+            if (tabCount) tabCount.textContent = `${sorted.length}`;
 
             let html = '';
-            sortedBirthdays.forEach(item => {
+            sorted.forEach(item => {
                 const daysDiff = Math.ceil((item.date - now) / (1000 * 60 * 60 * 24));
                 let badgeClass = 'upcoming';
                 let badgeText = `${daysDiff} days`;
                 if (daysDiff === 0) { badgeClass = 'today'; badgeText = '🎉 Today!'; }
                 else if (daysDiff < 0) { badgeClass = 'past'; badgeText = 'Passed'; }
                 else if (daysDiff === 1) { badgeText = 'Tomorrow!'; }
+
                 const initials = item.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                 const dateStr = item.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const idSafe = escapeAttr(item.id);
+
                 html += `
-                    <div class="birthday-item">
-                        <div class="avatar">${item.photoURL ? `<img src="${item.photoURL}" alt="${item.name}" />` : initials}</div>
+                    <div class="birthday-item" onclick="openMiniBirthday('${idSafe}')" role="button" tabindex="0">
+                        <div class="avatar">
+                            ${item.photoURL
+                                ? `<img src="${item.photoURL}" alt="${escapeAttr(item.name)}" />`
+                                : escapeHtml(initials)}
+                        </div>
                         <div class="info">
-                            <div class="name">${item.name}</div>
-                            <div class="date">🎂 ${dateStr} ${item.location ? '· ' + item.location : ''}</div>
+                            <div class="name">${escapeHtml(item.name)}</div>
+                            <div class="date">
+                                <i class="fas fa-birthday-cake"></i> ${escapeHtml(dateStr)}
+                                ${item.location ? `<span class="date-sep">·</span> <i class="fas fa-map-marker-alt"></i> ${escapeHtml(item.location)}` : ''}
+                            </div>
                         </div>
                         <span class="badge ${badgeClass}">${badgeText}</span>
                     </div>
@@ -3245,56 +4204,72 @@
             container.innerHTML = html;
         }
 
+        // ================================================================
+        // ===== EVENTS LIST =====
+        // ================================================================
         function renderEventsList() {
             const container = document.getElementById('eventsList');
             const tabCount = document.getElementById('eventsTabCount');
             if (!container) return;
 
             const now = new Date();
-            const upcoming = currentEvents
-                .filter(ev => {
-                    if (!ev.dateTime) return false;
-                    const d = convertTimestampToDate(ev.dateTime);
-                    return d >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                })
-                .sort((a, b) => convertTimestampToDate(a.dateTime) - convertTimestampToDate(b.dateTime));
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const upcoming = currentEvents.filter(ev => {
+                if (!ev.dateTime) return false;
+                return convertTimestampToDate(ev.dateTime) >= todayStart;
+            });
 
             if (tabCount) tabCount.textContent = `${upcoming.length}`;
 
             if (upcoming.length === 0) {
-                container.innerHTML = `<div class="no-events"><i class="fas fa-calendar-plus"></i><p>No upcoming events. Create one!</p></div>`;
+                container.innerHTML = `
+                    <div class="no-events">
+                        <i class="fas fa-calendar-plus"></i>
+                        <h3>No upcoming events</h3>
+                        <p>Create one to get the squad together!</p>
+                    </div>
+                `;
                 return;
             }
 
+            const sorted = sortEventsList(upcoming);
+
             let html = '';
-            upcoming.forEach(event => {
+            sorted.forEach(event => {
                 const eventDate = convertTimestampToDate(event.dateTime);
-                const dateStr = eventDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const monthStr = eventDate.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+                const dayStr = eventDate.getDate();
                 const timeStr = eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+                const fullDateStr = eventDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
                 const color = getEventColor(event.type || 'Other');
                 const typeLabel = event.type || 'Event';
+                const idSafe = escapeAttr(event.id);
+
                 html += `
-                    <div class="event-list-item" onclick="viewEventFromList('${event.id}')">
-                        <div class="event-color" style="background: ${color};"></div>
+                    <div class="event-list-item" style="--event-color: ${color};" onclick="openMiniEventFromList('${idSafe}')" role="button" tabindex="0">
+                        <div class="event-date-box">
+                            <div class="month" style="color: ${color};">${monthStr}</div>
+                            <div class="day">${dayStr}</div>
+                        </div>
                         <div class="event-info">
                             <div class="event-title">${escapeHtml(event.title || 'Untitled')}</div>
                             <div class="event-meta">
-                                <span><i class="fas fa-calendar-day"></i> ${dateStr}</span>
-                                <span><i class="fas fa-clock"></i> ${timeStr}</span>
+                                <span><i class="fas fa-calendar-day"></i> ${escapeHtml(fullDateStr)}</span>
+                                <span><i class="fas fa-clock"></i> ${escapeHtml(timeStr)}</span>
                                 ${event.location ? `<span><i class="fas fa-map-marker-alt"></i> ${escapeHtml(event.location)}</span>` : ''}
                             </div>
                         </div>
-                        <span class="event-badge">${typeLabel}</span>
+                        <span class="event-badge" style="background: color-mix(in srgb, ${color} 14%, transparent); color: ${color};">${escapeHtml(typeLabel)}</span>
                     </div>
                 `;
             });
             container.innerHTML = html;
         }
 
-        function viewEventFromList(eventId) {
+        function openMiniEventFromList(eventId) {
             const ev = currentEvents.find(e => e.id === eventId);
             if (!ev) return;
-            const fakeEvent = {
+            openMiniEvent({
                 id: ev.id,
                 title: ev.title || 'Untitled',
                 start: convertTimestampToDate(ev.dateTime),
@@ -3305,9 +4280,7 @@
                     createdBy: ev.createdBy || 'Unknown',
                     createdByUid: ev.createdByUid || ''
                 }
-            };
-            selectedEventId = ev.id;
-            showEventDetail(fakeEvent);
+            });
         }
 
         function switchListTab(tab) {
@@ -3321,6 +4294,7 @@
                 tabEvents.classList.remove('active');
                 paneBirthdays.classList.add('active');
                 paneEvents.classList.remove('active');
+                renderBirthdayList();
             } else {
                 tabEvents.classList.add('active');
                 tabBirthdays.classList.remove('active');
@@ -3330,6 +4304,9 @@
             }
         }
 
+        // ================================================================
+        // ===== CALENDAR =====
+        // ================================================================
         function initCalendar() {
             const calendarEl = document.getElementById('calendar');
 
@@ -3361,13 +4338,17 @@
                     selectedEventId = event.id;
 
                     if (extendedProps.isBirthday) {
-                        const birthdayDate = event.start ? new Date(event.start) : new Date();
-                        const dateStr = birthdayDate.toLocaleDateString('en-US', {
-                            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                        });
-                        alert(`🎂 ${event.title}\n📅 ${dateStr}\n📍 ${extendedProps.location || 'No location'}\n\n🎉 Don't forget to wish ${event.title.split("'")[0]} a happy birthday!`);
+                        const bd = birthdayEvents.find(b => b.id === extendedProps.userId);
+                        if (bd) {
+                            openMiniBirthday(bd.id, event.start || bd.date);
+                        }
                     } else {
-                        showEventDetail(event);
+                        openMiniEvent({
+                            id: event.id,
+                            title: event.title,
+                            start: event.start,
+                            extendedProps: extendedProps
+                        });
                     }
                 },
                 eventDidMount: function(info) {
@@ -3385,8 +4366,10 @@
                     }
                 },
                 height: 'auto',
-                aspectRatio: 1.6,
-                contentHeight: 'auto'
+                aspectRatio: 1.55,
+                contentHeight: 'auto',
+                dayMaxEvents: 3,
+                fixedWeekCount: false
             });
             calendar.render();
             updateCalendarEvents();
@@ -3415,16 +4398,21 @@
             const container = document.getElementById('datePopupEvents');
 
             if (eventsOnDate.length === 0 && birthdayOnDate.length === 0) {
-                container.innerHTML = `<div class="no-events-date"><i class="fas fa-calendar-plus"></i><p>No events on this day.</p></div>`;
+                container.innerHTML = `
+                    <div class="no-events-date">
+                        <i class="fas fa-calendar-plus"></i>
+                        <p>No events on this day.</p>
+                    </div>
+                `;
             } else {
                 let html = '';
                 birthdayOnDate.forEach(item => {
                     html += `
-                        <div class="event-list-item" style="border-left-color: #f5576c;">
+                        <div class="event-list-item" style="border-left-color: #f5576c;" onclick="closeDatePopup(); openMiniBirthday('${escapeAttr(item.id)}', new Date('${item.date.toISOString()}'));">
                             <div class="event-color" style="background: #f5576c;"></div>
                             <div class="event-info">
-                                <div class="event-title">🎂 ${item.name}'s Birthday</div>
-                                <div class="event-time">📍 ${item.location || 'No location'}</div>
+                                <div class="event-title">🎂 ${escapeHtml(item.name)}'s Birthday</div>
+                                <div class="event-time">📍 ${escapeHtml(item.location || 'No location')}</div>
                             </div>
                             <span class="event-badge" style="background:#fef3c7;color:#d97706;">Birthday</span>
                         </div>
@@ -3435,13 +4423,13 @@
                     const time = eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
                     const color = getEventColor(event.type || 'Other');
                     html += `
-                        <div class="event-list-item" onclick="viewEventFromPopup('${event.id}')">
+                        <div class="event-list-item" style="border-left-color: ${color};" onclick="closeDatePopup(); openMiniEventFromList('${escapeAttr(event.id)}');">
                             <div class="event-color" style="background: ${color};"></div>
                             <div class="event-info">
-                                <div class="event-title">${event.title || 'Untitled'}</div>
-                                <div class="event-time">🕐 ${time} · ${event.location || 'No location'}</div>
+                                <div class="event-title">${escapeHtml(event.title || 'Untitled')}</div>
+                                <div class="event-time">🕐 ${escapeHtml(time)} · ${escapeHtml(event.location || 'No location')}</div>
                             </div>
-                            <span class="event-badge">${event.type || 'Event'}</span>
+                            <span class="event-badge">${escapeHtml(event.type || 'Event')}</span>
                         </div>
                     `;
                 });
@@ -3452,21 +4440,9 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function viewEventFromPopup(eventId) {
-            const event = currentEvents.find(e => e.id === eventId);
-            if (event) {
-                closeDatePopup();
-                const calendarEvent = calendar.getEventById(eventId);
-                if (calendarEvent) {
-                    selectedEventId = eventId;
-                    showEventDetail(calendarEvent);
-                }
-            }
-        }
-
         function closeDatePopup() {
             document.getElementById('datePopupModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
         }
 
         function closeDatePopupAndAddEvent() {
@@ -3480,48 +4456,12 @@
             }
         }
 
-        function showEventDetail(event) {
-            const props = event.extendedProps;
-            document.getElementById('detailTitle').textContent = event.title;
-            document.getElementById('detailType').innerHTML = `<i class="fas fa-${props.type === 'Gala' ? 'crown' : props.type === 'Trip' ? 'plane' : props.type === 'Party' ? 'glass-cheers' : 'calendar-alt'}"></i> ${props.type || 'Event'} Details`;
-            const date = event.start ? new Date(event.start) : new Date();
-            document.getElementById('detailDate').textContent = date.toLocaleDateString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-            });
-            document.getElementById('detailTime').textContent = date.toLocaleTimeString('en-US', {
-                hour: '2-digit', minute: '2-digit'
-            });
-            document.getElementById('detailLocation').textContent = props.location || 'No location set';
-            document.getElementById('detailCreator').textContent = props.createdBy || 'Unknown';
-            document.getElementById('detailDescription').textContent = props.description || 'No description provided.';
-            document.getElementById('eventDetailModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeEventDetail() {
-            document.getElementById('eventDetailModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-            selectedEventId = null;
-        }
-
-        async function deleteEvent() {
-            if (!selectedEventId) { alert('No event selected'); return; }
-            if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
-            try {
-                await db.collection('events').doc(selectedEventId).delete();
-                closeEventDetail();
-                alert('✅ Event deleted successfully!');
-            } catch (error) {
-                console.error('Error deleting event:', error);
-                alert('❌ Error deleting event: ' + error.message);
-            }
-        }
-
         function updateCalendarEvents() {
             if (!calendar) return;
 
             const events = currentEvents.map(event => {
                 const eventDate = convertTimestampToDate(event.dateTime);
+                const color = getEventColor(event.type);
                 return {
                     id: event.id,
                     title: event.title || 'Untitled Event',
@@ -3535,8 +4475,8 @@
                         createdByUid: event.createdByUid || '',
                         isBirthday: false
                     },
-                    backgroundColor: getEventColor(event.type),
-                    borderColor: getEventColor(event.type),
+                    backgroundColor: color,
+                    borderColor: color,
                     textColor: '#ffffff'
                 };
             });
@@ -3568,20 +4508,13 @@
             calendar.addEventSource(allEvents);
         }
 
-        function getEventColor(type) {
-            const colors = {
-                'Gala': '#8b5cf6', 'Trip': '#3b82f6', 'Party': '#ef4444',
-                'Meeting': '#22c55e', 'Other': '#6b7280'
-            };
-            return colors[type] || colors['Other'];
-        }
-
         function refreshCalendar() {
             if (unsubscribeEvents) { unsubscribeEvents(); listenToEvents(); }
             if (unsubscribeBirthdays) { unsubscribeBirthdays(); listenToBirthdays(); }
             updateCalendarEvents();
             renderEventsList();
-            alert('🔄 Calendar refreshed!');
+            renderBirthdayList();
+            showToast('Calendar refreshed', 'success', 1800);
         }
 
         function showAddEvent() {
@@ -3590,13 +4523,14 @@
             document.body.style.overflow = 'hidden';
             const now = new Date();
             now.setHours(now.getHours() + 1);
+            now.setMinutes(0);
             document.getElementById('eventDateTime').value = now.toISOString().slice(0, 16);
         }
 
         function closeEventModal() {
             const modal = document.getElementById('eventModal');
             modal.classList.remove('active');
-            document.body.style.overflow = 'auto';
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('eventForm').reset();
             document.getElementById('customLocationInput').style.display = 'none';
         }
@@ -3614,7 +4548,7 @@
             const description = document.getElementById('eventDescription').value.trim();
 
             if (!title || !dateTime) {
-                alert('Please fill in the required fields');
+                showToast('Please fill in the required fields', 'warn');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Event';
                 return;
@@ -3636,57 +4570,198 @@
                 });
 
                 closeEventModal();
-                alert('✅ Event created successfully!');
+                showToast('Event created successfully!', 'success');
             } catch (error) {
                 console.error('Error creating event:', error);
-                alert('❌ Error creating event: ' + error.message);
+                showToast('Error creating event: ' + error.message, 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-save"></i> Create Event';
             }
         });
 
-        function toggleMobileMenu() {
-            document.getElementById('navLinks').classList.toggle('active');
-        }
+        // ================================================================
+        // ===== MINI EVENT WINDOW =====
+        // ================================================================
+        function openMiniEvent(event) {
+            if (!event) return;
+            miniEventCurrent = event;
 
-        document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
-            link.addEventListener('click', () => {
-                document.getElementById('navLinks').classList.remove('active');
+            const props = event.extendedProps || {};
+            const type = props.type || 'Other';
+            const color = getEventColor(type);
+            const iconClass = getEventTypeIcon(type);
+
+            const win = document.getElementById('miniEventWindow');
+            win.style.setProperty('--event-color', color);
+            document.getElementById('miniEventIcon').innerHTML = `<i class="fas ${iconClass}"></i>`;
+            document.getElementById('miniEventIcon').style.background = color;
+            document.getElementById('miniEventIcon').style.boxShadow = `0 6px 16px -6px ${color}`;
+            document.getElementById('miniEventType').textContent = type;
+            document.getElementById('miniEventType').style.color = color;
+            document.getElementById('miniEventTitle').textContent = event.title || 'Untitled Event';
+
+            const start = event.start ? new Date(event.start) : new Date();
+            document.getElementById('miniEventDate').textContent = start.toLocaleDateString('en-US', {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
             });
-        });
+            document.getElementById('miniEventTime').textContent = start.toLocaleTimeString('en-US', {
+                hour: '2-digit', minute: '2-digit'
+            });
 
-        async function logout() {
-            try {
-                if (auth.currentUser) {
-                    try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
-                }
-                await auth.signOut();
-                window.location.href = 'index.html';
-            } catch (error) {
-                alert('Error signing out: ' + error.message);
+            const locRow = document.getElementById('miniEventLocationRow');
+            const loc = props.location || '';
+            if (loc) {
+                locRow.style.display = 'flex';
+                document.getElementById('miniEventLocation').textContent = loc;
+            } else {
+                locRow.style.display = 'none';
             }
+
+            const descRow = document.getElementById('miniEventDescRow');
+            const desc = props.description || '';
+            if (desc) {
+                descRow.style.display = 'flex';
+                document.getElementById('miniEventDesc').textContent = desc;
+            } else {
+                descRow.style.display = 'none';
+            }
+
+            document.getElementById('miniEventCreator').textContent = props.createdBy || 'Unknown';
+
+            const deleteBtn = win.querySelector('.mini-btn-danger');
+            const isOwner = currentUser && props.createdByUid && props.createdByUid === currentUser.uid;
+            const isAdmin = titaUserData && titaUserData.isAdmin === true;
+            if (isOwner || isAdmin) {
+                deleteBtn.style.display = 'inline-flex';
+            } else {
+                deleteBtn.style.display = 'none';
+            }
+
+            win.classList.add('show');
         }
 
+        function closeMiniEvent() {
+            document.getElementById('miniEventWindow').classList.remove('show');
+            miniEventCurrent = null;
+        }
+
+        function openDayViewFromMini() {
+            if (!miniEventCurrent) return;
+            const start = miniEventCurrent.start ? new Date(miniEventCurrent.start) : null;
+            if (start && calendar) {
+                calendar.gotoDate(start);
+            }
+            closeMiniEvent();
+        }
+
+        function deleteEventFromMini() {
+            if (!miniEventCurrent) return;
+            const id = miniEventCurrent.id;
+            const title = miniEventCurrent.title || 'this event';
+            showConfirm({
+                title: 'Delete event?',
+                message: `"${title}" will be permanently deleted. This action cannot be undone.`,
+                confirmLabel: 'Delete',
+                type: 'danger',
+                onConfirm: async () => {
+                    try {
+                        await db.collection('events').doc(id).delete();
+                        closeMiniEvent();
+                        showToast('Event deleted successfully', 'success');
+                    } catch (error) {
+                        console.error('Error deleting event:', error);
+                        showToast('Error deleting event: ' + error.message, 'error');
+                    }
+                }
+            });
+        }
+
+        // ================================================================
+        // ===== MINI BIRTHDAY WINDOW =====
+        // ================================================================
+        function openMiniBirthday(birthdayId, overrideDate) {
+            const item = birthdayEvents.find(b => b.id === birthdayId);
+            if (!item) return;
+            miniBirthdayCurrent = item;
+
+            const win = document.getElementById('miniBirthdayWindow');
+            document.getElementById('miniBirthdayTitle').textContent = `${item.name}'s Birthday`;
+
+            const now = new Date();
+            let birthDate = overrideDate
+                ? new Date(overrideDate)
+                : new Date(now.getFullYear(), item.birthMonth, item.birthDay);
+            if (!overrideDate && birthDate < now) {
+                birthDate = new Date(now.getFullYear() + 1, item.birthMonth, item.birthDay);
+            }
+
+            document.getElementById('miniBirthdayDate').textContent = birthDate.toLocaleDateString('en-US', {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
+            });
+
+            const locRow = document.getElementById('miniBirthdayLocationRow');
+            if (item.location) {
+                locRow.style.display = 'flex';
+                document.getElementById('miniBirthdayLocation').textContent = item.location;
+            } else {
+                locRow.style.display = 'none';
+            }
+
+            const days = Math.ceil((birthDate - now) / (1000 * 60 * 60 * 24));
+            let countdownText;
+            if (days === 0) countdownText = '🎉 Today!';
+            else if (days === 1) countdownText = 'Tomorrow!';
+            else if (days > 0) countdownText = `in ${days} day${days === 1 ? '' : 's'}`;
+            else countdownText = `${Math.abs(days)} days ago`;
+            document.getElementById('miniBirthdayCountdown').textContent = countdownText;
+
+            win.classList.add('show');
+        }
+
+        function closeMiniBirthday() {
+            document.getElementById('miniBirthdayWindow').classList.remove('show');
+            miniBirthdayCurrent = null;
+        }
+
+        function viewBirthdayInCalendar() {
+            if (!miniBirthdayCurrent) return;
+            const item = miniBirthdayCurrent;
+            const now = new Date();
+            let birthDate = new Date(now.getFullYear(), item.birthMonth, item.birthDay);
+            if (birthDate < now) {
+                birthDate = new Date(now.getFullYear() + 1, item.birthMonth, item.birthDay);
+            }
+            if (calendar) calendar.gotoDate(birthDate);
+            closeMiniBirthday();
+        }
+
+        // ================================================================
+        // ===== MODAL STATE =====
+        // ================================================================
         function anyModalOpen() {
-            return ['eventModal', 'eventDetailModal', 'datePopupModal', 'announcementViewModal'].some(id => {
-                const el = document.getElementById(id);
-                return el && el.classList.contains('active');
-            }) || (document.getElementById('titaPanel') && document.getElementById('titaPanel').classList.contains('open'));
+            return ['eventModal', 'datePopupModal', 'announcementViewModal', 'confirmDialog']
+                .some(id => {
+                    const el = document.getElementById(id);
+                    return el && el.classList.contains('active');
+                })
+                || (document.getElementById('titaPanel') && document.getElementById('titaPanel').classList.contains('open'))
+                || (document.getElementById('miniEventWindow') && document.getElementById('miniEventWindow').classList.contains('show'))
+                || (document.getElementById('miniBirthdayWindow') && document.getElementById('miniBirthdayWindow').classList.contains('show'));
         }
 
         window.onclick = function(event) {
             const eventModal = document.getElementById('eventModal');
-            const detailModal = document.getElementById('eventDetailModal');
             const datePopup = document.getElementById('datePopupModal');
             const titaPanel = document.getElementById('titaPanel');
             const announcementPopup = document.getElementById('announcementPopup');
             const announcementViewModal = document.getElementById('announcementViewModal');
+            const confirmDialog = document.getElementById('confirmDialog');
 
             if (event.target === eventModal) closeEventModal();
-            if (event.target === detailModal) closeEventDetail();
             if (event.target === datePopup) closeDatePopup();
             if (event.target === announcementViewModal) closeAnnouncementView();
+            if (event.target === confirmDialog) closeConfirmDialog();
 
             if (titaPanel && titaPanel.classList.contains('open') &&
                 !titaPanel.contains(event.target) &&
@@ -3703,13 +4778,59 @@
                     closeAnnouncementPopup();
                 }
             }
-        }
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
+                else if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
+                else if (document.getElementById('miniEventWindow').classList.contains('show')) closeMiniEvent();
+                else if (document.getElementById('miniBirthdayWindow').classList.contains('show')) closeMiniBirthday();
+                else if (document.getElementById('eventModal').classList.contains('active')) closeEventModal();
+                else if (document.getElementById('datePopupModal').classList.contains('active')) closeDatePopup();
+                else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
+                else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
+            }
+        });
 
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
             if (window.scrollY > 20) navbar.style.boxShadow = '0 2px 30px rgba(0,0,0,0.08)';
             else navbar.style.boxShadow = '0 2px 20px rgba(0,0,0,0.04)';
         });
+
+        // ================================================================
+        // ===== NAV / LOGOUT =====
+        // ================================================================
+        function toggleMobileMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        document.querySelectorAll('.nav-links a, .nav-links button').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        function logout() {
+            showConfirm({
+                title: 'Sign out?',
+                message: 'You\'ll be signed out of TIMAWA and returned to the home page. Any unsaved changes will be lost.',
+                confirmLabel: 'Sign out',
+                type: 'danger',
+                onConfirm: async () => {
+                    try {
+                        if (auth.currentUser) {
+                            try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                        }
+                        await auth.signOut();
+                        window.location.href = 'index.html';
+                    } catch (error) {
+                        showToast('Error signing out: ' + error.message, 'error');
+                    }
+                }
+            });
+        }
 
         // ================================================================
         // ===== TITA TIMA =====
@@ -3722,7 +4843,7 @@
 
         function openTitaPanel() {
             if (!titaCurrentUser) {
-                alert('Please sign in to use Tita Tima 😊');
+                showToast('Please sign in to use Tita Tima 😊', 'warn');
                 window.location.href = 'index.html';
                 return;
             }
@@ -3850,8 +4971,6 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // ★ NOTE: We deliberately do NOT write theme here.
-                // Only profile.html is allowed to change the theme.
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
@@ -3895,14 +5014,6 @@
                 btn.innerHTML = originalHtml;
             }
         }
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
-                else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
-                else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
-            }
-        });
 
         window.addEventListener('resize', function() {
             const popup = document.getElementById('announcementPopup');

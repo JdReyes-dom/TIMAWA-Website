@@ -66,7 +66,6 @@
             pointer-events: none;
         }
 
-        /* Starry special: always dark night base */
         [data-timawa-theme="starry"] .theme-bg-base {
             background: linear-gradient(180deg, #1a1340 0%, #2a1a5e 50%, #1a1340 100%);
         }
@@ -94,11 +93,6 @@
             transition: background 0.6s ease;
         }
 
-        /* ================================================================
-           ===== SHAPE BASE =====
-           Each shape has its own class with self-contained styling.
-           Shapes are injected by JS based on active theme.
-           ================================================================ */
         .theme-bg-shapes .shape {
             position: absolute;
             pointer-events: none;
@@ -351,7 +345,6 @@
 
 /* -------- STARRY (STATIC-FIRST, CHEAP) -------- */
 
-        /* Layer 1: dense small stars — static background, no animation */
         .starfield {
             top: 0; left: 0; width: 100%; height: 100%;
             opacity: 0.85;
@@ -378,16 +371,13 @@
                 radial-gradient(1.4px 1.4px at 42% 82%, #fff, transparent);
             background-size: 200px 200px;
             background-repeat: repeat;
-            /* NO animation — static pattern is virtually free */
         }
-        /* Layer 2: sparse brighter stars, also static */
         .starfield-2 {
             background-size: 340px 340px;
             background-position: 50px 80px;
             opacity: 0.55;
         }
 
-        /* Shooting stars: keep them but slow + only 1 at a time feels alive */
         .shooting-star {
             width: 3px; height: 3px; background: #fff; border-radius: 50%;
             box-shadow: 0 0 6px 1px rgba(255,255,255,0.6);
@@ -404,12 +394,9 @@
         .shooting-star.sh1 { top: 14%; left: 80%; animation-delay: 2s; }
         .shooting-star.sh2 { top: 48%; left: 85%; animation-delay: 9s; animation-duration: 16s; }
 
-        /* Nebula: NO blur filter. Use radial-gradient falloff instead. */
-        /* radial-gradient with transparent stop = soft edge, free of blur cost */
         .nebula {
             border-radius: 50%;
             opacity: 0.30;
-            /* subtle pulse only on opacity (cheap) — no scale, no blur */
             animation: nebulaPulse 20s ease-in-out infinite;
             will-change: opacity;
         }
@@ -437,7 +424,6 @@
             16%  { transform: translate(-260px, 170px) rotate(-35deg); opacity: 0; }
             100% { transform: translate(-260px, 170px) rotate(-35deg); opacity: 0; }
         }
-        /* Opacity-only pulse — GPU cheap, no re-raster, no blur recompute */
         @keyframes nebulaPulse {
             0%, 100% { opacity: 0.22; }
             50%      { opacity: 0.38; }
@@ -1527,7 +1513,6 @@
         
         /* ================================================================
         ===== THEME CHANGE TOAST =====
-        Appears briefly when user picks a new theme preset or mode.
         ================================================================ */
         .theme-toast {
             position: fixed;
@@ -1570,9 +1555,265 @@
             }
         }
 
+        /* ================================================================
+           ===== NEW: TOASTS, CONFIRM DIALOG, LOADING OVERLAY =====
+           ================================================================ */
+
+        /* ===== TOAST STACK ===== */
+        .toast-stack {
+            position: fixed;
+            top: 90px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            border-radius: 14px;
+            background: var(--theme-card);
+            color: var(--theme-text);
+            box-shadow: 0 14px 40px -10px rgba(0,0,0,0.22),
+                        0 0 0 1px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            font-size: 13.5px;
+            font-weight: 600;
+            min-width: 260px;
+            max-width: 380px;
+            pointer-events: auto;
+            transform: translateX(20px);
+            opacity: 0;
+            animation: toastIn 0.32s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+            overflow-wrap: anywhere;
+        }
+        .toast.leaving { animation: toastOut 0.28s ease forwards; }
+        @keyframes toastIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastOut {
+            to { transform: translateX(20px); opacity: 0; }
+        }
+        .toast-icon {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .toast.success .toast-icon { background: linear-gradient(135deg, #16a34a, #22c55e); }
+        .toast.error .toast-icon { background: linear-gradient(135deg, #dc2626, #ef4444); }
+        .toast.info .toast-icon { background: var(--theme-gradient); }
+        .toast.warn .toast-icon { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+        /* ===== CONFIRM DIALOG ===== */
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .confirm-dialog.active { display: flex; }
+        .confirm-content {
+            background: var(--theme-card);
+            border-radius: 24px;
+            padding: 30px 28px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 30px 80px -20px color-mix(in srgb, var(--theme-primary) 40%, transparent);
+            animation: confirmPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--theme-text);
+            position: relative;
+        }
+        @keyframes confirmPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .confirm-icon-wrap {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+        .confirm-icon-wrap.danger { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
+        .confirm-icon-wrap.info { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb; }
+        .confirm-icon-wrap.warn { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
+        .confirm-title {
+            font-size: 19px; font-weight: 800;
+            color: var(--theme-text);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .confirm-message {
+            font-size: 13.5px;
+            color: var(--theme-text-muted);
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+        .confirm-actions { display: flex; gap: 10px; }
+        .confirm-actions button {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            gap: 6px;
+        }
+        .confirm-actions .confirm-cancel {
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-muted);
+        }
+        .confirm-actions .confirm-cancel:hover { background: var(--theme-primary-soft); }
+        .confirm-actions .confirm-ok {
+            background: var(--theme-gradient);
+            color: white;
+            box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+        }
+        .confirm-actions .confirm-ok.danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            box-shadow: 0 6px 18px -6px rgba(220, 38, 38, 0.5);
+        }
+        .confirm-actions .confirm-ok:hover { transform: translateY(-1px); }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            background: color-mix(in srgb, var(--theme-bg) 88%, transparent);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .loading-overlay .pl {
+            width: 6em;
+            height: 6em;
+            filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--theme-primary) 35%, transparent));
+        }
+        .loading-overlay .pl__ring {
+            stroke: color-mix(in srgb, var(--theme-primary) 15%, transparent);
+            transition: stroke 0.3s;
+        }
+        .loading-overlay .loading-text {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--theme-text-muted);
+            text-transform: uppercase;
+            animation: loadingTextFade 1.6s ease-in-out infinite;
+        }
+        @keyframes loadingTextFade {
+            0%, 100% { opacity: 0.55; }
+            50%      { opacity: 1; }
+        }
+
+        /* Uiverse.io spinner by PhilibertGentien */
+        .pl,
+        .pl__worm {
+            animation-duration: 4s;
+            animation-iteration-count: infinite;
+        }
+        .pl {
+            animation-name: bump5;
+            animation-timing-function: linear;
+        }
+        .pl__worm {
+            animation-name: worm5;
+            animation-timing-function: cubic-bezier(0.42,0.17,0.75,0.83);
+        }
+        @keyframes bump5 {
+            from, 42%, 46%, 51%, 55%, 59%, 63%, 67%, 71%, 74%, 78%, 81%, 85%, 88%, 92%, to {
+                transform: translate(0,0);
+            }
+            44% { transform: translate(1.33%, 6.75%); }
+            53% { transform: translate(-16.67%, -0.54%); }
+            61% { transform: translate(3.66%, -2.46%); }
+            69% { transform: translate(-0.59%, 15.27%); }
+            76% { transform: translate(-1.92%, -4.68%); }
+            83% { transform: translate(9.38%, 0.96%); }
+            90% { transform: translate(-4.55%, 1.98%); }
+        }
+        @keyframes worm5 {
+            from { stroke-dashoffset: 10; }
+            25%  { stroke-dashoffset: 295; }
+            to   { stroke-dashoffset: 1165; }
+        }
+
+        .pl__grad-stop-1 { stop-color: var(--theme-primary); }
+        .pl__grad-stop-2 { stop-color: var(--theme-accent); }
+
+        @media (max-width: 768px) {
+            .toast-stack { top: 70px; right: 12px; left: 12px; }
+            .toast { min-width: 0; max-width: none; }
+            .loading-overlay .pl { width: 5em; height: 5em; }
+        }
     </style>
 </head>
 <body>
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div class="loading-overlay active" id="loadingOverlay" aria-hidden="false">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="pl" aria-hidden="true">
+            <defs>
+                <linearGradient y2="1" x2="0" y1="0" x1="0" id="pl-grad">
+                    <stop class="pl__grad-stop-1" offset="0%"></stop>
+                    <stop class="pl__grad-stop-2" offset="100%"></stop>
+                </linearGradient>
+            </defs>
+            <circle stroke-linecap="round" stroke-width="16" stroke="currentColor" fill="none" cy="64" cx="64" r="56" class="pl__ring" style="color: color-mix(in srgb, var(--theme-primary) 15%, transparent);"></circle>
+            <path stroke-dashoffset="10" stroke-dasharray="44 1111" stroke-linejoin="round" stroke-linecap="round" stroke-width="16" stroke="url(#pl-grad)" fill="none" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" class="pl__worm"></path>
+        </svg>
+        <div class="loading-text" id="loadingText">Loading profile…</div>
+    </div>
+
+    <!-- ===== TOAST STACK ===== -->
+    <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- ===== CONFIRM DIALOG ===== -->
+    <div id="confirmDialog" class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <div class="confirm-content">
+            <div class="confirm-icon-wrap danger" id="confirmIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+            <div class="confirm-message" id="confirmMessage">This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="confirm-cancel" onclick="closeConfirmDialog()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="confirm-ok danger" id="confirmOkBtn">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== BACKGROUND LAYERS ===== -->
     <div class="theme-bg-base"></div>
     <div class="theme-bg-shapes" id="themeBgShapes"><!-- Injected by JS --></div>
@@ -1863,12 +2104,106 @@
 
     <script>
         // ================================================================
+        // ===== ★ TOASTS & CONFIRM DIALOG & LOADING OVERLAY =====
+        // ================================================================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function showToast(message, type = 'info', duration = 3200) {
+            const stack = document.getElementById('toastStack');
+            if (!stack) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconMap = {
+                success: 'fa-check',
+                error: 'fa-times',
+                info: 'fa-info',
+                warn: 'fa-exclamation'
+            };
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
+                <div>${escapeHtml(message)}</div>
+            `;
+            stack.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('leaving');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        let _confirmCallback = null;
+        function showConfirm({ title, message, confirmLabel, type, onConfirm }) {
+            const dlg = document.getElementById('confirmDialog');
+            document.getElementById('confirmTitle').textContent = title || 'Are you sure?';
+            document.getElementById('confirmMessage').textContent = message || '';
+            const okBtn = document.getElementById('confirmOkBtn');
+            okBtn.innerHTML = `<i class="fas fa-check"></i> ${confirmLabel || 'Confirm'}`;
+            okBtn.className = 'confirm-ok' + (type === 'danger' ? ' danger' : '');
+            const iconWrap = document.getElementById('confirmIcon');
+            iconWrap.className = 'confirm-icon-wrap ' + (type || 'info');
+            const iconMap = {
+                danger: 'fa-exclamation-triangle',
+                info: 'fa-info-circle',
+                warn: 'fa-exclamation-circle'
+            };
+            iconWrap.innerHTML = `<i class="fas ${iconMap[type] || iconMap.info}"></i>`;
+            _confirmCallback = onConfirm;
+            dlg.classList.add('active');
+        }
+
+        function closeConfirmDialog() {
+            document.getElementById('confirmDialog').classList.remove('active');
+            _confirmCallback = null;
+        }
+
+        let _loadingHideTimer = null;
+        function showLoadingOverlay(text) {
+            const overlay = document.getElementById('loadingOverlay');
+            const label = document.getElementById('loadingText');
+            if (!overlay) return;
+            if (text && label) label.textContent = text;
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+            if (_loadingHideTimer) {
+                clearTimeout(_loadingHideTimer);
+                _loadingHideTimer = null;
+            }
+        }
+
+        function hideLoadingOverlay(delay = 0) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (!overlay) return;
+            if (_loadingHideTimer) clearTimeout(_loadingHideTimer);
+            _loadingHideTimer = setTimeout(() => {
+                overlay.classList.remove('active');
+                overlay.setAttribute('aria-hidden', 'true');
+            }, Math.max(0, delay));
+        }
+
+        function hideLoadingOverlayWhenReady() {
+            hideLoadingOverlay(420);
+        }
+
+        (function initConfirmBtn() {
+            const okBtn = document.getElementById('confirmOkBtn');
+            if (okBtn) {
+                okBtn.addEventListener('click', () => {
+                    const cb = _confirmCallback;
+                    closeConfirmDialog();
+                    if (typeof cb === 'function') cb();
+                });
+            }
+        })();
+
+        // ================================================================
         // ===== ★ THEME SYSTEM WITH SHAPE INJECTION =====
         // ================================================================
         const THEME_STORAGE_KEY = 'timawa_theme';
         const THEME_EVENT = 'timawa-theme-change';
 
-        // Shape HTML templates — ONLY the active theme's shapes are injected into DOM
         const THEME_SHAPES = {
             ocean: `
                 <div class="shape ocean-wave"></div>
@@ -2185,15 +2520,10 @@
         const DEFAULT_THEME = { preset: 'ocean', mode: 'light' };
         let selectedTheme = { ...DEFAULT_THEME };
 
-        /**
-         * ★ KEY FUNCTION: Injects ONLY the active theme's shapes into the DOM.
-         * This guarantees ZERO element sharing between themes.
-         */
         function injectThemeShapes(presetKey) {
             const container = document.getElementById('themeBgShapes');
             if (!container) return;
             const html = THEME_SHAPES[presetKey];
-            // Only re-inject if the current theme's shapes aren't already there
             if (container.dataset.activeTheme !== presetKey) {
                 container.innerHTML = html || '';
                 container.dataset.activeTheme = presetKey;
@@ -2212,7 +2542,6 @@
             root.setAttribute('data-timawa-theme', theme.preset);
             root.setAttribute('data-timawa-mode', mode);
 
-            // ★ Inject ONLY this theme's shapes
             injectThemeShapes(theme.preset);
 
             let meta = document.querySelector('meta[name="theme-color"]');
@@ -2276,7 +2605,7 @@
         function selectThemePreset(key) {
             if (!THEMES[key]) return;
             selectedTheme.preset = key;
-            applyTheme(selectedTheme); // live preview only — no persist
+            applyTheme(selectedTheme);
             renderThemeGrid();
             showThemeToast(`Theme changed to ${THEMES[key].name} (unsaved)`);
         }
@@ -2284,16 +2613,13 @@
         function setThemeMode(mode) {
             if (mode !== 'light' && mode !== 'dark') return;
             selectedTheme.mode = mode;
-            applyTheme(selectedTheme); // live preview only — no persist
+            applyTheme(selectedTheme);
             document.querySelectorAll('#modeToggle .mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
             showThemeToast(`Switched to ${mode === 'dark' ? 'Dark' : 'Light'} mode (unsaved)`);
         }
 
-        /* ================================================================
-           ===== THEME TOAST (visual feedback on theme change) =====
-           ================================================================ */
         let themeToastTimer = null;
         function showThemeToast(message) {
             let toast = document.getElementById('themeToast');
@@ -2362,12 +2688,6 @@
         const ANNOUNCEMENT_CACHE_KEY = 'timawa_ann_cache_';
         const ANNOUNCEMENT_LIMIT = 30;
         const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
-        }
 
         function escapeAttr(text) {
             return String(text).replace(/&/g, '&amp;').replace(/"/g, '&quot;')
@@ -2928,70 +3248,6 @@
             } catch (e) { console.warn('welcome gen:', e.message); }
         }
 
-        async function createReplyAndMentionNotifications({ noteUid, noteOwnerUid, noteOwnerName, noteText, parentCommentId, parentCommentAuthorUid, parentCommentAuthorName, replierUid, replierName, replyText, isReplyToComment, mentionedUids }) {
-            try {
-                const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-                const queued = new Set();
-                const notifications = [];
-                const replySnippet = (replyText || '').slice(0, 80) + ((replyText || '').length > 80 ? '...' : '');
-                const noteSnippet = (noteText || '').slice(0, 60) + ((noteText || '').length > 60 ? '...' : '');
-
-                if (!isReplyToComment && noteOwnerUid && noteOwnerUid !== replierUid) {
-                    if (!queued.has(noteOwnerUid)) {
-                        queued.add(noteOwnerUid);
-                        notifications.push({
-                            type: 'reply', title: `💬 ${replierName} replied to your note`,
-                            message: `"${noteSnippet}"\n\n"${replySnippet}"`,
-                            icon: '💬', priority: 'info',
-                            link: 'index.html#members-section', linkLabel: 'View Reply',
-                            targetUid: noteOwnerUid, referenceId: noteUid, readBy: [],
-                            createdBy: 'system', createdByName: 'System',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(), expiresAt
-                        });
-                    }
-                }
-
-                if (isReplyToComment && parentCommentAuthorUid && parentCommentAuthorUid !== replierUid) {
-                    if (!queued.has(parentCommentAuthorUid)) {
-                        queued.add(parentCommentAuthorUid);
-                        notifications.push({
-                            type: 'reply', title: `💬 ${replierName} replied to your reply`,
-                            message: `On ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
-                            icon: '💬', priority: 'info',
-                            link: 'index.html#members-section', linkLabel: 'View Reply',
-                            targetUid: parentCommentAuthorUid, referenceId: noteUid, readBy: [],
-                            createdBy: 'system', createdByName: 'System',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(), expiresAt
-                        });
-                    }
-                }
-
-                if (Array.isArray(mentionedUids) && mentionedUids.length > 0) {
-                    mentionedUids.forEach(uid => {
-                        if (!uid || uid === replierUid || queued.has(uid)) return;
-                        queued.add(uid);
-                        notifications.push({
-                            type: 'mention', title: `@ ${replierName} mentioned you`,
-                            message: `In ${noteOwnerName}'s note: "${noteSnippet}"\n\n"${replySnippet}"`,
-                            icon: '📣', priority: 'info',
-                            link: 'index.html#members-section', linkLabel: 'View Mention',
-                            targetUid: uid, referenceId: noteUid, readBy: [],
-                            createdBy: 'system', createdByName: 'System',
-                            createdAt: firebase.firestore.FieldValue.serverTimestamp(), expiresAt
-                        });
-                    });
-                }
-
-                if (notifications.length === 0) return;
-                const batch = db.batch();
-                notifications.forEach(n => {
-                    const ref = db.collection('announcements').doc();
-                    batch.set(ref, n);
-                });
-                await batch.commit();
-            } catch (err) { console.warn('createReplyAndMentionNotifications error:', err); }
-        }
-
         function toggleCustomLocation() {
             const select = document.getElementById('locationSelect');
             const customInput = document.getElementById('customLocationInput');
@@ -3114,6 +3370,8 @@
             document.getElementById('email').value = user.email || '';
             isOffline = !navigator.onLine;
 
+            showLoadingOverlay('Loading profile…');
+
             const cachedTheme = readThemeFromStorage();
             if (cachedTheme) {
                 selectedTheme = cachedTheme;
@@ -3143,17 +3401,18 @@
                     if (ageMin < 5) autoGenerateMemberAnnouncement(user, profileData);
                 } catch (e) {}
             }
+
+            hideLoadingOverlayWhenReady();
         });
 
         window.addEventListener('online', () => {
             isOffline = false;
-            showMessage('✅ Back online!', 'success');
-            setTimeout(() => { document.getElementById('message').style.display = 'none'; }, 3000);
+            showToast('Back online!', 'success');
         });
 
         window.addEventListener('offline', () => {
             isOffline = true;
-            showMessage('⚠️ You are offline. Changes cannot be saved.', 'error');
+            showToast('You are offline. Changes cannot be saved.', 'warn');
         });
 
         async function loadProfile() {
@@ -3227,39 +3486,47 @@
         }
 
         function resetForm() {
-            if (profileData) {
-                document.getElementById('displayName').value = profileData.displayName || currentUser.displayName || '';
-                document.getElementById('bio').value = profileData.bio || '';
-                setLocationValue(profileData.location || '');
-                document.getElementById('birthday').value = profileData.birthday || '';
-                document.getElementById('occupation').value = profileData.occupation || '';
-                document.getElementById('interests').value = profileData.interests || '';
-                document.getElementById('status').value = profileData.status || 'available';
-                document.getElementById('loveLife').value = profileData.loveLife || '';
-                document.getElementById('instagram').value = profileData.instagram || '';
-                document.getElementById('twitter').value = profileData.twitter || '';
-                document.getElementById('tiktok').value = profileData.tiktok || '';
-                document.getElementById('facebook').value = profileData.facebook || '';
+            showConfirm({
+                title: 'Reset form?',
+                message: 'Any unsaved changes will be discarded and the form will return to the last saved values.',
+                confirmLabel: 'Reset',
+                type: 'warn',
+                onConfirm: () => {
+                    if (profileData) {
+                        document.getElementById('displayName').value = profileData.displayName || currentUser.displayName || '';
+                        document.getElementById('bio').value = profileData.bio || '';
+                        setLocationValue(profileData.location || '');
+                        document.getElementById('birthday').value = profileData.birthday || '';
+                        document.getElementById('occupation').value = profileData.occupation || '';
+                        document.getElementById('interests').value = profileData.interests || '';
+                        document.getElementById('status').value = profileData.status || 'available';
+                        document.getElementById('loveLife').value = profileData.loveLife || '';
+                        document.getElementById('instagram').value = profileData.instagram || '';
+                        document.getElementById('twitter').value = profileData.twitter || '';
+                        document.getElementById('tiktok').value = profileData.tiktok || '';
+                        document.getElementById('facebook').value = profileData.facebook || '';
 
-                if (profileData.theme && THEMES[profileData.theme.preset]) {
-                    selectedTheme = {
-                        preset: profileData.theme.preset,
-                        mode: profileData.theme.mode === 'dark' ? 'dark' : 'light'
-                    };
-                } else selectedTheme = { ...DEFAULT_THEME };
-                applyTheme(selectedTheme);
-                syncThemeUI();
+                        if (profileData.theme && THEMES[profileData.theme.preset]) {
+                            selectedTheme = {
+                                preset: profileData.theme.preset,
+                                mode: profileData.theme.mode === 'dark' ? 'dark' : 'light'
+                            };
+                        } else selectedTheme = { ...DEFAULT_THEME };
+                        applyTheme(selectedTheme);
+                        syncThemeUI();
 
-                if (profileData.photoURL) {
-                    const avatarEl = document.getElementById('heroAvatar');
-                    avatarEl.innerHTML = `<img src="${profileData.photoURL}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
-                    document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+                        if (profileData.photoURL) {
+                            const avatarEl = document.getElementById('heroAvatar');
+                            avatarEl.innerHTML = `<img src="${profileData.photoURL}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
+                            document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
+                        }
+                        updateLoveLifeBadge(profileData.loveLife || '');
+                        updateStatusBadge(profileData.status || 'available');
+                        selectedFile = null;
+                        showToast('Form reset to saved values', 'info');
+                    }
                 }
-                updateLoveLifeBadge(profileData.loveLife || '');
-                selectedFile = null;
-                showMessage('Form reset to saved values', 'info');
-                setTimeout(() => { document.getElementById('message').style.display = 'none'; }, 2000);
-            }
+            });
         }
 
         function updateStatusBadge(status) {
@@ -3293,7 +3560,7 @@
             const file = e.target.files[0];
             if (!file) return;
             if (file.size > 10 * 1024 * 1024) {
-                showMessage('⚠️ Photo too large! Please choose an image under 10MB.', 'error');
+                showToast('Photo too large! Please choose an image under 10MB.', 'warn');
                 return;
             }
             showMessage('📸 Compressing image...', 'info');
@@ -3306,13 +3573,12 @@
                     avatarEl.innerHTML = `<img src="${event.target.result}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
                     document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
                     document.getElementById('message').style.display = 'none';
-                    showMessage(`✅ Photo compressed (${Math.round(compressedFile.size / 1024)}KB). Click Save to upload.`, 'success');
-                    setTimeout(() => { document.getElementById('message').style.display = 'none'; }, 3000);
+                    showToast(`Photo compressed (${Math.round(compressedFile.size / 1024)}KB). Click Save to upload.`, 'info', 3500);
                 };
                 reader.readAsDataURL(compressedFile);
             } catch (error) {
                 console.error('Compression error:', error);
-                showMessage('❌ Error compressing image: ' + error.message, 'error');
+                showToast('Error compressing image: ' + error.message, 'error');
             }
         }
 
@@ -3337,7 +3603,7 @@
         document.getElementById('profileForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isOffline) {
-                showMessage('❌ Cannot save while offline. Please check your connection.', 'error');
+                showToast('Cannot save while offline. Please check your connection.', 'error');
                 return;
             }
 
@@ -3389,7 +3655,7 @@
             }
 
             if (facebook && !facebook.match(/^https?:\/\/(www\.)?facebook\.com\/.+/i)) {
-                showMessage('⚠️ Please enter a valid Facebook URL (e.g., https://facebook.com/username)', 'error');
+                showToast('Please enter a valid Facebook URL (e.g., https://facebook.com/username)', 'warn');
                 return;
             }
 
@@ -3410,7 +3676,7 @@
                         }, 500);
                     } catch (uploadError) {
                         console.error('Upload error:', uploadError);
-                        showMessage('❌ Error uploading photo: ' + uploadError.message, 'error');
+                        showToast('Error uploading photo: ' + uploadError.message, 'error');
                         saveBtn.disabled = false;
                         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Profile';
                         return;
@@ -3450,8 +3716,7 @@
                 selectedFile = null;
                 document.getElementById('photoInput').value = '';
 
-                showMessage('✅ Profile saved successfully!', 'success');
-                setTimeout(() => { document.getElementById('message').style.display = 'none'; }, 4000);
+                showToast('Profile saved successfully!', 'success');
 
                 showSaveConfirmModal({
                     title: 'Information Saved',
@@ -3460,7 +3725,7 @@
                 });
             } catch (error) {
                 console.error('Save error:', error);
-                showMessage('❌ Error saving profile: ' + error.message, 'error');
+                showToast('Error saving profile: ' + error.message, 'error');
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Profile';
@@ -3495,17 +3760,25 @@
         });
 
         async function logout() {
-            try {
-                if (auth.currentUser) {
-                    try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+            showConfirm({
+                title: 'Sign out?',
+                message: 'You\'ll be signed out of TIMAWA and returned to the home page. Any unsaved changes will be lost.',
+                confirmLabel: 'Sign out',
+                type: 'danger',
+                onConfirm: async () => {
+                    try {
+                        if (auth.currentUser) {
+                            try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                        }
+                        await auth.signOut();
+                        window.location.href = 'index.html';
+                    } catch (error) { showToast('Error signing out: ' + error.message, 'error'); }
                 }
-                await auth.signOut();
-                window.location.href = 'index.html';
-            } catch (error) { alert('Error signing out: ' + error.message); }
+            });
         }
 
         function anyModalOpen() {
-            return ['announcementViewModal', 'saveConfirmModal'].some(id => {
+            return ['announcementViewModal', 'saveConfirmModal', 'confirmDialog'].some(id => {
                 const el = document.getElementById(id);
                 return el && el.classList.contains('active');
             });
@@ -3515,9 +3788,11 @@
             const announcementPopup = document.getElementById('announcementPopup');
             const announcementViewModal = document.getElementById('announcementViewModal');
             const saveConfirmModal = document.getElementById('saveConfirmModal');
+            const confirmDialog = document.getElementById('confirmDialog');
 
             if (event.target === announcementViewModal) closeAnnouncementView();
             if (event.target === saveConfirmModal) closeSaveConfirmModal();
+            if (event.target === confirmDialog) closeConfirmDialog();
 
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
@@ -3532,10 +3807,12 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
+                const confirmDlg = document.getElementById('confirmDialog');
                 const saveModal = document.getElementById('saveConfirmModal');
                 const viewModal = document.getElementById('announcementViewModal');
                 const popup = document.getElementById('announcementPopup');
-                if (saveModal && saveModal.classList.contains('active')) closeSaveConfirmModal();
+                if (confirmDlg && confirmDlg.classList.contains('active')) closeConfirmDialog();
+                else if (saveModal && saveModal.classList.contains('active')) closeSaveConfirmModal();
                 else if (viewModal && viewModal.classList.contains('active')) closeAnnouncementView();
                 else if (popup && popup.classList.contains('open')) closeAnnouncementPopup();
             }
@@ -3552,14 +3829,12 @@
             }
         });
 
-        // ★ INIT: apply cached theme (which injects the correct shapes) ASAP
         (function() {
             const cached = readThemeFromStorage();
             if (cached) {
                 selectedTheme = cached;
                 applyTheme(selectedTheme);
             } else {
-                // Even without a cached theme, inject default shapes
                 injectThemeShapes(selectedTheme.preset);
             }
         })();

@@ -2163,9 +2163,266 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--theme-border-soft); border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: var(--theme-gradient); border-radius: 10px; }
+
+        /* ================================================================
+           ===== NEW: TOASTS, CONFIRM DIALOG, LOADING OVERLAY =====
+           ================================================================ */
+
+        /* ===== TOAST STACK ===== */
+        .toast-stack {
+            position: fixed;
+            top: 90px;
+            right: 24px;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+            max-width: calc(100vw - 32px);
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 18px;
+            border-radius: 14px;
+            background: var(--theme-card);
+            color: var(--theme-text);
+            box-shadow: 0 14px 40px -10px rgba(0,0,0,0.22),
+                        0 0 0 1px color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            font-size: 13.5px;
+            font-weight: 600;
+            min-width: 260px;
+            max-width: 380px;
+            pointer-events: auto;
+            transform: translateX(20px);
+            opacity: 0;
+            animation: toastIn 0.32s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+            overflow-wrap: anywhere;
+        }
+        .toast.leaving { animation: toastOut 0.28s ease forwards; }
+        @keyframes toastIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes toastOut {
+            to { transform: translateX(20px); opacity: 0; }
+        }
+        .toast-icon {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+        .toast.success .toast-icon { background: linear-gradient(135deg, #16a34a, #22c55e); }
+        .toast.error .toast-icon { background: linear-gradient(135deg, #dc2626, #ef4444); }
+        .toast.info .toast-icon { background: var(--theme-gradient); }
+        .toast.warn .toast-icon { background: linear-gradient(135deg, #d97706, #f59e0b); }
+
+        /* ===== CONFIRM DIALOG ===== */
+        .confirm-dialog {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(8px);
+            z-index: 4000;
+            justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        .confirm-dialog.active { display: flex; }
+        .confirm-content {
+            background: var(--theme-card);
+            border-radius: 24px;
+            padding: 30px 28px 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 30px 80px -20px color-mix(in srgb, var(--theme-primary) 40%, transparent);
+            animation: confirmPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--theme-text);
+            position: relative;
+        }
+        @keyframes confirmPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        .confirm-icon-wrap {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 32px;
+        }
+        .confirm-icon-wrap.danger { background: linear-gradient(135deg, #fee2e2, #fecaca); color: #dc2626; }
+        .confirm-icon-wrap.info { background: linear-gradient(135deg, #dbeafe, #bfdbfe); color: #2563eb; }
+        .confirm-icon-wrap.warn { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
+        .confirm-title {
+            font-size: 19px; font-weight: 800;
+            color: var(--theme-text);
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+        .confirm-message {
+            font-size: 13.5px;
+            color: var(--theme-text-muted);
+            line-height: 1.55;
+            margin-bottom: 22px;
+        }
+        .confirm-actions { display: flex; gap: 10px; }
+        .confirm-actions button {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 13.5px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center; justify-content: center;
+            gap: 6px;
+        }
+        .confirm-actions .confirm-cancel {
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-muted);
+        }
+        .confirm-actions .confirm-cancel:hover { background: var(--theme-primary-soft); }
+        .confirm-actions .confirm-ok {
+            background: var(--theme-gradient);
+            color: white;
+            box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+        }
+        .confirm-actions .confirm-ok.danger {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            box-shadow: 0 6px 18px -6px rgba(220, 38, 38, 0.5);
+        }
+        .confirm-actions .confirm-ok:hover { transform: translateY(-1px); }
+
+        /* ===== LOADING OVERLAY ===== */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 20px;
+            background: color-mix(in srgb, var(--theme-bg) 88%, transparent);
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .loading-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .loading-overlay .pl {
+            width: 6em;
+            height: 6em;
+            filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--theme-primary) 35%, transparent));
+        }
+        .loading-overlay .pl__ring {
+            stroke: color-mix(in srgb, var(--theme-primary) 15%, transparent);
+            transition: stroke 0.3s;
+        }
+        .loading-overlay .loading-text {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: var(--theme-text-muted);
+            text-transform: uppercase;
+            animation: loadingTextFade 1.6s ease-in-out infinite;
+        }
+        @keyframes loadingTextFade {
+            0%, 100% { opacity: 0.55; }
+            50%      { opacity: 1; }
+        }
+
+        /* Uiverse.io spinner by PhilibertGentien */
+        .pl,
+        .pl__worm {
+            animation-duration: 4s;
+            animation-iteration-count: infinite;
+        }
+        .pl {
+            animation-name: bump5;
+            animation-timing-function: linear;
+        }
+        .pl__worm {
+            animation-name: worm5;
+            animation-timing-function: cubic-bezier(0.42,0.17,0.75,0.83);
+        }
+        @keyframes bump5 {
+            from, 42%, 46%, 51%, 55%, 59%, 63%, 67%, 71%, 74%, 78%, 81%, 85%, 88%, 92%, to {
+                transform: translate(0,0);
+            }
+            44% { transform: translate(1.33%, 6.75%); }
+            53% { transform: translate(-16.67%, -0.54%); }
+            61% { transform: translate(3.66%, -2.46%); }
+            69% { transform: translate(-0.59%, 15.27%); }
+            76% { transform: translate(-1.92%, -4.68%); }
+            83% { transform: translate(9.38%, 0.96%); }
+            90% { transform: translate(-4.55%, 1.98%); }
+        }
+        @keyframes worm5 {
+            from { stroke-dashoffset: 10; }
+            25%  { stroke-dashoffset: 295; }
+            to   { stroke-dashoffset: 1165; }
+        }
+
+        .pl__grad-stop-1 { stop-color: var(--theme-primary); }
+        .pl__grad-stop-2 { stop-color: var(--theme-accent); }
+
+        @media (max-width: 768px) {
+            .toast-stack { top: 70px; right: 12px; left: 12px; }
+            .toast { min-width: 0; max-width: none; }
+            .loading-overlay .pl { width: 5em; height: 5em; }
+        }
     </style>
 </head>
 <body>
+    <!-- ===== LOADING OVERLAY (shown until content is ready) ===== -->
+    <div class="loading-overlay active" id="loadingOverlay" aria-hidden="false">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="pl" aria-hidden="true">
+            <defs>
+                <linearGradient y2="1" x2="0" y1="0" x1="0" id="pl-grad">
+                    <stop class="pl__grad-stop-1" offset="0%"></stop>
+                    <stop class="pl__grad-stop-2" offset="100%"></stop>
+                </linearGradient>
+            </defs>
+            <circle stroke-linecap="round" stroke-width="16" stroke="currentColor" fill="none" cy="64" cx="64" r="56" class="pl__ring" style="color: color-mix(in srgb, var(--theme-primary) 15%, transparent);"></circle>
+            <path stroke-dashoffset="10" stroke-dasharray="44 1111" stroke-linejoin="round" stroke-linecap="round" stroke-width="16" stroke="url(#pl-grad)" fill="none" d="M92,15.492S78.194,4.967,66.743,16.887c-17.231,17.938-28.26,96.974-28.26,96.974L119.85,59.892l-99-31.588,57.528,89.832L97.8,19.349,13.636,88.51l89.012,16.015S81.908,38.332,66.1,22.337C50.114,6.156,36,15.492,36,15.492a56,56,0,1,0,56,0Z" class="pl__worm"></path>
+        </svg>
+        <div class="loading-text" id="loadingText">Loading TIMAWA…</div>
+    </div>
+
+    <!-- ===== TOAST STACK ===== -->
+    <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- ===== CONFIRM DIALOG ===== -->
+    <div id="confirmDialog" class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <div class="confirm-content">
+            <div class="confirm-icon-wrap danger" id="confirmIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="confirm-title" id="confirmTitle">Are you sure?</div>
+            <div class="confirm-message" id="confirmMessage">This action cannot be undone.</div>
+            <div class="confirm-actions">
+                <button class="confirm-cancel" onclick="closeConfirmDialog()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button class="confirm-ok danger" id="confirmOkBtn">
+                    <i class="fas fa-check"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== BACKGROUND LAYERS ===== -->
     <div class="theme-bg-base"></div>
     <div class="theme-bg-shapes" id="themeBgShapes"><!-- Injected by JS --></div>
@@ -3066,133 +3323,95 @@
         const ANNOUNCEMENT_CACHE_TTL = 5 * 60 * 1000;
 
         // ================================================================
-        // ===== CLOUDINARY THUMBS =====
+        // ===== ★ TOASTS & CONFIRM DIALOG & LOADING OVERLAY =====
         // ================================================================
-        function cloudinaryThumb(url, width = 500) {
-            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
-            const afterUpload = url.split('/upload/')[1];
-            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
-            return url.replace('/upload/', `/upload/w_${width},q_auto:good,f_auto/`);
-        }
-
-        function cloudinaryAvatar(url, size = 400) {
-            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
-            const afterUpload = url.split('/upload/')[1];
-            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
-            return url.replace('/upload/', `/upload/w_${size},h_${size},c_fill,g_face,q_auto:good,f_auto/`);
-        }
-
-        // ================================================================
-        // ===== HELPERS =====
-        // ================================================================
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = String(text);
-            return div.innerHTML;
-        }
-
-        function escapeAttr(text) {
-            return String(text)
-                .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        }
-
-        function escapeRegex(str) {
-            return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        }
-
-        function sanitizeFilename(name) {
-            return String(name || 'item')
-                .replace(/[^a-z0-9_\-\s]+/gi, '').trim()
-                .replace(/\s+/g, '_').slice(0, 40) || 'item';
-        }
-
-        function extFromUrl(url) {
-            if (!url) return 'jpg';
-            const match = url.match(/\.([a-z0-9]+)(?:\?|$)/i);
-            return match ? match[1].toLowerCase() : 'jpg';
-        }
-
-        function formatRelativeTime(date) {
-            if (!date) return 'Just now';
-            const now = new Date();
-            const diffMs = now - date;
-            const diffMin = Math.floor(diffMs / 60000);
-            if (diffMin < 1) return 'Just now';
-            if (diffMin < 60) return `${diffMin}m ago`;
-            const diffHr = Math.floor(diffMin / 60);
-            if (diffHr < 24) return `${diffHr}h ago`;
-            const diffDay = Math.floor(diffHr / 24);
-            if (diffDay < 7) return `${diffDay}d ago`;
-            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        }
-
-        function formatFullDate(date) {
-            if (!date) return '';
-            return date.toLocaleDateString('en-US', {
-                weekday: 'long', year: 'numeric', month: 'long',
-                day: 'numeric', hour: '2-digit', minute: '2-digit'
-            });
-        }
-
-        function getLoveLifeLabel(value) {
-            switch (value) {
-                case 'Single': return { label: 'Single', icon: 'fa-heart-broken', cls: 'single' };
-                case 'MU': return { label: 'MU', icon: 'fa-heart', cls: 'mu' };
-                case 'Married': return { label: 'Married', icon: 'fa-ring', cls: 'married' };
-                default: return null;
-            }
-        }
-
-        function getStatusLabel(status) {
-            const map = {
-                'available': { label: 'Available', cls: 'available' },
-                'busy': { label: 'Busy', cls: 'busy' },
-                'away': { label: 'Away', cls: 'away' },
-                'dnd': { label: 'Do Not Disturb', cls: 'dnd' },
-                'offline': { label: 'Offline', cls: 'offline' }
+        function showToast(message, type = 'info', duration = 3200) {
+            const stack = document.getElementById('toastStack');
+            if (!stack) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const iconMap = {
+                success: 'fa-check',
+                error: 'fa-times',
+                info: 'fa-info',
+                warn: 'fa-exclamation'
             };
-            return map[status] || map['offline'];
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas ${iconMap[type] || iconMap.info}"></i></div>
+                <div>${escapeHtml(message)}</div>
+            `;
+            stack.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('leaving');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
         }
 
-        function formatBirthday(birthday) {
-            if (!birthday || typeof birthday !== 'string') return '';
-            const parts = birthday.split('-');
-            if (parts.length !== 3) return birthday;
-            const month = parseInt(parts[1], 10);
-            const day = parseInt(parts[2], 10);
-            if (isNaN(month) || isNaN(day)) return birthday;
-            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                'July', 'August', 'September', 'October', 'November', 'December'];
-            return `${monthNames[month - 1]} ${day}`;
+        let _confirmCallback = null;
+        function showConfirm({ title, message, confirmLabel, type, onConfirm }) {
+            const dlg = document.getElementById('confirmDialog');
+            document.getElementById('confirmTitle').textContent = title || 'Are you sure?';
+            document.getElementById('confirmMessage').textContent = message || '';
+            const okBtn = document.getElementById('confirmOkBtn');
+            okBtn.innerHTML = `<i class="fas fa-check"></i> ${confirmLabel || 'Confirm'}`;
+            okBtn.className = 'confirm-ok' + (type === 'danger' ? ' danger' : '');
+            const iconWrap = document.getElementById('confirmIcon');
+            iconWrap.className = 'confirm-icon-wrap ' + (type || 'info');
+            const iconMap = {
+                danger: 'fa-exclamation-triangle',
+                info: 'fa-info-circle',
+                warn: 'fa-exclamation-circle'
+            };
+            iconWrap.innerHTML = `<i class="fas ${iconMap[type] || iconMap.info}"></i>`;
+            _confirmCallback = onConfirm;
+            dlg.classList.add('active');
         }
 
-        async function getCurrentUserProfileCached(user) {
-            const CACHE_KEY = 'timawa_me_' + user.uid;
-            try {
-                const raw = sessionStorage.getItem(CACHE_KEY);
-                if (raw) {
-                    const parsed = JSON.parse(raw);
-                    if (parsed && parsed.uid === user.uid && (Date.now() - parsed.t) < USER_PROFILE_CACHE_TTL) {
-                        return parsed.data;
-                    }
-                }
-            } catch (e) { /* ignore */ }
+        function closeConfirmDialog() {
+            document.getElementById('confirmDialog').classList.remove('active');
+            _confirmCallback = null;
+        }
 
-            try {
-                const doc = await db.collection('users').doc(user.uid).get();
-                const data = doc.data() || {};
-                try {
-                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
-                        uid: user.uid, t: Date.now(), data
-                    }));
-                } catch (e) { /* ignore */ }
-                return data;
-            } catch (e) {
-                console.warn('getCurrentUserProfileCached failed:', e);
-                return {};
+        // ===== LOADING OVERLAY CONTROL =====
+        let _loadingHideTimer = null;
+        function showLoadingOverlay(text) {
+            const overlay = document.getElementById('loadingOverlay');
+            const label = document.getElementById('loadingText');
+            if (!overlay) return;
+            if (text && label) label.textContent = text;
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+            if (_loadingHideTimer) {
+                clearTimeout(_loadingHideTimer);
+                _loadingHideTimer = null;
             }
         }
+
+        function hideLoadingOverlay(delay = 0) {
+            const overlay = document.getElementById('loadingOverlay');
+            if (!overlay) return;
+            if (_loadingHideTimer) clearTimeout(_loadingHideTimer);
+            _loadingHideTimer = setTimeout(() => {
+                overlay.classList.remove('active');
+                overlay.setAttribute('aria-hidden', 'true');
+            }, Math.max(0, delay));
+        }
+
+        function hideLoadingOverlayWhenReady() {
+            hideLoadingOverlay(420);
+        }
+
+        // Wire up confirm OK button
+        (function initConfirmBtn() {
+            const okBtn = document.getElementById('confirmOkBtn');
+            if (okBtn) {
+                okBtn.addEventListener('click', () => {
+                    const cb = _confirmCallback;
+                    closeConfirmDialog();
+                    if (typeof cb === 'function') cb();
+                });
+            }
+        })();
 
         // ================================================================
         // ===== ★ MODAL-OPEN STATE MANAGER =====
@@ -4185,7 +4404,7 @@
 
         async function postNoteComment() {
             if (!isUserLoggedIn || !titaCurrentUser) {
-                alert('Please sign in to reply.');
+                showToast('Please sign in to reply.', 'warn');
                 return;
             }
 
@@ -4277,7 +4496,7 @@
 
             } catch (err) {
                 console.error('Post comment error:', err);
-                alert('❌ Could not post reply: ' + err.message);
+                showToast('Could not post reply: ' + err.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -4286,14 +4505,22 @@
 
         async function deleteNoteComment(commentId) {
             if (!isUserLoggedIn) return;
-            if (!confirm('Delete this reply?')) return;
 
-            try {
-                await deleteCommentAndChildren(commentId);
-            } catch (err) {
-                console.error('Delete comment error:', err);
-                alert('❌ Could not delete reply: ' + err.message);
-            }
+            showConfirm({
+                title: 'Delete reply?',
+                message: 'This reply and any nested replies will be permanently removed.',
+                confirmLabel: 'Delete',
+                type: 'danger',
+                onConfirm: async () => {
+                    try {
+                        await deleteCommentAndChildren(commentId);
+                        showToast('Reply deleted', 'success', 2000);
+                    } catch (err) {
+                        console.error('Delete comment error:', err);
+                        showToast('Could not delete reply: ' + err.message, 'error');
+                    }
+                }
+            });
         }
 
         // ================================================================
@@ -4726,7 +4953,7 @@
 
         async function postHighlightComment() {
             if (!isUserLoggedIn || !titaCurrentUser) {
-                alert('Please sign in to comment.');
+                showToast('Please sign in to comment.', 'warn');
                 return;
             }
 
@@ -4815,7 +5042,7 @@
 
             } catch (err) {
                 console.error('Post highlight comment error:', err);
-                alert('❌ Could not post comment: ' + err.message);
+                showToast('Could not post comment: ' + err.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -4824,25 +5051,32 @@
 
         async function deleteHighlightComment(commentId) {
             if (!isUserLoggedIn || !titaCurrentUser) return;
-            if (!confirm('Delete this comment?')) return;
 
-            try {
-                const refs = [db.collection('highlightComments').doc(commentId)];
+            showConfirm({
+                title: 'Delete comment?',
+                message: 'This comment and any replies will be permanently removed.',
+                confirmLabel: 'Delete',
+                type: 'danger',
+                onConfirm: async () => {
+                    try {
+                        const refs = [db.collection('highlightComments').doc(commentId)];
 
-                const childrenSnap = await db.collection('highlightComments')
-                    .where('replyToId', '==', commentId)
-                    .get();
-                childrenSnap.forEach(doc => refs.push(doc.ref));
+                        const childrenSnap = await db.collection('highlightComments')
+                            .where('replyToId', '==', commentId)
+                            .get();
+                        childrenSnap.forEach(doc => refs.push(doc.ref));
 
-                const batch = db.batch();
-                refs.forEach(ref => batch.delete(ref));
-                await batch.commit();
+                        const batch = db.batch();
+                        refs.forEach(ref => batch.delete(ref));
+                        await batch.commit();
 
-                console.log(`🗑️ Deleted ${refs.length} comment(s)`);
-            } catch (err) {
-                console.error('Delete highlight comment error:', err);
-                alert('❌ Could not delete comment: ' + err.message);
-            }
+                        showToast('Comment deleted', 'success', 2000);
+                    } catch (err) {
+                        console.error('Delete highlight comment error:', err);
+                        showToast('Could not delete comment: ' + err.message, 'error');
+                    }
+                }
+            });
         }
 
         async function createHighlightCommentNotification({
@@ -5695,20 +5929,28 @@
         auth.onAuthStateChanged(user => updateNavigation(user));
 
         async function logout() {
-            try {
-                stopCommentAutoCleanup();
-                detachAllNoteCountListeners();
-                detachHighlightCommentsListener();
-                if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
+            showConfirm({
+                title: 'Sign out?',
+                message: 'You\'ll be signed out of TIMAWA and returned to the home page. Any unsaved changes will be lost.',
+                confirmLabel: 'Sign out',
+                type: 'danger',
+                onConfirm: async () => {
+                    try {
+                        stopCommentAutoCleanup();
+                        detachAllNoteCountListeners();
+                        detachHighlightCommentsListener();
+                        if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
 
-                if (auth.currentUser) {
-                    try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                        if (auth.currentUser) {
+                            try { sessionStorage.removeItem('timawa_me_' + auth.currentUser.uid); } catch (e) {}
+                        }
+                        await auth.signOut();
+                        window.location.reload();
+                    } catch (error) {
+                        showToast('Error signing out: ' + error.message, 'error');
+                    }
                 }
-                await auth.signOut();
-                window.location.reload();
-            } catch (error) {
-                alert('Error signing out: ' + error.message);
-            }
+            });
         }
 
         // ===== DOWNLOAD HELPERS =====
@@ -5817,7 +6059,7 @@
 
         async function downloadCurrentItem() {
             if (!currentItem || !currentItem.imageUrl) {
-                alert('No image available to download.');
+                showToast('No image available to download.', 'warn');
                 return;
             }
             const safeTitle = sanitizeFilename(currentItem.title);
@@ -6102,7 +6344,7 @@
 
         async function downloadCurrentMemberAvatar() {
             if (!currentMember || !currentMember.photoURL) {
-                alert('No profile picture available.');
+                showToast('No profile picture available.', 'warn');
                 return;
             }
             const name = currentMember.displayName || currentMember.email || 'member';
@@ -6354,7 +6596,7 @@
                 saveAs(zipBlob, `TIMAWA_${safeAuthor}_${date}.zip`);
             } catch (err) {
                 console.error('ZIP error:', err);
-                alert('❌ Error creating ZIP: ' + err.message);
+                showToast('Error creating ZIP: ' + err.message, 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = originalHtml;
@@ -6905,7 +7147,7 @@
                 saveAs(zipBlob, `TIMAWA_${safeAuthor}_${date}.zip`);
             } catch (err) {
                 console.error('ZIP error:', err);
-                alert('❌ Error creating ZIP: ' + err.message);
+                showToast('Error creating ZIP: ' + err.message, 'error');
             }
         }
 
@@ -6926,7 +7168,7 @@
 
         function openTitaPanel() {
             if (!titaCurrentUser) {
-                alert('Please sign in to use Tita Tima 😊');
+                showToast('Please sign in to use Tita Tima 😊', 'warn');
                 window.location.href = 'login.html';
                 return;
             }
@@ -7177,6 +7419,9 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Show loading overlay initially
+            showLoadingOverlay('Loading TIMAWA…');
+
             loadCarouselData('coffeeShops', 'coffeeTrack', 'coffeeDots', 'coffee');
             loadCarouselData('favoritePlaces', 'placesTrack', 'placesDots', 'places');
             loadCarouselData('thingsToDo', 'activitiesTrack', 'activitiesDots', 'activities');
@@ -7197,6 +7442,9 @@
                     startAutoplay(id);
                 });
             });
+
+            // Hide loading overlay when ready
+            hideLoadingOverlayWhenReady();
         });
 
         window.addEventListener('beforeunload', function() {
@@ -7269,7 +7517,8 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key !== 'Escape') return;
-            if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
+            if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
+            else if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
             else if (document.getElementById('fullViewModal').classList.contains('active')) closeFullView();
             else if (document.getElementById('galleryModal').classList.contains('active')) closeGallery();
             else if (document.getElementById('highlightDetailModal').classList.contains('active')) closeHighlightDetail();
@@ -7279,6 +7528,132 @@
             else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
             else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
         });
+
+        // ================================================================
+        // ===== HELPERS (need to be defined before use) =====
+        // ================================================================
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+
+        function escapeAttr(text) {
+            return String(text)
+                .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function escapeRegex(str) {
+            return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function sanitizeFilename(name) {
+            return String(name || 'item')
+                .replace(/[^a-z0-9_\-\s]+/gi, '').trim()
+                .replace(/\s+/g, '_').slice(0, 40) || 'item';
+        }
+
+        function extFromUrl(url) {
+            if (!url) return 'jpg';
+            const match = url.match(/\.([a-z0-9]+)(?:\?|$)/i);
+            return match ? match[1].toLowerCase() : 'jpg';
+        }
+
+        function formatRelativeTime(date) {
+            if (!date) return 'Just now';
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMin = Math.floor(diffMs / 60000);
+            if (diffMin < 1) return 'Just now';
+            if (diffMin < 60) return `${diffMin}m ago`;
+            const diffHr = Math.floor(diffMin / 60);
+            if (diffHr < 24) return `${diffHr}h ago`;
+            const diffDay = Math.floor(diffHr / 24);
+            if (diffDay < 7) return `${diffDay}d ago`;
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function formatFullDate(date) {
+            if (!date) return '';
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long', year: 'numeric', month: 'long',
+                day: 'numeric', hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        function getLoveLifeLabel(value) {
+            switch (value) {
+                case 'Single': return { label: 'Single', icon: 'fa-heart-broken', cls: 'single' };
+                case 'MU': return { label: 'MU', icon: 'fa-heart', cls: 'mu' };
+                case 'Married': return { label: 'Married', icon: 'fa-ring', cls: 'married' };
+                default: return null;
+            }
+        }
+
+        function getStatusLabel(status) {
+            const map = {
+                'available': { label: 'Available', cls: 'available' },
+                'busy': { label: 'Busy', cls: 'busy' },
+                'away': { label: 'Away', cls: 'away' },
+                'dnd': { label: 'Do Not Disturb', cls: 'dnd' },
+                'offline': { label: 'Offline', cls: 'offline' }
+            };
+            return map[status] || map['offline'];
+        }
+
+        function formatBirthday(birthday) {
+            if (!birthday || typeof birthday !== 'string') return '';
+            const parts = birthday.split('-');
+            if (parts.length !== 3) return birthday;
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            if (isNaN(month) || isNaN(day)) return birthday;
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'];
+            return `${monthNames[month - 1]} ${day}`;
+        }
+
+        function cloudinaryThumb(url, width = 500) {
+            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+            const afterUpload = url.split('/upload/')[1];
+            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
+            return url.replace('/upload/', `/upload/w_${width},q_auto:good,f_auto/`);
+        }
+
+        function cloudinaryAvatar(url, size = 400) {
+            if (!url || !url.includes('res.cloudinary.com') || !url.includes('/upload/')) return url;
+            const afterUpload = url.split('/upload/')[1];
+            if (/^[a-z]_/.test(afterUpload) || /^[a-z]+,[a-z]/.test(afterUpload)) return url;
+            return url.replace('/upload/', `/upload/w_${size},h_${size},c_fill,g_face,q_auto:good,f_auto/`);
+        }
+
+        async function getCurrentUserProfileCached(user) {
+            const CACHE_KEY = 'timawa_me_' + user.uid;
+            try {
+                const raw = sessionStorage.getItem(CACHE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed && parsed.uid === user.uid && (Date.now() - parsed.t) < USER_PROFILE_CACHE_TTL) {
+                        return parsed.data;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                const data = doc.data() || {};
+                try {
+                    sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                        uid: user.uid, t: Date.now(), data
+                    }));
+                } catch (e) { /* ignore */ }
+                return data;
+            } catch (e) {
+                console.warn('getCurrentUserProfileCached failed:', e);
+                return {};
+            }
+        }
     </script>
 
     <script src="idle-logout.js"></script>
