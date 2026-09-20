@@ -2276,32 +2276,19 @@
         function selectThemePreset(key) {
             if (!THEMES[key]) return;
             selectedTheme.preset = key;
-            applyTheme(selectedTheme);
+            applyTheme(selectedTheme); // live preview only — no persist
             renderThemeGrid();
-
-            // ★ Persist to localStorage immediately (instant cross-tab sync)
-            // Firestore is only updated when the user clicks "Save Profile"
-            persistThemeLocally(selectedTheme);
-            broadcastThemeChange(selectedTheme);
-
-            // ★ Visual feedback
-            showThemeToast(`Theme changed to ${THEMES[key].name}`);
+            showThemeToast(`Theme changed to ${THEMES[key].name} (unsaved)`);
         }
 
         function setThemeMode(mode) {
             if (mode !== 'light' && mode !== 'dark') return;
             selectedTheme.mode = mode;
-            applyTheme(selectedTheme);
+            applyTheme(selectedTheme); // live preview only — no persist
             document.querySelectorAll('#modeToggle .mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === mode);
             });
-
-            // ★ Persist to localStorage immediately
-            persistThemeLocally(selectedTheme);
-            broadcastThemeChange(selectedTheme);
-
-            // ★ Visual feedback
-            showThemeToast(`Switched to ${mode === 'dark' ? 'Dark' : 'Light'} mode`);
+            showThemeToast(`Switched to ${mode === 'dark' ? 'Dark' : 'Light'} mode (unsaved)`);
         }
 
         /* ================================================================
