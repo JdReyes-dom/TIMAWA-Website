@@ -4,21 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TIMAWA - Sign In</title>
-    
+
+    <!--
+        ═══════════════════════════════════════════════════════════════════
+        ⚠️  RECOMMENDED FUTURE REFACTOR
+        ═══════════════════════════════════════════════════════════════════
+        The theme system (THEMES object, shape injection, applyTheme, etc.)
+        is currently inlined below — matching your profile.html pattern —
+        so this file works standalone immediately.
+
+        For long-term maintainability, extract:
+          1. theme.css  → All :root variables + shape styles + @media blocks
+          2. theme.js   → THEMES, THEME_SHAPES, applyTheme(), injectThemeShapes(),
+                          readThemeFromStorage(), broadcast, cross-tab sync, etc.
+
+        Then in every page (login, index, profile, dashboard, calendar, admin):
+          <link rel="stylesheet" href="theme.css" />
+          <script src="theme.js"></script>
+
+        And each page's own JS just calls: window.TimawaTheme.init()
+        ═══════════════════════════════════════════════════════════════════
+    -->
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* ================================================================
+           ===== THEME CSS VARIABLES (defaults = Ocean light) =====
+           These are overridden at runtime by applyTheme().
+           ================================================================ */
+        :root {
+            --theme-primary: #1089d3;
+            --theme-accent: #12b1d1;
+            --theme-primary-dark: #0c6ca8;
+            --theme-primary-soft: #e0f2fe;
+            --theme-primary-soft-2: #f0f7ff;
+            --theme-bg: #ffffff;
+            --theme-bg-soft: #f8faff;
+            --theme-card: #ffffff;
+            --theme-text: #1a1a2e;
+            --theme-text-muted: #555;
+            --theme-text-dim: #888;
+            --theme-text-faint: #aaa;
+            --theme-border: #eef2f7;
+            --theme-border-soft: #f0f4ff;
+            --theme-border-input: #e0e7ff;
+            --theme-gradient: linear-gradient(45deg, #1089d3 0%, #12b1d1 100%);
+            --theme-shadow: rgba(133, 189, 215, 0.15);
+            --theme-shadow-soft: #cff0ff;
+            --theme-nav-bg: rgba(255, 255, 255, 0.98);
+            --theme-danger: #ef4444;
+            --theme-danger-soft: #fee2e2;
+            --theme-success: #16a34a;
+            --theme-success-soft: #dcfce7;
+            --theme-warn: #d97706;
+            --theme-warn-soft: #fef3c7;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
@@ -26,551 +77,776 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+            background: var(--theme-bg);
+            color: var(--theme-text);
             padding: 20px;
+            transition: background 0.4s ease, color 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
         }
 
+        /* ================================================================
+           ===== BACKGROUND LAYERS =====
+           ================================================================ */
+        .theme-bg-base {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -3;
+            background: var(--theme-bg);
+            transition: background 0.6s ease;
+            pointer-events: none;
+        }
+
+        [data-timawa-theme="starry"] .theme-bg-base {
+            background: linear-gradient(180deg, #1a1340 0%, #2a1a5e 50%, #1a1340 100%);
+        }
+        [data-timawa-theme="starry"][data-timawa-mode="dark"] .theme-bg-base {
+            background: linear-gradient(180deg, #06040e 0%, #100828 50%, #06040e 100%);
+        }
+
+        .theme-bg-shapes {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .theme-bg-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: radial-gradient(ellipse at 20% 30%, color-mix(in srgb, var(--theme-primary) 5%, transparent) 0%, transparent 70%),
+                        radial-gradient(ellipse at 80% 70%, color-mix(in srgb, var(--theme-accent) 5%, transparent) 0%, transparent 70%);
+            transition: background 0.6s ease;
+        }
+
+        .theme-bg-shapes .shape {
+            position: absolute;
+            pointer-events: none;
+            will-change: transform, opacity;
+        }
+
+        /* -------- OCEAN -------- */
+        .ocean-wave {
+            width: 200%; height: 180px; left: -50%; bottom: -30px;
+            border-radius: 45%; background: var(--theme-primary);
+            opacity: 0.10; animation: oceanWave 18s ease-in-out infinite;
+        }
+        .ocean-wave.w2 {
+            bottom: -60px; height: 220px; opacity: 0.07;
+            background: var(--theme-accent);
+            animation-duration: 24s; animation-direction: reverse;
+        }
+        .ocean-bubble {
+            border-radius: 50%; border: 2px solid var(--theme-primary);
+            background: transparent; opacity: 0.15;
+            animation: oceanBubble 22s linear infinite;
+        }
+        .ocean-bubble.b1 { width: 60px; height: 60px; left: 10%; bottom: -80px; }
+        .ocean-bubble.b2 { width: 40px; height: 40px; left: 30%; bottom: -60px; animation-delay: 5s; }
+        .ocean-bubble.b3 { width: 80px; height: 80px; left: 70%; bottom: -100px; animation-delay: 10s; }
+        .ocean-bubble.b4 { width: 30px; height: 30px; left: 85%; bottom: -40px; animation-delay: 15s; }
+        .ocean-fish {
+            width: 50px; height: 25px; background: var(--theme-primary);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0.10; animation: oceanFish 35s linear infinite;
+        }
+        .ocean-fish::before {
+            content: ''; position: absolute; right: -12px; top: 50%;
+            transform: translateY(-50%); width: 0; height: 0;
+            border-top: 12px solid transparent; border-bottom: 12px solid transparent;
+            border-left: 15px solid var(--theme-primary);
+        }
+        .ocean-fish.f1 { top: 20%; left: -80px; }
+        .ocean-fish.f2 { top: 65%; left: -100px; animation-duration: 45s; animation-delay: 8s; }
+
+        @keyframes oceanWave {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-4%) rotate(2deg); }
+            75% { transform: translateX(4%) rotate(-2deg); }
+        }
+        @keyframes oceanBubble {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            10% { opacity: 0.6; }
+            100% { transform: translateY(-110vh) scale(1.3); opacity: 0; }
+        }
+        @keyframes oceanFish {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+
+        /* -------- SUNSET -------- */
+        .sunset-ray {
+            top: -20%; left: 50%; width: 200%; height: 200%; opacity: 0.10;
+            background: conic-gradient(from 0deg at 50% 50%,
+                transparent 0deg, var(--theme-primary) 20deg, transparent 40deg,
+                var(--theme-accent) 70deg, transparent 100deg,
+                var(--theme-primary) 130deg, transparent 160deg,
+                var(--theme-accent) 190deg, transparent 220deg,
+                var(--theme-primary) 250deg, transparent 280deg,
+                var(--theme-accent) 310deg, transparent 340deg, transparent 360deg);
+            transform: translate(-50%, -50%);
+            animation: sunsetRay 80s linear infinite;
+        }
+        .sunset-glow {
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--theme-primary) 0%, transparent 70%);
+            filter: blur(40px); opacity: 0.12;
+            animation: sunsetGlow 10s ease-in-out infinite;
+        }
+        .sunset-glow.g1 { width: 400px; height: 400px; top: 10%; right: -100px; }
+        .sunset-glow.g2 { width: 300px; height: 300px; bottom: 20%; left: -80px; animation-delay: 4s; }
+        .sunset-cloud {
+            width: 180px; height: 50px; background: var(--theme-accent);
+            border-radius: 50px; filter: blur(20px); opacity: 0.10;
+            animation: sunsetCloud 40s linear infinite;
+        }
+        .sunset-cloud.c1 { top: 30%; left: -200px; }
+        .sunset-cloud.c2 { top: 60%; left: -250px; animation-delay: 15s; width: 220px; height: 60px; }
+        @keyframes sunsetRay {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        @keyframes sunsetGlow {
+            0%, 100% { transform: scale(1); opacity: 0.08; }
+            50% { transform: scale(1.2); opacity: 0.18; }
+        }
+        @keyframes sunsetCloud {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 300px)); }
+        }
+
+        /* -------- BLOSSOM -------- */
+        .petal {
+            width: 28px; height: 28px; background: var(--theme-primary);
+            border-radius: 50% 0 50% 0; opacity: 0.22;
+            animation: petalFall 18s linear infinite;
+        }
+        .petal.p1 { left: 10%; top: -10%; width: 22px; height: 22px; }
+        .petal.p2 { left: 25%; top: -15%; animation-delay: 3s; width: 30px; height: 30px; }
+        .petal.p3 { left: 45%; top: -8%; animation-delay: 6s; width: 20px; height: 20px; }
+        .petal.p4 { left: 65%; top: -12%; animation-delay: 2s; width: 26px; height: 26px; }
+        .petal.p5 { left: 82%; top: -6%; animation-delay: 8s; width: 24px; height: 24px; }
+        .petal.p6 { left: 50%; top: -20%; animation-delay: 10s; width: 18px; height: 18px; }
+        .blossom {
+            width: 60px; height: 60px;
+            background: radial-gradient(circle at 30% 30%, var(--theme-accent), var(--theme-primary));
+            border-radius: 50%; filter: blur(15px); opacity: 0.14;
+            animation: blossomFloat 25s ease-in-out infinite;
+        }
+        .blossom.b1 { top: 20%; left: 5%; }
+        .blossom.b2 { top: 70%; left: 85%; animation-delay: 8s; width: 80px; height: 80px; }
+        .blossom.b3 { top: 45%; left: 50%; animation-delay: 16s; width: 50px; height: 50px; }
+        @keyframes petalFall {
+            0% { transform: translateY(0) rotate(45deg) scale(1); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(110vh) rotate(405deg) scale(0.8); opacity: 0; }
+        }
+        @keyframes blossomFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.08; }
+            50% { transform: translate(20px, -30px) scale(1.1); opacity: 0.18; }
+        }
+
+        /* -------- FOREST -------- */
+        .leaf {
+            width: 40px; height: 40px; background: var(--theme-primary);
+            border-radius: 0 100% 0 100%; opacity: 0.18;
+            animation: leafFloat 22s ease-in-out infinite;
+        }
+        .leaf.l1 { left: 5%; top: 10%; transform: rotate(15deg); width: 50px; height: 50px; }
+        .leaf.l2 { left: 80%; top: 15%; animation-delay: 4s; transform: rotate(-30deg); width: 35px; height: 35px; }
+        .leaf.l3 { left: 20%; top: 65%; animation-delay: 8s; transform: rotate(45deg); width: 45px; height: 45px; }
+        .leaf.l4 { left: 70%; top: 70%; animation-delay: 3s; transform: rotate(-15deg); width: 30px; height: 30px; }
+        .leaf.l5 { left: 45%; top: 45%; animation-delay: 12s; transform: rotate(75deg); width: 38px; height: 38px; }
+        .fern {
+            width: 100px; height: 100px; border: 2px solid var(--theme-accent);
+            border-radius: 0 100% 0 100%; filter: blur(8px); opacity: 0.12;
+            animation: fernSway 30s ease-in-out infinite;
+        }
+        .fern.f1 { top: 10%; right: 10%; transform: rotate(45deg); }
+        .fern.f2 { bottom: 15%; left: 5%; animation-delay: 10s; transform: rotate(-30deg); width: 140px; height: 140px; }
+        @keyframes leafFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(15px, -20px) rotate(10deg); }
+            50% { transform: translate(-10px, -10px) rotate(-5deg); }
+            75% { transform: translate(5px, -25px) rotate(8deg); }
+        }
+        @keyframes fernSway {
+            0%, 100% { transform: rotate(45deg) scale(1); opacity: 0.08; }
+            50% { transform: rotate(55deg) scale(1.1); opacity: 0.18; }
+        }
+
+        /* -------- SUNSHINE -------- */
+        .sunbeam {
+            width: 140px; height: 120%; top: -10%;
+            background: linear-gradient(to bottom, var(--theme-primary), transparent);
+            transform: rotate(25deg); filter: blur(25px); opacity: 0.12;
+            animation: sunbeamShimmer 12s ease-in-out infinite;
+        }
+        .sunbeam.s1 { left: 5%; }
+        .sunbeam.s2 { left: 35%; animation-delay: 3s; width: 90px; }
+        .sunbeam.s3 { left: 65%; animation-delay: 6s; width: 170px; }
+        .sunbeam.s4 { left: 85%; animation-delay: 9s; width: 70px; }
+        .sun-dot {
+            border-radius: 50%; background: var(--theme-primary);
+            filter: blur(1.5px); opacity: 0.20;
+            animation: sunDotFloat 14s ease-in-out infinite;
+        }
+        .sun-dot.d1 { width: 14px; height: 14px; left: 15%; top: 20%; }
+        .sun-dot.d2 { width: 20px; height: 20px; left: 70%; top: 40%; animation-delay: 4s; }
+        .sun-dot.d3 { width: 10px; height: 10px; left: 40%; top: 75%; animation-delay: 7s; }
+        .sun-dot.d4 { width: 16px; height: 16px; left: 88%; top: 60%; animation-delay: 2s; }
+        .sun-ring {
+            border-radius: 50%; border: 3px solid var(--theme-accent);
+            filter: blur(4px); opacity: 0.10;
+            animation: sunRingPulse 8s ease-in-out infinite;
+        }
+        .sun-ring.r1 { width: 200px; height: 200px; top: 10%; left: 30%; }
+        .sun-ring.r2 { width: 150px; height: 150px; bottom: 20%; right: 15%; animation-delay: 4s; }
+        @keyframes sunbeamShimmer {
+            0%, 100% { opacity: 0.06; transform: rotate(25deg) scaleX(1); }
+            50% { opacity: 0.18; transform: rotate(25deg) scaleX(1.3); }
+        }
+        @keyframes sunDotFloat {
+            0%, 100% { transform: translate(0, 0); opacity: 0.10; }
+            50% { transform: translate(-10px, -15px); opacity: 0.28; }
+        }
+        @keyframes sunRingPulse {
+            0%, 100% { transform: scale(1); opacity: 0.05; }
+            50% { transform: scale(1.15); opacity: 0.16; }
+        }
+
+        /* -------- STARRY -------- */
+        .starfield {
+            top: 0; left: 0; width: 100%; height: 100%; opacity: 1;
+            background-image:
+                radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+                radial-gradient(1px 1px at 25% 45%, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 40% 10%, #fff, transparent),
+                radial-gradient(1px 1px at 55% 70%, #fff, transparent),
+                radial-gradient(1.2px 1.2px at 70% 30%, #fff, transparent),
+                radial-gradient(1px 1px at 85% 55%, #fff, transparent),
+                radial-gradient(1.8px 1.8px at 15% 80%, #fff, transparent),
+                radial-gradient(1px 1px at 60% 90%, #fff, transparent),
+                radial-gradient(1.3px 1.3px at 90% 10%, #fff, transparent),
+                radial-gradient(1px 1px at 5% 50%, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 48% 35%, #fff, transparent),
+                radial-gradient(1px 1px at 78% 85%, #fff, transparent),
+                radial-gradient(1px 1px at 33% 60%, #fff, transparent),
+                radial-gradient(1.2px 1.2px at 92% 75%, #fff, transparent),
+                radial-gradient(1px 1px at 8% 95%, #fff, transparent),
+                radial-gradient(1.6px 1.6px at 68% 50%, #fff, transparent),
+                radial-gradient(1px 1px at 50% 15%, #fff, transparent),
+                radial-gradient(1.1px 1.1px at 22% 5%, #fff, transparent),
+                radial-gradient(1px 1px at 75% 5%, #fff, transparent),
+                radial-gradient(1.4px 1.4px at 42% 82%, #fff, transparent);
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            animation: starfieldDrift 120s linear infinite;
+        }
+        .star {
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 0 6px 1px rgba(255,255,255,0.7);
+            opacity: 0.9; animation: starTwinkle 3s ease-in-out infinite;
+        }
+        .star.s1 { width: 3px; height: 3px; top: 12%; left: 18%; }
+        .star.s2 { width: 2px; height: 2px; top: 28%; left: 72%; animation-delay: 0.7s; }
+        .star.s3 { width: 4px; height: 4px; top: 55%; left: 35%; animation-delay: 1.4s; }
+        .star.s4 { width: 2.5px; height: 2.5px; top: 75%; left: 82%; animation-delay: 2.1s; }
+        .star.s5 { width: 3.5px; height: 3.5px; top: 40%; left: 55%; animation-delay: 0.4s; }
+        .star.s6 { width: 2px; height: 2px; top: 85%; left: 15%; animation-delay: 1.8s; }
+        .star.s7 { width: 3px; height: 3px; top: 20%; left: 90%; animation-delay: 2.5s; }
+        .star.s8 { width: 4px; height: 4px; top: 62%; left: 8%; animation-delay: 1.1s; }
+        .star.s9 { width: 2px; height: 2px; top: 48%; left: 95%; animation-delay: 0.2s; }
+        .shooting-star {
+            width: 4px; height: 4px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px 2px rgba(255,255,255,0.8), 0 0 20px 4px rgba(200,220,255,0.4);
+            opacity: 0; animation: shoot 8s ease-in infinite;
+        }
+        .shooting-star::after {
+            content: ''; position: absolute; top: 50%; right: 100%;
+            width: 80px; height: 2px;
+            background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+            transform: translateY(-50%); border-radius: 2px;
+        }
+        .shooting-star.sh1 { top: 10%; left: 80%; }
+        .shooting-star.sh2 { top: 30%; left: 60%; animation-delay: 5s; animation-duration: 9s; }
+        .shooting-star.sh3 { top: 60%; left: 90%; animation-delay: 10s; animation-duration: 7s; }
+        .shooting-star.sh4 { top: 45%; left: 20%; animation-delay: 15s; animation-duration: 11s; }
+        .nebula {
+            border-radius: 50%; filter: blur(60px); opacity: 0.24;
+            animation: nebulaPulse 14s ease-in-out infinite;
+        }
+        .nebula.n1 { width: 500px; height: 500px; top: -10%; right: -15%; background: radial-gradient(circle, #6d28d9, transparent 70%); }
+        .nebula.n2 { width: 400px; height: 400px; bottom: -10%; left: -10%; background: radial-gradient(circle, #c4b5fd, transparent 70%); animation-delay: 5s; }
+        .nebula.n3 { width: 300px; height: 300px; top: 40%; left: 30%; background: radial-gradient(circle, #1e1b4b, transparent 70%); animation-delay: 10s; }
+        @keyframes starfieldDrift {
+            from { background-position: 0 0; }
+            to { background-position: 200px 200px; }
+        }
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes shoot {
+            0% { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+            5% { opacity: 1; }
+            20% { transform: translate(-300px, 200px) rotate(-35deg); opacity: 0; }
+            100% { transform: translate(-300px, 200px) rotate(-35deg); opacity: 0; }
+        }
+        @keyframes nebulaPulse {
+            0%, 100% { transform: scale(1); opacity: 0.16; }
+            50% { transform: scale(1.15); opacity: 0.32; }
+        }
+
+        /* -------- CAFÉ -------- */
+        .coffee-ring {
+            border-radius: 50%; border: 3px solid var(--theme-primary);
+            background: transparent; opacity: 0.14;
+            animation: coffeeRingFloat 20s ease-in-out infinite;
+        }
+        .coffee-ring.cr1 { width: 140px; height: 140px; top: 15%; left: 10%; }
+        .coffee-ring.cr2 { width: 90px; height: 90px; top: 60%; left: 70%; animation-delay: 4s; }
+        .coffee-ring.cr3 { width: 200px; height: 200px; top: 40%; left: 45%; animation-delay: 8s; }
+        .coffee-ring.cr4 { width: 70px; height: 70px; top: 80%; left: 20%; animation-delay: 12s; }
+        .bean {
+            width: 30px; height: 22px; background: var(--theme-primary);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            opacity: 0.16; transform: rotate(-20deg);
+            animation: beanFloat 24s ease-in-out infinite;
+        }
+        .bean::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); width: 2px; height: 60%;
+            background: var(--theme-bg); border-radius: 2px; opacity: 0.4;
+        }
+        .bean.bn1 { top: 25%; left: 85%; transform: rotate(15deg); }
+        .bean.bn2 { top: 70%; left: 5%; animation-delay: 6s; transform: rotate(-40deg); width: 26px; height: 19px; }
+        .bean.bn3 { top: 50%; left: 50%; animation-delay: 12s; transform: rotate(70deg); width: 34px; height: 25px; }
+        .bean.bn4 { top: 10%; left: 40%; animation-delay: 18s; transform: rotate(-10deg); width: 22px; height: 16px; }
+        .steam {
+            width: 60px; height: 120px;
+            background: linear-gradient(to top, var(--theme-accent), transparent);
+            border-radius: 50px; filter: blur(15px); opacity: 0.12;
+            animation: steamRise 10s ease-in-out infinite;
+        }
+        .steam.st1 { bottom: 10%; left: 30%; }
+        .steam.st2 { bottom: 15%; right: 25%; animation-delay: 5s; width: 80px; }
+        @keyframes coffeeRingFloat {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(10deg); }
+        }
+        @keyframes beanFloat {
+            0%, 100% { transform: translate(0, 0) rotate(-20deg); }
+            25% { transform: translate(10px, -15px) rotate(0deg); }
+            50% { transform: translate(-8px, -8px) rotate(-30deg); }
+            75% { transform: translate(5px, -20px) rotate(-10deg); }
+        }
+        @keyframes steamRise {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.06; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 0.18; }
+        }
+
+        /* -------- CRIMSON -------- */
+        .crimson-orb {
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--theme-primary), transparent);
+            filter: blur(30px); opacity: 0.18;
+            animation: crimsonOrb 16s ease-in-out infinite;
+        }
+        .crimson-orb.o1 { width: 250px; height: 250px; top: 10%; right: 5%; }
+        .crimson-orb.o2 { width: 180px; height: 180px; bottom: 15%; left: 8%; animation-delay: 5s; }
+        .crimson-orb.o3 { width: 300px; height: 300px; top: 50%; left: 50%; animation-delay: 10s; }
+        .crimson-streak {
+            width: 3px; height: 120px;
+            background: linear-gradient(to bottom, var(--theme-primary), transparent);
+            border-radius: 3px; opacity: 0.14; transform: rotate(35deg);
+            animation: crimsonStreak 8s ease-in-out infinite;
+        }
+        .crimson-streak.cs1 { top: 10%; left: 25%; }
+        .crimson-streak.cs2 { top: 40%; left: 70%; animation-delay: 3s; height: 160px; }
+        .crimson-streak.cs3 { top: 70%; left: 45%; animation-delay: 6s; height: 100px; }
+        .crimson-diamond {
+            width: 40px; height: 40px; background: var(--theme-accent);
+            transform: rotate(45deg); filter: blur(2px); opacity: 0.12;
+            animation: crimsonDiamond 20s ease-in-out infinite;
+        }
+        .crimson-diamond.cd1 { top: 20%; left: 60%; }
+        .crimson-diamond.cd2 { top: 75%; left: 15%; animation-delay: 8s; width: 30px; height: 30px; }
+        .crimson-diamond.cd3 { top: 55%; right: 10%; animation-delay: 14s; width: 50px; height: 50px; }
+        @keyframes crimsonOrb {
+            0%, 100% { transform: scale(1); opacity: 0.12; }
+            50% { transform: scale(1.2); opacity: 0.24; }
+        }
+        @keyframes crimsonStreak {
+            0%, 100% { transform: rotate(35deg) scaleY(1); opacity: 0.08; }
+            50% { transform: rotate(35deg) scaleY(1.3); opacity: 0.22; }
+        }
+        @keyframes crimsonDiamond {
+            0%, 100% { transform: rotate(45deg) scale(1); opacity: 0.08; }
+            50% { transform: rotate(405deg) scale(1.2); opacity: 0.18; }
+        }
+
+        /* -------- MAROON -------- */
+        .maroon-blob {
+            border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            background: var(--theme-primary); filter: blur(25px);
+            opacity: 0.18; animation: maroonBlob 22s ease-in-out infinite;
+        }
+        .maroon-blob.mb1 { width: 300px; height: 300px; top: -5%; left: -5%; }
+        .maroon-blob.mb2 { width: 250px; height: 250px; bottom: 5%; right: -5%; animation-delay: 7s; }
+        .maroon-blob.mb3 { width: 200px; height: 200px; top: 40%; left: 50%; animation-delay: 14s; }
+        .maroon-ring {
+            border-radius: 50%; border: 4px solid var(--theme-accent);
+            opacity: 0.14; animation: maroonRing 18s ease-in-out infinite;
+        }
+        .maroon-ring.mr1 { width: 180px; height: 180px; top: 25%; right: 15%; }
+        .maroon-ring.mr2 { width: 120px; height: 120px; bottom: 25%; left: 20%; animation-delay: 6s; }
+        .maroon-ring.mr3 { width: 220px; height: 220px; top: 60%; left: 70%; animation-delay: 12s; }
+        .maroon-triangle {
+            width: 0; height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 40px solid var(--theme-primary);
+            filter: blur(3px); opacity: 0.10;
+            animation: maroonTriangle 20s ease-in-out infinite;
+        }
+        .maroon-triangle.mt1 { top: 15%; left: 40%; transform: rotate(15deg); }
+        .maroon-triangle.mt2 { top: 70%; left: 60%; animation-delay: 10s; transform: rotate(-25deg); border-left-width: 18px; border-right-width: 18px; border-bottom-width: 30px; }
+        .maroon-triangle.mt3 { top: 50%; left: 10%; animation-delay: 5s; transform: rotate(45deg); border-left-width: 20px; border-right-width: 20px; border-bottom-width: 35px; }
+        @keyframes maroonBlob {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 0.10; }
+            50% { transform: translate(20px, -20px) scale(1.15) rotate(20deg); opacity: 0.22; }
+        }
+        @keyframes maroonRing {
+            0%, 100% { transform: scale(1); opacity: 0.06; }
+            50% { transform: scale(1.2); opacity: 0.18; }
+        }
+        @keyframes maroonTriangle {
+            0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.05; }
+            50% { transform: rotate(30deg) scale(1.2); opacity: 0.16; }
+        }
+
+        /* ================================================================
+           ===== LOGIN PAGE STYLES (themed) =====
+           ================================================================ */
         .container {
             max-width: 420px;
             width: 100%;
-            background: #F8F9FD;
-            background: linear-gradient(0deg, rgb(255, 255, 255) 0%, rgb(244, 247, 251) 100%);
+            background: var(--theme-card);
             border-radius: 40px;
             padding: 40px 40px;
-            border: 5px solid rgb(255, 255, 255);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 30px 30px -20px;
+            border: 5px solid var(--theme-card);
+            box-shadow: var(--theme-shadow) 0px 30px 30px -20px;
+            position: relative;
+            z-index: 1;
+            transition: background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
         }
 
         .heading {
             text-align: center;
             font-weight: 900;
             font-size: 36px;
-            color: rgb(16, 137, 211);
+            color: var(--theme-primary);
             letter-spacing: 2px;
             margin-bottom: 5px;
+            transition: color 0.4s ease;
         }
 
         .sub-heading {
             text-align: center;
             font-size: 14px;
-            color: rgb(100, 100, 100);
+            color: var(--theme-text-dim);
             margin-bottom: 25px;
+            transition: color 0.4s ease;
         }
 
-        .form {
-            margin-top: 10px;
-        }
+        .form { margin-top: 10px; }
 
         .form .input {
             width: 100%;
-            background: white;
+            background: var(--theme-bg-soft);
             border: none;
             padding: 15px 20px;
             border-radius: 20px;
             margin-top: 15px;
-            box-shadow: #cff0ff 0px 10px 10px -5px;
+            box-shadow: var(--theme-shadow-soft) 0px 10px 10px -5px;
             border-inline: 2px solid transparent;
             font-size: 14px;
             box-sizing: border-box;
             transition: all 0.3s ease;
+            color: var(--theme-text);
+            font-family: inherit;
         }
 
-        .form .input::placeholder {
-            color: rgb(170, 170, 170);
-        }
+        .form .input::placeholder { color: var(--theme-text-faint); }
 
         .form .input:focus {
             outline: none;
-            border-inline: 2px solid #12B1D1;
-            box-shadow: #cff0ff 0px 10px 15px -8px;
+            border-inline: 2px solid var(--theme-accent);
+            box-shadow: var(--theme-shadow-soft) 0px 10px 15px -8px;
         }
 
-        /* Password wrapper with eye toggle */
-        .password-wrapper {
-            position: relative;
-            margin-top: 15px;
-        }
-
-        .password-wrapper .input {
-            margin-top: 0;
-            padding-right: 50px;
-        }
-
+        .password-wrapper { position: relative; margin-top: 15px; }
+        .password-wrapper .input { margin-top: 0; padding-right: 50px; }
         .password-wrapper .toggle-password {
-            position: absolute;
-            right: 18px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: rgb(150, 150, 150);
-            font-size: 16px;
-            padding: 5px;
+            position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--theme-text-faint); font-size: 16px; padding: 5px;
             transition: color 0.2s ease;
         }
-
-        .password-wrapper .toggle-password:hover {
-            color: rgb(16, 137, 211);
-        }
+        .password-wrapper .toggle-password:hover { color: var(--theme-primary); }
 
         .form .login-button {
-            display: block;
-            width: 100%;
+            display: block; width: 100%;
             font-weight: bold;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+            background: var(--theme-gradient);
             color: white;
             padding-block: 15px;
             margin: 20px auto 10px;
             border-radius: 20px;
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 20px 10px -15px;
+            box-shadow: var(--theme-shadow) 0px 20px 10px -15px;
             border: none;
             transition: all 0.2s ease-in-out;
             font-size: 16px;
             cursor: pointer;
+            font-family: inherit;
         }
-
-        .form .login-button:hover {
-            transform: scale(1.02);
-            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 23px 10px -20px;
-        }
-
-        .form .login-button:active {
-            transform: scale(0.97);
-        }
-
-        .form .login-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .form .login-button:hover { transform: scale(1.02); box-shadow: var(--theme-shadow) 0px 23px 10px -20px; }
+        .form .login-button:active { transform: scale(0.97); }
+        .form .login-button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
         .error-message {
-            background: #fee2e2;
-            color: #dc2626;
+            background: var(--theme-danger-soft);
+            color: var(--theme-danger);
             padding: 12px 16px;
             border-radius: 15px;
             font-size: 13px;
             margin-top: 15px;
             text-align: center;
-            border: 1px solid #fecaca;
+            border: 1px solid var(--theme-danger-soft);
             display: none;
         }
-
         .success-message {
-            background: #fef3c7;
-            color: #d97706;
+            background: var(--theme-warn-soft);
+            color: var(--theme-warn);
             padding: 12px 16px;
             border-radius: 15px;
             font-size: 13px;
             margin-top: 15px;
             text-align: center;
-            border: 1px solid #fde68a;
+            border: 1px solid var(--theme-warn-soft);
             display: none;
         }
 
-        .agreement {
-            display: block;
-            text-align: center;
-            margin-top: 25px;
-        }
-
-        .agreement a {
-            text-decoration: none;
-            color: #0099ff;
-            font-size: 10px;
-        }
+        .agreement { display: block; text-align: center; margin-top: 25px; }
+        .agreement a { text-decoration: none; color: var(--theme-primary); font-size: 10px; }
 
         .signup-link {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #666;
+            text-align: center; margin-top: 15px;
+            font-size: 14px; color: var(--theme-text-muted);
         }
-
         .signup-link a {
-            color: rgb(16, 137, 211);
-            text-decoration: none;
-            font-weight: 600;
-            cursor: pointer;
+            color: var(--theme-primary); text-decoration: none;
+            font-weight: 600; cursor: pointer;
         }
-
-        .signup-link a:hover {
-            text-decoration: underline;
-        }
+        .signup-link a:hover { text-decoration: underline; }
 
         .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid rgba(255,255,255,.3); border-radius: 50%;
+            border-top-color: #fff; animation: spin 1s ease-in-out infinite;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ===== SIGN UP MODAL ===== */
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(8px);
+            z-index: 1000; justify-content: center; align-items: center;
             padding: 20px;
         }
-
-        .modal.active {
-            display: flex;
-        }
+        .modal.active { display: flex; }
 
         .modal-content {
-            background: white;
-            padding: 35px;
-            border-radius: 30px;
-            max-width: 560px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: rgba(133, 189, 215, 0.5) 0px 30px 40px -20px;
+            background: var(--theme-card);
+            padding: 35px; border-radius: 30px;
+            max-width: 560px; width: 100%;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: var(--theme-shadow) 0px 30px 40px -20px;
+            color: var(--theme-text);
+            transition: background 0.4s ease;
         }
-
         .modal-content h2 {
-            text-align: center;
-            color: rgb(16, 137, 211);
-            margin-bottom: 8px;
-            font-size: 28px;
-            font-weight: 800;
+            text-align: center; color: var(--theme-primary);
+            margin-bottom: 8px; font-size: 28px; font-weight: 800;
         }
-
         .modal-content .modal-subtitle {
-            text-align: center;
-            color: #888;
-            font-size: 14px;
-            margin-bottom: 20px;
+            text-align: center; color: var(--theme-text-dim);
+            font-size: 14px; margin-bottom: 20px;
         }
 
-        /* Profile picture upload */
         .avatar-upload-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
+            display: flex; flex-direction: column;
+            align-items: center; margin-bottom: 20px;
         }
-
         .avatar-upload {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 42px;
-            color: rgb(16, 137, 211);
-            border: 4px solid white;
-            box-shadow: rgba(133, 189, 215, 0.25) 0px 12px 25px -10px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            width: 120px; height: 120px; border-radius: 50%;
+            background: var(--theme-primary-soft);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 42px; color: var(--theme-primary);
+            border: 4px solid var(--theme-card);
+            box-shadow: var(--theme-shadow) 0px 12px 25px -10px;
+            cursor: pointer; position: relative;
+            overflow: hidden; transition: all 0.3s ease;
         }
-
-        .avatar-upload:hover {
-            transform: scale(1.03);
-            box-shadow: rgba(133, 189, 215, 0.4) 0px 15px 30px -10px;
-        }
-
-        .avatar-upload img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
+        .avatar-upload:hover { transform: scale(1.03); box-shadow: var(--theme-shadow) 0px 15px 30px -10px; }
+        .avatar-upload img { width: 100%; height: 100%; object-fit: cover; }
         .avatar-upload .avatar-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.45);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            opacity: 0;
+            position: absolute; inset: 0; background: rgba(0,0,0,0.45);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px; opacity: 0;
             transition: all 0.3s ease;
         }
+        .avatar-upload:hover .avatar-overlay { opacity: 1; }
+        .avatar-upload input[type="file"] { display: none; }
 
-        .avatar-upload:hover .avatar-overlay {
-            opacity: 1;
-        }
+        .avatar-hint { margin-top: 8px; font-size: 12px; color: var(--theme-text-dim); }
+        .avatar-hint.required-hint { color: var(--theme-danger); font-weight: 600; }
+        .avatar-hint.ok-hint { color: var(--theme-success); font-weight: 600; }
 
-        .avatar-upload input[type="file"] {
-            display: none;
-        }
-
-        .avatar-hint {
-            margin-top: 8px;
-            font-size: 12px;
-            color: #888;
-        }
-
-        .avatar-hint.required-hint {
-            color: #ef4444;
-            font-weight: 600;
-        }
-
-        .avatar-hint.ok-hint {
-            color: #16a34a;
-            font-weight: 600;
-        }
-
-        .modal-content .input-group {
-            margin-bottom: 14px;
-        }
-
+        .modal-content .input-group { margin-bottom: 14px; }
         .modal-content .input-group label {
-            display: block;
-            font-weight: 600;
-            color: #555;
-            font-size: 13px;
-            margin-bottom: 5px;
+            display: block; font-weight: 600;
+            color: var(--theme-text-muted); font-size: 13px; margin-bottom: 5px;
         }
-
         .modal-content .input-group label i {
-            color: rgb(16, 137, 211);
-            width: 18px;
-            margin-right: 4px;
+            color: var(--theme-primary); width: 18px; margin-right: 4px;
         }
-
-        .modal-content .input-group .required-star {
-            color: #ef4444;
-        }
-
+        .modal-content .input-group .required-star { color: var(--theme-danger); }
         .modal-content .input-group .input {
             width: 100%;
-            background: #f8faff;
-            border: 2px solid #e0e7ff;
-            padding: 12px 16px;
-            border-radius: 15px;
-            font-size: 14px;
-            box-sizing: border-box;
+            background: var(--theme-bg-soft);
+            border: 2px solid var(--theme-border-input);
+            padding: 12px 16px; border-radius: 15px;
+            font-size: 14px; box-sizing: border-box;
             transition: all 0.3s ease;
-            font-family: inherit;
-            color: #333;
+            font-family: inherit; color: var(--theme-text);
         }
-
         .modal-content .input-group .input:focus {
             outline: none;
-            border-color: rgb(16, 137, 211);
-            box-shadow: 0 0 0 3px rgba(16, 137, 211, 0.1);
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 3px var(--theme-primary-soft);
         }
-
-        .modal-content .input-group textarea.input {
-            min-height: 80px;
-            resize: vertical;
-        }
-
+        .modal-content .input-group textarea.input { min-height: 80px; resize: vertical; }
         .modal-content .input-group .helper-text {
-            font-size: 11px;
-            color: #999;
-            margin-top: 3px;
-            display: block;
+            font-size: 11px; color: var(--theme-text-faint);
+            margin-top: 3px; display: block;
         }
-
         .modal-content .input-group select.input {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
-            padding-right: 40px;
-            cursor: pointer;
+            padding-right: 40px; cursor: pointer;
         }
 
         .modal-content .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
         }
 
         .modal-content .login-button {
-            display: block;
-            width: 100%;
+            display: block; width: 100%;
             font-weight: bold;
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
+            background: var(--theme-gradient); color: white;
+            padding: 15px; border-radius: 15px; border: none;
+            font-size: 16px; cursor: pointer; margin-top: 10px;
+            transition: all 0.3s ease; font-family: inherit;
         }
-
-        .modal-content .login-button:hover {
-            transform: scale(1.02);
-        }
-
-        .modal-content .login-button:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .modal-content .login-button:hover { transform: scale(1.02); }
+        .modal-content .login-button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
         .modal-content .cancel-btn {
-            display: block;
-            width: 100%;
-            margin-top: 10px;
-            padding: 12px;
-            border: none;
-            background: #f3f4f6;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 14px;
+            display: block; width: 100%; margin-top: 10px;
+            padding: 12px; border: none;
+            background: var(--theme-bg-soft); border-radius: 15px;
+            cursor: pointer; font-size: 14px;
             transition: all 0.3s ease;
-            color: #666;
-            font-weight: 600;
+            color: var(--theme-text-muted); font-weight: 600;
+            font-family: inherit;
         }
-
-        .modal-content .cancel-btn:hover {
-            background: #e5e7eb;
-        }
+        .modal-content .cancel-btn:hover { background: var(--theme-primary-soft); }
 
         .modal-content .divider {
-            border: none;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(16, 137, 211, 0.15), transparent);
+            border: none; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--theme-primary-soft), transparent);
             margin: 15px 0;
         }
-
         .modal-content .optional-label {
-            font-size: 13px;
-            color: #888;
-            font-weight: 600;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 13px; color: var(--theme-text-dim);
+            font-weight: 600; margin-bottom: 5px;
+            display: flex; align-items: center; gap: 8px;
         }
+        .modal-content .optional-label i { color: var(--theme-primary); }
 
-        .modal-content .optional-label i {
-            color: rgb(16, 137, 211);
-        }
+        .custom-location-input { display: none; margin-top: 8px; }
+        .custom-location-input.active { display: block; }
 
-        .custom-location-input {
-            display: none;
-            margin-top: 8px;
-        }
+        .modal-content::-webkit-scrollbar { width: 6px; }
+        .modal-content::-webkit-scrollbar-track { background: var(--theme-border-soft); border-radius: 10px; }
+        .modal-content::-webkit-scrollbar-thumb { background: var(--theme-gradient); border-radius: 10px; }
 
-        .custom-location-input.active {
-            display: block;
-        }
-
-        .modal-content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .modal-content::-webkit-scrollbar-track {
-            background: #f0f4ff;
-            border-radius: 10px;
-        }
-
-        .modal-content::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
-            border-radius: 10px;
-        }
-
-        /* Password wrapper inside modal */
-        .modal-content .password-wrapper {
-            position: relative;
-            margin-top: 0;
-        }
-
-        .modal-content .password-wrapper .input {
-            padding-right: 50px;
-        }
-
+        .modal-content .password-wrapper { position: relative; margin-top: 0; }
+        .modal-content .password-wrapper .input { padding-right: 50px; }
         .modal-content .password-wrapper .toggle-password {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: rgb(150, 150, 150);
-            font-size: 15px;
-            padding: 5px;
+            position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer;
+            color: var(--theme-text-faint); font-size: 15px; padding: 5px;
             transition: color 0.2s ease;
         }
-
-        .modal-content .password-wrapper .toggle-password:hover {
-            color: rgb(16, 137, 211);
-        }
+        .modal-content .password-wrapper .toggle-password:hover { color: var(--theme-primary); }
 
         /* ===== VERIFICATION SECTION ===== */
         .verification-section {
-            background: #fef3f7;
-            border: 2px dashed #f5576c;
-            border-radius: 15px;
-            padding: 18px;
-            margin-bottom: 14px;
-            text-align: center;
+            background: var(--theme-danger-soft);
+            border: 2px dashed var(--theme-danger);
+            border-radius: 15px; padding: 18px;
+            margin-bottom: 14px; text-align: center;
         }
-
         .verification-section .verification-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: #f5576c;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            font-size: 14px; font-weight: 700;
+            color: var(--theme-danger); margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-
-        .verification-section .verification-title i {
-            font-size: 16px;
-        }
-
+        .verification-section .verification-title i { font-size: 16px; }
         .verification-section .input {
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-size: 16px;
-            border-color: #fecdd3 !important;
-            background: white !important;
+            text-align: center; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase; font-size: 16px;
+            border-color: var(--theme-danger-soft) !important;
+            background: var(--theme-card) !important;
         }
-
         .verification-section .input:focus {
-            border-color: #f5576c !important;
-            box-shadow: 0 0 0 3px rgba(245, 87, 108, 0.15) !important;
+            border-color: var(--theme-danger) !important;
+            box-shadow: 0 0 0 3px var(--theme-danger-soft) !important;
         }
-
         .verification-section .input.verified {
-            border-color: #16a34a !important;
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.15) !important;
-            background: #f0fdf4 !important;
-            color: #16a34a;
+            border-color: var(--theme-success) !important;
+            box-shadow: 0 0 0 3px var(--theme-success-soft) !important;
+            background: var(--theme-success-soft) !important;
+            color: var(--theme-success);
         }
-
         .verification-section .input.invalid {
-            border-color: #ef4444 !important;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
-            background: #fef2f2 !important;
+            border-color: var(--theme-danger) !important;
+            box-shadow: 0 0 0 3px var(--theme-danger-soft) !important;
+            background: var(--theme-danger-soft) !important;
             animation: shake 0.4s ease;
         }
-
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-6px); }
@@ -578,72 +854,70 @@
         }
 
         .verification-status {
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-            display: none;
+            font-size: 12px; font-weight: 600;
+            margin-top: 8px; display: none;
         }
-
         .verification-status.show { display: block; }
-        .verification-status.valid { color: #16a34a; }
-        .verification-status.invalid { color: #ef4444; }
+        .verification-status.valid { color: var(--theme-success); }
+        .verification-status.invalid { color: var(--theme-danger); }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 25px 20px;
-            }
-            
-            .heading {
-                font-size: 28px;
-            }
+            .container { padding: 25px 20px; }
+            .heading { font-size: 28px; }
+            .modal-content { padding: 20px; }
+            .modal-content .form-row { grid-template-columns: 1fr; gap: 0; }
+        }
 
-            .modal-content {
-                padding: 20px;
-            }
-
-            .modal-content .form-row {
-                grid-template-columns: 1fr;
-                gap: 0;
+        @media (prefers-reduced-motion: reduce) {
+            .theme-bg-shapes .shape,
+            .theme-bg-shapes .shape * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
+    <!-- ===== BACKGROUND LAYERS ===== -->
+    <div class="theme-bg-base"></div>
+    <div class="theme-bg-shapes" id="themeBgShapes"><!-- Injected by JS --></div>
+    <div class="theme-bg-overlay"></div>
+
     <div class="container">
         <div class="heading">TIMAWA</div>
         <div class="sub-heading">✨ Sign in to access the hub ✨</div>
-        
+
         <div id="errorMessage" class="error-message"></div>
         <div id="successMessage" class="success-message"></div>
-        
+
         <form id="loginForm" class="form">
             <input required class="input" type="email" id="email" placeholder="E-mail" />
-            
+
             <div class="password-wrapper">
                 <input required class="input" type="password" id="password" placeholder="Password" />
                 <button type="button" class="toggle-password" onclick="togglePassword('password', this)">
                     <i class="fas fa-eye"></i>
                 </button>
             </div>
-            
+
             <button type="submit" class="login-button" id="loginBtn">Sign In</button>
         </form>
-        
+
         <span class="agreement"><a href="#">Made with ❤️ for the TIMAWA squad</a></span>
-        
+
         <div class="signup-link">
             Don't have an account? <a onclick="showSignUp()">Sign up here</a>
         </div>
     </div>
 
-    <!-- ===== SIGN UP MODAL (single form, no separate completion step) ===== -->
+    <!-- ===== SIGN UP MODAL ===== -->
     <div id="signupModal" class="modal">
         <div class="modal-content">
             <h2>🇹🇮🇲🇦🇼🇦 Join the Squad</h2>
             <p class="modal-subtitle">Fill in all required fields to create your account.</p>
 
             <form id="signupForm" novalidate>
-                <!-- Profile Picture -->
                 <div class="avatar-upload-section">
                     <label class="avatar-upload" for="signupPhoto">
                         <span id="avatarPlaceholder"><i class="fas fa-user"></i></span>
@@ -656,19 +930,16 @@
                     </div>
                 </div>
 
-                <!-- Username / Display Name -->
                 <div class="input-group">
                     <label><i class="fas fa-user"></i> Username <span class="required-star">*</span></label>
                     <input class="input" type="text" id="signupName" placeholder="Enter your username" required />
                 </div>
 
-                <!-- Email -->
                 <div class="input-group">
                     <label><i class="fas fa-envelope"></i> E-mail <span class="required-star">*</span></label>
                     <input class="input" type="email" id="signupEmail" placeholder="Enter your email" required />
                 </div>
 
-                <!-- Password with eye toggle -->
                 <div class="input-group">
                     <label><i class="fas fa-lock"></i> Password <span class="required-star">*</span></label>
                     <div class="password-wrapper">
@@ -680,7 +951,6 @@
                     <span class="helper-text">At least 6 characters</span>
                 </div>
 
-                <!-- Location -->
                 <div class="input-group">
                     <label><i class="fas fa-map-marker-alt"></i> Current Location <span class="required-star">*</span></label>
                     <select class="input" id="locationSelect" onchange="toggleCustomLocation()" required>
@@ -699,26 +969,22 @@
                     </div>
                 </div>
 
-                <!-- Birthday -->
                 <div class="input-group">
                     <label><i class="fas fa-calendar-alt"></i> Birthday <span class="required-star">*</span></label>
                     <input class="input" type="date" id="signupBirthday" required />
                 </div>
 
-                <!-- Occupation -->
                 <div class="input-group">
                     <label><i class="fas fa-briefcase"></i> Occupation <span class="required-star">*</span></label>
                     <input class="input" type="text" id="signupOccupation" placeholder="e.g., Software Engineer" required />
                 </div>
 
-                <!-- Interests -->
                 <div class="input-group">
                     <label><i class="fas fa-heart"></i> Interests <span class="required-star">*</span></label>
                     <input class="input" type="text" id="signupInterests" placeholder="e.g., Coffee, Travel, Gaming" required />
                     <span class="helper-text">Separate interests with commas</span>
                 </div>
 
-                <!-- Status -->
                 <div class="input-group">
                     <label><i class="fas fa-circle"></i> Status <span class="required-star">*</span></label>
                     <select class="input" id="signupStatus" required>
@@ -730,7 +996,6 @@
                     </select>
                 </div>
 
-                <!-- Love Life -->
                 <div class="input-group">
                     <label><i class="fas fa-heart-broken"></i> Love Life <span class="required-star">*</span></label>
                     <select class="input" id="signupLoveLife" required>
@@ -743,7 +1008,6 @@
 
                 <hr class="divider" />
 
-                <!-- Social Media (Optional) -->
                 <div class="optional-label"><i class="fas fa-share-alt"></i> Social Media (Optional)</div>
 
                 <div class="form-row">
@@ -770,15 +1034,14 @@
 
                 <hr class="divider" />
 
-                <!-- ===== VERIFICATION SECTION ===== -->
                 <div class="verification-section">
                     <div class="verification-title">
                         <i class="fas fa-shield-alt"></i> Squad Verification
                     </div>
-                    <input class="input" type="text" id="signupVerification" 
-                           placeholder="Enter verification code" 
-                           autocomplete="off" 
-                           spellcheck="false" 
+                    <input class="input" type="text" id="signupVerification"
+                           placeholder="Enter verification code"
+                           autocomplete="off"
+                           spellcheck="false"
                            maxlength="10"
                            oninput="checkVerificationCode()" />
                     <div class="verification-status" id="verificationStatus"></div>
@@ -791,7 +1054,403 @@
     </div>
 
     <script>
-        // ===== FIREBASE CONFIG =====
+        // ================================================================
+        // ===== ★ THEME SYSTEM (inlined — matching profile.html) =====
+        // ================================================================
+        const THEME_STORAGE_KEY = 'timawa_theme';
+
+        const THEME_SHAPES = {
+            ocean: `
+                <div class="shape ocean-wave"></div>
+                <div class="shape ocean-wave w2"></div>
+                <div class="shape ocean-bubble b1"></div>
+                <div class="shape ocean-bubble b2"></div>
+                <div class="shape ocean-bubble b3"></div>
+                <div class="shape ocean-bubble b4"></div>
+                <div class="shape ocean-fish f1"></div>
+                <div class="shape ocean-fish f2"></div>
+            `,
+            sunset: `
+                <div class="shape sunset-ray"></div>
+                <div class="shape sunset-glow g1"></div>
+                <div class="shape sunset-glow g2"></div>
+                <div class="shape sunset-cloud c1"></div>
+                <div class="shape sunset-cloud c2"></div>
+            `,
+            pink: `
+                <div class="shape petal p1"></div>
+                <div class="shape petal p2"></div>
+                <div class="shape petal p3"></div>
+                <div class="shape petal p4"></div>
+                <div class="shape petal p5"></div>
+                <div class="shape petal p6"></div>
+                <div class="shape blossom b1"></div>
+                <div class="shape blossom b2"></div>
+                <div class="shape blossom b3"></div>
+            `,
+            forest: `
+                <div class="shape leaf l1"></div>
+                <div class="shape leaf l2"></div>
+                <div class="shape leaf l3"></div>
+                <div class="shape leaf l4"></div>
+                <div class="shape leaf l5"></div>
+                <div class="shape fern f1"></div>
+                <div class="shape fern f2"></div>
+            `,
+            sunshine: `
+                <div class="shape sunbeam s1"></div>
+                <div class="shape sunbeam s2"></div>
+                <div class="shape sunbeam s3"></div>
+                <div class="shape sunbeam s4"></div>
+                <div class="shape sun-dot d1"></div>
+                <div class="shape sun-dot d2"></div>
+                <div class="shape sun-dot d3"></div>
+                <div class="shape sun-dot d4"></div>
+                <div class="shape sun-ring r1"></div>
+                <div class="shape sun-ring r2"></div>
+            `,
+            starry: `
+                <div class="shape starfield"></div>
+                <div class="shape star s1"></div>
+                <div class="shape star s2"></div>
+                <div class="shape star s3"></div>
+                <div class="shape star s4"></div>
+                <div class="shape star s5"></div>
+                <div class="shape star s6"></div>
+                <div class="shape star s7"></div>
+                <div class="shape star s8"></div>
+                <div class="shape star s9"></div>
+                <div class="shape shooting-star sh1"></div>
+                <div class="shape shooting-star sh2"></div>
+                <div class="shape shooting-star sh3"></div>
+                <div class="shape shooting-star sh4"></div>
+                <div class="shape nebula n1"></div>
+                <div class="shape nebula n2"></div>
+                <div class="shape nebula n3"></div>
+            `,
+            cafe: `
+                <div class="shape coffee-ring cr1"></div>
+                <div class="shape coffee-ring cr2"></div>
+                <div class="shape coffee-ring cr3"></div>
+                <div class="shape coffee-ring cr4"></div>
+                <div class="shape bean bn1"></div>
+                <div class="shape bean bn2"></div>
+                <div class="shape bean bn3"></div>
+                <div class="shape bean bn4"></div>
+                <div class="shape steam st1"></div>
+                <div class="shape steam st2"></div>
+            `,
+            crimson: `
+                <div class="shape crimson-orb o1"></div>
+                <div class="shape crimson-orb o2"></div>
+                <div class="shape crimson-orb o3"></div>
+                <div class="shape crimson-streak cs1"></div>
+                <div class="shape crimson-streak cs2"></div>
+                <div class="shape crimson-streak cs3"></div>
+                <div class="shape crimson-diamond cd1"></div>
+                <div class="shape crimson-diamond cd2"></div>
+                <div class="shape crimson-diamond cd3"></div>
+            `,
+            maroon: `
+                <div class="shape maroon-blob mb1"></div>
+                <div class="shape maroon-blob mb2"></div>
+                <div class="shape maroon-blob mb3"></div>
+                <div class="shape maroon-ring mr1"></div>
+                <div class="shape maroon-ring mr2"></div>
+                <div class="shape maroon-ring mr3"></div>
+                <div class="shape maroon-triangle mt1"></div>
+                <div class="shape maroon-triangle mt2"></div>
+                <div class="shape maroon-triangle mt3"></div>
+            `
+        };
+
+        const THEMES = {
+            ocean: {
+                name: 'Ocean', sub: 'Fresh · Cool', emoji: '🌊',
+                light: {
+                    '--theme-primary': '#1089d3', '--theme-accent': '#12b1d1', '--theme-primary-dark': '#0c6ca8',
+                    '--theme-primary-soft': '#e0f2fe', '--theme-primary-soft-2': '#f0f7ff',
+                    '--theme-bg': '#ffffff', '--theme-bg-soft': '#f8faff', '--theme-card': '#ffffff',
+                    '--theme-text': '#1a1a2e', '--theme-text-muted': '#555', '--theme-text-dim': '#888', '--theme-text-faint': '#aaa',
+                    '--theme-border': '#eef2f7', '--theme-border-soft': '#f0f4ff', '--theme-border-input': '#e0e7ff',
+                    '--theme-gradient': 'linear-gradient(45deg, #1089d3 0%, #12b1d1 100%)',
+                    '--theme-shadow': 'rgba(133, 189, 215, 0.15)', '--theme-shadow-soft': '#cff0ff',
+                    '--theme-nav-bg': 'rgba(255, 255, 255, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#4dabf7', '--theme-accent': '#5ac8fa', '--theme-primary-dark': '#339af0',
+                    '--theme-primary-soft': '#1a2b3d', '--theme-primary-soft-2': '#0f1a26',
+                    '--theme-bg': '#0a1118', '--theme-bg-soft': '#131b24', '--theme-card': '#131b24',
+                    '--theme-text': '#e6f0f9', '--theme-text-muted': '#a0b3c5', '--theme-text-dim': '#7a8fa3', '--theme-text-faint': '#5a6b7d',
+                    '--theme-border': '#1f2a37', '--theme-border-soft': '#16202b', '--theme-border-input': '#1f2a37',
+                    '--theme-gradient': 'linear-gradient(45deg, #4dabf7 0%, #5ac8fa 100%)',
+                    '--theme-shadow': 'rgba(77, 171, 247, 0.2)', '--theme-shadow-soft': 'rgba(77, 171, 247, 0.15)',
+                    '--theme-nav-bg': 'rgba(10, 17, 24, 0.98)'
+                }
+            },
+            sunset: {
+                name: 'Sunset', sub: 'Warm · Bold', emoji: '🌅',
+                light: {
+                    '--theme-primary': '#f5576c', '--theme-accent': '#f093fb', '--theme-primary-dark': '#c73a52',
+                    '--theme-primary-soft': '#ffe4e6', '--theme-primary-soft-2': '#fff1f2',
+                    '--theme-bg': '#ffffff', '--theme-bg-soft': '#fff8f9', '--theme-card': '#ffffff',
+                    '--theme-text': '#2e1a1e', '--theme-text-muted': '#6b4a50', '--theme-text-dim': '#9c7a80', '--theme-text-faint': '#c4a5aa',
+                    '--theme-border': '#fdeef0', '--theme-border-soft': '#fef5f6', '--theme-border-input': '#fde0e3',
+                    '--theme-gradient': 'linear-gradient(45deg, #f5576c 0%, #f093fb 100%)',
+                    '--theme-shadow': 'rgba(245, 87, 108, 0.15)', '--theme-shadow-soft': 'rgba(245, 87, 108, 0.2)',
+                    '--theme-nav-bg': 'rgba(255, 255, 255, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#ff6b7e', '--theme-accent': '#ff9db0', '--theme-primary-dark': '#e04458',
+                    '--theme-primary-soft': '#3d1f26', '--theme-primary-soft-2': '#1e0f13',
+                    '--theme-bg': '#1a0e11', '--theme-bg-soft': '#241318', '--theme-card': '#241318',
+                    '--theme-text': '#fbe5e8', '--theme-text-muted': '#c9a0a7', '--theme-text-dim': '#a57a82', '--theme-text-faint': '#7d5a61',
+                    '--theme-border': '#3a1f26', '--theme-border-soft': '#2a151b', '--theme-border-input': '#3a1f26',
+                    '--theme-gradient': 'linear-gradient(45deg, #ff6b7e 0%, #ff9db0 100%)',
+                    '--theme-shadow': 'rgba(255, 107, 126, 0.25)', '--theme-shadow-soft': 'rgba(255, 107, 126, 0.18)',
+                    '--theme-nav-bg': 'rgba(26, 14, 17, 0.98)'
+                }
+            },
+            pink: {
+                name: 'Blossom', sub: 'Soft · Sweet', emoji: '🌸',
+                light: {
+                    '--theme-primary': '#ec4899', '--theme-accent': '#f9a8d4', '--theme-primary-dark': '#be185d',
+                    '--theme-primary-soft': '#fce7f3', '--theme-primary-soft-2': '#fdf2f8',
+                    '--theme-bg': '#ffffff', '--theme-bg-soft': '#fff7fb', '--theme-card': '#ffffff',
+                    '--theme-text': '#2e1a26', '--theme-text-muted': '#6b4a5c', '--theme-text-dim': '#9c7a8c', '--theme-text-faint': '#c4a5b4',
+                    '--theme-border': '#fde8f1', '--theme-border-soft': '#fef3f9', '--theme-border-input': '#fbd5e5',
+                    '--theme-gradient': 'linear-gradient(45deg, #ec4899 0%, #f9a8d4 100%)',
+                    '--theme-shadow': 'rgba(236, 72, 153, 0.15)', '--theme-shadow-soft': 'rgba(236, 72, 153, 0.2)',
+                    '--theme-nav-bg': 'rgba(255, 255, 255, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#f472b6', '--theme-accent': '#fbcfe8', '--theme-primary-dark': '#db2777',
+                    '--theme-primary-soft': '#3d1f30', '--theme-primary-soft-2': '#1e0f1a',
+                    '--theme-bg': '#1a0e16', '--theme-bg-soft': '#241320', '--theme-card': '#241320',
+                    '--theme-text': '#fbe5f0', '--theme-text-muted': '#c9a0b8', '--theme-text-dim': '#a57a95', '--theme-text-faint': '#7d5a70',
+                    '--theme-border': '#3a1f30', '--theme-border-soft': '#2a1522', '--theme-border-input': '#3a1f30',
+                    '--theme-gradient': 'linear-gradient(45deg, #f472b6 0%, #fbcfe8 100%)',
+                    '--theme-shadow': 'rgba(244, 114, 182, 0.25)', '--theme-shadow-soft': 'rgba(244, 114, 182, 0.18)',
+                    '--theme-nav-bg': 'rgba(26, 14, 22, 0.98)'
+                }
+            },
+            forest: {
+                name: 'Forest', sub: 'Fresh · Natural', emoji: '🌲',
+                light: {
+                    '--theme-primary': '#16a34a', '--theme-accent': '#22c55e', '--theme-primary-dark': '#15803d',
+                    '--theme-primary-soft': '#dcfce7', '--theme-primary-soft-2': '#f0fdf4',
+                    '--theme-bg': '#ffffff', '--theme-bg-soft': '#f8fdf9', '--theme-card': '#ffffff',
+                    '--theme-text': '#0f2e1a', '--theme-text-muted': '#3d5c47', '--theme-text-dim': '#698072', '--theme-text-faint': '#9cb3a4',
+                    '--theme-border': '#e8f5ec', '--theme-border-soft': '#f0f9f2', '--theme-border-input': '#d1e7d8',
+                    '--theme-gradient': 'linear-gradient(45deg, #16a34a 0%, #22c55e 100%)',
+                    '--theme-shadow': 'rgba(22, 163, 74, 0.15)', '--theme-shadow-soft': 'rgba(22, 163, 74, 0.2)',
+                    '--theme-nav-bg': 'rgba(255, 255, 255, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#4ade80', '--theme-accent': '#86efac', '--theme-primary-dark': '#22c55e',
+                    '--theme-primary-soft': '#14281a', '--theme-primary-soft-2': '#0a1810',
+                    '--theme-bg': '#08140d', '--theme-bg-soft': '#0f1e15', '--theme-card': '#0f1e15',
+                    '--theme-text': '#e0f2e6', '--theme-text-muted': '#a0c4ad', '--theme-text-dim': '#7a9c86', '--theme-text-faint': '#5a7c66',
+                    '--theme-border': '#1c3524', '--theme-border-soft': '#122319', '--theme-border-input': '#1c3524',
+                    '--theme-gradient': 'linear-gradient(45deg, #4ade80 0%, #86efac 100%)',
+                    '--theme-shadow': 'rgba(74, 222, 128, 0.25)', '--theme-shadow-soft': 'rgba(74, 222, 128, 0.18)',
+                    '--theme-nav-bg': 'rgba(8, 20, 13, 0.98)'
+                }
+            },
+            sunshine: {
+                name: 'Sunshine', sub: 'Bright · Cheery', emoji: '☀️',
+                light: {
+                    '--theme-primary': '#f59e0b', '--theme-accent': '#fbbf24', '--theme-primary-dark': '#d97706',
+                    '--theme-primary-soft': '#fef3c7', '--theme-primary-soft-2': '#fffbeb',
+                    '--theme-bg': '#ffffff', '--theme-bg-soft': '#fffdf5', '--theme-card': '#ffffff',
+                    '--theme-text': '#2e2410', '--theme-text-muted': '#6b5a30', '--theme-text-dim': '#9c8a5c', '--theme-text-faint': '#c4b588',
+                    '--theme-border': '#fdf3dc', '--theme-border-soft': '#fef9ec', '--theme-border-input': '#fce8b3',
+                    '--theme-gradient': 'linear-gradient(45deg, #f59e0b 0%, #fbbf24 100%)',
+                    '--theme-shadow': 'rgba(245, 158, 11, 0.15)', '--theme-shadow-soft': 'rgba(245, 158, 11, 0.2)',
+                    '--theme-nav-bg': 'rgba(255, 255, 255, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#fbbf24', '--theme-accent': '#fcd34d', '--theme-primary-dark': '#f59e0b',
+                    '--theme-primary-soft': '#3d3018', '--theme-primary-soft-2': '#1f1808',
+                    '--theme-bg': '#171207', '--theme-bg-soft': '#221a0c', '--theme-card': '#221a0c',
+                    '--theme-text': '#fbf3d9', '--theme-text-muted': '#c9baa0', '--theme-text-dim': '#a59578', '--theme-text-faint': '#7d7058',
+                    '--theme-border': '#3a2e15', '--theme-border-soft': '#2a210f', '--theme-border-input': '#3a2e15',
+                    '--theme-gradient': 'linear-gradient(45deg, #fbbf24 0%, #fcd34d 100%)',
+                    '--theme-shadow': 'rgba(251, 191, 36, 0.25)', '--theme-shadow-soft': 'rgba(251, 191, 36, 0.18)',
+                    '--theme-nav-bg': 'rgba(23, 18, 7, 0.98)'
+                }
+            },
+            starry: {
+                name: 'Starry', sub: 'Cosmic · Night', emoji: '✨',
+                light: {
+                    '--theme-primary': '#a78bfa', '--theme-accent': '#c4b5fd', '--theme-primary-dark': '#8b5cf6',
+                    '--theme-primary-soft': '#2a1e3d', '--theme-primary-soft-2': '#150e26',
+                    '--theme-bg': '#0a0714', '--theme-bg-soft': '#0e0818', '--theme-card': '#17102a',
+                    '--theme-text': '#e8e0ff', '--theme-text-muted': '#b0a0d0', '--theme-text-dim': '#8878b0', '--theme-text-faint': '#665a88',
+                    '--theme-border': '#281e3d', '--theme-border-soft': '#1a1229', '--theme-border-input': '#281e3d',
+                    '--theme-gradient': 'linear-gradient(45deg, #a78bfa 0%, #c4b5fd 100%)',
+                    '--theme-shadow': 'rgba(167, 139, 250, 0.3)', '--theme-shadow-soft': 'rgba(167, 139, 250, 0.2)',
+                    '--theme-nav-bg': 'rgba(10, 7, 20, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#a78bfa', '--theme-accent': '#c4b5fd', '--theme-primary-dark': '#8b5cf6',
+                    '--theme-primary-soft': '#2a1e3d', '--theme-primary-soft-2': '#150e26',
+                    '--theme-bg': '#0a0714', '--theme-bg-soft': '#0e0818', '--theme-card': '#17102a',
+                    '--theme-text': '#e8e0ff', '--theme-text-muted': '#b0a0d0', '--theme-text-dim': '#8878b0', '--theme-text-faint': '#665a88',
+                    '--theme-border': '#281e3d', '--theme-border-soft': '#1a1229', '--theme-border-input': '#281e3d',
+                    '--theme-gradient': 'linear-gradient(45deg, #a78bfa 0%, #c4b5fd 100%)',
+                    '--theme-shadow': 'rgba(167, 139, 250, 0.3)', '--theme-shadow-soft': 'rgba(167, 139, 250, 0.2)',
+                    '--theme-nav-bg': 'rgba(10, 7, 20, 0.98)'
+                }
+            },
+            cafe: {
+                name: 'Café', sub: 'Warm · Cozy', emoji: '☕',
+                light: {
+                    '--theme-primary': '#8B5E3C', '--theme-accent': '#D2B48C', '--theme-primary-dark': '#6B4226',
+                    '--theme-primary-soft': '#F5E6D3', '--theme-primary-soft-2': '#FAF3E8',
+                    '--theme-bg': '#FDF8F2', '--theme-bg-soft': '#F9F1E7', '--theme-card': '#FFFFFF',
+                    '--theme-text': '#3E2C1C', '--theme-text-muted': '#6B5A4A', '--theme-text-dim': '#9C8A7A', '--theme-text-faint': '#C4B5A5',
+                    '--theme-border': '#EDE0D0', '--theme-border-soft': '#F5EDE2', '--theme-border-input': '#DCC8B0',
+                    '--theme-gradient': 'linear-gradient(45deg, #8B5E3C 0%, #D2B48C 100%)',
+                    '--theme-shadow': 'rgba(139, 94, 60, 0.15)', '--theme-shadow-soft': 'rgba(139, 94, 60, 0.2)',
+                    '--theme-nav-bg': 'rgba(253, 248, 242, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#C49A6C', '--theme-accent': '#D2B48C', '--theme-primary-dark': '#A67B5B',
+                    '--theme-primary-soft': '#3D2E1E', '--theme-primary-soft-2': '#1E150E',
+                    '--theme-bg': '#1A120B', '--theme-bg-soft': '#241A12', '--theme-card': '#241A12',
+                    '--theme-text': '#F0E6D8', '--theme-text-muted': '#C4B5A0', '--theme-text-dim': '#A09080', '--theme-text-faint': '#7D6E60',
+                    '--theme-border': '#3A2C1E', '--theme-border-soft': '#2A1E14', '--theme-border-input': '#3A2C1E',
+                    '--theme-gradient': 'linear-gradient(45deg, #C49A6C 0%, #D2B48C 100%)',
+                    '--theme-shadow': 'rgba(196, 154, 108, 0.25)', '--theme-shadow-soft': 'rgba(196, 154, 108, 0.18)',
+                    '--theme-nav-bg': 'rgba(26, 18, 11, 0.98)'
+                }
+            },
+            crimson: {
+                name: 'Crimson', sub: 'Bold · Passion', emoji: '❤️',
+                light: {
+                    '--theme-primary': '#dc2626', '--theme-accent': '#f87171', '--theme-primary-dark': '#b91c1c',
+                    '--theme-primary-soft': '#fee2e2', '--theme-primary-soft-2': '#fef2f2',
+                    '--theme-bg': '#ffffff', '--theme-bg-soft': '#fff5f5', '--theme-card': '#ffffff',
+                    '--theme-text': '#2e1a1a', '--theme-text-muted': '#6b4a4a', '--theme-text-dim': '#9c7a7a', '--theme-text-faint': '#c4a5a5',
+                    '--theme-border': '#fde8e8', '--theme-border-soft': '#fef3f3', '--theme-border-input': '#fbd5d5',
+                    '--theme-gradient': 'linear-gradient(45deg, #dc2626 0%, #f87171 100%)',
+                    '--theme-shadow': 'rgba(220, 38, 38, 0.15)', '--theme-shadow-soft': 'rgba(220, 38, 38, 0.2)',
+                    '--theme-nav-bg': 'rgba(255, 255, 255, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#ef4444', '--theme-accent': '#fca5a5', '--theme-primary-dark': '#dc2626',
+                    '--theme-primary-soft': '#3d1a1a', '--theme-primary-soft-2': '#1e0e0e',
+                    '--theme-bg': '#1a0a0a', '--theme-bg-soft': '#241010', '--theme-card': '#241010',
+                    '--theme-text': '#fbe5e5', '--theme-text-muted': '#c9a0a0', '--theme-text-dim': '#a57a7a', '--theme-text-faint': '#7d5a5a',
+                    '--theme-border': '#3a1a1a', '--theme-border-soft': '#2a1010', '--theme-border-input': '#3a1a1a',
+                    '--theme-gradient': 'linear-gradient(45deg, #ef4444 0%, #fca5a5 100%)',
+                    '--theme-shadow': 'rgba(239, 68, 68, 0.25)', '--theme-shadow-soft': 'rgba(239, 68, 68, 0.18)',
+                    '--theme-nav-bg': 'rgba(26, 10, 10, 0.98)'
+                }
+            },
+            maroon: {
+                name: 'Maroon', sub: 'Deep · Classic', emoji: '🍷',
+                light: {
+                    '--theme-primary': '#800000', '--theme-accent': '#a52a2a', '--theme-primary-dark': '#5c0000',
+                    '--theme-primary-soft': '#f5e6e6', '--theme-primary-soft-2': '#faf0f0',
+                    '--theme-bg': '#fdf8f8', '--theme-bg-soft': '#f9f0f0', '--theme-card': '#ffffff',
+                    '--theme-text': '#2e1a1a', '--theme-text-muted': '#5c3a3a', '--theme-text-dim': '#8a6a6a', '--theme-text-faint': '#b5a0a0',
+                    '--theme-border': '#e8d5d5', '--theme-border-soft': '#f0e0e0', '--theme-border-input': '#d4b5b5',
+                    '--theme-gradient': 'linear-gradient(45deg, #800000 0%, #a52a2a 100%)',
+                    '--theme-shadow': 'rgba(128, 0, 0, 0.15)', '--theme-shadow-soft': 'rgba(128, 0, 0, 0.2)',
+                    '--theme-nav-bg': 'rgba(253, 248, 248, 0.98)'
+                },
+                dark: {
+                    '--theme-primary': '#a52a2a', '--theme-accent': '#c04040', '--theme-primary-dark': '#800000',
+                    '--theme-primary-soft': '#2a1515', '--theme-primary-soft-2': '#1a0d0d',
+                    '--theme-bg': '#120808', '--theme-bg-soft': '#1a0f0f', '--theme-card': '#1a0f0f',
+                    '--theme-text': '#f0e0e0', '--theme-text-muted': '#c4a0a0', '--theme-text-dim': '#a08080', '--theme-text-faint': '#7d6060',
+                    '--theme-border': '#2e1a1a', '--theme-border-soft': '#221212', '--theme-border-input': '#2e1a1a',
+                    '--theme-gradient': 'linear-gradient(45deg, #a52a2a 0%, #c04040 100%)',
+                    '--theme-shadow': 'rgba(165, 42, 42, 0.25)', '--theme-shadow-soft': 'rgba(165, 42, 42, 0.18)',
+                    '--theme-nav-bg': 'rgba(18, 8, 8, 0.98)'
+                }
+            }
+        };
+
+        const DEFAULT_THEME = { preset: 'ocean', mode: 'light' };
+        let selectedTheme = { ...DEFAULT_THEME };
+
+        function injectThemeShapes(presetKey) {
+            const container = document.getElementById('themeBgShapes');
+            if (!container) return;
+            const html = THEME_SHAPES[presetKey];
+            if (container.dataset.activeTheme !== presetKey) {
+                container.innerHTML = html || '';
+                container.dataset.activeTheme = presetKey;
+            }
+        }
+
+        function applyTheme(theme) {
+            const preset = THEMES[theme.preset] || THEMES.ocean;
+            const mode = theme.mode === 'dark' ? 'dark' : 'light';
+            const palette = preset[mode];
+
+            const root = document.documentElement;
+            Object.keys(palette).forEach(key => {
+                root.style.setProperty(key, palette[key]);
+            });
+            root.setAttribute('data-timawa-theme', theme.preset);
+            root.setAttribute('data-timawa-mode', mode);
+
+            injectThemeShapes(theme.preset);
+
+            let meta = document.querySelector('meta[name="theme-color"]');
+            if (!meta) {
+                meta = document.createElement('meta');
+                meta.name = 'theme-color';
+                document.head.appendChild(meta);
+            }
+            meta.content = palette['--theme-bg'];
+        }
+
+        function readThemeFromStorage() {
+            try {
+                const raw = localStorage.getItem(THEME_STORAGE_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                if (parsed && parsed.preset && THEMES[parsed.preset]) {
+                    return { preset: parsed.preset, mode: parsed.mode === 'dark' ? 'dark' : 'light' };
+                }
+            } catch (e) {}
+            return null;
+        }
+
+        // ================================================================
+        // ★ APPLY CACHED THEME IMMEDIATELY (before Firebase Auth resolves)
+        // Prevents "flash of default Ocean" on login.
+        // ================================================================
+        (function() {
+            const cached = readThemeFromStorage();
+            if (cached) selectedTheme = cached;
+            applyTheme(selectedTheme); // always applies Ocean if no cache
+        })();
+
+        // ================================================================
+        // ★ CROSS-TAB LIVE SYNC (BroadcastChannel)
+        // If user changes theme in another tab, login page updates.
+        // ================================================================
+        try {
+            if ('BroadcastChannel' in window) {
+                const bc = new BroadcastChannel('timawa_theme_sync');
+                bc.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'theme-change' && event.data.theme) {
+                        selectedTheme = event.data.theme;
+                        applyTheme(selectedTheme);
+                    }
+                });
+            }
+        } catch (e) {}
+
+        // ================================================================
+        // FIREBASE CONFIG
+        // ================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyC05mMZ304IN_S0-NRv2Uf7E5_tZLiM4Js",
             authDomain: "timawa2.firebaseapp.com",
@@ -805,24 +1464,29 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // ===== CLOUDINARY CONFIG =====
+        // ================================================================
+        // CLOUDINARY CONFIG
+        // ================================================================
         const CLOUDINARY_CONFIG = {
             cloudName: "ooq99nlw",
             uploadPreset: "t-imawa"
         };
 
-        // ===== VERIFICATION CODE =====
+        // ================================================================
+        // VERIFICATION CODE
+        // ================================================================
         const VERIFICATION_CODE = "AWAMIT";
 
         let selectedAvatarFile = null;
 
-        // ===== VERIFICATION CODE CHECKER =====
+        // ================================================================
+        // VERIFICATION CODE CHECKER
+        // ================================================================
         function checkVerificationCode() {
             const input = document.getElementById('signupVerification');
             const status = document.getElementById('verificationStatus');
             const value = input.value.trim().toUpperCase();
 
-            // Reset classes
             input.classList.remove('verified', 'invalid');
 
             if (!value) {
@@ -837,7 +1501,6 @@
                 status.classList.remove('invalid');
                 status.innerHTML = '<i class="fas fa-check-circle"></i> Verified! You may join the squad.';
             } else {
-                // Only mark invalid if the length matches (so we don't flash red while typing)
                 if (value.length >= VERIFICATION_CODE.length) {
                     input.classList.add('invalid');
                     status.classList.add('show', 'invalid');
@@ -850,7 +1513,9 @@
             }
         }
 
-        // ===== PASSWORD VISIBILITY TOGGLE =====
+        // ================================================================
+        // PASSWORD VISIBILITY TOGGLE
+        // ================================================================
         function togglePassword(inputId, btn) {
             const input = document.getElementById(inputId);
             if (!input) return;
@@ -866,7 +1531,9 @@
             }
         }
 
-        // ===== LOCATION FUNCTIONS =====
+        // ================================================================
+        // LOCATION FUNCTIONS
+        // ================================================================
         function toggleCustomLocation() {
             const select = document.getElementById('locationSelect');
             const customInput = document.getElementById('customLocationInput');
@@ -891,7 +1558,9 @@
             return select.value;
         }
 
-        // ===== IMAGE COMPRESSION =====
+        // ================================================================
+        // IMAGE COMPRESSION
+        // ================================================================
         function compressImage(file, maxSize = 400, quality = 0.7) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -932,7 +1601,9 @@
             });
         }
 
-        // ===== UPLOAD TO CLOUDINARY =====
+        // ================================================================
+        // UPLOAD TO CLOUDINARY
+        // ================================================================
         async function uploadToCloudinary(file) {
             const formData = new FormData();
             formData.append('file', file);
@@ -957,7 +1628,9 @@
             });
         }
 
-        // ===== AVATAR PREVIEW HANDLER =====
+        // ================================================================
+        // AVATAR PREVIEW HANDLER
+        // ================================================================
         document.getElementById('signupPhoto').addEventListener('change', async function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -990,48 +1663,64 @@
             }
         });
 
-        // ===== AUTH STATE (redirect already-signed-in users) =====
+        // ================================================================
+        // ★ AUTH STATE — READ FIRESTORE THEME BEFORE REDIRECT
+        // Handles the "new device, empty localStorage" case.
+        // ================================================================
         auth.onAuthStateChanged(async (user) => {
             if (!user) return;
 
             try {
                 const doc = await db.collection('users').doc(user.uid).get();
                 const data = doc.data();
+
+                // Apply the user's saved Firestore theme (if any) before redirect
+                if (data && data.theme && THEMES[data.theme.preset]) {
+                    const firestoreTheme = {
+                        preset: data.theme.preset,
+                        mode: data.theme.mode === 'dark' ? 'dark' : 'light'
+                    };
+                    applyTheme(firestoreTheme);
+                    try { localStorage.setItem(THEME_STORAGE_KEY, JSON.stringify(firestoreTheme)); } catch (e) {}
+                }
+
                 const isAdmin = data?.isAdmin === true;
 
-                if (isAdmin) {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'index.html';
-                }
+                // Small delay so the theme paints before navigating
+                setTimeout(() => {
+                    if (isAdmin) window.location.href = 'admin.html';
+                    else window.location.href = 'index.html';
+                }, 150);
             } catch (error) {
                 console.error('Error checking user profile:', error);
                 window.location.href = 'index.html';
             }
         });
 
-        // ===== LOGIN FORM =====
+        // ================================================================
+        // LOGIN FORM
+        // ================================================================
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const btn = document.getElementById('loginBtn');
-            
+
             if (!email || !password) {
                 showError('Please fill in all fields');
                 return;
             }
-            
+
             showLoading(btn);
             hideMessages();
-            
+
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 // Redirect handled by onAuthStateChanged
             } catch (error) {
                 console.error('Login error:', error);
-                
+
                 let errorMessage = error.message;
                 if (error.code === 'auth/user-not-found') {
                     errorMessage = 'No account found with this email. Please sign up first.';
@@ -1044,13 +1733,15 @@
                 } else if (error.code === 'auth/invalid-credential') {
                     errorMessage = 'Invalid email or password. Please try again.';
                 }
-                
+
                 showError(errorMessage);
                 hideLoading(btn);
             }
         });
 
-        // ===== SIGN UP FORM (single form, account created at the end) =====
+        // ================================================================
+        // SIGN UP FORM (single form, account created at the end)
+        // ================================================================
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -1071,7 +1762,6 @@
             const twitter = document.getElementById('signupTwitter').value.trim();
             const verification = document.getElementById('signupVerification').value.trim().toUpperCase();
 
-            // ===== VALIDATION (all required fields) =====
             if (!selectedAvatarFile) {
                 showError('⚠️ Please upload a profile picture');
                 document.getElementById('avatarHint').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1088,7 +1778,6 @@
             if (!status) { showError('⚠️ Status is required'); return; }
             if (!loveLife) { showError('⚠️ Love life status is required'); return; }
 
-            // ===== VERIFICATION CODE VALIDATION =====
             if (!verification) {
                 showError('⚠️ Squad verification code is required');
                 document.getElementById('signupVerification').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1103,7 +1792,6 @@
                 return;
             }
 
-            // Facebook URL validation (if provided)
             if (facebook && !facebook.match(/^https?:\/\/(www\.)?facebook\.com\/.+/i)) {
                 showError('⚠️ Please enter a valid Facebook URL (e.g., https://facebook.com/username)');
                 return;
@@ -1114,7 +1802,6 @@
             btn.innerHTML = '<span class="loading-spinner"></span> Creating account...';
 
             try {
-                // Step 1: Upload profile picture to Cloudinary FIRST
                 let photoURL = '';
                 try {
                     photoURL = await uploadToCloudinary(selectedAvatarFile);
@@ -1126,11 +1813,9 @@
                     return;
                 }
 
-                // Step 2: Create the Firebase Auth account
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
 
-                // Step 3: Save full profile to Firestore (single write)
                 await db.collection('users').doc(user.uid).set({
                     displayName: name,
                     email: email,
@@ -1147,11 +1832,13 @@
                     tiktok: tiktok || '',
                     twitter: twitter || '',
                     isAdmin: false,
+                    // ★ Default theme written at signup so login page can read
+                    // it back on any device (even with empty localStorage).
+                    theme: { preset: 'ocean', mode: 'light' },
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Step 4: Update Firebase Auth display name + photo
                 try {
                     await user.updateProfile({
                         displayName: name,
@@ -1182,7 +1869,9 @@
             }
         });
 
-        // ===== UI FUNCTIONS =====
+        // ================================================================
+        // UI FUNCTIONS
+        // ================================================================
         function showSignUp() {
             document.getElementById('signupModal').classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1192,7 +1881,6 @@
             document.getElementById('signupModal').classList.remove('active');
             document.body.style.overflow = 'auto';
             document.getElementById('signupForm').reset();
-            // Reset avatar UI
             selectedAvatarFile = null;
             document.getElementById('avatarPreview').style.display = 'none';
             document.getElementById('avatarPreview').src = '';
@@ -1201,10 +1889,8 @@
             hint.classList.remove('ok-hint');
             hint.classList.add('required-hint');
             hint.innerHTML = '<i class="fas fa-exclamation-circle"></i> Profile picture is required';
-            // Reset custom location
             document.getElementById('customLocationInput').classList.remove('active');
             document.getElementById('customLocation').required = false;
-            // Reset verification
             const verifInput = document.getElementById('signupVerification');
             verifInput.value = '';
             verifInput.classList.remove('verified', 'invalid');
@@ -1243,7 +1929,9 @@
             btn.disabled = false;
         }
 
-        // ===== CLOSE MODAL ON OUTSIDE CLICK =====
+        // ================================================================
+        // CLOSE MODAL ON OUTSIDE CLICK
+        // ================================================================
         window.onclick = function(event) {
             const signupModal = document.getElementById('signupModal');
             if (event.target === signupModal) {
@@ -1251,8 +1939,9 @@
             }
         }
 
-        // ===== IDLE LOGOUT NOTICE =====
-        // If the user was signed out due to inactivity, show a friendly message.
+        // ================================================================
+        // IDLE LOGOUT NOTICE
+        // ================================================================
         document.addEventListener('DOMContentLoaded', () => {
             try {
                 if (sessionStorage.getItem('timawa_idle_logout') === '1') {
@@ -1270,6 +1959,6 @@
 
     <!-- Auto-logout on idle (only activates when a user is signed in) -->
     <script src="idle-logout.js"></script>
-    
+
 </body>
 </html>
