@@ -2861,6 +2861,28 @@
             flex-shrink: 0;
         }
 
+                .activity-row .activity-clear-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-dim);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            margin-top: 4px;
+        }
+        .activity-row .activity-clear-btn:hover {
+            background: var(--theme-warn-soft);
+            color: var(--theme-warn);
+            transform: scale(1.1);
+        }
+
         .activity-row .activity-time {
             font-size: 12px;
             font-weight: 700;
@@ -5228,6 +5250,11 @@
                 padding-top: 4px;
                 border-top: 1px solid var(--theme-border-soft);
             }
+
+            .activity-row .activity-clear-btn {
+                margin-top: 0;
+                margin-left: auto;
+            }
         }
 
         @media (max-width: 768px) and (min-height: 640px) {
@@ -7343,7 +7370,7 @@
                     });
 
                     if (inactiveUserIds.length > 0) {
-                        cleanupInactiveUsers(inactiveUserIds);
+                        clearInactiveActivityRecords(inactiveUserIds);
                     }
 
                     renderActivityTracker(rows);
@@ -7382,7 +7409,7 @@
             const now = Date.now();
             let html = '';
 
-            rows.forEach(row => {
+                        rows.forEach(row => {
                 const initials = row.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                 const avatarContent = row.photoUrl
                     ? `<img src="${cloudinaryAvatar(row.photoUrl, 100)}" alt="${escapeAttr(row.name)}" loading="lazy" />`
@@ -7411,6 +7438,11 @@
                         </div>
                         <div class="activity-meta">
                             <span class="activity-time">${escapeHtml(rel)}</span>
+                            <button class="activity-clear-btn"
+                                    onclick="event.stopPropagation(); clearSingleActivityRecord('${escapeAttr(row.uid)}', '${escapeAttr(row.name)}')"
+                                    title="Remove from activity tracker (keeps their account)">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -7423,12 +7455,12 @@
         // ================================================================
         // ===== ★ CLEANUP INACTIVE USERS =====
         // ================================================================
-        async function cleanupInactiveUsers(userIds) {
-            if (!userIds || userIds.length === 0) return { deleted: 0 };
+        async function clearInactiveActivityRecords(userIds) {
+            if (!userIds || userIds.length === 0) return { cleared: 0 };
 
             try {
-                const batchSize = INACTIVE_USER_CLEANUP_BATCH;
-                let totalDeleted = 0;
+                const batchSize = INACTIVE_USER_CLEANUP_BATCH; // 50
+                let totalCleared = 0;
 
                 for (let i = 0; i < userIds.length; i += batchSize) {
                     const batchIds = userIds.slice(i, i + batchSize);
@@ -7436,25 +7468,61 @@
                     let queued = 0;
 
                     batchIds.forEach(uid => {
+                        // Safety: don't touch the currently signed-in user's activity
                         if (currentUser && uid === currentUser.uid) return;
-                        batch.delete(db.collection('users').doc(uid));
+
+                        // ✅ UPDATE instead of DELETE — only wipe activity fields
+                        batch.update(db.collection('users').doc(uid), {
+                            lastVisit: firebase.firestore.FieldValue.delete(),
+                            lastVisitPage: firebase.firestore.FieldValue.delete(),
+                            lastVisitTitle: firebase.firestore.FieldValue.delete(),
+                            visitCount: firebase.firestore.FieldValue.delete()
+                        });
                         queued++;
                     });
 
                     if (queued > 0) {
                         await batch.commit();
-                        totalDeleted += queued;
+                        totalCleared += queued;
                     }
                 }
 
-                if (totalDeleted > 0) {
-                    console.log(`🧹 Inactive cleanup: removed ${totalDeleted} user(s) from Firebase.`);
+                if (totalCleared > 0) {
+                    console.log(`🧹 Activity cleanup: cleared activity records for ${totalCleared} user(s).`);
                 }
-                return { deleted: totalDeleted };
+                return { cleared: totalCleared };
             } catch (err) {
-                console.warn('cleanupInactiveUsers error:', err.message);
-                return { deleted: 0, error: err };
+                console.warn('clearInactiveActivityRecords error:', err.message);
+                return { cleared: 0, error: err };
             }
+        }
+
+        async function clearSingleActivityRecord(uid, name) {
+            if (!uid) return;
+            if (currentUser && uid === currentUser.uid) {
+                showToast('You can\'t clear your own activity record.', 'warn');
+                return;
+            }
+
+            showConfirm({
+                title: 'Remove from Activity?',
+                message: `Clear ${name}'s activity record? They will still be a squad member — only their "last seen" info is removed.`,
+                confirmLabel: 'Remove',
+                type: 'warn',
+                onConfirm: async () => {
+                    try {
+                        await db.collection('users').doc(uid).update({
+                            lastVisit: firebase.firestore.FieldValue.delete(),
+                            lastVisitPage: firebase.firestore.FieldValue.delete(),
+                            lastVisitTitle: firebase.firestore.FieldValue.delete(),
+                            visitCount: firebase.firestore.FieldValue.delete()
+                        });
+                        showToast(`${name} removed from activity tracker.`, 'success');
+                    } catch (err) {
+                        showToast('Could not clear activity: ' + err.message, 'error');
+                    }
+                }
+            });
         }
 
         async function scheduledInactiveUserCleanup() {
@@ -7466,32 +7534,36 @@
                     .limit(INACTIVE_USER_CLEANUP_BATCH)
                     .get();
 
-                if (snapshot.empty) {
-                    return { deleted: 0 };
-                }
+                if (snapshot.empty) return { cleared: 0 };
 
                 const batch = db.batch();
-                let deletedCount = 0;
+                let clearedCount = 0;
 
                 snapshot.forEach(doc => {
                     if (currentUser && doc.id === currentUser.uid) return;
-                    batch.delete(doc.ref);
-                    deletedCount++;
+
+                    // ✅ Only clear the activity fields
+                    batch.update(doc.ref, {
+                        lastVisit: firebase.firestore.FieldValue.delete(),
+                        lastVisitPage: firebase.firestore.FieldValue.delete(),
+                        lastVisitTitle: firebase.firestore.FieldValue.delete(),
+                        visitCount: firebase.firestore.FieldValue.delete()
+                    });
+                    clearedCount++;
                 });
 
-                if (deletedCount > 0) {
+                if (clearedCount > 0) {
                     await batch.commit();
-                    console.log(`🧹 Scheduled inactive cleanup: removed ${deletedCount} user(s).`);
+                    console.log(`🧹 Scheduled activity cleanup: cleared ${clearedCount} record(s).`);
                 }
-
                 if (snapshot.size === INACTIVE_USER_CLEANUP_BATCH) {
                     setTimeout(scheduledInactiveUserCleanup, 3000);
                 }
 
-                return { deleted: deletedCount };
+                return { cleared: clearedCount };
             } catch (err) {
                 console.warn('scheduledInactiveUserCleanup error:', err.message);
-                return { deleted: 0, error: err };
+                return { cleared: 0, error: err };
             }
         }
 
