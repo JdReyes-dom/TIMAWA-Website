@@ -1678,12 +1678,15 @@
             border-radius: 0;
             border: none;
             max-width: 100vw;
-            max-height: 100vh;
-            height: 100vh;
+            /* Use dvh so mobile browser chrome doesn't hide the input */
+            max-height: 100dvh;
+            height: 100vh;   /* fallback for older browsers */
+            height: 100dvh;  /* modern mobile-safe height */
             width: 100vw;
             margin: 0;
             grid-template-columns: 320px 1fr;
             box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.6);
+            overflow: hidden;
         }
 
         .chat-container.fullscreen-chat .chat-sidebar {
@@ -1694,8 +1697,30 @@
             /* Use an "exit fullscreen" icon */
         }
 
+        /* ★ HARD SCROLL LOCK — prevents background scroll bleed in fullscreen.
+           Uses position:fixed trick because iOS Safari ignores overflow:hidden on body.
+           .fullscreen-scroll-lock is applied by JS with the saved scroll position. */
         body.chat-fullscreen-active {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
             overflow: hidden;
+            touch-action: none;
+            overscroll-behavior: none;
+        }
+
+        /* Re-enable touch scrolling inside the chat panels themselves */
+        body.chat-fullscreen-active .chat-container.fullscreen-chat,
+        body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-sidebar,
+        body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-main,
+        body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-body,
+        body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-user-list,
+        body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-input-stack textarea {
+            touch-action: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         /* ★ Hide navbar, Tita launcher, and Tita panel when chat is fullscreen */
@@ -5440,9 +5465,10 @@
                 grid-template-columns: 1fr;
             }
 
-            /* Fullscreen on mobile: keep the same structure */
+            /* Fullscreen on mobile: flex column so the input is always visible */
             .chat-container.fullscreen-chat {
-                display: block;
+                display: flex;
+                flex-direction: column;
                 position: fixed;
                 top: 0;
                 left: 0;
@@ -5451,8 +5477,33 @@
                 z-index: 6000;
                 border-radius: 0;
                 border: none;
-                height: 100vh;
+                height: 100vh;   /* fallback */
+                height: 100dvh;  /* mobile-safe height */
+                max-height: 100dvh;
                 width: 100vw;
+                overflow: hidden;
+                overscroll-behavior: contain;
+            }
+
+            /* Ensure the chat main column is a flex column inside fullscreen */
+            .chat-container.fullscreen-chat .chat-main {
+                display: flex;
+                flex-direction: column;
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            .chat-container.fullscreen-chat .chat-body {
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain;
+            }
+
+            .chat-container.fullscreen-chat .chat-input-wrap {
+                flex-shrink: 0;
             }
 
             .chat-sidebar {
@@ -8542,8 +8593,10 @@
         }
 
         // ================================================================
-        // ===== ★ NEW: CHAT FULLSCREEN =====
+        // ===== ★ CHAT FULLSCREEN (with hard scroll lock) =====
         // ================================================================
+        let _fullscreenScrollY = 0;
+
         function toggleChatFullscreen() {
             const container = document.getElementById('chatContainerEl');
             const btn = document.getElementById('chatFullscreenBtn');
@@ -8551,7 +8604,20 @@
             if (!container) return;
 
             const isFullscreen = container.classList.toggle('fullscreen-chat');
-            document.body.classList.toggle('chat-fullscreen-active', isFullscreen);
+            const body = document.body;
+
+            if (isFullscreen) {
+                // Save current scroll position, then hard-lock the body.
+                _fullscreenScrollY = window.scrollY || window.pageYOffset || 0;
+                body.style.top = `-${_fullscreenScrollY}px`;
+                body.classList.add('chat-fullscreen-active');
+            } else {
+                // Unlock and restore the exact scroll position.
+                body.classList.remove('chat-fullscreen-active');
+                body.style.top = '';
+                window.scrollTo(0, _fullscreenScrollY);
+                _fullscreenScrollY = 0;
+            }
 
             const buttons = [btn, btnSidebar].filter(Boolean);
             buttons.forEach(b => {
@@ -8568,6 +8634,11 @@
                 if (isMobile() && activeChatUid) {
                     hideChatSidebar();
                 }
+                // Reset chat body scroll to bottom so latest messages show
+                setTimeout(() => {
+                    const chatBody = document.getElementById('chatBody');
+                    if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+                }, 60);
             } else {
                 if (isMobile()) {
                     showChatSidebar();
@@ -12728,6 +12799,9 @@
             if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
             if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
             if (activityUnsubscribe) { try { activityUnsubscribe(); } catch (e) {} activityUnsubscribe = null; }
+            // ★ Safety: remove scroll lock if user leaves the page while fullscreen
+            document.body.classList.remove('chat-fullscreen-active');
+            document.body.style.top = '';
         });
 
         // ================================================================
@@ -14188,6 +14262,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (document.getElementById('reactionCustomizeModal').classList.contains('active')) closeReactionCustomizeModal();
+                else if (document.body.classList.contains('chat-fullscreen-active')) toggleChatFullscreen();
                 else if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
                 else if (document.getElementById('fullViewModal').classList.contains('active')) closeFullView();
                 else if (document.getElementById('newMessageModal').classList.contains('active')) closeNewMessageModal();
