@@ -5592,8 +5592,48 @@
                 min-height: 0;
             }
 
+            /* ---- Message layout: shrink-to-fit bubbles ---- */
             .chat-msg {
-                max-width: 88%;
+                max-width: 82%;
+                align-items: flex-end;
+            }
+
+            .chat-msg.mine {
+                align-items: flex-end;
+            }
+
+            .chat-msg .chat-msg-bubble-wrap {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                min-width: 0;
+                max-width: 100%;
+            }
+
+            .chat-msg.mine .chat-msg-bubble-wrap {
+                align-items: flex-end;
+            }
+
+            .chat-msg .chat-msg-bubble {
+                display: inline-block;
+                width: auto;
+                max-width: 100%;
+                /* Prevent Android flex items from stretching to full width */
+                align-self: flex-start;
+            }
+
+            .chat-msg.mine .chat-msg-bubble {
+                align-self: flex-end;
+            }
+
+            .chat-msg .chat-msg-time,
+            .chat-msg .chat-msg-author {
+                align-self: flex-start;
+            }
+
+            .chat-msg.mine .chat-msg-time,
+            .chat-msg.mine .chat-msg-author {
+                align-self: flex-end;
             }
 
             .chat-input-wrap {
@@ -10097,6 +10137,33 @@
             input.style.height = Math.min(input.scrollHeight, 120) + 'px';
         }
 
+        // ★ Keep the chat input visible when the mobile keyboard opens
+        function ensureChatInputVisible() {
+            const input = document.getElementById('chatInput');
+            const body = document.getElementById('chatBody');
+            if (!input || !body) return;
+
+            // Scroll the chat body to the bottom so the latest message is visible
+            body.scrollTop = body.scrollHeight;
+
+            // Then nudge the input into view — some browsers need this
+            // because the visual viewport shrinks when the keyboard opens.
+            try {
+                input.scrollIntoView({ block: 'end', behavior: 'auto' });
+            } catch (e) {
+                // Older browsers don't support options object
+                input.scrollIntoView(false);
+            }
+
+            // Second pass after layout settles (Android often needs this)
+            setTimeout(() => {
+                body.scrollTop = body.scrollHeight;
+                try {
+                    input.scrollIntoView({ block: 'end', behavior: 'auto' });
+                } catch (e) {}
+            }, 120);
+        }
+
         function handleChatKeydown(e) {
             if (chatMentionDropdownOpen) {
                 if (e.key === 'ArrowDown') {
@@ -14540,9 +14607,6 @@
             }
         }
 
-        // ================================================================
-        // ===== EVENTS =====
-        // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
             const wrapper = document.getElementById('highlightsCarousel');
             if (wrapper) {
@@ -14556,6 +14620,35 @@
                 chatInput.addEventListener('keydown', handleChatKeydown);
                 chatInput.addEventListener('blur', () => {
                     setTimeout(closeChatMentionDropdown, 180);
+                });
+
+                // ★ Fix: when keyboard opens the first time, scroll input + body into view
+                chatInput.addEventListener('focus', () => {
+                    // Immediate attempt
+                    ensureChatInputVisible();
+                    // And again after the keyboard finishes animating in
+                    setTimeout(ensureChatInputVisible, 250);
+                    setTimeout(ensureChatInputVisible, 500);
+                });
+            }
+
+            // ★ Fix: visualViewport resize fires when the mobile keyboard opens/closes
+            if (window.visualViewport) {
+                let _vvTimer = null;
+                window.visualViewport.addEventListener('resize', () => {
+                    // Only act if the chat input is focused
+                    const active = document.activeElement;
+                    if (!active || active.id !== 'chatInput') return;
+                    if (_vvTimer) clearTimeout(_vvTimer);
+                    _vvTimer = setTimeout(() => {
+                        ensureChatInputVisible();
+                        _vvTimer = null;
+                    }, 80);
+                });
+                window.visualViewport.addEventListener('scroll', () => {
+                    const active = document.activeElement;
+                    if (!active || active.id !== 'chatInput') return;
+                    ensureChatInputVisible();
                 });
             }
         });
