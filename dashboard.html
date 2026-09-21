@@ -6259,8 +6259,26 @@
             <button class="tita-close" onclick="closeTitaPanel()" aria-label="Close"><i class="fas fa-times"></i></button>
         </div>
         <div class="tita-body">
+                    <div class="tita-body">
             <div class="tita-greeting" id="titaGreeting">
                 Kumusta, <strong id="titaGreetName">ka-TIMAWA</strong>! Gusto mo ba mag-update ng status? Fill out lang dito, save agad. 😊
+            </div>
+
+            <div class="tita-field">
+                <label>
+                    <i class="fas fa-comment-dots"></i> Quick Note
+                    <span style="color:var(--theme-text-dim);font-weight:500;text-transform:none;letter-spacing:0;font-size:11px;">(60 chars · expires in 24h)</span>
+                </label>
+                <input type="text" id="titaNote" placeholder="Coffee later? ☕" maxlength="60" />
+                <div style="font-size:11px;color:var(--theme-text-dim);margin-top:4px;text-align:right;">
+                    <span id="titaNoteCount">0</span>/60
+                </div>
+                <div id="titaNoteStatus" style="font-size:11px;color:var(--theme-text-dim);margin-top:4px;display:none;">
+                    <i class="fas fa-clock"></i> <span></span>
+                </div>
+                <div style="font-size:10px;color:#dc2626;margin-top:6px;">
+                    <i class="fas fa-exclamation-triangle"></i> Changing the note text will delete all existing replies.
+                </div>
             </div>
 
             <div class="tita-field">
@@ -6312,23 +6330,6 @@
             <div class="tita-field">
                 <label><i class="fas fa-heart"></i> Interests</label>
                 <input type="text" id="titaInterests" placeholder="e.g., Coffee, Gaming, Travel" />
-            </div>
-
-            <div class="tita-field">
-                <label>
-                    <i class="fas fa-comment-dots"></i> Quick Note
-                    <span style="color:#888;font-weight:500;text-transform:none;letter-spacing:0;font-size:11px;">(60 chars · expires in 24h)</span>
-                </label>
-                <input type="text" id="titaNote" placeholder="Coffee later? ☕" maxlength="60" />
-                <div style="font-size:11px;color:#888;margin-top:4px;text-align:right;">
-                    <span id="titaNoteCount">0</span>/60
-                </div>
-                <div id="titaNoteStatus" style="font-size:11px;color:#888;margin-top:4px;display:none;">
-                    <i class="fas fa-clock"></i> <span></span>
-                </div>
-                <div style="font-size:10px;color:#dc2626;margin-top:6px;">
-                    <i class="fas fa-exclamation-triangle"></i> Changing the note text will delete all existing replies.
-                </div>
             </div>
 
             <div class="tita-actions">
@@ -12903,7 +12904,7 @@
             panel.classList.add('open');
             populateTitaFields();
             document.getElementById('titaBadge').classList.remove('show');
-            setTimeout(() => { document.getElementById('titaUsername').focus(); }, 200);
+            // Do NOT auto-focus any input — prevents mobile keyboard from popping up
         }
 
         function closeTitaPanel() {
@@ -13005,6 +13006,7 @@
 
         async function titaSaveProfile() {
             if (!titaCurrentUser) return;
+
             const btn = document.getElementById('titaSaveBtn');
             const originalHtml = btn.innerHTML;
             btn.disabled = true;
@@ -13020,8 +13022,11 @@
                 const interests = document.getElementById('titaInterests').value.trim();
 
                 let location = '';
-                if (locationSelect === 'custom') location = customLocation;
-                else location = locationSelect;
+                if (locationSelect === 'custom') {
+                    location = customLocation;
+                } else {
+                    location = locationSelect;
+                }
 
                 if (!displayName) {
                     titaShowStatus('⚠️ Username cannot be empty', 'error');
@@ -13033,60 +13038,98 @@
                 titaShowStatus('📝 Saving changes...', 'info');
 
                 const updateData = {
-                    displayName, status, loveLife, location, bio, interests,
+                    displayName,
+                    status,
+                    loveLife,
+                    location,
+                    bio,
+                    interests,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
+                // ★ NOTE: We deliberately do NOT write theme here.
+                // Only profile.html is allowed to change the theme.
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
+                // ============================================================
+                // ★ NOTE HANDLING — only touch the note doc if the TEXT changed
+                // ============================================================
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
                 const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
                 const existingNote = notesCache[titaCurrentUser.uid];
                 const oldText = existingNote?.text || '';
                 const textChanged = noteText !== oldText;
+                const hadNote = !!oldText;
+                const willHaveNote = !!noteText;
 
-                if (textChanged) await purgeCommentsForNote(titaCurrentUser.uid);
+                if (textChanged) {
+                    // Only purge comments when the note TEXT actually changed
+                    if (hadNote) {
+                        await purgeCommentsForNote(titaCurrentUser.uid);
+                    }
 
-                if (noteText) {
-                    const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-                    await noteRef.set({
-                        uid: titaCurrentUser.uid,
-                        displayName, photoURL: titaUserData.photoURL || '',
-                        text: noteText,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                } else {
-                    try { await noteRef.delete(); } catch (e) {}
+                    if (willHaveNote) {
+                        // Preserve the existing expiry if it's still in the future,
+                        // so editing other profile fields doesn't reset the 24h window.
+                        let expireAt;
+                        if (existingNote && existingNote.expireAt) {
+                            const existingExp = existingNote.expireAt.seconds
+                                ? new Date(existingNote.expireAt.seconds * 1000)
+                                : new Date(existingNote.expireAt);
+                            expireAt = existingExp > new Date()
+                                ? existingExp
+                                : new Date(Date.now() + 24 * 60 * 60 * 1000);
+                        } else {
+                            expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                        }
+
+                        await noteRef.set({
+                            uid: titaCurrentUser.uid,
+                            displayName: displayName,
+                            photoURL: titaUserData.photoURL || '',
+                            text: noteText,
+                            createdAt: (existingNote && existingNote.createdAt)
+                                ? existingNote.createdAt
+                                : firebase.firestore.FieldValue.serverTimestamp(),
+                            expireAt: firebase.firestore.Timestamp.fromDate(expireAt),
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } else {
+                        // Note text was cleared — remove the note doc
+                        try { await noteRef.delete(); } catch (e) { /* ignore */ }
+                    }
                 }
+                // If textChanged === false, do nothing to the note doc at all.
+                // The note keeps its original createdAt/expireAt and comments stay intact.
 
                 titaUserData = { ...titaUserData, ...updateData };
                 userProfileCache[titaCurrentUser.uid] = { id: titaCurrentUser.uid, ...titaUserData };
 
                 try {
                     sessionStorage.setItem('timawa_me_' + titaCurrentUser.uid, JSON.stringify({
-                        uid: titaCurrentUser.uid, t: Date.now(), data: titaUserData
+                        uid: titaCurrentUser.uid,
+                        t: Date.now(),
+                        data: titaUserData
                     }));
-                } catch (e) {}
+                } catch (e) { /* ignore */ }
 
                 if (displayName !== titaCurrentUser.displayName) {
-                    try { await titaCurrentUser.updateProfile({ displayName }); } catch (e) {}
+                    try {
+                        await titaCurrentUser.updateProfile({ displayName });
+                    } catch (authErr) {
+                        console.warn('Could not update auth display name:', authErr);
+                    }
                 }
-
-                const heroNameEl = document.getElementById('heroName');
-                if (heroNameEl) heroNameEl.textContent = displayName;
-                const userNameEl = document.getElementById('userName');
-                if (userNameEl) userNameEl.textContent = displayName;
 
                 renderMembersGridFromCache();
 
-                const replyMsg = textChanged ? ' (old replies cleared)' : '';
-                titaShowStatus('✅ Saved! Anong susunod, \'nak?' + replyMsg, 'success');
+                titaShowStatus('✅ Saved! Anong susunod, \'nak?', 'success');
+
                 setTimeout(() => {
                     const msg = document.getElementById('titaStatusMsg');
                     msg.classList.remove('show');
                 }, 3000);
+
             } catch (err) {
                 console.error('Tita save error:', err);
                 titaShowStatus('❌ Error: ' + err.message, 'error');
