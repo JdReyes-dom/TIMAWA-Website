@@ -1653,6 +1653,7 @@
             min-height: 560px;
             background: var(--theme-card);
             position: relative;
+            transition: grid-template-columns 0.3s ease, border-radius 0.3s ease;
         }
 
         .chat-container.sidebar-collapsed {
@@ -1664,6 +1665,45 @@
             overflow: hidden;
             border-right: none;
             padding: 0;
+        }
+
+        /* ===== FULLSCREEN CHAT MODE ===== */
+        .chat-container.fullscreen-chat {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 6000;
+            border-radius: 0;
+            border: none;
+            max-width: 100vw;
+            max-height: 100vh;
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            grid-template-columns: 320px 1fr;
+            box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.6);
+        }
+
+        .chat-container.fullscreen-chat .chat-sidebar {
+            border-right: 1px solid var(--theme-border);
+        }
+
+        .chat-container.fullscreen-chat .chat-fullscreen-btn i {
+            /* Use an "exit fullscreen" icon */
+        }
+
+        body.chat-fullscreen-active {
+            overflow: hidden;
+        }
+
+        /* ★ Hide navbar, Tita launcher, and Tita panel when chat is fullscreen */
+        body.chat-fullscreen-active .navbar,
+        body.chat-fullscreen-active .tita-launcher,
+        body.chat-fullscreen-active .tita-panel,
+        body.chat-fullscreen-active .footer {
+            display: none !important;
         }
 
         .chat-sidebar {
@@ -2064,9 +2104,33 @@
             border-radius: 50%;
         }
 
+        .chat-header .chat-fullscreen-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid var(--theme-border-input);
+            background: var(--theme-card);
+            color: var(--theme-text-dim);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        .chat-header .chat-fullscreen-btn:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+            background: var(--theme-primary-soft-2);
+            transform: scale(1.05);
+        }
+
         .chat-body {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
             padding: 16px 20px;
             display: flex;
             flex-direction: column;
@@ -2107,6 +2171,10 @@
             gap: 8px;
             max-width: 78%;
             animation: chatMsgIn 0.25s ease-out;
+            position: relative;
+            /* Ensure the picker never causes a horizontal scrollbar */
+            min-width: 0;
+            max-width: 78%;
         }
 
         @keyframes chatMsgIn {
@@ -2147,6 +2215,9 @@
             display: flex;
             flex-direction: column;
             min-width: 0;
+            position: relative;
+            /* Prevent the reaction picker from expanding the layout */
+            max-width: 100%;
         }
 
         .chat-msg .chat-msg-author {
@@ -2159,6 +2230,57 @@
 
         .chat-msg.mine .chat-msg-author {
             text-align: right;
+        }
+
+        /* ===== REPLY PREVIEW INSIDE BUBBLE ===== */
+        .chat-msg-reply-preview {
+            background: color-mix(in srgb, var(--theme-primary) 8%, var(--theme-card));
+            border-left: 3px solid var(--theme-primary);
+            border-radius: 10px 10px 0 0;
+            padding: 6px 10px 4px;
+            margin-bottom: -4px;
+            font-size: 11px;
+            color: var(--theme-text-muted);
+            cursor: pointer;
+            transition: background 0.15s ease;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .chat-msg-reply-preview:hover {
+            background: color-mix(in srgb, var(--theme-primary) 15%, var(--theme-card));
+        }
+
+        .chat-msg.mine .chat-msg-reply-preview {
+            background: rgba(255, 255, 255, 0.15);
+            border-left-color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .chat-msg.mine .chat-msg-reply-preview:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .chat-msg-reply-preview .reply-preview-author {
+            font-weight: 800;
+            color: var(--theme-primary);
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 1px;
+        }
+
+        .chat-msg.mine .chat-msg-reply-preview .reply-preview-author {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .chat-msg-reply-preview .reply-preview-text {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.9;
         }
 
         .chat-msg .chat-msg-bubble {
@@ -2180,6 +2302,153 @@
             border: none;
         }
 
+        /* ===== REACTION DISPLAY ===== */
+        .chat-msg-reactions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 3px;
+            margin-top: 4px;
+            padding: 0 4px;
+        }
+
+        .chat-msg.mine .chat-msg-reactions {
+            justify-content: flex-end;
+        }
+
+        .chat-reaction-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            background: var(--theme-card);
+            border: 1px solid var(--theme-border);
+            border-radius: 50px;
+            padding: 2px 8px 2px 6px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            user-select: none;
+        }
+
+        .chat-reaction-chip:hover {
+            transform: scale(1.1);
+            border-color: var(--theme-primary);
+        }
+
+        .chat-reaction-chip.mine-reaction {
+            background: var(--theme-primary-soft);
+            border-color: color-mix(in srgb, var(--theme-primary) 30%, transparent);
+        }
+
+        .chat-reaction-chip .reaction-count {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--theme-text-muted);
+            margin-left: 1px;
+        }
+
+        .chat-msg.mine .chat-reaction-chip {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-msg.mine .chat-reaction-chip .reaction-count {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* ===== REACTION PICKER ===== */
+        .chat-reaction-picker {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            margin-bottom: 6px;
+            background: var(--theme-card);
+            border: 1px solid var(--theme-border);
+            border-radius: 50px;
+            padding: 6px 10px;
+            display: none;
+            gap: 4px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+            z-index: 50;
+            white-space: nowrap;
+            /* Constrain so it never breaks the layout */
+            max-width: min(calc(100vw - 32px), 360px);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            animation: reactionPickerPop 0.18s ease-out;
+        }
+
+        .chat-reaction-picker::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chat-reaction-picker.show {
+            display: flex;
+        }
+
+        /* For own (right-aligned) messages: anchor picker to the right edge of the bubble */
+        .chat-msg.mine .chat-reaction-picker {
+            left: auto;
+            right: 0;
+        }
+
+        @keyframes reactionPickerPop {
+            from { opacity: 0; transform: translateY(0) scale(0.85); }
+            to { opacity: 1; transform: translateY(-4px) scale(1); }
+        }
+
+        .chat-reaction-picker .reaction-pick {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: all 0.15s ease;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-reaction-picker .reaction-pick:hover {
+            background: var(--theme-primary-soft);
+            transform: scale(1.25);
+        }
+
+        .chat-reaction-picker .reaction-pick:active {
+            transform: scale(0.95);
+        }
+
+        .chat-reaction-picker .reaction-pick.custom-reaction {
+            border: 1.5px dashed var(--theme-border-input);
+        }
+
+        .chat-reaction-picker .reaction-pick.custom-reaction:hover {
+            border-color: var(--theme-primary);
+        }
+
+        .chat-reaction-picker .reaction-close {
+            background: none;
+            border: none;
+            color: var(--theme-text-faint);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-reaction-picker .reaction-close:hover {
+            background: var(--theme-danger-soft);
+            color: var(--theme-danger);
+        }
+
         .chat-msg .chat-msg-time {
             font-size: 10px;
             color: var(--theme-text-faint);
@@ -2192,21 +2461,44 @@
             text-align: right;
         }
 
-        .chat-msg .chat-msg-delete {
+        .chat-msg .chat-msg-actions {
             align-self: center;
-            background: none;
-            border: none;
-            color: var(--theme-danger);
-            cursor: pointer;
-            font-size: 11px;
-            padding: 4px 6px;
+            display: flex;
+            gap: 2px;
             opacity: 0;
             transition: opacity 0.2s ease;
-            font-family: inherit;
         }
 
-        .chat-msg:hover .chat-msg-delete {
+        .chat-msg:hover .chat-msg-actions {
             opacity: 1;
+        }
+
+        .chat-msg .chat-msg-actions button {
+            background: none;
+            border: none;
+            color: var(--theme-text-dim);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px 6px;
+            border-radius: 50%;
+            transition: all 0.15s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+        }
+
+        .chat-msg .chat-msg-actions button:hover {
+            background: var(--theme-primary-soft);
+            color: var(--theme-primary);
+            transform: scale(1.1);
+        }
+
+        .chat-msg .chat-msg-actions button.delete-action:hover {
+            background: var(--theme-danger-soft);
+            color: var(--theme-danger);
         }
 
         .chat-date-divider {
@@ -2262,6 +2554,53 @@
             box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 10%, transparent);
         }
 
+        /* ===== REPLY BANNER IN CHAT INPUT ===== */
+        .chat-reply-banner {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--theme-primary-soft);
+            border-radius: 10px 10px 0 0;
+            font-size: 12px;
+            color: var(--theme-primary);
+            font-weight: 700;
+            margin-bottom: -2px;
+        }
+
+        .chat-reply-banner.show {
+            display: flex;
+        }
+
+        .chat-reply-banner .reply-banner-text {
+            flex: 1;
+            min-width: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-reply-banner .reply-banner-text strong {
+            font-weight: 800;
+        }
+
+        .chat-reply-banner button {
+            background: none;
+            border: none;
+            color: var(--theme-danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0 4px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+            font-family: inherit;
+        }
+
+        .chat-reply-banner button:hover {
+            background: color-mix(in srgb, var(--theme-danger) 12%, transparent);
+        }
+
         .chat-send-btn {
             width: 42px;
             height: 42px;
@@ -2311,6 +2650,48 @@
             border-color: var(--theme-primary);
             color: var(--theme-primary);
             background: var(--theme-primary-soft-2);
+        }
+
+        /* ★ Sidebar header action group (fullscreen + sidebar toggle) */
+        .chat-sidebar-header-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        /* Fullscreen button variant sized for the sidebar header */
+        .chat-fullscreen-btn-sidebar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1.5px solid var(--theme-border-input);
+            background: var(--theme-card);
+            color: var(--theme-text-dim);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .chat-fullscreen-btn-sidebar:hover {
+            border-color: var(--theme-primary);
+            color: var(--theme-primary);
+            background: var(--theme-primary-soft-2);
+            transform: scale(1.05);
+        }
+
+        /* Slightly larger tap target on mobile for the sidebar fullscreen button */
+        @media (max-width: 768px) {
+            .chat-fullscreen-btn-sidebar {
+                width: 36px;
+                height: 36px;
+                font-size: 14px;
+            }
         }
 
         /* ===== MOBILE CHAT BACK ===== */
@@ -5059,6 +5440,21 @@
                 grid-template-columns: 1fr;
             }
 
+            /* Fullscreen on mobile: keep the same structure */
+            .chat-container.fullscreen-chat {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 6000;
+                border-radius: 0;
+                border: none;
+                height: 100vh;
+                width: 100vw;
+            }
+
             .chat-sidebar {
                 position: absolute;
                 top: 0;
@@ -5269,6 +5665,24 @@
         }
 
         @media (max-width: 480px) {
+
+            /* Reaction picker: tighter on small phones */
+            .chat-reaction-picker {
+                padding: 5px 8px;
+                gap: 3px;
+                max-width: calc(100vw - 24px);
+            }
+
+            .chat-reaction-picker .reaction-pick {
+                font-size: 19px;
+                padding: 3px 5px;
+            }
+
+            .chat-reaction-picker .reaction-close {
+                font-size: 12px;
+                padding: 3px 5px;
+            }
+
             .hero-banner .content h1 { font-size: 18px; }
 
             .hero-banner .actions { flex-direction: column; }
@@ -5936,9 +6350,14 @@
                             <div class="chat-sidebar-header">
                                 <h4>
                                     <span><i class="fas fa-user-friends"></i> Conversations</span>
-                                    <button class="chat-sidebar-toggle" onclick="toggleChatSidebar()" title="Hide sidebar" style="display:none;">
-                                        <i class="fas fa-chevron-left"></i>
-                                    </button>
+                                    <span class="chat-sidebar-header-actions">
+                                        <button class="chat-fullscreen-btn chat-fullscreen-btn-sidebar" id="chatFullscreenBtnSidebar" onclick="toggleChatFullscreen()" title="Toggle fullscreen">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                        <button class="chat-sidebar-toggle" onclick="toggleChatSidebar()" title="Hide sidebar" style="display:none;">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                    </span>
                                 </h4>
                                 <button class="chat-new-msg-btn" onclick="openNewMessageModal()">
                                     <i class="fas fa-plus"></i> New Message
@@ -5965,9 +6384,18 @@
                                     <div class="chat-header-name" id="chatHeaderName"></div>
                                     <div class="chat-header-status" id="chatHeaderStatus"></div>
                                 </div>
+                                <button class="chat-fullscreen-btn" id="chatFullscreenBtn" onclick="toggleChatFullscreen()" title="Toggle fullscreen">
+                                    <i class="fas fa-expand"></i>
+                                </button>
                             </div>
                             <div class="chat-body" id="chatBody" style="display:none;"></div>
                             <div class="chat-input-wrap" id="chatInputWrap" style="display:none;">
+                                <div class="chat-reply-banner" id="chatReplyBanner">
+                                    <span class="reply-banner-text">Replying to <strong id="chatReplyToName"></strong></span>
+                                    <button type="button" onclick="cancelChatReply()" title="Cancel reply">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
                                 <div class="chat-input-row">
                                     <div class="chat-input-stack">
                                         <div class="mention-dropdown" id="chatMentionDropdown"></div>
@@ -6795,6 +7223,57 @@
         const CHAT_POLL_INTERVAL_MS = 5000;
         const LAST_VISIT_THROTTLE_MS = 5 * 60 * 1000;
 
+        // ===== REACTION SYSTEM =====
+        const DEFAULT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🔥'];
+        const REACTIONS_STORAGE_KEY = 'timawa_chat_reactions';
+        const MAX_CUSTOM_REACTIONS = 12;
+        let chatReactions = [...DEFAULT_REACTIONS];
+
+        function loadChatReactions() {
+            try {
+                const raw = localStorage.getItem(REACTIONS_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        chatReactions = parsed.slice(0, MAX_CUSTOM_REACTIONS);
+                        return;
+                    }
+                }
+            } catch (e) { /* ignore */ }
+            chatReactions = [...DEFAULT_REACTIONS];
+        }
+
+        function saveChatReactions() {
+            try {
+                localStorage.setItem(REACTIONS_STORAGE_KEY, JSON.stringify(chatReactions));
+            } catch (e) { /* ignore */ }
+        }
+
+        function resetChatReactions() {
+            chatReactions = [...DEFAULT_REACTIONS];
+            saveChatReactions();
+        }
+
+        function addCustomReaction(emoji) {
+            if (!emoji || chatReactions.includes(emoji)) return false;
+            if (chatReactions.length >= MAX_CUSTOM_REACTIONS) return false;
+            chatReactions.push(emoji);
+            saveChatReactions();
+            return true;
+        }
+
+        function removeCustomReaction(emoji) {
+            const idx = chatReactions.indexOf(emoji);
+            if (idx === -1) return false;
+            // Prevent removing the core 6 defaults
+            if (DEFAULT_REACTIONS.includes(emoji) && chatReactions.filter(r => DEFAULT_REACTIONS.includes(r)).length <= 6) return false;
+            chatReactions.splice(idx, 1);
+            saveChatReactions();
+            return true;
+        }
+
+        loadChatReactions();
+
         let currentUser = null;
         let currentUserData = null;
         let selectedFiles = [];
@@ -6891,9 +7370,15 @@
         let chatMentionDropdownOpen = false;
         let chatSquadMentionPending = false;
 
-        // ===== ★ NEW: CHAT POLLING STATE =====
-        let chatPollTimer = null;
-        let chatPollInFlight = false;
+        // ===== ★ REAL-TIME CHAT LISTENER STATE (replaces polling) =====
+        let chatMessagesListener = null;      // Active onSnapshot() unsubscribe function
+        let chatMessagesInitialLoadDone = false;
+
+        // ===== ★ NEW: CHAT REPLY STATE =====
+        let chatReplyTo = null; // { id, authorName, text }
+
+        // ===== ★ NEW: CHAT REACTION STATE =====
+        let activeReactionPickerMsgId = null;
 
         // ===== ACTIVITY TRACKER STATE =====
         let activityLoaded = false;
@@ -7281,7 +7766,9 @@
         }
 
         function detachChatListeners() {
-            stopChatPolling();
+            // Tear down the real-time message listener
+            detachChatMessagesListener();
+
             if (chatMessagesUnsubscribe) {
                 chatMessagesUnsubscribe();
                 chatMessagesUnsubscribe = null;
@@ -7295,6 +7782,8 @@
             activeChatIsGroup = false;
             chatMessages = [];
             chatLastMessages = {};
+            chatReplyTo = null;
+            hideChatReplyBanner();
         }
 
         function restoreActiveSocialTab() {
@@ -7671,6 +8160,40 @@
         }
 
         // ================================================================
+        // ===== ★ NEW: CHAT FULLSCREEN =====
+        // ================================================================
+        function toggleChatFullscreen() {
+            const container = document.getElementById('chatContainerEl');
+            const btn = document.getElementById('chatFullscreenBtn');
+            const btnSidebar = document.getElementById('chatFullscreenBtnSidebar');
+            if (!container) return;
+
+            const isFullscreen = container.classList.toggle('fullscreen-chat');
+            document.body.classList.toggle('chat-fullscreen-active', isFullscreen);
+
+            const buttons = [btn, btnSidebar].filter(Boolean);
+            buttons.forEach(b => {
+                if (isFullscreen) {
+                    b.innerHTML = '<i class="fas fa-compress"></i>';
+                    b.title = 'Exit fullscreen';
+                } else {
+                    b.innerHTML = '<i class="fas fa-expand"></i>';
+                    b.title = 'Toggle fullscreen';
+                }
+            });
+
+            if (isFullscreen) {
+                if (isMobile() && activeChatUid) {
+                    hideChatSidebar();
+                }
+            } else {
+                if (isMobile()) {
+                    showChatSidebar();
+                }
+            }
+        }
+
+        // ================================================================
         // ===== CHAT: USER LIST =====
         // ================================================================
         function loadChatUserList() {
@@ -8002,11 +8525,25 @@
         // ================================================================
 
         function chatMessagesSignature(messages) {
-        if (!messages || messages.length === 0) return '';
-        const first = messages[0]?.id || '';
-        const last = messages[messages.length - 1]?.id || '';
-        return `${messages.length}|${first}|${last}`;
-}
+            if (!messages || messages.length === 0) return '';
+
+            // Include reactions in the signature so reaction-only updates
+            // (add/remove) trigger a re-render from the listener.
+            let reactionHash = '';
+            for (const msg of messages) {
+                if (msg.reactions && typeof msg.reactions === 'object') {
+                    const entries = Object.keys(msg.reactions).sort();
+                    for (const emoji of entries) {
+                        const uids = msg.reactions[emoji];
+                        reactionHash += `${msg.id}:${emoji}:${Array.isArray(uids) ? uids.length : 0};`;
+                    }
+                }
+            }
+
+            const first = messages[0]?.id || '';
+            const last = messages[messages.length - 1]?.id || '';
+            return `${messages.length}|${first}|${last}|${reactionHash}`;
+        }
 
         function openChatWith(uid) {
             if (!chatFeatureEnabled) return;
@@ -8019,6 +8556,9 @@
             chatMessagesSignatureCache = '';
             chatHasMoreOlder = false;
             chatOldestDoc = null;
+            chatReplyTo = null;
+            hideChatReplyBanner();
+            closeChatReactionPicker();
 
             renderChatUserList();
             attachChatMessagesListener();
@@ -8042,6 +8582,9 @@
             chatMessagesSignatureCache = '';
             chatHasMoreOlder = false;
             chatOldestDoc = null;
+            chatReplyTo = null;
+            hideChatReplyBanner();
+            closeChatReactionPicker();
 
             renderChatUserList();
             attachChatMessagesListener();
@@ -8141,90 +8684,87 @@
         }
 
         // ================================================================
-        // ===== ★ OPTIMIZATION 1 & 4: CHAT POLLING (5s, visibility-aware) =====
+        // ===== ★ REAL-TIME CHAT LISTENER (replaces polling) =====
+        // Uses Firestore onSnapshot() to receive messages instantly.
+        // Cost model: 0 reads when idle, 1 read per new/changed message.
         // ================================================================
         function attachChatMessagesListener() {
-            stopChatPolling();
+            // Tear down any previous listener first
+            detachChatMessagesListener();
+
             if (!activeChatUid || !currentUser) return;
-            startChatPolling();
+
+            const myUid = currentUser.uid;
+            let query;
+
+            if (activeChatIsGroup) {
+                query = db.collection('chatMessages')
+                    .where('participantsKey', '==', GROUP_CHAT_KEY)
+                    .orderBy('createdAt', 'desc')
+                    .limit(CHAT_PAGE_SIZE);
+            } else {
+                const key = [myUid, activeChatUid].sort().join('_');
+                query = db.collection('chatMessages')
+                    .where('participantsKey', '==', key)
+                    .orderBy('createdAt', 'desc')
+                    .limit(CHAT_PAGE_SIZE);
+            }
+
+            chatMessagesInitialLoadDone = false;
+
+            chatMessagesListener = query.onSnapshot(
+                (snap) => {
+                    const items = [];
+                    snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
+                    chatMessages = items;
+
+                    chatOldestDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
+                    chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
+
+                    const newSig = chatMessagesSignature(items);
+                    if (newSig !== chatMessagesSignatureCache) {
+                        chatMessagesSignatureCache = newSig;
+                        renderChatMessages();
+                    }
+
+                    if (!activeChatIsGroup && activeChatUid) {
+                        markChatReadFrom(activeChatUid);
+                    }
+
+                    if (!chatMessagesInitialLoadDone) {
+                        chatMessagesInitialLoadDone = true;
+                    }
+                },
+                (err) => {
+                    console.warn('Chat listener error:', err.message);
+                    showToast('Chat connection lost. Retrying…', 'warn', 3000);
+                    // Firestore auto-retries internally; nothing more to do here
+                }
+            );
+        }
+
+        function detachChatMessagesListener() {
+            if (chatMessagesListener) {
+                try { chatMessagesListener(); } catch (e) { /* ignore */ }
+                chatMessagesListener = null;
+            }
+            chatMessagesInitialLoadDone = false;
+        }
+
+        // ---- Backwards-compatible shims so old call sites keep working ----
+        function stopChatPolling() {
+            detachChatMessagesListener();
+        }
+
+        function fetchChatMessagesOnce() {
+            // No-op now. The listener already delivers every change instantly.
+            // Kept so any existing calls (e.g. from sendChatMessage, toggleReaction)
+            // don't break.
         }
 
         function startChatPolling() {
-            if (chatPollTimer) clearInterval(chatPollTimer);
-
-            fetchChatMessagesOnce();
-
-            chatPollTimer = setInterval(() => {
-                if (document.visibilityState === 'hidden') return;
-                fetchChatMessagesOnce();
-            }, CHAT_POLL_INTERVAL_MS);
+            // No-op — listener handles everything. Kept for compatibility.
         }
-
-        function stopChatPolling() {
-            if (chatPollTimer) {
-                clearInterval(chatPollTimer);
-                chatPollTimer = null;
-            }
-            chatPollInFlight = false;
-        }
-
-        async function fetchChatMessagesOnce() {
-            if (chatPollInFlight) return;
-            if (!activeChatUid || !currentUser) return;
-
-            chatPollInFlight = true;
-
-            const myUid = currentUser.uid;
-
-            try {
-                let query;
-                if (activeChatIsGroup) {
-                    query = db.collection('chatMessages')
-                        .where('participantsKey', '==', GROUP_CHAT_KEY)
-                        .orderBy('createdAt', 'desc')
-                        .limit(CHAT_PAGE_SIZE);
-                } else {
-                    const key = [myUid, activeChatUid].sort().join('_');
-                    query = db.collection('chatMessages')
-                        .where('participantsKey', '==', key)
-                        .orderBy('createdAt', 'desc')
-                        .limit(CHAT_PAGE_SIZE);
-                }
-
-                const snap = await query.get();
-                const items = [];
-                snap.forEach(doc => items.push({ id: doc.id, ...doc.data() }));
-                chatMessages = items;
-
-                chatOldestDoc = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
-                chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
-
-                const newSig = chatMessagesSignature(items);
-                if (newSig !== chatMessagesSignatureCache) {
-                    chatMessagesSignatureCache = newSig;
-                    renderChatMessages();
-                }
-
-                if (!activeChatIsGroup && activeChatUid) {
-                    markChatReadFrom(activeChatUid);
-                }
-            } catch (err) {
-                console.warn('Chat poll fetch error:', err.message);
-            } finally {
-                chatPollInFlight = false;
-            }
-        }
-
-        // ================================================================
-        // ===== ★ OPTIMIZATION 4: RESUME POLLING WHEN TAB BECOMES VISIBLE =====
-        // ================================================================
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible') {
-                if (activeChatUid && chatPollTimer) {
-                    fetchChatMessagesOnce();
-                }
-            }
-        });
 
         async function markChatReadFrom(uid) {
             if (!currentUser || !uid || activeChatIsGroup) return;
@@ -8262,6 +8802,9 @@
         }
 
         async function loadOlderChatMessages() {
+            // "Load older" uses a one-time get() because we're paginating
+            // through history, not listening to live changes. This is fine
+            // and still cheaper than the old polling loop.
             if (!chatHasMoreOlder || !chatOldestDoc || !activeChatUid || !currentUser) return;
             if (chatMessages.length === 0) return;
 
@@ -8297,6 +8840,8 @@
                 chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
                 chatMessages = [...chatMessages, ...older];
 
+                // Force a re-render since the listener won't fire (no new data)
+                chatMessagesSignatureCache = '';
                 renderChatMessages();
             } catch (e) {
                 console.warn('loadOlderChatMessages error:', e.message);
@@ -8369,27 +8914,261 @@
 
                 const textHtml = renderTextWithMentions(msg.text || '', msg.mentions);
 
-                const deleteBtn = isMine
-                    ? `<button class="chat-msg-delete" onclick="deleteChatMessage('${escapeAttr(msg.id)}')" title="Delete"><i class="fas fa-trash"></i></button>`
-                    : '';
-
                 const showAuthor = activeChatIsGroup ? !isMine : !isMine;
 
+                // ★ REPLY PREVIEW
+                let replyPreviewHtml = '';
+                if (msg.replyToId) {
+                    const replyAuthor = msg.replyToAuthorName || 'Someone';
+                    const replyText = (msg.replyToText || '').slice(0, 50);
+                    replyPreviewHtml = `
+                        <div class="chat-msg-reply-preview" onclick="scrollToMessage('${escapeAttr(msg.replyToId)}')">
+                            <span class="reply-preview-author">${escapeHtml(replyAuthor)}</span>
+                            <span class="reply-preview-text">${escapeHtml(replyText)}${(msg.replyToText || '').length > 50 ? '…' : ''}</span>
+                        </div>
+                    `;
+                }
+
+                // ★ REACTIONS
+                let reactionsHtml = '';
+                if (msg.reactions && typeof msg.reactions === 'object') {
+                    const entries = Object.entries(msg.reactions).filter(([, uids]) => Array.isArray(uids) && uids.length > 0);
+                    if (entries.length > 0) {
+                        reactionsHtml = '<div class="chat-msg-reactions">';
+                        entries.forEach(([emoji, uids]) => {
+                            const isMineReaction = myUid && uids.includes(myUid);
+                            reactionsHtml += `
+                                <span class="chat-reaction-chip ${isMineReaction ? 'mine-reaction' : ''}"
+                                      onclick="event.stopPropagation(); toggleReaction('${escapeAttr(msg.id)}', '${escapeAttr(emoji)}')"
+                                      title="${uids.length} reaction${uids.length !== 1 ? 's' : ''}">
+                                    ${emoji}${uids.length > 1 ? `<span class="reaction-count">${uids.length}</span>` : ''}
+                                </span>
+                            `;
+                        });
+                        reactionsHtml += '</div>';
+                    }
+                }
+
+                // ★ ACTION BUTTONS
+                const replyBtn = `<button onclick="startChatReply('${escapeAttr(msg.id)}')" title="Reply"><i class="fas fa-reply"></i></button>`;
+                const reactBtn = `<button onclick="openReactionPicker('${escapeAttr(msg.id)}')" title="React"><i class="fas fa-smile"></i></button>`;
+                const deleteBtn = isMine
+                    ? `<button class="delete-action" onclick="deleteChatMessage('${escapeAttr(msg.id)}')" title="Delete"><i class="fas fa-trash"></i></button>`
+                    : '';
+
                 html += `
-                    <div class="chat-msg ${isMine ? 'mine' : ''}">
+                    <div class="chat-msg ${isMine ? 'mine' : ''}" data-msg-id="${escapeAttr(msg.id)}">
                         <div class="chat-msg-avatar">${avatarContent}</div>
                         <div class="chat-msg-bubble-wrap">
                             ${showAuthor ? `<div class="chat-msg-author">${escapeHtml(authorName)}</div>` : ''}
+                            ${replyPreviewHtml}
                             <div class="chat-msg-bubble">${textHtml}</div>
                             <div class="chat-msg-time">${escapeHtml(formatChatTime(createdDate))}</div>
+                            ${reactionsHtml}
                         </div>
-                        ${deleteBtn}
+                        <div class="chat-msg-actions">
+                            ${replyBtn}
+                            ${reactBtn}
+                            ${deleteBtn}
+                        </div>
                     </div>
                 `;
             });
 
             body.innerHTML = html;
             body.scrollTop = body.scrollHeight;
+        }
+
+        // ================================================================
+        // ===== ★ CHAT: REPLY FUNCTIONS =====
+        // ================================================================
+        function startChatReply(msgId) {
+            const msg = chatMessages.find(m => m.id === msgId);
+            if (!msg) return;
+
+            chatReplyTo = {
+                id: msg.id,
+                authorName: msg.senderName || 'Someone',
+                text: msg.text || ''
+            };
+
+            const banner = document.getElementById('chatReplyBanner');
+            const nameEl = document.getElementById('chatReplyToName');
+            if (banner && nameEl) {
+                nameEl.textContent = chatReplyTo.authorName;
+                banner.classList.add('show');
+            }
+
+            const input = document.getElementById('chatInput');
+            if (input) {
+                input.placeholder = `Replying to ${chatReplyTo.authorName}...`;
+                input.focus();
+            }
+        }
+
+        function cancelChatReply() {
+            chatReplyTo = null;
+            hideChatReplyBanner();
+            const input = document.getElementById('chatInput');
+            if (input) {
+                input.placeholder = activeChatIsGroup
+                    ? 'Type a message... (use @ to mention)'
+                    : 'Type a message...';
+            }
+        }
+
+        function hideChatReplyBanner() {
+            const banner = document.getElementById('chatReplyBanner');
+            if (banner) banner.classList.remove('show');
+        }
+
+        function scrollToMessage(msgId) {
+            const el = document.querySelector(`[data-msg-id="${CSS.escape(msgId)}"]`);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.style.transition = 'background 0.3s ease';
+            el.style.background = 'color-mix(in srgb, var(--theme-primary) 12%, transparent)';
+            setTimeout(() => {
+                el.style.background = '';
+            }, 1200);
+        }
+
+        // ================================================================
+        // ===== ★ CHAT: REACTION FUNCTIONS =====
+        // ================================================================
+        function openReactionPicker(msgId) {
+            // Close any existing picker first
+            closeChatReactionPicker();
+
+            // Find the message element
+            const msgEl = document.querySelector(`[data-msg-id="${CSS.escape(msgId)}"]`);
+            if (!msgEl) return;
+
+            // Remove any existing picker in this message
+            const existing = msgEl.querySelector('.chat-reaction-picker');
+            if (existing) existing.remove();
+
+            const picker = document.createElement('div');
+            picker.className = 'chat-reaction-picker show';
+            picker.id = 'activeReactionPicker';
+
+            let pickerHtml = '';
+            chatReactions.forEach(emoji => {
+                pickerHtml += `<button class="reaction-pick" data-emoji="${escapeAttr(emoji)}" title="React with ${emoji}">${emoji}</button>`;
+            });
+            pickerHtml += `<button class="reaction-pick custom-reaction" onclick="event.stopPropagation(); openCustomReactionModal('${escapeAttr(msgId)}')" title="Add custom reaction">➕</button>`;
+            pickerHtml += `<button class="reaction-close" onclick="event.stopPropagation(); closeChatReactionPicker()" title="Close"><i class="fas fa-times"></i></button>`;
+
+            picker.innerHTML = pickerHtml;
+
+            // Position: append to the message bubble wrap (already position: relative via CSS)
+            const bubbleWrap = msgEl.querySelector('.chat-msg-bubble-wrap');
+            if (bubbleWrap) {
+                bubbleWrap.appendChild(picker);
+            } else {
+                msgEl.appendChild(picker);
+            }
+
+            activeReactionPickerMsgId = msgId;
+
+            // Wire up click handlers
+            picker.querySelectorAll('.reaction-pick:not(.custom-reaction)').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const emoji = this.dataset.emoji;
+                    if (emoji) {
+                        toggleReaction(msgId, emoji);
+                        closeChatReactionPicker();
+                    }
+                });
+            });
+
+            // Close on outside click (handled globally)
+        }
+
+        function closeChatReactionPicker() {
+            const existing = document.getElementById('activeReactionPicker');
+            if (existing) existing.remove();
+            activeReactionPickerMsgId = null;
+        }
+
+        async function toggleReaction(msgId, emoji) {
+            if (!currentUser) return;
+            const myUid = currentUser.uid;
+
+            const msg = chatMessages.find(m => m.id === msgId);
+            if (!msg) return;
+
+            const reactions = msg.reactions || {};
+            const uids = Array.isArray(reactions[emoji]) ? [...reactions[emoji]] : [];
+
+            const idx = uids.indexOf(myUid);
+            if (idx === -1) {
+                uids.push(myUid);
+            } else {
+                uids.splice(idx, 1);
+            }
+
+            // Build the updated reactions object
+            const newReactions = { ...reactions };
+            if (uids.length > 0) {
+                newReactions[emoji] = uids;
+            } else {
+                delete newReactions[emoji];
+            }
+
+            // Optimistic local update
+            const msgIndex = chatMessages.findIndex(m => m.id === msgId);
+            if (msgIndex !== -1) {
+                chatMessages[msgIndex] = { ...chatMessages[msgIndex], reactions: newReactions };
+                chatMessagesSignatureCache = ''; // force re-render
+                renderChatMessages();
+            }
+
+            try {
+                await db.collection('chatMessages').doc(msgId).update({
+                    reactions: newReactions
+                });
+                // The live listener will push the updated reactions to all clients.
+            } catch (err) {
+                console.warn('toggleReaction error:', err);
+                showToast('Could not save reaction: ' + err.message, 'error');
+                // Revert the optimistic update by forcing a re-render from
+                // the last known server state (the listener will also correct it).
+                chatMessagesSignatureCache = '';
+                renderChatMessages();
+            }
+        }
+
+        // Custom reaction modal
+        function openCustomReactionModal(msgId) {
+            // Simple prompt-based approach — lightweight and works everywhere
+            const currentList = chatReactions.join(' ');
+            const input = prompt(
+                `Current reactions: ${currentList}\n\nEnter a custom emoji to add (max ${MAX_CUSTOM_REACTIONS} total):`,
+                ''
+            );
+            if (!input) return;
+
+            const emoji = input.trim().slice(0, 4); // allow up to 4 chars for emoji sequences
+            if (!emoji) return;
+
+            if (chatReactions.includes(emoji)) {
+                showToast('That reaction is already in your list.', 'warn');
+                return;
+            }
+
+            if (chatReactions.length >= MAX_CUSTOM_REACTIONS) {
+                showToast(`You can only have ${MAX_CUSTOM_REACTIONS} reactions. Remove one first.`, 'warn');
+                return;
+            }
+
+            addCustomReaction(emoji);
+            showToast(`Added ${emoji} to your reactions!`, 'success');
+
+            // Re-open the picker for the same message
+            closeChatReactionPicker();
+            setTimeout(() => openReactionPicker(msgId), 200);
         }
 
         // ================================================================
@@ -8433,8 +9212,16 @@
                     hasSquadMention: hasSquadMention || false,
                     read: false,
                     isGroup: activeChatIsGroup || false,
+                    reactions: {},
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
+
+                // ★ REPLY DATA
+                if (chatReplyTo) {
+                    msgData.replyToId = chatReplyTo.id;
+                    msgData.replyToAuthorName = chatReplyTo.authorName;
+                    msgData.replyToText = chatReplyTo.text;
+                }
 
                 if (activeChatIsGroup) {
                     msgData.receiverUid = '';
@@ -8480,11 +9267,13 @@
                 chatSquadMentionPending = false;
                 autoResizeChatInput();
                 closeChatMentionDropdown();
+                cancelChatReply();
 
                 loadChatConversationsSummary();
 
+                // The live listener will push the new message to all clients
+                // automatically — no manual re-fetch needed.
                 chatMessagesSignatureCache = '';
-                fetchChatMessagesOnce();
             } catch (e) {
                 console.error('sendChatMessage error:', e);
                 showToast('Could not send message: ' + e.message, 'error');
@@ -8504,7 +9293,7 @@
                     try {
                         await db.collection('chatMessages').doc(id).delete();
                         chatMessagesSignatureCache = '';
-                        fetchChatMessagesOnce();
+                        // The listener will remove the message from the UI automatically.
                         showToast('Message deleted', 'success', 2000);
                     } catch (e) {
                         showToast('Could not delete message: ' + e.message, 'error');
@@ -8514,7 +9303,7 @@
         }
 
         // ================================================================
-        // ===== DIRECT MESSAGE NOTIFICATIONS =====
+        // ===== ★ OPTIMIZED: DIRECT MESSAGE NOTIFICATIONS (ONE PER CONVO) =====
         // ================================================================
         async function createDirectMessageNotification({
             receiverUid,
@@ -8526,25 +9315,46 @@
             if (receiverUid === senderUid) return;
 
             try {
-                const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
-                const snippet = (text || '').slice(0, 80) + ((text || '').length > 80 ? '...' : '');
+                // Check if there's already an unread chat notification from this sender
+                // If so, just update the message preview and timestamp instead of creating a new one
+                const existingSnap = await db.collection('announcements')
+                    .where('type', '==', 'chat')
+                    .where('targetUid', '==', receiverUid)
+                    .where('referenceId', '==', `dm_${senderUid}`)
+                    .limit(1)
+                    .get();
 
-                await db.collection('announcements').add({
-                    type: 'chat',
-                    title: `💬 ${senderName} sent you a message`,
-                    message: `"${snippet}"`,
-                    icon: '💬',
-                    priority: 'info',
-                    link: 'dashboard.html',
-                    linkLabel: 'Open Chat',
-                    targetUid: receiverUid,
-                    referenceId: `dm_${senderUid}`,
-                    readBy: [],
-                    createdBy: 'system',
-                    createdByName: 'System',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    expiresAt
-                });
+                const snippet = (text || '').slice(0, 80) + ((text || '').length > 80 ? '...' : '');
+                const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+                if (!existingSnap.empty) {
+                    // Update existing notification — just refresh the message and timestamp
+                    const docRef = existingSnap.docs[0].ref;
+                    await docRef.update({
+                        message: `"${snippet}"`,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt: expiresAt,
+                        readBy: [] // mark as unread again
+                    });
+                } else {
+                    // Create a new notification
+                    await db.collection('announcements').add({
+                        type: 'chat',
+                        title: `💬 ${senderName} has a new message for you`,
+                        message: `"${snippet}"`,
+                        icon: '💬',
+                        priority: 'info',
+                        link: 'dashboard.html',
+                        linkLabel: 'Open Chat',
+                        targetUid: receiverUid,
+                        referenceId: `dm_${senderUid}`,
+                        readBy: [],
+                        createdBy: 'system',
+                        createdByName: 'System',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        expiresAt
+                    });
+                }
             } catch (err) {
                 console.warn('createDirectMessageNotification error:', err);
             }
@@ -12859,6 +13669,14 @@
                 closeAnnouncementPopup();
             }
         }
+
+        // Close reaction picker when clicking outside
+        if (activeReactionPickerMsgId) {
+            const picker = document.getElementById('activeReactionPicker');
+            if (picker && !picker.contains(event.target) && !event.target.closest('[onclick*="openReactionPicker"]')) {
+                closeChatReactionPicker();
+            }
+        }
     };
 
         document.addEventListener('keydown', function(e) {
@@ -12875,6 +13693,7 @@
                 else if (document.getElementById('announcementViewModal').classList.contains('active')) closeAnnouncementView();
                 else if (document.getElementById('titaPanel').classList.contains('open')) closeTitaPanel();
                 else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
+                else if (activeReactionPickerMsgId) closeChatReactionPicker();
             }
         });
 
