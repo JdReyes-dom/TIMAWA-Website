@@ -6713,6 +6713,73 @@
             box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 35%, transparent);
         }
 
+        /* ================================================================
+           ===== ★ DESKTOP: hover-triggered "⋯" button =====
+           The button is rendered inside the bubble-wrap (added by JS)
+           and only shown on hover for non-touch devices.
+           ================================================================ */
+        .chat-msg-more-btn {
+            display: none; /* shown only on hover-capable devices */
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid var(--theme-border);
+            background: var(--theme-card);
+            color: var(--theme-text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            opacity: 0;
+            transition: opacity 0.18s ease, transform 0.18s ease, background 0.18s ease;
+            z-index: 3;
+            font-family: inherit;
+            padding: 0;
+        }
+
+        .chat-msg-more-btn:hover {
+            background: var(--theme-primary-soft);
+            color: var(--theme-primary);
+            transform: translateY(-50%) scale(1.08);
+        }
+
+        /* Show the button only on hover-capable (desktop) devices */
+        @media (hover: hover) and (pointer: fine) {
+            .chat-msg-more-btn {
+                display: flex;
+            }
+            .chat-msg:hover .chat-msg-more-btn {
+                opacity: 1;
+            }
+            /* Keep the hover state while the sheet is open */
+            .chat-msg.long-press-active .chat-msg-more-btn {
+                opacity: 1;
+            }
+        }
+
+        /* Positioning: incoming messages → button on the right of the wrap;
+           own messages → button on the left of the wrap. */
+        .chat-msg:not(.mine) .chat-msg-more-btn {
+            left: calc(100% + 6px);
+        }
+        .chat-msg.mine .chat-msg-more-btn {
+            right: calc(100% + 6px);
+        }
+
+        /* Reserve horizontal room on desktop so the button doesn't clip */
+        @media (hover: hover) and (pointer: fine) {
+            .chat-msg:not(.mine) {
+                margin-right: 40px;
+            }
+            .chat-msg.mine {
+                margin-left: 40px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -9625,6 +9692,9 @@
                             <div class="chat-msg-bubble">${textHtml}</div>
                             <div class="chat-msg-time">${escapeHtml(formatChatTime(createdDate))}</div>
                             ${reactionsHtml}
+                            <button type="button" class="chat-msg-more-btn" data-msg-id="${escapeAttr(msg.id)}" title="More options" aria-label="More options">
+                                <i class="fas fa-ellipsis-h"></i>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -9727,6 +9797,18 @@
                     e.preventDefault();
                     openMsgActionSheet(this.dataset.msgId);
                 });
+
+                // ---- Desktop: "⋯" button opens the sheet ----
+                const moreBtn = msgEl.querySelector('.chat-msg-more-btn');
+                if (moreBtn && moreBtn.dataset.bound !== '1') {
+                    moreBtn.dataset.bound = '1';
+                    moreBtn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        const id = this.dataset.msgId;
+                        if (id) openMsgActionSheet(id);
+                    });
+                }
             });
         }
 
