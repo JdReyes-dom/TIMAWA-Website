@@ -5499,6 +5499,9 @@
                 background: var(--theme-card);
                 transform: translateX(100%);
                 transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
             }
 
             .chat-main.visible {
@@ -5516,6 +5519,7 @@
             .chat-header {
                 padding: 10px 12px;
                 gap: 8px;
+                flex-shrink: 0;
             }
 
             .chat-header .chat-header-avatar {
@@ -5528,8 +5532,13 @@
                 font-size: 14px;
             }
 
+            /* Chat body: fills the space between header and input */
             .chat-body {
                 padding: 10px 12px;
+                flex: 1 1 auto;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                min-height: 0;
             }
 
             .chat-msg {
@@ -5537,7 +5546,12 @@
             }
 
             .chat-input-wrap {
-                padding: 8px 10px;
+                padding: 8px 10px 12px;
+                flex-shrink: 0;
+                background: var(--theme-card);
+                border-top: 1px solid var(--theme-border);
+                position: relative;
+                z-index: 6;
             }
 
             .chat-input-stack textarea {
@@ -6140,6 +6154,311 @@
             .toast { min-width: 0; max-width: none; }
             .loading-overlay .pl { width: 5em; height: 5em; }
         }
+
+        /* ================================================================
+           ===== ★ REACTION CUSTOMIZE MODAL =====
+           ================================================================ */
+        .reaction-customize-modal .modal-content {
+            background: var(--theme-card);
+            border-radius: 24px;
+            padding: 0;
+            max-width: 460px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px color-mix(in srgb, var(--theme-primary) 35%, transparent);
+            color: var(--theme-text);
+            position: relative;
+            animation: reactionCustomizePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes reactionCustomizePop {
+            from { transform: scale(0.92) translateY(14px); opacity: 0; }
+            to   { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .reaction-customize-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: color-mix(in srgb, var(--theme-primary) 10%, transparent);
+            border: none;
+            color: var(--theme-text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.22s ease;
+            z-index: 2;
+        }
+
+        .reaction-customize-close:hover {
+            background: var(--theme-danger-soft);
+            color: var(--theme-danger);
+            transform: rotate(90deg);
+        }
+
+        .reaction-customize-header {
+            padding: 26px 26px 16px;
+            text-align: center;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--theme-primary) 10%, var(--theme-card)) 0%,
+                color-mix(in srgb, var(--theme-primary) 18%, var(--theme-card)) 100%);
+            border-radius: 24px 24px 0 0;
+            border-bottom: 1px solid var(--theme-border);
+        }
+
+        .reaction-customize-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--theme-gradient);
+            color: white;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            box-shadow: 0 8px 22px color-mix(in srgb, var(--theme-primary) 35%, transparent);
+        }
+
+        .reaction-customize-header h2 {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--theme-text);
+            margin: 0 0 4px;
+            display: block;
+        }
+
+        .reaction-customize-header p {
+            font-size: 12.5px;
+            color: var(--theme-text-muted);
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .reaction-customize-body {
+            padding: 20px 26px 8px;
+        }
+
+        .reaction-customize-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--theme-text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 10px;
+        }
+
+        .reaction-customize-label i {
+            color: var(--theme-primary);
+            font-size: 12px;
+        }
+
+        .reaction-customize-slots {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .reaction-slot {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 14px;
+            border: 2px solid var(--theme-border-input);
+            background: var(--theme-bg-soft);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            padding: 0;
+            min-width: 0;
+        }
+
+        .reaction-slot:hover {
+            border-color: var(--theme-primary);
+            background: var(--theme-primary-soft-2);
+            transform: translateY(-2px);
+        }
+
+        .reaction-slot.selected {
+            border-color: var(--theme-primary);
+            background: var(--theme-primary-soft);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 22%, transparent);
+        }
+
+        .reaction-slot.customized::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--theme-primary);
+            box-shadow: 0 0 0 2px var(--theme-card);
+        }
+
+        .reaction-slot-emoji {
+            font-size: 22px;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .reaction-slot-num {
+            position: absolute;
+            bottom: 3px;
+            right: 6px;
+            font-size: 9px;
+            font-weight: 800;
+            color: var(--theme-text-faint);
+            pointer-events: none;
+        }
+
+        .reaction-slot.selected .reaction-slot-num {
+            color: var(--theme-primary);
+        }
+
+        .reaction-customize-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+
+        .reaction-customize-input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 2px solid var(--theme-border-input);
+            background: var(--theme-bg-soft);
+            font-size: 16px;
+            font-family: inherit;
+            color: var(--theme-text);
+            transition: all 0.2s ease;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .reaction-customize-input:focus {
+            outline: none;
+            border-color: var(--theme-primary);
+            background: var(--theme-card);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 12%, transparent);
+        }
+
+        .reaction-customize-preview {
+            width: 56px;
+            min-width: 56px;
+            border-radius: 14px;
+            background: var(--theme-gradient);
+            color: white;
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px color-mix(in srgb, var(--theme-primary) 30%, transparent);
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+
+        .reaction-customize-preview:active {
+            transform: scale(0.94);
+        }
+
+        .reaction-customize-hint {
+            font-size: 11.5px;
+            color: var(--theme-text-dim);
+            background: var(--theme-primary-soft-2);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.4;
+        }
+
+        .reaction-customize-hint i {
+            color: var(--theme-warn);
+            flex-shrink: 0;
+        }
+
+        .reaction-customize-actions {
+            display: flex;
+            gap: 8px;
+            padding: 18px 26px 22px;
+            flex-wrap: wrap;
+        }
+
+        .reaction-customize-actions button {
+            flex: 1;
+            min-width: 110px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .reaction-customize-reset {
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-muted);
+        }
+
+        .reaction-customize-reset:hover {
+            background: var(--theme-warn-soft);
+            color: var(--theme-warn);
+        }
+
+        .reaction-customize-reset-slot {
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-muted);
+        }
+
+        .reaction-customize-reset-slot:hover {
+            background: var(--theme-primary-soft);
+            color: var(--theme-primary);
+        }
+
+        .reaction-customize-actions .btn-primary {
+            background: var(--theme-gradient);
+            color: white;
+            box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+        }
+
+        .reaction-customize-actions .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px -6px color-mix(in srgb, var(--theme-primary) 65%, transparent);
+        }
+
+        @media (max-width: 480px) {
+            .reaction-customize-header { padding: 22px 18px 14px; }
+            .reaction-customize-body { padding: 18px 18px 6px; }
+            .reaction-customize-actions { padding: 16px 18px 20px; }
+            .reaction-customize-slots { gap: 6px; }
+            .reaction-slot { border-radius: 12px; }
+            .reaction-slot-emoji { font-size: 18px; }
+            .reaction-customize-preview { width: 48px; min-width: 48px; font-size: 22px; }
+            .reaction-customize-actions button { min-width: 0; flex: 1 1 40%; }
+        }
     </style>
 </head>
 <body>
@@ -6667,6 +6986,64 @@
             <button class="fullview-download" onclick="downloadFullViewImage()" title="Download">
                 <i class="fas fa-download"></i>
             </button>
+        </div>
+    </div>
+
+    <!-- ===== ★ REACTION CUSTOMIZE MODAL ===== -->
+    <div id="reactionCustomizeModal" class="modal reaction-customize-modal">
+        <div class="modal-content">
+            <button class="reaction-customize-close" onclick="closeReactionCustomizeModal()" title="Close" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="reaction-customize-header">
+                <div class="reaction-customize-icon"><i class="fas fa-face-smile"></i></div>
+                <h2>Customize Reactions</h2>
+                <p>Pick a slot to replace with your own emoji. You always keep 6 slots.</p>
+            </div>
+
+            <div class="reaction-customize-body">
+                <div class="reaction-customize-label">
+                    <i class="fas fa-hand-pointer"></i>
+                    <span>Choose a slot</span>
+                </div>
+
+                <div class="reaction-customize-slots" id="reactionCustomizeSlots"></div>
+
+                <div class="reaction-customize-label" style="margin-top:20px;">
+                    <i class="fas fa-keyboard"></i>
+                    <span>New emoji for <strong id="reactionCustomizeSlotLabel">Slot 1</strong></span>
+                </div>
+
+                <div class="reaction-customize-input-row">
+                    <input type="text"
+                           id="reactionCustomizeInput"
+                           class="reaction-customize-input"
+                           placeholder="Type or paste an emoji"
+                           maxlength="4"
+                           oninput="previewReactionCustomizeInput()"
+                           onkeydown="if(event.key==='Enter'){event.preventDefault();applyReactionCustomize();}"
+                           autocomplete="off" />
+                    <div class="reaction-customize-preview" id="reactionCustomizePreview">👍</div>
+                </div>
+
+                <div class="reaction-customize-hint">
+                    <i class="fas fa-lightbulb"></i>
+                    Tip: you can paste any emoji — try 😎 🥳 🤯 💀 🫡 🎉
+                </div>
+            </div>
+
+            <div class="reaction-customize-actions">
+                <button type="button" class="btn-secondary reaction-customize-reset" onclick="resetAllReactionSlots()">
+                    <i class="fas fa-rotate-left"></i> Reset all
+                </button>
+                <button type="button" class="btn-secondary reaction-customize-reset-slot" onclick="resetReactionCustomizeSlot()">
+                    <i class="fas fa-undo"></i> Reset slot
+                </button>
+                <button type="button" class="btn-primary" onclick="applyReactionCustomize()">
+                    <i class="fas fa-check"></i> Apply
+                </button>
+            </div>
         </div>
     </div>
 
@@ -7223,10 +7600,10 @@
         const CHAT_POLL_INTERVAL_MS = 5000;
         const LAST_VISIT_THROTTLE_MS = 5 * 60 * 1000;
 
-        // ===== REACTION SYSTEM =====
+        // ===== REACTION SYSTEM (6 fixed slots, each replaceable) =====
         const DEFAULT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🔥'];
         const REACTIONS_STORAGE_KEY = 'timawa_chat_reactions';
-        const MAX_CUSTOM_REACTIONS = 12;
+        const REACTION_SLOT_COUNT = 6;
         let chatReactions = [...DEFAULT_REACTIONS];
 
         function loadChatReactions() {
@@ -7234,8 +7611,13 @@
                 const raw = localStorage.getItem(REACTIONS_STORAGE_KEY);
                 if (raw) {
                     const parsed = JSON.parse(raw);
-                    if (Array.isArray(parsed) && parsed.length > 0) {
-                        chatReactions = parsed.slice(0, MAX_CUSTOM_REACTIONS);
+                    if (Array.isArray(parsed)) {
+                        // Always normalize to exactly 6 slots
+                        const padded = parsed.slice(0, REACTION_SLOT_COUNT);
+                        while (padded.length < REACTION_SLOT_COUNT) {
+                            padded.push(DEFAULT_REACTIONS[padded.length] || '👍');
+                        }
+                        chatReactions = padded;
                         return;
                     }
                 }
@@ -7254,20 +7636,20 @@
             saveChatReactions();
         }
 
-        function addCustomReaction(emoji) {
-            if (!emoji || chatReactions.includes(emoji)) return false;
-            if (chatReactions.length >= MAX_CUSTOM_REACTIONS) return false;
-            chatReactions.push(emoji);
+        // Replace the emoji in a specific slot (0-5). Returns true on success.
+        function setReactionAtSlot(index, emoji) {
+            if (index < 0 || index >= REACTION_SLOT_COUNT) return false;
+            const trimmed = (emoji || '').trim().slice(0, 4); // allow multi-codepoint emoji
+            if (!trimmed) return false;
+            chatReactions[index] = trimmed;
             saveChatReactions();
             return true;
         }
 
-        function removeCustomReaction(emoji) {
-            const idx = chatReactions.indexOf(emoji);
-            if (idx === -1) return false;
-            // Prevent removing the core 6 defaults
-            if (DEFAULT_REACTIONS.includes(emoji) && chatReactions.filter(r => DEFAULT_REACTIONS.includes(r)).length <= 6) return false;
-            chatReactions.splice(idx, 1);
+        // Reset a single slot back to its default emoji
+        function resetReactionSlot(index) {
+            if (index < 0 || index >= REACTION_SLOT_COUNT) return false;
+            chatReactions[index] = DEFAULT_REACTIONS[index];
             saveChatReactions();
             return true;
         }
@@ -9053,10 +9435,12 @@
             picker.id = 'activeReactionPicker';
 
             let pickerHtml = '';
-            chatReactions.forEach(emoji => {
-                pickerHtml += `<button class="reaction-pick" data-emoji="${escapeAttr(emoji)}" title="React with ${emoji}">${emoji}</button>`;
-            });
-            pickerHtml += `<button class="reaction-pick custom-reaction" onclick="event.stopPropagation(); openCustomReactionModal('${escapeAttr(msgId)}')" title="Add custom reaction">➕</button>`;
+            // Always render exactly REACTION_SLOT_COUNT slots
+            for (let i = 0; i < REACTION_SLOT_COUNT; i++) {
+                const emoji = chatReactions[i] || DEFAULT_REACTIONS[i];
+                pickerHtml += `<button class="reaction-pick" data-emoji="${escapeAttr(emoji)}" data-slot="${i}" title="React with ${emoji}">${emoji}</button>`;
+            }
+            pickerHtml += `<button class="reaction-pick customize-reaction" onclick="event.stopPropagation(); openReactionCustomizeModal('${escapeAttr(msgId)}')" title="Customize reactions">✏️</button>`;
             pickerHtml += `<button class="reaction-close" onclick="event.stopPropagation(); closeChatReactionPicker()" title="Close"><i class="fas fa-times"></i></button>`;
 
             picker.innerHTML = pickerHtml;
@@ -9071,8 +9455,8 @@
 
             activeReactionPickerMsgId = msgId;
 
-            // Wire up click handlers
-            picker.querySelectorAll('.reaction-pick:not(.custom-reaction)').forEach(btn => {
+            // Wire up click handlers for the 6 reaction slots
+            picker.querySelectorAll('.reaction-pick:not(.customize-reaction)').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     const emoji = this.dataset.emoji;
@@ -9140,35 +9524,159 @@
             }
         }
 
-        // Custom reaction modal
-        function openCustomReactionModal(msgId) {
-            // Simple prompt-based approach — lightweight and works everywhere
-            const currentList = chatReactions.join(' ');
-            const input = prompt(
-                `Current reactions: ${currentList}\n\nEnter a custom emoji to add (max ${MAX_CUSTOM_REACTIONS} total):`,
-                ''
-            );
-            if (!input) return;
+        // ================================================================
+        // ===== ★ REACTION CUSTOMIZE MODAL (pick a slot, replace emoji) =====
+        // ================================================================
+        let _reactionCustomizeMsgId = null;
+        let _reactionCustomizeSelectedSlot = 0;
 
-            const emoji = input.trim().slice(0, 4); // allow up to 4 chars for emoji sequences
-            if (!emoji) return;
-
-            if (chatReactions.includes(emoji)) {
-                showToast('That reaction is already in your list.', 'warn');
-                return;
-            }
-
-            if (chatReactions.length >= MAX_CUSTOM_REACTIONS) {
-                showToast(`You can only have ${MAX_CUSTOM_REACTIONS} reactions. Remove one first.`, 'warn');
-                return;
-            }
-
-            addCustomReaction(emoji);
-            showToast(`Added ${emoji} to your reactions!`, 'success');
-
-            // Re-open the picker for the same message
+        function openReactionCustomizeModal(msgId) {
+            // Close the picker first so it doesn't overlap the modal
             closeChatReactionPicker();
-            setTimeout(() => openReactionPicker(msgId), 200);
+
+            _reactionCustomizeMsgId = msgId;
+            _reactionCustomizeSelectedSlot = 0;
+
+            const modal = document.getElementById('reactionCustomizeModal');
+            if (!modal) return;
+
+            renderReactionCustomizeSlots();
+            updateReactionCustomizeInput();
+
+            modal.classList.add('active');
+            syncModalOpenState();
+
+            // Focus the input so the user can type immediately
+            setTimeout(() => {
+                const inp = document.getElementById('reactionCustomizeInput');
+                if (inp) inp.focus();
+            }, 180);
+        }
+
+        function closeReactionCustomizeModal() {
+            const modal = document.getElementById('reactionCustomizeModal');
+            if (modal) modal.classList.remove('active');
+            _reactionCustomizeMsgId = null;
+            syncModalOpenState();
+        }
+
+        function renderReactionCustomizeSlots() {
+            const grid = document.getElementById('reactionCustomizeSlots');
+            if (!grid) return;
+
+            let html = '';
+            for (let i = 0; i < REACTION_SLOT_COUNT; i++) {
+                const emoji = chatReactions[i] || DEFAULT_REACTIONS[i];
+                const isSelected = i === _reactionCustomizeSelectedSlot;
+                const isDefault = emoji === DEFAULT_REACTIONS[i];
+                html += `
+                    <button type="button"
+                            class="reaction-slot ${isSelected ? 'selected' : ''} ${isDefault ? '' : 'customized'}"
+                            data-slot="${i}"
+                            onclick="selectReactionCustomizeSlot(${i})"
+                            title="Slot ${i + 1}">
+                        <span class="reaction-slot-emoji">${emoji}</span>
+                        <span class="reaction-slot-num">${i + 1}</span>
+                        ${!isDefault ? '<span class="reaction-slot-dot" title="Customized"></span>' : ''}
+                    </button>
+                `;
+            }
+            grid.innerHTML = html;
+        }
+
+        function selectReactionCustomizeSlot(index) {
+            _reactionCustomizeSelectedSlot = index;
+            renderReactionCustomizeSlots();
+            updateReactionCustomizeInput();
+            const inp = document.getElementById('reactionCustomizeInput');
+            if (inp) {
+                inp.focus();
+                inp.select();
+            }
+        }
+
+        function updateReactionCustomizeInput() {
+            const inp = document.getElementById('reactionCustomizeInput');
+            const preview = document.getElementById('reactionCustomizePreview');
+            const label = document.getElementById('reactionCustomizeSlotLabel');
+            if (!inp) return;
+
+            const current = chatReactions[_reactionCustomizeSelectedSlot] || DEFAULT_REACTIONS[_reactionCustomizeSelectedSlot];
+            inp.value = '';
+            inp.placeholder = `Replace slot ${_reactionCustomizeSelectedSlot + 1} (currently ${current})`;
+
+            if (label) {
+                label.textContent = `Slot ${_reactionCustomizeSelectedSlot + 1}`;
+            }
+            if (preview) {
+                preview.textContent = current;
+            }
+        }
+
+        function previewReactionCustomizeInput() {
+            const inp = document.getElementById('reactionCustomizeInput');
+            const preview = document.getElementById('reactionCustomizePreview');
+            if (!inp || !preview) return;
+            const val = (inp.value || '').trim();
+            preview.textContent = val || (chatReactions[_reactionCustomizeSelectedSlot] || DEFAULT_REACTIONS[_reactionCustomizeSelectedSlot]);
+        }
+
+        function applyReactionCustomize() {
+            const inp = document.getElementById('reactionCustomizeInput');
+            if (!inp) return;
+
+            const val = (inp.value || '').trim().slice(0, 4);
+            if (!val) {
+                showToast('Please type or paste an emoji first.', 'warn');
+                inp.focus();
+                return;
+            }
+
+            const slot = _reactionCustomizeSelectedSlot;
+            const oldEmoji = chatReactions[slot] || DEFAULT_REACTIONS[slot];
+
+            const ok = setReactionAtSlot(slot, val);
+            if (!ok) {
+                showToast('Could not update that slot.', 'error');
+                return;
+            }
+
+            showToast(`Slot ${slot + 1}: ${oldEmoji} → ${val}`, 'success');
+
+            // Re-render the slot grid
+            renderReactionCustomizeSlots();
+            updateReactionCustomizeInput();
+
+            // Close the modal and re-open the picker on the same message
+            const msgId = _reactionCustomizeMsgId;
+            closeReactionCustomizeModal();
+            if (msgId) {
+                setTimeout(() => openReactionPicker(msgId), 180);
+            }
+        }
+
+        function resetReactionCustomizeSlot() {
+            const slot = _reactionCustomizeSelectedSlot;
+            const oldEmoji = chatReactions[slot] || DEFAULT_REACTIONS[slot];
+            const defEmoji = DEFAULT_REACTIONS[slot];
+
+            if (oldEmoji === defEmoji) {
+                showToast(`Slot ${slot + 1} is already the default ${defEmoji}.`, 'info');
+                return;
+            }
+
+            resetReactionSlot(slot);
+            showToast(`Slot ${slot + 1} reset to ${defEmoji}`, 'success');
+
+            renderReactionCustomizeSlots();
+            updateReactionCustomizeInput();
+        }
+
+        function resetAllReactionSlots() {
+            resetChatReactions();
+            showToast('All 6 reactions reset to defaults', 'success');
+            renderReactionCustomizeSlots();
+            updateReactionCustomizeInput();
         }
 
         // ================================================================
@@ -13569,11 +14077,8 @@
             } catch (err) { showToast('Failed to download: ' + err.message, 'error'); }
         }
 
-        // ================================================================
-        // ===== MODAL STATE =====
-        // ================================================================
         function anyModalOpen() {
-            return ['uploadModal', 'galleryModal', 'lightboxModal', 'fullViewModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal', 'newMessageModal']
+            return ['uploadModal', 'galleryModal', 'lightboxModal', 'fullViewModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal', 'newMessageModal', 'reactionCustomizeModal']
                 .some(id => {
                     const el = document.getElementById(id);
                     return el && el.classList.contains('active');
@@ -13653,6 +14158,7 @@
         if (event.target === announcementViewModal) closeAnnouncementView();
         if (event.target === newMessageModal) closeNewMessageModal();
         if (event.target === confirmDialog) closeConfirmDialog();
+        if (event.target === document.getElementById('reactionCustomizeModal')) closeReactionCustomizeModal();
 
         if (titaPanel && titaPanel.classList.contains('open') &&
             !titaPanel.contains(event.target) &&
@@ -13681,7 +14187,8 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
+                if (document.getElementById('reactionCustomizeModal').classList.contains('active')) closeReactionCustomizeModal();
+                else if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
                 else if (document.getElementById('fullViewModal').classList.contains('active')) closeFullView();
                 else if (document.getElementById('newMessageModal').classList.contains('active')) closeNewMessageModal();
                 else if (document.getElementById('lightboxModal').classList.contains('active')) closeLightbox();
