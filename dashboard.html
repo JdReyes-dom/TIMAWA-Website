@@ -2163,6 +2163,17 @@
             background: var(--theme-bg-soft);
         }
 
+        /* ★ Reserve space on each side so out-of-bubble actions
+           never clip off the chat body edge. Only on hover/selected does
+           the space get used, but reserving it always keeps layout stable. */
+        .chat-msg:not(.mine) {
+            margin-right: 40px; /* room for actions on the right */
+        }
+
+        .chat-msg.mine {
+            margin-left: 40px; /* room for actions on the left */
+        }
+
         .chat-load-more-wrap {
             text-align: center;
             padding: 8px 0;
@@ -2494,8 +2505,8 @@
             transition: opacity 0.2s ease;
         }
 
-        .chat-msg:hover .chat-msg-actions {
-            opacity: 1;
+        .chat-msg .chat-msg-actions {
+            display: none !important;
         }
 
         .chat-msg .chat-msg-actions button {
@@ -5592,9 +5603,12 @@
                 min-height: 0;
             }
 
-            /* ---- Message layout: shrink-to-fit bubbles ---- */
+            /* ---- Message layout: real-world mobile chat bubbles ---- */
+            /* Row: [avatar] [bubble-wrap] [actions]
+               The bubble grows to fill the row minus avatar/actions,
+               and text wraps at the row's natural width — no early breaks. */
             .chat-msg {
-                max-width: 82%;
+                max-width: 88%;
                 align-items: flex-end;
             }
 
@@ -5608,24 +5622,34 @@
                 align-items: flex-start;
                 min-width: 0;
                 max-width: 100%;
+                flex: 1 1 auto;
             }
 
             .chat-msg.mine .chat-msg-bubble-wrap {
                 align-items: flex-end;
             }
 
+            /* The bubble is a plain block that fills available width.
+               Text wraps only when it truly exceeds the row width.
+               No fit-content, no inline-block, no shrink-to-word games. */
             .chat-msg .chat-msg-bubble {
-                display: inline-block;
+                display: block;
                 width: auto;
                 max-width: 100%;
-                /* Prevent Android flex items from stretching to full width */
-                align-self: flex-start;
+                min-width: 0;
+                overflow-wrap: break-word;
+                word-break: normal;
+                hyphens: none;
+                /* Prevent Android flex from collapsing the box */
+                flex: 0 1 auto;
+                box-sizing: border-box;
             }
 
             .chat-msg.mine .chat-msg-bubble {
-                align-self: flex-end;
+                margin-left: auto;
             }
 
+            /* Meta lines align with the bubble side */
             .chat-msg .chat-msg-time,
             .chat-msg .chat-msg-author {
                 align-self: flex-start;
@@ -5634,6 +5658,12 @@
             .chat-msg.mine .chat-msg-time,
             .chat-msg.mine .chat-msg-author {
                 align-self: flex-end;
+            }
+
+            /* Actions are now shown via a floating sheet on long-press.
+               Remove the old inline column styling entirely. */
+            .chat-msg .chat-msg-actions {
+                display: none !important;
             }
 
             .chat-input-wrap {
@@ -6550,6 +6580,139 @@
             .reaction-customize-preview { width: 48px; min-width: 48px; font-size: 22px; }
             .reaction-customize-actions button { min-width: 0; flex: 1 1 40%; }
         }
+
+        /* ================================================================
+           ===== ★ LONG-PRESS ACTION SHEET =====
+           ================================================================ */
+        .msg-action-sheet {
+            position: fixed;
+            z-index: 6500;
+            background: var(--theme-card);
+            border: 1px solid var(--theme-border);
+            border-radius: 18px;
+            box-shadow: 0 18px 50px -12px rgba(0, 0, 0, 0.35),
+                        0 0 0 1px color-mix(in srgb, var(--theme-primary) 8%, transparent);
+            padding: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 240px;
+            max-width: calc(100vw - 24px);
+            animation: msgActionSheetPop 0.18s ease-out;
+            color: var(--theme-text);
+        }
+
+        .msg-action-sheet.show {
+            display: flex;
+        }
+
+        @keyframes msgActionSheetPop {
+            from { opacity: 0; transform: translateY(6px) scale(0.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Row of reaction emojis */
+        .msg-action-sheet .mas-reactions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: nowrap;
+            justify-content: center;
+            padding: 4px 4px 8px;
+            border-bottom: 1px solid var(--theme-border-soft);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .msg-action-sheet .mas-reactions::-webkit-scrollbar { display: none; }
+
+        .msg-action-sheet .mas-reaction {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        .msg-action-sheet .mas-reaction:hover {
+            background: var(--theme-primary-soft);
+            transform: scale(1.15);
+        }
+
+        .msg-action-sheet .mas-reaction:active {
+            transform: scale(0.95);
+        }
+
+        /* Action buttons (Reply / Customize / Delete) */
+        .msg-action-sheet .mas-action {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--theme-text);
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s ease;
+            width: 100%;
+        }
+
+        .msg-action-sheet .mas-action:hover {
+            background: var(--theme-primary-soft-2);
+        }
+
+        .msg-action-sheet .mas-action i {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+            color: var(--theme-primary);
+        }
+
+        .msg-action-sheet .mas-action.danger {
+            color: var(--theme-danger);
+        }
+
+        .msg-action-sheet .mas-action.danger i {
+            color: var(--theme-danger);
+        }
+
+        .msg-action-sheet .mas-action.danger:hover {
+            background: var(--theme-danger-soft);
+        }
+
+        /* Backdrop to catch taps outside the sheet */
+        .msg-action-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 6400;
+            background: rgba(0, 0, 0, 0.28);
+            backdrop-filter: blur(2px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.18s ease;
+        }
+
+        .msg-action-backdrop.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Highlight the message being acted on */
+        .chat-msg.long-press-active .chat-msg-bubble {
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 35%, transparent);
+        }
+
     </style>
 </head>
 <body>
@@ -9052,6 +9215,8 @@
             chatReplyTo = null;
             hideChatReplyBanner();
             closeChatReactionPicker();
+            clearSelectedChatMsg();
+            closeMsgActionSheet();
 
             renderChatUserList();
             attachChatMessagesListener();
@@ -9078,6 +9243,8 @@
             chatReplyTo = null;
             hideChatReplyBanner();
             closeChatReactionPicker();
+            clearSelectedChatMsg();
+            closeMsgActionSheet();
 
             renderChatUserList();
             attachChatMessagesListener();
@@ -9459,18 +9626,261 @@
                             <div class="chat-msg-time">${escapeHtml(formatChatTime(createdDate))}</div>
                             ${reactionsHtml}
                         </div>
-                        <div class="chat-msg-actions">
-                            ${replyBtn}
-                            ${reactBtn}
-                            ${deleteBtn}
-                        </div>
                     </div>
                 `;
             });
 
             body.innerHTML = html;
             body.scrollTop = body.scrollHeight;
+
+            // ★ Re-bind long-press handlers after every render
+            attachChatMsgLongPress();
+
+            // ★ Close any open action sheet if its target message is gone
+            if (_actionSheetMsgId) {
+                const stillThere = body.querySelector(`[data-msg-id="${CSS.escape(_actionSheetMsgId)}"]`);
+                if (!stillThere) closeMsgActionSheet();
+            }
         }
+
+        // ================================================================
+        // ===== ★ LONG-PRESS ACTION SHEET =====
+        // ================================================================
+        let _actionSheetMsgId = null;
+        let _actionSheetEl = null;
+        let _actionSheetBackdrop = null;
+        let _longPressTimer = null;
+        let _longPressStartX = 0;
+        let _longPressStartY = 0;
+        let _longPressMoved = false;
+        const LONG_PRESS_MS = 450;
+
+        function ensureActionSheetEls() {
+            if (_actionSheetEl && _actionSheetBackdrop) return;
+
+            _actionSheetBackdrop = document.createElement('div');
+            _actionSheetBackdrop.className = 'msg-action-backdrop';
+            _actionSheetBackdrop.addEventListener('click', closeMsgActionSheet);
+            _actionSheetBackdrop.addEventListener('touchstart', closeMsgActionSheet, { passive: true });
+            document.body.appendChild(_actionSheetBackdrop);
+
+            _actionSheetEl = document.createElement('div');
+            _actionSheetEl.className = 'msg-action-sheet';
+            _actionSheetEl.addEventListener('click', (e) => e.stopPropagation());
+            document.body.appendChild(_actionSheetEl);
+        }
+
+        function attachChatMsgLongPress() {
+            const body = document.getElementById('chatBody');
+            if (!body) return;
+
+            body.querySelectorAll('.chat-msg').forEach(msgEl => {
+                if (msgEl.dataset.lpBound === '1') return;
+                msgEl.dataset.lpBound = '1';
+
+                // ---- Touch (mobile) ----
+                msgEl.addEventListener('touchstart', function(e) {
+                    const touch = e.touches[0];
+                    if (!touch) return;
+                    // Ignore if touching a picker / link
+                    if (e.target.closest('.chat-reaction-picker')) return;
+                    if (e.target.closest('a')) return;
+                    if (e.target.closest('.mention-chip')) return;
+
+                    _longPressStartX = touch.clientX;
+                    _longPressStartY = touch.clientY;
+                    _longPressMoved = false;
+
+                    if (_longPressTimer) clearTimeout(_longPressTimer);
+                    _longPressTimer = setTimeout(() => {
+                        if (!_longPressMoved) {
+                            openMsgActionSheet(this.dataset.msgId);
+                            // Haptic feedback if supported
+                            if (navigator.vibrate) { try { navigator.vibrate(15); } catch (err) {} }
+                        }
+                        _longPressTimer = null;
+                    }, LONG_PRESS_MS);
+                }, { passive: true });
+
+                msgEl.addEventListener('touchmove', function(e) {
+                    const touch = e.touches[0];
+                    if (!touch) return;
+                    const dx = Math.abs(touch.clientX - _longPressStartX);
+                    const dy = Math.abs(touch.clientY - _longPressStartY);
+                    if (dx > 10 || dy > 10) {
+                        _longPressMoved = true;
+                        if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+                    }
+                }, { passive: true });
+
+                msgEl.addEventListener('touchend', function() {
+                    if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+                });
+
+                msgEl.addEventListener('touchcancel', function() {
+                    if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
+                });
+
+                // ---- Mouse (desktop): right-click opens the sheet ----
+                msgEl.addEventListener('contextmenu', function(e) {
+                    if (e.target.closest('a')) return;
+                    e.preventDefault();
+                    openMsgActionSheet(this.dataset.msgId);
+                });
+            });
+        }
+
+        function openMsgActionSheet(msgId) {
+            if (!msgId) return;
+            const msg = chatMessages.find(m => m.id === msgId);
+            if (!msg) return;
+
+            ensureActionSheetEls();
+
+            // Hide any old picker
+            closeChatReactionPicker();
+
+            // Remove highlight from any previous target
+            document.querySelectorAll('.chat-msg.long-press-active').forEach(el => el.classList.remove('long-press-active'));
+
+            const msgEl = document.querySelector(`[data-msg-id="${CSS.escape(msgId)}"]`);
+            if (!msgEl) return;
+            msgEl.classList.add('long-press-active');
+
+            const isMine = currentUser && msg.senderUid === currentUser.uid;
+
+            // Build the sheet content
+            let reactionRow = '<div class="mas-reactions">';
+            for (let i = 0; i < REACTION_SLOT_COUNT; i++) {
+                const emoji = chatReactions[i] || DEFAULT_REACTIONS[i];
+                reactionRow += `<button type="button" class="mas-reaction" data-emoji="${escapeAttr(emoji)}" title="React ${emoji}">${emoji}</button>`;
+            }
+            reactionRow += '</div>';
+
+            let actionsHtml = '';
+            actionsHtml += `
+                <button type="button" class="mas-action" data-action="reply">
+                    <i class="fas fa-reply"></i>
+                    <span>Reply</span>
+                </button>
+            `;
+            actionsHtml += `
+                <button type="button" class="mas-action" data-action="customize">
+                    <i class="fas fa-face-smile"></i>
+                    <span>Customize reactions</span>
+                </button>
+            `;
+            if (isMine) {
+                actionsHtml += `
+                    <button type="button" class="mas-action danger" data-action="delete">
+                        <i class="fas fa-trash"></i>
+                        <span>Delete</span>
+                    </button>
+                `;
+            }
+
+            _actionSheetEl.innerHTML = reactionRow + actionsHtml;
+
+            // Wire up reactions
+            _actionSheetEl.querySelectorAll('.mas-reaction').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const emoji = btn.dataset.emoji;
+                    if (emoji) {
+                        toggleReaction(msgId, emoji);
+                        closeMsgActionSheet();
+                    }
+                });
+            });
+
+            // Wire up action buttons
+            _actionSheetEl.querySelectorAll('.mas-action').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const action = btn.dataset.action;
+                    if (action === 'reply') {
+                        startChatReply(msgId);
+                        closeMsgActionSheet();
+                    } else if (action === 'delete') {
+                        deleteChatMessage(msgId);
+                        closeMsgActionSheet();
+                    } else if (action === 'customize') {
+                        const savedId = msgId;
+                        closeMsgActionSheet();
+                        // Slight delay so the sheet finishes closing before the modal appears
+                        setTimeout(() => openReactionCustomizeModal(savedId), 120);
+                    }
+                });
+            });
+
+            // Position: measure the sheet and the target message, then choose
+            // above or below based on available space.
+            _actionSheetEl.style.visibility = 'hidden';
+            _actionSheetEl.classList.add('show');
+            _actionSheetBackdrop.classList.add('show');
+
+            _actionSheetMsgId = msgId;
+
+            // Defer measurement one frame so the sheet has layout
+            requestAnimationFrame(() => {
+                positionActionSheet(msgEl);
+                _actionSheetEl.style.visibility = '';
+            });
+        }
+
+        function positionActionSheet(msgEl) {
+            if (!_actionSheetEl || !msgEl) return;
+            const rect = msgEl.getBoundingClientRect();
+            const sheetRect = _actionSheetEl.getBoundingClientRect();
+            const vh = window.innerHeight;
+            const vw = window.innerWidth;
+            const margin = 10;
+            const gap = 8;
+
+            const spaceBelow = vh - rect.bottom - margin;
+            const spaceAbove = rect.top - margin;
+
+            let top;
+            if (spaceBelow >= sheetRect.height + gap || spaceBelow >= spaceAbove) {
+                // Place below the message
+                top = rect.bottom + gap;
+            } else {
+                // Place above
+                top = rect.top - sheetRect.height - gap;
+            }
+
+            // Clamp to viewport
+            if (top + sheetRect.height > vh - margin) top = vh - sheetRect.height - margin;
+            if (top < margin) top = margin;
+
+            // Horizontal: center on the message, clamp to viewport
+            let left = rect.left + (rect.width / 2) - (sheetRect.width / 2);
+            if (left < margin) left = margin;
+            if (left + sheetRect.width > vw - margin) left = vw - sheetRect.width - margin;
+
+            _actionSheetEl.style.top = top + 'px';
+            _actionSheetEl.style.left = left + 'px';
+        }
+
+        function closeMsgActionSheet() {
+            if (_actionSheetEl) {
+                _actionSheetEl.classList.remove('show');
+                _actionSheetEl.innerHTML = '';
+            }
+            if (_actionSheetBackdrop) {
+                _actionSheetBackdrop.classList.remove('show');
+            }
+            document.querySelectorAll('.chat-msg.long-press-active').forEach(el => el.classList.remove('long-press-active'));
+            _actionSheetMsgId = null;
+        }
+
+        // ================================================================
+        // ===== (Removed) tap-to-select — replaced by long-press sheet =====
+        // Kept as no-ops so any leftover calls don't error.
+        // ================================================================
+        function clearSelectedChatMsg() { /* no-op */ }
+        function selectChatMsg() { /* no-op */ }
+        function attachChatMsgTapHandlers() { /* no-op */ }
 
         // ================================================================
         // ===== ★ CHAT: REPLY FUNCTIONS =====
@@ -14329,6 +14739,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (document.getElementById('reactionCustomizeModal').classList.contains('active')) closeReactionCustomizeModal();
+                else if (_actionSheetMsgId) closeMsgActionSheet();
                 else if (document.body.classList.contains('chat-fullscreen-active')) toggleChatFullscreen();
                 else if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
                 else if (document.getElementById('fullViewModal').classList.contains('active')) closeFullView();
