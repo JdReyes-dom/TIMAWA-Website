@@ -2252,10 +2252,8 @@
             flex-direction: column;
             min-width: 0;
             position: relative;
-            /* Prevent the reaction picker from expanding the layout */
             max-width: 100%;
         }
-
         .chat-msg .chat-msg-author {
             font-size: 10px;
             font-weight: 700;
@@ -2338,17 +2336,49 @@
             border: none;
         }
 
-        /* ===== REACTION DISPLAY ===== */
-        .chat-msg-reactions {
+        /* ★ Meta row: timestamp + reaction chip share one line */
+        .chat-msg .chat-msg-meta-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 3px;
-            margin-top: 4px;
-            padding: 0 4px;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3px;
+            padding: 0 10px;
+            min-width: 0;
         }
 
-        .chat-msg.mine .chat-msg-reactions {
+        /* Own messages: chip first (left), date second (right) */
+        .chat-msg.mine .chat-msg-meta-row {
+            flex-direction: row;
             justify-content: flex-end;
+        }
+
+        /* Received messages: date first (left), chip second */
+        .chat-msg:not(.mine) .chat-msg-meta-row {
+            flex-direction: row;
+            justify-content: flex-start;
+        }
+
+        /* ===== REACTION DISPLAY (inline with the date, no overlap) ===== */
+        .chat-msg-reactions {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 2px;
+            /* ★ No negative margin — chip sits cleanly in the meta row */
+            margin-top: 0;
+            position: relative;
+            z-index: 5;
+            pointer-events: none;
+            flex-shrink: 0;
+        }
+
+        /* Own messages: the chip sits to the LEFT of the date */
+        .chat-msg.mine .chat-msg-reactions {
+            order: 1;
+        }
+
+        /* Received messages: the chip sits to the RIGHT of the date */
+        .chat-msg:not(.mine) .chat-msg-reactions {
+            order: 2;
         }
 
         .chat-reaction-chip {
@@ -2356,24 +2386,28 @@
             align-items: center;
             gap: 2px;
             background: var(--theme-card);
-            border: 1px solid var(--theme-border);
+            border: 1.5px solid var(--theme-border);
             border-radius: 50px;
             padding: 2px 8px 2px 6px;
-            font-size: 13px;
+            font-size: 14px;
+            line-height: 1;
             cursor: pointer;
             transition: all 0.15s ease;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
             user-select: none;
+            pointer-events: auto; /* re-enable taps on the chip itself */
         }
 
         .chat-reaction-chip:hover {
-            transform: scale(1.1);
+            transform: scale(1.15);
             border-color: var(--theme-primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
         }
 
         .chat-reaction-chip.mine-reaction {
             background: var(--theme-primary-soft);
-            border-color: color-mix(in srgb, var(--theme-primary) 30%, transparent);
+            border-color: color-mix(in srgb, var(--theme-primary) 40%, transparent);
+            box-shadow: 0 2px 6px color-mix(in srgb, var(--theme-primary) 20%, transparent);
         }
 
         .chat-reaction-chip .reaction-count {
@@ -2384,31 +2418,42 @@
         }
 
         .chat-msg.mine .chat-reaction-chip {
-            background: rgba(255, 255, 255, 0.2);
-            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
         }
 
         .chat-msg.mine .chat-reaction-chip .reaction-count {
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.9);
         }
 
-        /* ===== REACTION PICKER ===== */
+        /* ★ Kill any empty/blank reaction chip artifact */
+        .chat-reaction-chip:empty {
+            display: none;
+        }
+
+        /* ===== REACTION PICKER (Instagram-style, overlaid on the bubble top) ===== */
+        .chat-msg-bubble {
+            position: relative; /* ★ anchor for the reaction picker */
+        }
+
         .chat-reaction-picker {
             position: absolute;
             bottom: 100%;
-            left: 0;
-            margin-bottom: 6px;
+            left: 50%;
+            /* ★ Overlay: negative translateY pulls the picker DOWN so it overlaps
+            the top of the bubble by ~8px, making it feel attached. */
+            transform: translateX(-50%) translateY(8px);
             background: var(--theme-card);
             border: 1px solid var(--theme-border);
             border-radius: 50px;
-            padding: 6px 10px;
+            padding: 5px 8px;
             display: none;
-            gap: 4px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-            z-index: 50;
+            gap: 2px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.22);
+            z-index: 60;
             white-space: nowrap;
-            /* Constrain so it never breaks the layout */
-            max-width: min(calc(100vw - 32px), 360px);
+            max-width: min(calc(100vw - 32px), 340px);
             overflow-x: auto;
             overflow-y: hidden;
             scrollbar-width: none;
@@ -2424,15 +2469,22 @@
             display: flex;
         }
 
-        /* For own (right-aligned) messages: anchor picker to the right edge of the bubble */
-        .chat-msg.mine .chat-reaction-picker {
-            left: auto;
-            right: 0;
+        /* On narrow screens: keep the picker inside the bubble horizontally */
+        @media (max-width: 480px) {
+            .chat-reaction-picker {
+                left: 0;
+                transform: translateY(-8px);
+                max-width: calc(100vw - 40px);
+            }
+            .chat-msg.mine .chat-reaction-picker {
+                left: auto;
+                right: 0;
+            }
         }
 
         @keyframes reactionPickerPop {
-            from { opacity: 0; transform: translateY(0) scale(0.85); }
-            to { opacity: 1; transform: translateY(-4px) scale(1); }
+            from { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.85); }
+            to   { opacity: 1; transform: translateX(-50%) translateY(8px) scale(1); }
         }
 
         .chat-reaction-picker .reaction-pick {
@@ -2488,13 +2540,26 @@
         .chat-msg .chat-msg-time {
             font-size: 10px;
             color: var(--theme-text-faint);
-            margin-top: 3px;
-            padding: 0 10px;
+            /* ★ No top margin — it now lives in the meta row */
+            margin: 0;
+            padding: 0;
             font-weight: 600;
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+            line-height: 1;
+            /* ★ Nudge the date down slightly so it centers with the chip */
+            align-self: center;
         }
 
+        /* Own messages: date is on the right of the chip */
         .chat-msg.mine .chat-msg-time {
-            text-align: right;
+            order: 2;
+        }
+
+        /* Received messages: date is on the left of the chip */
+        .chat-msg:not(.mine) .chat-msg-time {
+            order: 1;
         }
 
         .chat-msg .chat-msg-actions {
@@ -5805,7 +5870,13 @@
             .chat-reaction-picker {
                 padding: 5px 8px;
                 gap: 3px;
-                max-width: calc(100vw - 24px);
+                max-width: calc(100vw - 40px);
+                left: 0;
+                transform: translateY(8px);
+            }
+            .chat-msg.mine .chat-reaction-picker {
+                left: auto;
+                right: 0;
             }
 
             .chat-reaction-picker .reaction-pick {
@@ -9690,8 +9761,10 @@
                             ${showAuthor ? `<div class="chat-msg-author">${escapeHtml(authorName)}</div>` : ''}
                             ${replyPreviewHtml}
                             <div class="chat-msg-bubble">${textHtml}</div>
-                            <div class="chat-msg-time">${escapeHtml(formatChatTime(createdDate))}</div>
-                            ${reactionsHtml}
+                            <div class="chat-msg-meta-row">
+                                <div class="chat-msg-time">${escapeHtml(formatChatTime(createdDate))}</div>
+                                ${reactionsHtml}
+                            </div>
                             <button type="button" class="chat-msg-more-btn" data-msg-id="${escapeAttr(msg.id)}" title="More options" aria-label="More options">
                                 <i class="fas fa-ellipsis-h"></i>
                             </button>
@@ -10048,12 +10121,15 @@
 
             picker.innerHTML = pickerHtml;
 
-            // Position: append to the message bubble wrap (already position: relative via CSS)
-            const bubbleWrap = msgEl.querySelector('.chat-msg-bubble-wrap');
-            if (bubbleWrap) {
-                bubbleWrap.appendChild(picker);
+            // ★ Anchor the picker to the BUBBLE itself (not the whole row),
+            // so it hugs the bubble like Instagram does.
+            const bubble = msgEl.querySelector('.chat-msg-bubble');
+            if (bubble) {
+                bubble.appendChild(picker);
             } else {
-                msgEl.appendChild(picker);
+                // Fallback: if no bubble, use the wrap
+                const bubbleWrap = msgEl.querySelector('.chat-msg-bubble-wrap');
+                (bubbleWrap || msgEl).appendChild(picker);
             }
 
             activeReactionPickerMsgId = msgId;
