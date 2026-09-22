@@ -3316,6 +3316,7 @@
         function closeConfirmDialog() {
             document.getElementById('confirmDialog').classList.remove('active');
             _confirmCallback = null;
+            syncBodyScrollLock();
         }
 
         document.getElementById('confirmOkBtn').addEventListener('click', () => {
@@ -3724,8 +3725,8 @@
 
         function closeAnnouncementView() {
             document.getElementById('announcementViewModal').classList.remove('active');
-            if (!anyModalOpen()) document.body.style.overflow = 'auto';
             currentAnnouncementViewId = null;
+            syncBodyScrollLock();
         }
 
         function loadAnnouncements(user) {
@@ -4441,12 +4442,12 @@
             }
 
             document.getElementById('datePopupModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
+            syncBodyScrollLock();
         }
 
         function closeDatePopup() {
             document.getElementById('datePopupModal').classList.remove('active');
-            if (!anyModalOpen()) document.body.style.overflow = 'auto';
+            syncBodyScrollLock();
         }
 
         function closeDatePopupAndAddEvent() {
@@ -4534,9 +4535,9 @@
         function closeEventModal() {
             const modal = document.getElementById('eventModal');
             modal.classList.remove('active');
-            if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('eventForm').reset();
             document.getElementById('customLocationInput').style.display = 'none';
+            syncBodyScrollLock();
         }
 
         document.getElementById('eventForm').addEventListener('submit', async function(e) {
@@ -4648,6 +4649,7 @@
         function closeMiniEvent() {
             document.getElementById('miniEventWindow').classList.remove('show');
             miniEventCurrent = null;
+            syncBodyScrollLock();
         }
 
         function openDayViewFromMini() {
@@ -4726,6 +4728,7 @@
         function closeMiniBirthday() {
             document.getElementById('miniBirthdayWindow').classList.remove('show');
             miniBirthdayCurrent = null;
+            syncBodyScrollLock();
         }
 
         function viewBirthdayInCalendar() {
@@ -4752,6 +4755,16 @@
                 || (document.getElementById('titaPanel') && document.getElementById('titaPanel').classList.contains('open'))
                 || (document.getElementById('miniEventWindow') && document.getElementById('miniEventWindow').classList.contains('show'))
                 || (document.getElementById('miniBirthdayWindow') && document.getElementById('miniBirthdayWindow').classList.contains('show'));
+        }
+
+        // ★ Centralized scroll-lock. Call this ANY time a modal/popup opens or closes.
+        // It guarantees the body is unlocked the moment nothing is open.
+        function syncBodyScrollLock() {
+            if (anyModalOpen()) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         }
 
         window.onclick = function(event) {
@@ -4782,6 +4795,11 @@
                     closeAnnouncementPopup();
                 }
             }
+
+            // ★ Safety net: after any outside click, re-sync the scroll lock.
+            // This guarantees the body is unlocked even if a close function
+            // was bypassed or an unexpected state occurred.
+            syncBodyScrollLock();
         };
 
         document.addEventListener('keydown', function(e) {
