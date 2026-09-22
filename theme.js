@@ -108,6 +108,120 @@
             <div class="shape maroon-triangle mt1"></div>
             <div class="shape maroon-triangle mt2"></div>
             <div class="shape maroon-triangle mt3"></div>
+        `,
+
+        // ============================================================
+        // ===== ★ REDESIGNED NEW THEMES (unique from old + ember + glacier)
+        // ============================================================
+
+        sakura: `
+            <div class="shape sakura-tree-branch"></div>
+            <div class="shape sakura-tree-blossoms"></div>
+            <div class="shape sakura-torii"></div>
+            <div class="shape sakura-koi-pond"></div>
+            <div class="shape sakura-falling-petal sfp1"></div>
+            <div class="shape sakura-falling-petal sfp2"></div>
+            <div class="shape sakura-falling-petal sfp3"></div>
+            <div class="shape sakura-falling-petal sfp4"></div>
+            <div class="shape sakura-falling-petal sfp5"></div>
+            <div class="shape sakura-sun-halo"></div>
+        `,
+        nebula: `
+            <div class="shape nebula-wormhole"></div>
+            <div class="shape nebula-wormhole-core"></div>
+            <div class="shape nebula-planet"></div>
+            <div class="shape nebula-planet-ring"></div>
+            <div class="shape nebula-constellation-grid"></div>
+            <div class="shape nebula-pulse-star nps1"></div>
+            <div class="shape nebula-pulse-star nps2"></div>
+            <div class="shape nebula-pulse-star nps3"></div>
+        `,
+        ember: `
+            <div class="shape ember-particle ep1"></div>
+            <div class="shape ember-particle ep2"></div>
+            <div class="shape ember-particle ep3"></div>
+            <div class="shape ember-particle ep4"></div>
+            <div class="shape ember-particle ep5"></div>
+            <div class="shape ember-particle ep6"></div>
+            <div class="shape ember-particle ep7"></div>
+            <div class="shape ember-particle ep8"></div>
+            <div class="shape ember-glow eg1"></div>
+            <div class="shape ember-glow eg2"></div>
+            <div class="shape ember-crack ec1"></div>
+            <div class="shape ember-crack ec2"></div>
+        `,
+        autumn: `
+            <div class="shape autumn-pumpkin ap1"></div>
+            <div class="shape autumn-pumpkin ap2"></div>
+            <div class="shape autumn-pumpkin ap3"></div>
+            <div class="shape autumn-leaf-tornado alt1"></div>
+            <div class="shape autumn-fence"></div>
+            <div class="shape autumn-wheat tuft1"></div>
+            <div class="shape autumn-wheat tuft2"></div>
+            <div class="shape autumn-wheat tuft3"></div>
+            <div class="shape autumn-fog af1"></div>
+        `,
+        glacier: `
+            <div class="shape glacier-shard gs1"></div>
+            <div class="shape glacier-shard gs2"></div>
+            <div class="shape glacier-shard gs3"></div>
+            <div class="shape glacier-shard gs4"></div>
+            <div class="shape glacier-shard gs5"></div>
+            <div class="shape glacier-shard gs6"></div>
+            <div class="shape glacier-sparkle gk1"></div>
+            <div class="shape glacier-sparkle gk2"></div>
+            <div class="shape glacier-sparkle gk3"></div>
+            <div class="shape glacier-sparkle gk4"></div>
+        `,
+        tropic: `
+            <div class="shape tropic-sunset-horizon"></div>
+            <div class="shape tropic-water-band"></div>
+            <div class="shape tropic-tiki tki1"></div>
+            <div class="shape tropic-tiki tki2"></div>
+            <div class="shape tropic-driftwood"></div>
+            <div class="shape tropic-foam tf1"></div>
+            <div class="shape tropic-foam tf2"></div>
+            <div class="shape tropic-foam tf3"></div>
+            <div class="shape tropic-bird tb1"></div>
+            <div class="shape tropic-bird tb2"></div>
+        `,
+        moonlit: `
+            <div class="shape moonlit-lighthouse"></div>
+            <div class="shape moonlit-beam"></div>
+            <div class="shape moonlit-water-line"></div>
+            <div class="shape moonlit-reflection mr1"></div>
+            <div class="shape moonlit-reflection mr2"></div>
+            <div class="shape moonlit-crescent"></div>
+            <div class="shape moonlit-star mls1"></div>
+            <div class="shape moonlit-star mls2"></div>
+            <div class="shape moonlit-star mls3"></div>
+            <div class="shape moonlit-star mls4"></div>
+        `,
+        aurora: `
+            <div class="shape aurora-mountain am1"></div>
+            <div class="shape aurora-mountain am2"></div>
+            <div class="shape aurora-mountain am3"></div>
+            <div class="shape aurora-curtain ac1"></div>
+            <div class="shape aurora-curtain ac2"></div>
+            <div class="shape aurora-curtain ac3"></div>
+            <div class="shape aurora-reflection-lake"></div>
+            <div class="shape aurora-snowcap as1"></div>
+            <div class="shape aurora-snowcap as2"></div>
+        `,
+        matcha: `
+            <div class="shape matcha-zen-circle mzc1"></div>
+            <div class="shape matcha-zen-circle mzc2"></div>
+            <div class="shape matcha-zen-circle mzc3"></div>
+            <div class="shape matcha-leaf ml1"></div>
+            <div class="shape matcha-leaf ml2"></div>
+            <div class="shape matcha-leaf ml3"></div>
+            <div class="shape matcha-leaf ml4"></div>
+            <div class="shape matcha-leaf ml5"></div>
+            <div class="shape matcha-steam ms1"></div>
+            <div class="shape matcha-steam ms2"></div>
+            <div class="shape matcha-shoji-grid"></div>
+            <div class="shape matcha-bamboo mb1"></div>
+            <div class="shape matcha-bamboo mb2"></div>
         `
     };
 
@@ -330,6 +444,231 @@
                 '--theme-shadow': 'rgba(165, 42, 42, 0.25)', '--theme-shadow-soft': 'rgba(165, 42, 42, 0.18)',
                 '--theme-nav-bg': 'rgba(18, 8, 8, 0.98)'
             }
+        },
+
+        // ============================================================
+        // ===== ★ REDESIGNED NEW THEMES =====
+        // ============================================================
+
+        sakura: {
+            name: 'Sakura', sub: 'Dreamy · Spring', emoji: '🌸',
+            preview: { primary: '#ff8fab', gradient: 'linear-gradient(135deg, #ffb7c5 0%, #ff8fab 100%)' },
+            light: {
+                '--theme-primary': '#ff8fab', '--theme-accent': '#ffb7c5', '--theme-primary-dark': '#e57399',
+                '--theme-primary-soft': '#ffe4ec', '--theme-primary-soft-2': '#fff0f5',
+                '--theme-bg': '#fff9fb', '--theme-bg-soft': '#fff5f8', '--theme-card': '#ffffff',
+                '--theme-text': '#3a1f2b', '--theme-text-muted': '#7a5563', '--theme-text-dim': '#a88091', '--theme-text-faint': '#d4b3bf',
+                '--theme-border': '#ffe0ea', '--theme-border-soft': '#ffeef4', '--theme-border-input': '#ffd0dd',
+                '--theme-gradient': 'linear-gradient(45deg, #ff8fab 0%, #ffb7c5 100%)',
+                '--theme-shadow': 'rgba(255, 143, 171, 0.18)', '--theme-shadow-soft': 'rgba(255, 143, 171, 0.22)',
+                '--theme-nav-bg': 'rgba(255, 249, 251, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#ffa5b8', '--theme-accent': '#ffc8d4', '--theme-primary-dark': '#e57a94',
+                '--theme-primary-soft': '#3d1f2c', '--theme-primary-soft-2': '#1e0f17',
+                '--theme-bg': '#1a0e14', '--theme-bg-soft': '#241420', '--theme-card': '#241420',
+                '--theme-text': '#fbe5ed', '--theme-text-muted': '#c9a0b3', '--theme-text-dim': '#a57a8f', '--theme-text-faint': '#7d5a6c',
+                '--theme-border': '#3a1f2c', '--theme-border-soft': '#2a1520', '--theme-border-input': '#3a1f2c',
+                '--theme-gradient': 'linear-gradient(45deg, #ffa5b8 0%, #ffc8d4 100%)',
+                '--theme-shadow': 'rgba(255, 165, 184, 0.28)', '--theme-shadow-soft': 'rgba(255, 165, 184, 0.20)',
+                '--theme-nav-bg': 'rgba(26, 14, 20, 0.98)'
+            }
+        },
+        nebula: {
+            name: 'Nebula', sub: 'Cosmic · Sci-fi', emoji: '🌌',
+            preview: { primary: '#7c3aed', gradient: 'linear-gradient(135deg, #1e1b4b 0%, #7c3aed 50%, #ec4899 100%)' },
+            light: {
+                '--theme-primary': '#7c3aed', '--theme-accent': '#ec4899', '--theme-primary-dark': '#6d28d9',
+                '--theme-primary-soft': '#2a1e4d', '--theme-primary-soft-2': '#150e26',
+                '--theme-bg': '#0a0618', '--theme-bg-soft': '#120a24', '--theme-card': '#1a1030',
+                '--theme-text': '#ede5ff', '--theme-text-muted': '#b8a8e0', '--theme-text-dim': '#8878b0', '--theme-text-faint': '#665a88',
+                '--theme-border': '#2a1e4d', '--theme-border-soft': '#1a1229', '--theme-border-input': '#2a1e4d',
+                '--theme-gradient': 'linear-gradient(45deg, #7c3aed 0%, #ec4899 100%)',
+                '--theme-shadow': 'rgba(124, 58, 237, 0.35)', '--theme-shadow-soft': 'rgba(236, 72, 153, 0.25)',
+                '--theme-nav-bg': 'rgba(10, 6, 24, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#a78bfa', '--theme-accent': '#f472b6', '--theme-primary-dark': '#8b5cf6',
+                '--theme-primary-soft': '#2a1e4d', '--theme-primary-soft-2': '#150e26',
+                '--theme-bg': '#06030f', '--theme-bg-soft': '#0e0720', '--theme-card': '#150a28',
+                '--theme-text': '#ede5ff', '--theme-text-muted': '#b8a8e0', '--theme-text-dim': '#8878b0', '--theme-text-faint': '#665a88',
+                '--theme-border': '#2a1e4d', '--theme-border-soft': '#1a1229', '--theme-border-input': '#2a1e4d',
+                '--theme-gradient': 'linear-gradient(45deg, #a78bfa 0%, #f472b6 100%)',
+                '--theme-shadow': 'rgba(167, 139, 250, 0.4)', '--theme-shadow-soft': 'rgba(244, 114, 182, 0.28)',
+                '--theme-nav-bg': 'rgba(6, 3, 15, 0.98)'
+            }
+        },
+        ember: {
+            name: 'Ember', sub: 'Intense · Fiery', emoji: '🌋',
+            preview: { primary: '#f97316', gradient: 'linear-gradient(135deg, #7c2d12 0%, #f97316 50%, #dc2626 100%)' },
+            light: {
+                '--theme-primary': '#f97316', '--theme-accent': '#dc2626', '--theme-primary-dark': '#ea580c',
+                '--theme-primary-soft': '#3d1a0a', '--theme-primary-soft-2': '#1e0e05',
+                '--theme-bg': '#1a0f08', '--theme-bg-soft': '#241812', '--theme-card': '#2a1a10',
+                '--theme-text': '#fbe8d9', '--theme-text-muted': '#c9b0a0', '--theme-text-dim': '#a58a78', '--theme-text-faint': '#7d6858',
+                '--theme-border': '#3a2015', '--theme-border-soft': '#2a1a10', '--theme-border-input': '#3a2015',
+                '--theme-gradient': 'linear-gradient(45deg, #f97316 0%, #dc2626 100%)',
+                '--theme-shadow': 'rgba(249, 115, 22, 0.35)', '--theme-shadow-soft': 'rgba(220, 38, 38, 0.28)',
+                '--theme-nav-bg': 'rgba(26, 15, 8, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#fb923c', '--theme-accent': '#ef4444', '--theme-primary-dark': '#f97316',
+                '--theme-primary-soft': '#3d1a0a', '--theme-primary-soft-2': '#1e0e05',
+                '--theme-bg': '#0f0805', '--theme-bg-soft': '#1a0f0a', '--theme-card': '#1a0f0a',
+                '--theme-text': '#fbe8d9', '--theme-text-muted': '#c9b0a0', '--theme-text-dim': '#a58a78', '--theme-text-faint': '#7d6858',
+                '--theme-border': '#3a2015', '--theme-border-soft': '#2a1a10', '--theme-border-input': '#3a2015',
+                '--theme-gradient': 'linear-gradient(45deg, #fb923c 0%, #ef4444 100%)',
+                '--theme-shadow': 'rgba(251, 146, 60, 0.4)', '--theme-shadow-soft': 'rgba(239, 68, 68, 0.3)',
+                '--theme-nav-bg': 'rgba(15, 8, 5, 0.98)'
+            }
+        },
+        autumn: {
+            name: 'Autumn', sub: 'Cozy · Harvest', emoji: '🍁',
+            preview: { primary: '#ea580c', gradient: 'linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #f59e0b 100%)' },
+            light: {
+                '--theme-primary': '#ea580c', '--theme-accent': '#f59e0b', '--theme-primary-dark': '#c2410c',
+                '--theme-primary-soft': '#fee8d4', '--theme-primary-soft-2': '#fff5ea',
+                '--theme-bg': '#fffbf5', '--theme-bg-soft': '#fdf5ea', '--theme-card': '#ffffff',
+                '--theme-text': '#3a1f0f', '--theme-text-muted': '#6b4a30', '--theme-text-dim': '#a57852', '--theme-text-faint': '#d4b096',
+                '--theme-border': '#f5e0c8', '--theme-border-soft': '#faecd8', '--theme-border-input': '#e8c8a8',
+                '--theme-gradient': 'linear-gradient(45deg, #ea580c 0%, #f59e0b 100%)',
+                '--theme-shadow': 'rgba(234, 88, 12, 0.18)', '--theme-shadow-soft': 'rgba(245, 158, 11, 0.22)',
+                '--theme-nav-bg': 'rgba(255, 251, 245, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#fb923c', '--theme-accent': '#fbbf24', '--theme-primary-dark': '#f97316',
+                '--theme-primary-soft': '#3d2010', '--theme-primary-soft-2': '#1e1008',
+                '--theme-bg': '#1a0f08', '--theme-bg-soft': '#241812', '--theme-card': '#241812',
+                '--theme-text': '#fbe8d8', '--theme-text-muted': '#c9b0a0', '--theme-text-dim': '#a58a78', '--theme-text-faint': '#7d6858',
+                '--theme-border': '#3a2015', '--theme-border-soft': '#2a1a10', '--theme-border-input': '#3a2015',
+                '--theme-gradient': 'linear-gradient(45deg, #fb923c 0%, #fbbf24 100%)',
+                '--theme-shadow': 'rgba(251, 146, 60, 0.3)', '--theme-shadow-soft': 'rgba(251, 191, 36, 0.22)',
+                '--theme-nav-bg': 'rgba(26, 15, 8, 0.98)'
+            }
+        },
+        glacier: {
+            name: 'Glacier', sub: 'Clean · Sharp', emoji: '🧊',
+            preview: { primary: '#67e8f9', gradient: 'linear-gradient(135deg, #67e8f9 0%, #bae6fd 100%)' },
+            light: {
+                '--theme-primary': '#0891b2', '--theme-accent': '#67e8f9', '--theme-primary-dark': '#0e7490',
+                '--theme-primary-soft': '#e0f7fa', '--theme-primary-soft-2': '#f0fbfd',
+                '--theme-bg': '#f8fdff', '--theme-bg-soft': '#effaff', '--theme-card': '#ffffff',
+                '--theme-text': '#0f2a35', '--theme-text-muted': '#3d5c6a', '--theme-text-dim': '#6b8a99', '--theme-text-faint': '#a0bcc7',
+                '--theme-border': '#d8f0f7', '--theme-border-soft': '#e8f7fb', '--theme-border-input': '#bfe6f0',
+                '--theme-gradient': 'linear-gradient(45deg, #0891b2 0%, #67e8f9 100%)',
+                '--theme-shadow': 'rgba(8, 145, 178, 0.15)', '--theme-shadow-soft': 'rgba(103, 232, 249, 0.22)',
+                '--theme-nav-bg': 'rgba(248, 253, 255, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#22d3ee', '--theme-accent': '#67e8f9', '--theme-primary-dark': '#06b6d4',
+                '--theme-primary-soft': '#0f2a35', '--theme-primary-soft-2': '#08181e',
+                '--theme-bg': '#061217', '--theme-bg-soft': '#0f1e24', '--theme-card': '#0f1e24',
+                '--theme-text': '#e0f7fc', '--theme-text-muted': '#a0c4d0', '--theme-text-dim': '#7a9ca8', '--theme-text-faint': '#5a7c88',
+                '--theme-border': '#1a3040', '--theme-border-soft': '#122028', '--theme-border-input': '#1a3040',
+                '--theme-gradient': 'linear-gradient(45deg, #22d3ee 0%, #67e8f9 100%)',
+                '--theme-shadow': 'rgba(34, 211, 238, 0.3)', '--theme-shadow-soft': 'rgba(103, 232, 249, 0.22)',
+                '--theme-nav-bg': 'rgba(6, 18, 23, 0.98)'
+            }
+        },
+        tropic: {
+            name: 'Tropic', sub: 'Sunset · Island', emoji: '🌴',
+            preview: { primary: '#f43f5e', gradient: 'linear-gradient(135deg, #f43f5e 0%, #fbbf24 100%)' },
+            light: {
+                '--theme-primary': '#f43f5e', '--theme-accent': '#fbbf24', '--theme-primary-dark': '#e11d48',
+                '--theme-primary-soft': '#ffe4e6', '--theme-primary-soft-2': '#fff1f2',
+                '--theme-bg': '#fffaf0', '--theme-bg-soft': '#fff5e6', '--theme-card': '#ffffff',
+                '--theme-text': '#3a1f2b', '--theme-text-muted': '#6b4a50', '--theme-text-dim': '#9c7a80', '--theme-text-faint': '#c4a5aa',
+                '--theme-border': '#ffe4d0', '--theme-border-soft': '#fff0e0', '--theme-border-input': '#fdd0b8',
+                '--theme-gradient': 'linear-gradient(45deg, #f43f5e 0%, #fbbf24 100%)',
+                '--theme-shadow': 'rgba(244, 63, 94, 0.18)', '--theme-shadow-soft': 'rgba(251, 191, 36, 0.22)',
+                '--theme-nav-bg': 'rgba(255, 250, 240, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#fb7185', '--theme-accent': '#fbbf24', '--theme-primary-dark': '#f43f5e',
+                '--theme-primary-soft': '#3d1f2b', '--theme-primary-soft-2': '#1e0f15',
+                '--theme-bg': '#1a0f10', '--theme-bg-soft': '#241818', '--theme-card': '#241818',
+                '--theme-text': '#fbe5e8', '--theme-text-muted': '#c9a0a5', '--theme-text-dim': '#a57a82', '--theme-text-faint': '#7d5a62',
+                '--theme-border': '#3a1f26', '--theme-border-soft': '#2a151b', '--theme-border-input': '#3a1f26',
+                '--theme-gradient': 'linear-gradient(45deg, #fb7185 0%, #fbbf24 100%)',
+                '--theme-shadow': 'rgba(251, 113, 133, 0.3)', '--theme-shadow-soft': 'rgba(251, 191, 36, 0.22)',
+                '--theme-nav-bg': 'rgba(26, 15, 16, 0.98)'
+            }
+        },
+        moonlit: {
+            name: 'Moonlit', sub: 'Serene · Coastal', emoji: '🌙',
+            preview: { primary: '#94a3b8', gradient: 'linear-gradient(135deg, #1e293b 0%, #94a3b8 50%, #e2e8f0 100%)' },
+            light: {
+                '--theme-primary': '#64748b', '--theme-accent': '#94a3b8', '--theme-primary-dark': '#475569',
+                '--theme-primary-soft': '#e2e8f0', '--theme-primary-soft-2': '#f1f5f9',
+                '--theme-bg': '#f8fafc', '--theme-bg-soft': '#f1f5f9', '--theme-card': '#ffffff',
+                '--theme-text': '#1e293b', '--theme-text-muted': '#475569', '--theme-text-dim': '#94a3b8', '--theme-text-faint': '#cbd5e1',
+                '--theme-border': '#e2e8f0', '--theme-border-soft': '#eef2f6', '--theme-border-input': '#cbd5e1',
+                '--theme-gradient': 'linear-gradient(45deg, #64748b 0%, #94a3b8 100%)',
+                '--theme-shadow': 'rgba(100, 116, 139, 0.15)', '--theme-shadow-soft': 'rgba(148, 163, 184, 0.22)',
+                '--theme-nav-bg': 'rgba(248, 250, 252, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#cbd5e1', '--theme-accent': '#e2e8f0', '--theme-primary-dark': '#94a3b8',
+                '--theme-primary-soft': '#1e293b', '--theme-primary-soft-2': '#0f172a',
+                '--theme-bg': '#0a1020', '--theme-bg-soft': '#141c30', '--theme-card': '#141c30',
+                '--theme-text': '#e2e8f0', '--theme-text-muted': '#a0aec4', '--theme-text-dim': '#7a8aa0', '--theme-text-faint': '#5a6a80',
+                '--theme-border': '#1f2a44', '--theme-border-soft': '#162036', '--theme-border-input': '#1f2a44',
+                '--theme-gradient': 'linear-gradient(45deg, #cbd5e1 0%, #e2e8f0 100%)',
+                '--theme-shadow': 'rgba(203, 213, 225, 0.25)', '--theme-shadow-soft': 'rgba(226, 232, 240, 0.18)',
+                '--theme-nav-bg': 'rgba(10, 16, 32, 0.98)'
+            }
+        },
+        aurora: {
+            name: 'Aurora', sub: 'Alpine · Ethereal', emoji: '🌠',
+            preview: { primary: '#34d399', gradient: 'linear-gradient(135deg, #0f172a 0%, #34d399 50%, #a78bfa 100%)' },
+            light: {
+                '--theme-primary': '#10b981', '--theme-accent': '#a78bfa', '--theme-primary-dark': '#059669',
+                '--theme-primary-soft': '#0f2a25', '--theme-primary-soft-2': '#08181a',
+                '--theme-bg': '#061414', '--theme-bg-soft': '#0f1e24', '--theme-card': '#0f1e24',
+                '--theme-text': '#e0fff4', '--theme-text-muted': '#a0d4c4', '--theme-text-dim': '#7aa89c', '--theme-text-faint': '#5a7c72',
+                '--theme-border': '#1a3028', '--theme-border-soft': '#122019', '--theme-border-input': '#1a3028',
+                '--theme-gradient': 'linear-gradient(45deg, #10b981 0%, #a78bfa 100%)',
+                '--theme-shadow': 'rgba(16, 185, 129, 0.3)', '--theme-shadow-soft': 'rgba(167, 139, 250, 0.25)',
+                '--theme-nav-bg': 'rgba(6, 20, 20, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#34d399', '--theme-accent': '#c4b5fd', '--theme-primary-dark': '#10b981',
+                '--theme-primary-soft': '#0f2a25', '--theme-primary-soft-2': '#08181a',
+                '--theme-bg': '#04100f', '--theme-bg-soft': '#0a1818', '--theme-card': '#0a1818',
+                '--theme-text': '#e0fff4', '--theme-text-muted': '#a0d4c4', '--theme-text-dim': '#7aa89c', '--theme-text-faint': '#5a7c72',
+                '--theme-border': '#1a3028', '--theme-border-soft': '#122019', '--theme-border-input': '#1a3028',
+                '--theme-gradient': 'linear-gradient(45deg, #34d399 0%, #c4b5fd 100%)',
+                '--theme-shadow': 'rgba(52, 211, 153, 0.4)', '--theme-shadow-soft': 'rgba(196, 181, 253, 0.3)',
+                '--theme-nav-bg': 'rgba(4, 16, 15, 0.98)'
+            }
+        },
+
+        // ============================================================
+        // ===== ★ MATCHA (new)
+        // ============================================================
+        matcha: {
+            name: 'Matcha', sub: 'Zen · Balanced', emoji: '🍵',
+            preview: { primary: '#84cc16', gradient: 'linear-gradient(135deg, #65a30d 0%, #a3e635 100%)' },
+            light: {
+                '--theme-primary': '#65a30d', '--theme-accent': '#a3e635', '--theme-primary-dark': '#4d7c0f',
+                '--theme-primary-soft': '#ecfccb', '--theme-primary-soft-2': '#f7fee7',
+                '--theme-bg': '#fefdf7', '--theme-bg-soft': '#f7f8ed', '--theme-card': '#ffffff',
+                '--theme-text': '#1f2a0f', '--theme-text-muted': '#4a5c2a', '--theme-text-dim': '#7a8a5c', '--theme-text-faint': '#b5c096',
+                '--theme-border': '#e8f0d0', '--theme-border-soft': '#f0f5e0', '--theme-border-input': '#d4e0a8',
+                '--theme-gradient': 'linear-gradient(45deg, #65a30d 0%, #a3e635 100%)',
+                '--theme-shadow': 'rgba(101, 163, 13, 0.15)', '--theme-shadow-soft': 'rgba(163, 230, 53, 0.22)',
+                '--theme-nav-bg': 'rgba(254, 253, 247, 0.98)'
+            },
+            dark: {
+                '--theme-primary': '#a3e635', '--theme-accent': '#bef264', '--theme-primary-dark': '#84cc16',
+                '--theme-primary-soft': '#1a2810', '--theme-primary-soft-2': '#0d1a08',
+                '--theme-bg': '#0a1408', '--theme-bg-soft': '#131f10', '--theme-card': '#131f10',
+                '--theme-text': '#e8f7d9', '--theme-text-muted': '#a8c490', '--theme-text-dim': '#7a9c60', '--theme-text-faint': '#5a7c40',
+                '--theme-border': '#1f3518', '--theme-border-soft': '#162510', '--theme-border-input': '#1f3518',
+                '--theme-gradient': 'linear-gradient(45deg, #a3e635 0%, #bef264 100%)',
+                '--theme-shadow': 'rgba(163, 230, 53, 0.3)', '--theme-shadow-soft': 'rgba(190, 242, 100, 0.22)',
+                '--theme-nav-bg': 'rgba(10, 20, 8, 0.98)'
+            }
         }
     };
 
@@ -342,17 +681,10 @@
     // ================================================================
     // ===== CORE FUNCTIONS =====
     // ================================================================
-
-    /**
-     * Inject the shape HTML for a preset into #themeBgShapes.
-     * Idempotent — only re-injects if the preset changed.
-     * Handles unknown presets gracefully (falls back to empty).
-     */
     window.injectThemeShapes = function (presetKey) {
         const container = document.getElementById('themeBgShapes');
         if (!container) return;
 
-        // Guard against invalid keys
         if (!presetKey || !window.THEME_SHAPES[presetKey]) {
             console.warn('injectThemeShapes: unknown preset "' + presetKey + '"');
             return;
@@ -364,17 +696,7 @@
         }
     };
 
-    /**
-     * Apply a theme object { preset, mode } to the document.
-     * - Sets all CSS variables on :root
-     * - Sets data-timawa-theme and data-timawa-mode
-     * - Injects shapes
-     * - Updates the <meta name="theme-color">
-     *
-     * Validates input — falls back to DEFAULT_THEME if invalid.
-     */
     window.applyTheme = function (theme) {
-        // Validate
         const safeTheme = (theme && typeof theme === 'object') ? theme : {};
         const presetKey = (safeTheme.preset && window.THEMES[safeTheme.preset])
             ? safeTheme.preset
@@ -401,14 +723,9 @@
         }
         meta.content = palette['--theme-bg'];
 
-        // Keep the global state in sync
         window.selectedTheme = { preset: presetKey, mode };
     };
 
-    /**
-     * Read the cached theme from localStorage.
-     * Returns { preset, mode } or null.
-     */
     window.readThemeFromStorage = function () {
         try {
             const raw = localStorage.getItem(window.THEME_STORAGE_KEY);
@@ -421,10 +738,6 @@
         return null;
     };
 
-    /**
-     * Save a theme to localStorage.
-     * Validates the theme object before saving.
-     */
     window.persistThemeLocally = function (theme) {
         if (!theme || typeof theme !== 'object') return;
         if (!theme.preset || !window.THEMES[theme.preset]) return;
@@ -436,10 +749,6 @@
         } catch (e) { /* ignore */ }
     };
 
-    /**
-     * Broadcast a theme change to all other tabs.
-     * Also dispatches a local CustomEvent for same-tab listeners.
-     */
     window.broadcastThemeChange = function (theme) {
         if (!theme || typeof theme !== 'object') return;
         if (!theme.preset || !window.THEMES[theme.preset]) return;
@@ -497,23 +806,10 @@
     // ================================================================
     // ===== ★ CRITICAL FIX: Re-inject shapes once DOM is ready =====
     // ================================================================
-    // The boot-time applyTheme() runs in <head> BEFORE <body> is parsed,
-    // so #themeBgShapes doesn't exist yet. That means injectThemeShapes()
-    // silently returns without adding the shape elements.
-    //
-    // We must re-run applyTheme() after the DOM is fully parsed so that
-    // the shapes actually get injected into #themeBgShapes.
-    //
-    // Also: some pages (like dashboard.html) only call applyTheme() from
-    // their auth handler IF the user has a theme saved in Firestore. If
-    // they don't, nothing re-triggers the injection — hence empty shapes.
-    // This listener guarantees the injection always happens.
-    // ================================================================
     function ensureShapesInjected() {
         const container = document.getElementById('themeBgShapes');
         if (!container) return;
 
-        // Re-read current theme from the DOM (source of truth)
         const currentPreset = document.documentElement.getAttribute('data-timawa-theme')
             || window.selectedTheme.preset
             || window.DEFAULT_THEME.preset;
@@ -521,7 +817,6 @@
             || window.selectedTheme.mode
             || window.DEFAULT_THEME.mode;
 
-        // Force re-injection by temporarily clearing the marker
         container.dataset.activeTheme = '';
         window.applyTheme({ preset: currentPreset, mode: currentMode });
     }
@@ -529,12 +824,9 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', ensureShapesInjected);
     } else {
-        // DOM already loaded (deferred scripts, etc.) — run now
         ensureShapesInjected();
     }
 
-    // Also re-check shortly after load, in case the page's auth handler
-    // delayed things
     window.addEventListener('load', () => {
         setTimeout(ensureShapesInjected, 100);
     });
