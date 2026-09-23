@@ -2876,19 +2876,31 @@
             } catch (e) { /* ignore */ }
         }
 
+        // ================================================================
+        // ===== LOCAL DATE HELPER (fixes UTC date rollover at 8AM PHT) =====
+        // Returns "YYYY-MM-DD" in the user's local timezone.
+        // ================================================================
+        function getLocalDateString(date) {
+            const d = date instanceof Date ? date : new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
         function hasAutogenRunToday(uid, kind) {
             try {
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
-                const today = new Date().toISOString().slice(0, 10);
+                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
                 return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
             } catch (e) { return false; }
         }
 
         function markAutogenRunToday(uid, kind) {
             try {
-                const today = new Date().toISOString().slice(0, 10);
+                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
                 let parsed = { date: today, kinds: {} };
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (raw) {
@@ -3235,34 +3247,38 @@
                     return;
                 }
 
-                const todayStart = new Date();
-                todayStart.setHours(0, 0, 0, 0);
+                // ✅ Use a LOCAL date-stamped referenceId for exact dedup.
+                // No timezone comparison needed — just check if today's ref exists.
+                const localDateStr = getLocalDateString();
 
                 let alreadyAnnouncedUids = new Set();
                 try {
                     const existingSnap = await db.collection('announcements')
                         .where('type', '==', 'birthday')
-                        .where('createdAt', '>=', todayStart)
+                        .where('referenceId', '>=', `${localDateStr}_`)
+                        .where('referenceId', '<', `${localDateStr}_\uf8ff`)
                         .get();
 
                     existingSnap.forEach(doc => {
                         const d = doc.data();
-                        if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
+                        if (d.referenceId) {
+                            // referenceId format: "2026-09-23_<uid>" → extract uid
+                            const parts = d.referenceId.split('_');
+                            if (parts.length >= 2) alreadyAnnouncedUids.add(parts[1]);
+                        }
                     });
                 } catch (err) {
+                    console.warn('Birthday dedup query failed, falling back:', err.message);
                     const fallbackSnap = await db.collection('announcements')
+                        .where('type', '==', 'birthday')
                         .orderBy('createdAt', 'desc')
-                        .limit(50)
+                        .limit(100)
                         .get();
                     fallbackSnap.forEach(doc => {
                         const d = doc.data();
-                        if (d.type === 'birthday' && d.referenceId) {
-                            const createdAt = d.createdAt && d.createdAt.seconds
-                                ? new Date(d.createdAt.seconds * 1000)
-                                : null;
-                            if (createdAt && createdAt >= todayStart) {
-                                alreadyAnnouncedUids.add(d.referenceId);
-                            }
+                        if (d.referenceId && d.referenceId.startsWith(`${localDateStr}_`)) {
+                            const parts = d.referenceId.split('_');
+                            if (parts.length >= 2) alreadyAnnouncedUids.add(parts[1]);
                         }
                     });
                 }
@@ -3283,7 +3299,7 @@
                         link: 'calendar.html',
                         linkLabel: 'View Calendar',
                         targetUid: '',
-                        referenceId: person.uid,
+                        referenceId: `${localDateStr}_${person.uid}`,
                         readBy: [],
                         createdBy: 'system',
                         createdByName: 'System',

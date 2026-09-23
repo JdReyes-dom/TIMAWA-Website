@@ -4404,19 +4404,31 @@
             } catch (e) { /* ignore */ }
         }
 
+        // ================================================================
+        // ===== LOCAL DATE HELPER (fixes UTC date rollover at 8AM PHT) =====
+        // Returns "YYYY-MM-DD" in the user's local timezone.
+        // ================================================================
+        function getLocalDateString(date) {
+            const d = date instanceof Date ? date : new Date();
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
         function hasAutogenRunToday(uid, kind) {
             try {
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
-                const today = new Date().toISOString().slice(0, 10);
+                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
                 return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
             } catch (e) { return false; }
         }
 
         function markAutogenRunToday(uid, kind) {
             try {
-                const today = new Date().toISOString().slice(0, 10);
+                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
                 let parsed = { date: today, kinds: {} };
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (raw) {
@@ -4768,35 +4780,38 @@
                     return;
                 }
 
-                const todayStart = new Date();
-                todayStart.setHours(0, 0, 0, 0);
+                // ✅ Use a LOCAL date-stamped referenceId for exact dedup.
+                // No timezone comparison needed — just check if today's ref exists.
+                const localDateStr = getLocalDateString();
 
                 let alreadyAnnouncedUids = new Set();
                 try {
                     const existingSnap = await db.collection('announcements')
                         .where('type', '==', 'birthday')
-                        .where('createdAt', '>=', todayStart)
+                        .where('referenceId', '>=', `${localDateStr}_`)
+                        .where('referenceId', '<', `${localDateStr}_\uf8ff`)
                         .get();
 
                     existingSnap.forEach(doc => {
                         const d = doc.data();
-                        if (d.referenceId) alreadyAnnouncedUids.add(d.referenceId);
+                        if (d.referenceId) {
+                            // referenceId format: "2026-09-23_<uid>" → extract uid
+                            const parts = d.referenceId.split('_');
+                            if (parts.length >= 2) alreadyAnnouncedUids.add(parts[1]);
+                        }
                     });
                 } catch (err) {
-                    console.warn('Birthday check query failed (may need index), falling back:', err.message);
+                    console.warn('Birthday dedup query failed, falling back:', err.message);
                     const fallbackSnap = await db.collection('announcements')
+                        .where('type', '==', 'birthday')
                         .orderBy('createdAt', 'desc')
-                        .limit(50)
+                        .limit(100)
                         .get();
                     fallbackSnap.forEach(doc => {
                         const d = doc.data();
-                        if (d.type === 'birthday' && d.referenceId) {
-                            const createdAt = d.createdAt && d.createdAt.seconds
-                                ? new Date(d.createdAt.seconds * 1000)
-                                : null;
-                            if (createdAt && createdAt >= todayStart) {
-                                alreadyAnnouncedUids.add(d.referenceId);
-                            }
+                        if (d.referenceId && d.referenceId.startsWith(`${localDateStr}_`)) {
+                            const parts = d.referenceId.split('_');
+                            if (parts.length >= 2) alreadyAnnouncedUids.add(parts[1]);
                         }
                     });
                 }
@@ -4817,7 +4832,7 @@
                         link: 'calendar.html',
                         linkLabel: 'View Calendar',
                         targetUid: '',
-                        referenceId: person.uid,
+                        referenceId: `${localDateStr}_${person.uid}`,
                         readBy: [],
                         createdBy: 'system',
                         createdByName: 'System',
@@ -4986,10 +5001,29 @@
 
         async function autoGenerateMemberAnnouncement(newUser, newUserData) {
             if (!newUser || !newUserData) return;
+
+            // ★ Claim the run IMMEDIATELY (before any async work).
+            //    This blocks multi-tab/multi-page races — the second tab
+            //    will read the flag as "already done" and bail out.
             if (hasAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid)) return;
+            markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
 
             const name = newUserData.displayName || newUserData.email || 'A new member';
+
             try {
+                // ★ Dedup at the DB level too — if a race still slips through,
+                //    or if the user clears localStorage, this prevents duplicates.
+                const existing = await db.collection('announcements')
+                    .where('type', '==', 'member')
+                    .where('referenceId', '==', newUser.uid)
+                    .limit(1)
+                    .get();
+
+                if (!existing.empty) {
+                    console.log('👥 Welcome notification already exists for', newUser.uid, '— skipping.');
+                    return;
+                }
+
                 await db.collection('announcements').add({
                     type: 'member',
                     title: `Welcome ${name}! 🎉`,
@@ -5006,7 +5040,7 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
                 });
-                markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
+                console.log('👥 Welcome notification created for', name);
             } catch (e) {
                 console.warn('welcome gen:', e.message);
             }
@@ -5067,8 +5101,8 @@
                         const created = data.createdAt.seconds
                             ? new Date(data.createdAt.seconds * 1000)
                             : new Date(data.createdAt);
-                        const ageMin = (Date.now() - created.getTime()) / 60000;
-                        if (ageMin < 5) {
+                        const ageSeconds = (Date.now() - created.getTime()) / 1000;
+                        if (ageSeconds < 90) {   // ★ was 5 minutes — now 90 seconds
                             autoGenerateMemberAnnouncement(user, data);
                         }
                     } catch (e) { /* ignore */ }

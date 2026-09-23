@@ -103,12 +103,21 @@
     // On a brand-new browser session, sessionStorage + localStorage are
     // cleared (localStorage is NOT — so we use a date-based reset below if needed).
 
+    // ===== LOCAL DATE HELPER (fixes UTC rollover at 8AM PHT) =====
+    function getLocalDateString(date) {
+        const d = date instanceof Date ? date : new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
     // ===== OPTIONAL: clear the "already written" flag daily =====
     // localStorage persists across browser restarts, so we expire the flag
-    // at midnight local time to allow a fresh count per day.
+    // at midnight LOCAL time (PHT) to allow a fresh count per day.
     (function expireSessionFlagDaily() {
         try {
-            const today = new Date().toISOString().slice(0, 10);
+            const today = getLocalDateString();  // ✅ LOCAL date (PHT)
             const storedDay = safeGet(localStorage, 'timawa_visit_day');
             if (storedDay !== today) {
                 // New day — clear all visit-written flags
