@@ -327,22 +327,68 @@
     background-repeat: repeat;
     opacity: 0.75;
 }
+/* -------- STARRY — shooting stars (left → right, tail behind head) -------- */
 .shooting-star {
     position: absolute;
-    width: 3px; height: 3px; background: #fff; border-radius: 50%;
-    box-shadow: 0 0 6px 1px rgba(255,255,255,0.6);
+    width: 80px;
+    height: 2px;
+    /* ★ Trail gradient: bright at the RIGHT end (head), fading to transparent at the LEFT (tail tip) */
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.9));
+    border-radius: 1px;
     opacity: 0;
     animation: shoot 14s ease-in infinite;
     will-change: transform, opacity;
+    transform-origin: 100% 50%;   /* ★ pivot at the bright end (head) */
 }
+/* The head dot sits exactly at the bright end */
 .shooting-star::after {
-    content: ''; position: absolute; top: 50%; right: 100%;
-    width: 60px; height: 1px;
-    background: linear-gradient(to left, rgba(255,255,255,0.7), transparent);
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -3px;              /* center the dot on the bright end */
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px 2px rgba(255,255,255,0.9);
     transform: translateY(-50%);
 }
-.shooting-star.sh1 { top: 14%; left: 80%; animation-delay: 2s; }
-.shooting-star.sh2 { top: 48%; left: 85%; animation-delay: 9s; animation-duration: 16s; }
+
+.shooting-star.sh1 {
+    top: 20%;
+    left: 10%;
+    transform: rotate(35deg);
+    animation-delay: 2s;
+}
+.shooting-star.sh2 {
+    top: 45%;
+    left: 5%;
+    transform: rotate(45deg);
+    animation-delay: 9s;
+    animation-duration: 16s;
+    animation-name: shoot2;
+    width: 100px;
+}
+
+.shooting-star.sh3 {
+    top: 55%;
+    left: 20%;
+    transform: rotate(30deg);
+    animation-delay: 5s;
+    animation-duration: 18s;
+    animation-name: shoot3;
+    width: 70px;
+}
+.shooting-star.sh4 {
+    top: 25%;
+    left: 40%;
+    transform: rotate(40deg);
+    animation-delay: 12s;
+    animation-duration: 15s;
+    animation-name: shoot4;
+    width: 90px;
+}
+
 .nebula {
     position: absolute;
     border-radius: 50%;
@@ -369,10 +415,28 @@
 }
 
 @keyframes shoot {
-    0%   { transform: translate(0, 0) rotate(-35deg); opacity: 0; }
+    0%   { transform: rotate(35deg) translateX(0); opacity: 0; }
     4%   { opacity: 1; }
-    16%  { transform: translate(-260px, 170px) rotate(-35deg); opacity: 0; }
-    100% { transform: translate(-260px, 170px) rotate(-35deg); opacity: 0; }
+    16%  { transform: rotate(35deg) translateX(280px); opacity: 0; }
+    100% { transform: rotate(35deg) translateX(280px); opacity: 0; }
+}
+@keyframes shoot2 {
+    0%   { transform: rotate(45deg) translateX(0); opacity: 0; }
+    4%   { opacity: 1; }
+    16%  { transform: rotate(45deg) translateX(340px); opacity: 0; }
+    100% { transform: rotate(45deg) translateX(340px); opacity: 0; }
+}
+@keyframes shoot3 {
+    0%   { transform: rotate(30deg) translateX(0); opacity: 0; }
+    4%   { opacity: 1; }
+    16%  { transform: rotate(30deg) translateX(320px); opacity: 0; }
+    100% { transform: rotate(30deg) translateX(320px); opacity: 0; }
+}
+@keyframes shoot4 {
+    0%   { transform: rotate(40deg) translateX(0); opacity: 0; }
+    4%   { opacity: 1; }
+    16%  { transform: rotate(40deg) translateX(260px); opacity: 0; }
+    100% { transform: rotate(40deg) translateX(260px); opacity: 0; }
 }
 @keyframes nebulaPulse {
     0%, 100% { opacity: 0.32; }

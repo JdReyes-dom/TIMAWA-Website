@@ -72,6 +72,8 @@
             <div class="shape starfield starfield-2"></div>
             <div class="shape shooting-star sh1"></div>
             <div class="shape shooting-star sh2"></div>
+            <div class="shape shooting-star sh3"></div>
+            <div class="shape shooting-star sh4"></div>
             <div class="shape nebula n1"></div>
             <div class="shape nebula n2"></div>
         `,
