@@ -18,6 +18,7 @@
     // ===== THEME SHAPES (HTML for each preset's animated background) =====
     // ================================================================
     window.THEME_SHAPES = {
+        // ★ Realistic ocean with waves, bubbles, fish
         ocean: `
             <div class="shape ocean-wave"></div>
             <div class="shape ocean-wave w2"></div>
@@ -28,45 +29,111 @@
             <div class="shape ocean-fish f1"></div>
             <div class="shape ocean-fish f2"></div>
         `,
+
+        // ★ Realistic sunset with sun, rays, clouds, birds, mountains, ground
         sunset: `
-            <div class="shape sunset-ray"></div>
-            <div class="shape sunset-glow g1"></div>
-            <div class="shape sunset-glow g2"></div>
+            <div class="shape sunset-sun-halo"></div>
+            <div class="shape sunset-sun"></div>
+            <div class="shape sunset-ray r1"></div>
+            <div class="shape sunset-ray r2"></div>
+            <div class="shape sunset-ray r3"></div>
+            <div class="shape sunset-ray r4"></div>
+            <div class="shape sunset-ray r5"></div>
+            <div class="shape sunset-ray r6"></div>
+            <div class="shape sunset-horizon"></div>
             <div class="shape sunset-cloud c1"></div>
             <div class="shape sunset-cloud c2"></div>
+            <div class="shape sunset-cloud c3"></div>
+            <div class="shape sunset-bird sb1"></div>
+            <div class="shape sunset-bird sb2"></div>
+            <div class="shape sunset-bird sb3"></div>
+            <div class="shape sunset-mountain-far mf1"></div>
+            <div class="shape sunset-mountain-far mf2"></div>
+            <div class="shape sunset-mountain m1"></div>
+            <div class="shape sunset-mountain m2"></div>
+            <div class="shape sunset-mountain m3"></div>
+            <div class="shape sunset-ground"></div>
         `,
+
+        // ★ NEW: Dreamy flower meadow (Blossom / pink)
+        //   Rolling hills + tulips + daisies + butterflies + floating petals + sun haze
         pink: `
-            <div class="shape petal p1"></div>
-            <div class="shape petal p2"></div>
-            <div class="shape petal p3"></div>
-            <div class="shape petal p4"></div>
-            <div class="shape petal p5"></div>
-            <div class="shape petal p6"></div>
-            <div class="shape blossom b1"></div>
-            <div class="shape blossom b2"></div>
-            <div class="shape blossom b3"></div>
+            <div class="shape blossom-sun-haze"></div>
+            <div class="shape blossom-meadow-hill hill-far"></div>
+            <div class="shape blossom-meadow-hill"></div>
+            <div class="shape blossom-meadow-hill hill-near"></div>
+            <div class="shape blossom-meadow-ground"></div>
+            <div class="shape blossom-tulip t1"></div>
+            <div class="shape blossom-tulip t2"></div>
+            <div class="shape blossom-tulip t3"></div>
+            <div class="shape blossom-tulip t4"></div>
+            <div class="shape blossom-tulip t5"></div>
+            <div class="shape blossom-tulip t6"></div>
+            <div class="shape blossom-tulip t7"></div>
+            <div class="shape blossom-daisy d1"></div>
+            <div class="shape blossom-daisy d2"></div>
+            <div class="shape blossom-daisy d3"></div>
+            <div class="shape blossom-daisy d4"></div>
+            <div class="shape blossom-daisy d5"></div>
+            <div class="shape blossom-floating-petal fp1"></div>
+            <div class="shape blossom-floating-petal fp2"></div>
+            <div class="shape blossom-floating-petal fp3"></div>
+            <div class="shape blossom-floating-petal fp4"></div>
+            <div class="shape blossom-floating-petal fp5"></div>
+            <div class="shape blossom-floating-petal fp6"></div>
+            <div class="shape blossom-floating-petal fp7"></div>
+            <div class="shape blossom-butterfly bf1"></div>
+            <div class="shape blossom-butterfly bf2"></div>
+            <div class="shape blossom-butterfly bf3"></div>
         `,
+
+        // ★ NEW: Layered pine forest silhouettes + moon rays + fog + spore lights
         forest: `
-            <div class="shape leaf l1"></div>
-            <div class="shape leaf l2"></div>
-            <div class="shape leaf l3"></div>
-            <div class="shape leaf l4"></div>
-            <div class="shape leaf l5"></div>
-            <div class="shape fern f1"></div>
-            <div class="shape fern f2"></div>
+            <div class="shape forest-moon-ray mr1"></div>
+            <div class="shape forest-moon-ray mr2"></div>
+            <div class="shape forest-moon-ray mr3"></div>
+            <div class="shape forest-pine-layer far"></div>
+            <div class="shape forest-pine-layer"></div>
+            <div class="shape forest-pine-layer near"></div>
+            <div class="shape forest-fog-band fb1"></div>
+            <div class="shape forest-fog-band fb2"></div>
+            <div class="shape forest-fog-band fb3"></div>
+            <div class="shape forest-moss-ground"></div>
+            <div class="shape forest-spore sp1"></div>
+            <div class="shape forest-spore sp2"></div>
+            <div class="shape forest-spore sp3"></div>
+            <div class="shape forest-spore sp4"></div>
+            <div class="shape forest-spore sp5"></div>
         `,
+
+        // ★ Realistic sunshine: sun, rays, beam, sunflowers, pollen, lens flares
         sunshine: `
-            <div class="shape sunbeam s1"></div>
-            <div class="shape sunbeam s2"></div>
-            <div class="shape sunbeam s3"></div>
-            <div class="shape sunbeam s4"></div>
-            <div class="shape sun-dot d1"></div>
-            <div class="shape sun-dot d2"></div>
-            <div class="shape sun-dot d3"></div>
-            <div class="shape sun-dot d4"></div>
-            <div class="shape sun-ring r1"></div>
-            <div class="shape sun-ring r2"></div>
+            <div class="shape sunshine-beam"></div>
+            <div class="shape sunshine-sun"></div>
+            <div class="shape sunshine-ray sr1"></div>
+            <div class="shape sunshine-ray sr2"></div>
+            <div class="shape sunshine-ray sr3"></div>
+            <div class="shape sunshine-ray sr4"></div>
+            <div class="shape sunshine-ray sr5"></div>
+            <div class="shape sunshine-ray sr6"></div>
+            <div class="shape sunshine-ray sr7"></div>
+            <div class="shape sunshine-ray sr8"></div>
+            <div class="shape sunshine-lens-flare lf1"></div>
+            <div class="shape sunshine-lens-flare lf2"></div>
+            <div class="shape sunshine-lens-flare lf3"></div>
+            <div class="shape sunshine-sunflower sf1"></div>
+            <div class="shape sunshine-sunflower sf2"></div>
+            <div class="shape sunshine-sunflower sf3"></div>
+            <div class="shape sunshine-sunflower sf4"></div>
+            <div class="shape sunshine-sunflower sf5"></div>
+            <div class="shape sunshine-pollen sp1"></div>
+            <div class="shape sunshine-pollen sp2"></div>
+            <div class="shape sunshine-pollen sp3"></div>
+            <div class="shape sunshine-pollen sp4"></div>
+            <div class="shape sunshine-pollen sp5"></div>
+            <div class="shape sunshine-pollen sp6"></div>
         `,
+
         starry: `
             <div class="shape starfield"></div>
             <div class="shape starfield starfield-2"></div>
@@ -77,68 +144,82 @@
             <div class="shape nebula n1"></div>
             <div class="shape nebula n2"></div>
         `,
+
+        // ★ Realistic café: window light, rings, steam, cup, saucer, croissant, sugar, beans
         cafe: `
+            <div class="shape cafe-window-light"></div>
             <div class="shape coffee-ring cr1"></div>
             <div class="shape coffee-ring cr2"></div>
             <div class="shape coffee-ring cr3"></div>
             <div class="shape coffee-ring cr4"></div>
+            <div class="shape cafe-steam-wisp sw1"></div>
+            <div class="shape cafe-steam-wisp sw2"></div>
+            <div class="shape cafe-steam-wisp sw3"></div>
+            <div class="shape cafe-saucer"></div>
+            <div class="shape cafe-cup"></div>
+            <div class="shape cafe-cup-fill"></div>
+            <div class="shape cafe-croissant"></div>
+            <div class="shape cafe-sugar-cube sc1"></div>
+            <div class="shape cafe-sugar-cube sc2"></div>
+            <div class="shape cafe-sugar-cube sc3"></div>
             <div class="shape bean bn1"></div>
             <div class="shape bean bn2"></div>
             <div class="shape bean bn3"></div>
             <div class="shape bean bn4"></div>
-            <div class="shape steam st1"></div>
-            <div class="shape steam st2"></div>
         `,
+
+        // ★ NEW: Gothic cathedral with rose window, arches, candles, drifting petals
         crimson: `
+            <div class="shape crimson-vignette"></div>
             <div class="shape crimson-orb o1"></div>
             <div class="shape crimson-orb o2"></div>
-            <div class="shape crimson-orb o3"></div>
-            <div class="shape crimson-streak cs1"></div>
-            <div class="shape crimson-streak cs2"></div>
-            <div class="shape crimson-streak cs3"></div>
-            <div class="shape crimson-diamond cd1"></div>
-            <div class="shape crimson-diamond cd2"></div>
-            <div class="shape crimson-diamond cd3"></div>
+            <div class="shape crimson-cathedral"></div>
+            <div class="shape crimson-rose-window"></div>
+            <div class="shape crimson-arch-window aw1"></div>
+            <div class="shape crimson-arch-window aw2"></div>
+            <div class="shape crimson-arch-window aw3"></div>
+            <div class="shape crimson-arch-window aw4"></div>
+            <div class="shape crimson-rose-petal rp1"></div>
+            <div class="shape crimson-rose-petal rp2"></div>
+            <div class="shape crimson-rose-petal rp3"></div>
+            <div class="shape crimson-rose-petal rp4"></div>
+            <div class="shape crimson-rose-petal rp5"></div>
+            <div class="shape crimson-rose-petal rp6"></div>
+            <div class="shape crimson-candle-glow cg1"></div>
+            <div class="shape crimson-candle-glow cg2"></div>
+            <div class="shape crimson-candle-glow cg3"></div>
+            <div class="shape crimson-candle-glow cg4"></div>
         `,
+
+        // ★ NEW: Velvet stage — curtains, valance, spotlight, chandelier, glass, corks, halo
         maroon: `
-            <div class="shape maroon-blob mb1"></div>
-            <div class="shape maroon-blob mb2"></div>
-            <div class="shape maroon-blob mb3"></div>
-            <div class="shape maroon-ring mr1"></div>
-            <div class="shape maroon-ring mr2"></div>
-            <div class="shape maroon-ring mr3"></div>
-            <div class="shape maroon-triangle mt1"></div>
-            <div class="shape maroon-triangle mt2"></div>
-            <div class="shape maroon-triangle mt3"></div>
+            <div class="shape maroon-curtain mc1"></div>
+            <div class="shape maroon-curtain mc2"></div>
+            <div class="shape maroon-valance"></div>
+            <div class="shape maroon-spotlight"></div>
+            <div class="shape maroon-halo"></div>
+            <div class="shape maroon-chandelier"></div>
+            <div class="shape maroon-glass"></div>
+            <div class="shape maroon-cork c1"></div>
+            <div class="shape maroon-cork c2"></div>
+            <div class="shape maroon-cork c3"></div>
+            <div class="shape maroon-cork c4"></div>
         `,
 
-        // ============================================================
-        // ===== ★ REDESIGNED NEW THEMES (unique from old + ember + glacier)
-        // ============================================================
-
-        sakura: `
-            <div class="shape sakura-tree-branch"></div>
-            <div class="shape sakura-tree-blossoms"></div>
-            <div class="shape sakura-torii"></div>
-            <div class="shape sakura-koi-pond"></div>
-            <div class="shape sakura-falling-petal sfp1"></div>
-            <div class="shape sakura-falling-petal sfp2"></div>
-            <div class="shape sakura-falling-petal sfp3"></div>
-            <div class="shape sakura-falling-petal sfp4"></div>
-            <div class="shape sakura-falling-petal sfp5"></div>
-            <div class="shape sakura-sun-halo"></div>
-        `,
-        nebula: `
-            <div class="shape nebula-wormhole"></div>
-            <div class="shape nebula-wormhole-core"></div>
-            <div class="shape nebula-planet"></div>
-            <div class="shape nebula-planet-ring"></div>
-            <div class="shape nebula-constellation-grid"></div>
-            <div class="shape nebula-pulse-star nps1"></div>
-            <div class="shape nebula-pulse-star nps2"></div>
-            <div class="shape nebula-pulse-star nps3"></div>
-        `,
+        // ★ Realistic ember: volcano, crater, lava flow, smoke, ash, embers, lava pool, cracks
         ember: `
+            <div class="shape ember-volcano"></div>
+            <div class="shape ember-crater"></div>
+            <div class="shape ember-lava-flow lf1"></div>
+            <div class="shape ember-lava-flow lf2"></div>
+            <div class="shape ember-smoke"></div>
+            <div class="shape ember-smoke sm2"></div>
+            <div class="shape ember-ash as1"></div>
+            <div class="shape ember-ash as2"></div>
+            <div class="shape ember-ash as3"></div>
+            <div class="shape ember-ash as4"></div>
+            <div class="shape ember-ash as5"></div>
+            <div class="shape ember-ash as6"></div>
             <div class="shape ember-particle ep1"></div>
             <div class="shape ember-particle ep2"></div>
             <div class="shape ember-particle ep3"></div>
@@ -147,34 +228,48 @@
             <div class="shape ember-particle ep6"></div>
             <div class="shape ember-particle ep7"></div>
             <div class="shape ember-particle ep8"></div>
-            <div class="shape ember-glow eg1"></div>
-            <div class="shape ember-glow eg2"></div>
+            <div class="shape ember-lava-pool"></div>
             <div class="shape ember-crack ec1"></div>
             <div class="shape ember-crack ec2"></div>
         `,
+
         autumn: `
             <div class="shape autumn-pumpkin ap1"></div>
             <div class="shape autumn-pumpkin ap2"></div>
             <div class="shape autumn-pumpkin ap3"></div>
-            <div class="shape autumn-leaf-tornado alt1"></div>
+            <div class="shape autumn-leaf-tornado"></div>
             <div class="shape autumn-fence"></div>
             <div class="shape autumn-wheat tuft1"></div>
             <div class="shape autumn-wheat tuft2"></div>
             <div class="shape autumn-wheat tuft3"></div>
             <div class="shape autumn-fog af1"></div>
         `,
+
         glacier: `
-            <div class="shape glacier-shard gs1"></div>
-            <div class="shape glacier-shard gs2"></div>
-            <div class="shape glacier-shard gs3"></div>
-            <div class="shape glacier-shard gs4"></div>
-            <div class="shape glacier-shard gs5"></div>
-            <div class="shape glacier-shard gs6"></div>
+            <div class="shape glacier-iceberg ib1"></div>
+            <div class="shape glacier-iceberg ib2"></div>
+            <div class="shape glacier-iceberg ib3"></div>
+            <div class="shape glacier-iceberg-underwater iw1"></div>
+            <div class="shape glacier-iceberg-underwater iw2"></div>
+            <div class="shape glacier-iceberg-underwater iw3"></div>
+            <div class="shape glacier-water-line"></div>
+            <div class="shape glacier-water-surface"></div>
+            <div class="shape glacier-peak pk1"></div>
+            <div class="shape glacier-peak pk2"></div>
+            <div class="shape glacier-snowflake gs1"></div>
+            <div class="shape glacier-snowflake gs2"></div>
+            <div class="shape glacier-snowflake gs3"></div>
+            <div class="shape glacier-snowflake gs4"></div>
+            <div class="shape glacier-snowflake gs5"></div>
+            <div class="shape glacier-snowflake gs6"></div>
+            <div class="shape glacier-snowflake gs7"></div>
+            <div class="shape glacier-snowflake gs8"></div>
             <div class="shape glacier-sparkle gk1"></div>
             <div class="shape glacier-sparkle gk2"></div>
             <div class="shape glacier-sparkle gk3"></div>
             <div class="shape glacier-sparkle gk4"></div>
         `,
+
         tropic: `
             <div class="shape tropic-sunset-horizon"></div>
             <div class="shape tropic-water-band"></div>
@@ -187,6 +282,7 @@
             <div class="shape tropic-bird tb1"></div>
             <div class="shape tropic-bird tb2"></div>
         `,
+
         moonlit: `
             <div class="shape moonlit-lighthouse"></div>
             <div class="shape moonlit-beam"></div>
@@ -199,6 +295,7 @@
             <div class="shape moonlit-star mls3"></div>
             <div class="shape moonlit-star mls4"></div>
         `,
+
         aurora: `
             <div class="shape aurora-mountain am1"></div>
             <div class="shape aurora-mountain am2"></div>
@@ -210,6 +307,57 @@
             <div class="shape aurora-snowcap as1"></div>
             <div class="shape aurora-snowcap as2"></div>
         `,
+
+        // ★ UPDATED: Sakura now includes the full cherry-tree scene
+        //   (trunk, branches, twigs, blossom clusters, petals, grass, mountain)
+        //   plus the original sakura torii / koi pond / halo accents.
+        sakura: `
+            <div class="shape blossom-mountain"></div>
+            <div class="shape blossom-trunk"></div>
+            <div class="shape blossom-branch br1"></div>
+            <div class="shape blossom-branch br2"></div>
+            <div class="shape blossom-branch br3"></div>
+            <div class="shape blossom-branch br4"></div>
+            <div class="shape blossom-twig tw1"></div>
+            <div class="shape blossom-twig tw2"></div>
+            <div class="shape blossom-twig tw3"></div>
+            <div class="shape blossom-twig tw4"></div>
+            <div class="shape blossom-twig tw5"></div>
+            <div class="shape blossom-cluster bc1"></div>
+            <div class="shape blossom-cluster bc2"></div>
+            <div class="shape blossom-cluster bc3"></div>
+            <div class="shape blossom-cluster bc4"></div>
+            <div class="shape blossom-cluster bc5"></div>
+            <div class="shape petal p1"></div>
+            <div class="shape petal p2"></div>
+            <div class="shape petal p3"></div>
+            <div class="shape petal p4"></div>
+            <div class="shape petal p5"></div>
+            <div class="shape petal p6"></div>
+            <div class="shape petal p7"></div>
+            <div class="shape petal p8"></div>
+            <div class="shape blossom-grass"></div>
+            <div class="shape sakura-torii"></div>
+            <div class="shape sakura-koi-pond"></div>
+            <div class="shape sakura-falling-petal sfp1"></div>
+            <div class="shape sakura-falling-petal sfp2"></div>
+            <div class="shape sakura-falling-petal sfp3"></div>
+            <div class="shape sakura-falling-petal sfp4"></div>
+            <div class="shape sakura-falling-petal sfp5"></div>
+            <div class="shape sakura-sun-halo"></div>
+        `,
+
+        nebula: `
+            <div class="shape nebula-wormhole"></div>
+            <div class="shape nebula-wormhole-core"></div>
+            <div class="shape nebula-planet"></div>
+            <div class="shape nebula-planet-ring"></div>
+            <div class="shape nebula-constellation-grid"></div>
+            <div class="shape nebula-pulse-star nps1"></div>
+            <div class="shape nebula-pulse-star nps2"></div>
+            <div class="shape nebula-pulse-star nps3"></div>
+        `,
+
         matcha: `
             <div class="shape matcha-zen-circle mzc1"></div>
             <div class="shape matcha-zen-circle mzc2"></div>
@@ -228,7 +376,7 @@
     };
 
     // ================================================================
-    // ===== THEMES (palette definitions) =====
+    // ===== THEMES (palette definitions) — UNCHANGED =====
     // ================================================================
     window.THEMES = {
         ocean: {
@@ -447,11 +595,6 @@
                 '--theme-nav-bg': 'rgba(18, 8, 8, 0.98)'
             }
         },
-
-        // ============================================================
-        // ===== ★ REDESIGNED NEW THEMES =====
-        // ============================================================
-
         sakura: {
             name: 'Sakura', sub: 'Dreamy · Spring', emoji: '🌸',
             preview: { primary: '#ff8fab', gradient: 'linear-gradient(135deg, #ffb7c5 0%, #ff8fab 100%)' },
@@ -644,10 +787,6 @@
                 '--theme-nav-bg': 'rgba(4, 16, 15, 0.98)'
             }
         },
-
-        // ============================================================
-        // ===== ★ MATCHA (new)
-        // ============================================================
         matcha: {
             name: 'Matcha', sub: 'Zen · Balanced', emoji: '🍵',
             preview: { primary: '#84cc16', gradient: 'linear-gradient(135deg, #65a30d 0%, #a3e635 100%)' },
@@ -806,7 +945,7 @@
     } catch (e) { /* ignore */ }
 
     // ================================================================
-    // ===== ★ CRITICAL FIX: Re-inject shapes once DOM is ready =====
+    // ===== Re-inject shapes once DOM is ready =====
     // ================================================================
     function ensureShapesInjected() {
         const container = document.getElementById('themeBgShapes');
