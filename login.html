@@ -725,6 +725,34 @@
             flex-shrink: 0;
         }
 
+        /* ★ Theme preview button */
+        .theme-preview-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: var(--theme-card);
+            color: var(--theme-primary);
+            border: 2px solid var(--theme-primary);
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            width: 100%;
+            margin-top: 4px;
+        }
+        .theme-preview-btn:hover {
+            background: var(--theme-primary-soft);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px color-mix(in srgb, var(--theme-primary) 25%, transparent);
+        }
+        .theme-preview-btn i {
+            font-size: 14px;
+        }
+
         .theme-picker-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -868,6 +896,7 @@
             padding: 22px 20px;
             margin-bottom: 14px;
             text-align: center;
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
         .verification-section.invalid {
             animation: fieldShake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97);
@@ -881,8 +910,11 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: color 0.3s ease;
         }
         .verification-section .verification-title i { font-size: 16px; }
+
+        /* ★ FIXED: High-contrast input for verification code */
         .verification-section .input {
             text-align: center;
             font-weight: 800;
@@ -890,24 +922,51 @@
             text-transform: uppercase;
             font-size: 18px;
             padding: 14px 16px;
-            border-color: var(--theme-danger-soft) !important;
-            background: var(--theme-card) !important;
+            border: 2px solid var(--theme-danger) !important;
+            background: #ffffff !important;
+            color: #1a1a2e !important;
+            -webkit-text-fill-color: #1a1a2e !important;
+            caret-color: var(--theme-danger);
+            border-radius: 14px;
+            transition: all 0.3s ease;
+        }
+        /* Dark mode override: keep it readable */
+        [data-theme-mode="dark"] .verification-section .input {
+            background: #1e1e2e !important;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
+            caret-color: #ffffff;
+            border-color: var(--theme-danger) !important;
         }
         .verification-section .input:focus {
             border-color: var(--theme-danger) !important;
-            box-shadow: 0 0 0 3px var(--theme-danger-soft) !important;
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-danger) 25%, transparent) !important;
+            outline: none;
         }
         .verification-section .input.verified {
             border-color: var(--theme-success) !important;
-            box-shadow: 0 0 0 3px var(--theme-success-soft) !important;
-            background: var(--theme-success-soft) !important;
-            color: var(--theme-success);
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-success) 25%, transparent) !important;
+            background: #f0fdf4 !important;
+            color: #166534 !important;
+            -webkit-text-fill-color: #166534 !important;
+        }
+        [data-theme-mode="dark"] .verification-section .input.verified {
+            background: #052e16 !important;
+            color: #86efac !important;
+            -webkit-text-fill-color: #86efac !important;
         }
         .verification-section .input.invalid {
             border-color: var(--theme-danger) !important;
-            box-shadow: 0 0 0 3px var(--theme-danger-soft) !important;
-            background: var(--theme-danger-soft) !important;
+            box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-danger) 25%, transparent) !important;
+            background: #fef2f2 !important;
+            color: #991b1b !important;
+            -webkit-text-fill-color: #991b1b !important;
             animation: fieldShake 0.4s ease;
+        }
+        [data-theme-mode="dark"] .verification-section .input.invalid {
+            background: #450a0a !important;
+            color: #fca5a5 !important;
+            -webkit-text-fill-color: #fca5a5 !important;
         }
 
         .verification-status {
@@ -1043,20 +1102,68 @@
         }
 
         /* ================================================================
+           ===== FULLSCREEN THEME PREVIEW =====
+           ================================================================ */
+        .theme-preview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: transparent;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+        .theme-preview-overlay.active {
+            display: flex;
+            pointer-events: auto;
+        }
+        .theme-preview-overlay .preview-back-btn {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 22px;
+            background: var(--theme-card);
+            color: var(--theme-text);
+            border: 2px solid var(--theme-border-input);
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: all 0.25s ease;
+            z-index: 2001;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .theme-preview-overlay .preview-back-btn:hover {
+            background: var(--theme-primary);
+            color: white;
+            border-color: var(--theme-primary);
+            transform: translateX(-4px);
+            box-shadow: 0 12px 32px color-mix(in srgb, var(--theme-primary) 40%, transparent);
+        }
+        .theme-preview-overlay .preview-back-btn i {
+            font-size: 14px;
+        }
+
+        /* ================================================================
            ===== PANEL-SPECIFIC 2-COLUMN DESKTOP LAYOUT =====
-           These wrap each panel's content into two columns on desktop.
-           On mobile these grids collapse to a single column automatically.
            ================================================================ */
         .panel-grid-2col {
             display: grid;
-            grid-template-columns: 1fr;  /* Mobile: single column */
+            grid-template-columns: 1fr;
             gap: 0;
         }
         .panel-col {
             min-width: 0;
         }
 
-        /* Panel 1: Photo left, hint right */
         .panel-photo-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -1066,17 +1173,13 @@
 
         /* ================================================================
            ===== DESKTOP WIDE LAYOUT (≥ 900px) =====
-           Full-width modal + 2-column panel layouts so almost nothing
-           needs to scroll.
            ================================================================ */
         @media (min-width: 900px) {
-            /* ----- Wider modal ----- */
             .modal-content {
                 max-width: min(1280px, 95vw);
                 max-height: 94vh;
             }
 
-            /* ----- Header ----- */
             .wizard-header {
                 padding: 22px 40px 16px;
             }
@@ -1101,17 +1204,14 @@
                 font-size: 12.5px;
             }
 
-            /* ----- Body: reduce vertical padding ----- */
             .wizard-body {
                 padding: 20px 40px 4px;
             }
 
-            /* ----- Footer ----- */
             .wizard-footer {
                 padding: 14px 40px 18px;
             }
 
-            /* ----- Panel header: compact horizontal on desktop ----- */
             .panel-header {
                 display: flex;
                 align-items: center;
@@ -1141,7 +1241,6 @@
                 margin: 0;
             }
 
-            /* ----- Compact input groups ----- */
             .input-group {
                 margin-bottom: 12px;
             }
@@ -1161,13 +1260,11 @@
                 font-size: 10.5px;
             }
 
-            /* ----- Panel grids: turn on 2 columns on desktop ----- */
             .panel-grid-2col {
                 grid-template-columns: 1fr 1fr;
                 gap: 0 28px;
             }
 
-            /* ----- Panel 1: avatar + hint side by side ----- */
             .panel-photo-grid {
                 grid-template-columns: auto 1fr;
                 gap: 32px;
@@ -1192,7 +1289,6 @@
                 justify-content: flex-start;
             }
 
-            /* ----- Panel 4: theme grid left, mode right ----- */
             .panel-theme-grid {
                 display: grid;
                 grid-template-columns: 1.6fr 1fr;
@@ -1224,7 +1320,6 @@
                 padding: 7px 12px;
             }
 
-            /* ----- Panel 5: review left, verification right ----- */
             .panel-verify-grid {
                 display: grid;
                 grid-template-columns: 1.15fr 1fr;
@@ -1238,14 +1333,11 @@
                 margin-bottom: 0;
             }
 
-            /* ----- Form rows inside 2-col panels ----- */
             .panel-col .form-row {
                 grid-template-columns: 1fr 1fr;
                 gap: 12px;
             }
 
-            /* ★ Theme preview: slide modal to the left, background on right is fully visible.
-                 Modal is a bit narrower so there's real room for the animated background. */
             .modal.theme-preview-mode {
                 justify-content: flex-start;
                 padding: 24px 32px;
@@ -1257,7 +1349,7 @@
         }
 
         /* ================================================================
-           ===== RESPONSIVE — MOBILE (≤ 640px) — UNCHANGED =====
+           ===== RESPONSIVE — MOBILE (≤ 640px) =====
            ================================================================ */
         @media (max-width: 640px) {
             .container { padding: 30px 24px; }
@@ -1273,7 +1365,6 @@
                 border-radius: 24px;
             }
 
-            /* Mobile keeps the old blur behavior; theme preview is subtle */
             .modal.theme-preview-mode {
                 background: rgba(0,0,0,0.30);
                 backdrop-filter: blur(6px);
@@ -1318,7 +1409,6 @@
             .mode-toggle { width: 100%; justify-content: space-between; }
             .mode-toggle .mode-btn { flex: 1; justify-content: center; }
 
-            /* Force single column on mobile for the desktop grids */
             .panel-grid-2col,
             .panel-photo-grid,
             .panel-theme-grid,
@@ -1328,6 +1418,13 @@
             }
             .panel-theme-side {
                 margin-top: 12px;
+            }
+
+            .theme-preview-overlay .preview-back-btn {
+                top: 16px;
+                left: 16px;
+                padding: 10px 18px;
+                font-size: 13px;
             }
         }
 
@@ -1385,6 +1482,15 @@
         <div class="signup-link">
             Don't have an account? <a onclick="showSignUp()">Sign up here</a>
         </div>
+    </div>
+
+    <!-- ================================================================
+         ===== FULLSCREEN THEME PREVIEW OVERLAY =====
+         ================================================================ -->
+    <div class="theme-preview-overlay" id="themePreviewOverlay">
+        <button type="button" class="preview-back-btn" onclick="closeThemePreview()">
+            <i class="fas fa-arrow-left"></i> Back to form
+        </button>
     </div>
 
     <!-- ================================================================
@@ -1452,7 +1558,6 @@
 
                     <!-- ============================================================
                          PANEL 1: PROFILE PICTURE
-                         Desktop: avatar on left, hint on right.
                          ============================================================ -->
                     <div class="wizard-panel active" data-panel="1">
                         <div class="panel-header">
@@ -1492,7 +1597,6 @@
 
                     <!-- ============================================================
                          PANEL 2: PERSONAL DETAILS
-                         Desktop: 2 columns — identity left, profile right.
                          ============================================================ -->
                     <div class="wizard-panel" data-panel="2">
                         <div class="panel-header">
@@ -1608,7 +1712,6 @@
 
                     <!-- ============================================================
                          PANEL 3: SOCIALS (OPTIONAL)
-                         Desktop: 2x2 grid.
                          ============================================================ -->
                     <div class="wizard-panel" data-panel="3">
                         <div class="panel-header">
@@ -1645,15 +1748,14 @@
                     </div>
 
                     <!-- ============================================================
-                         PANEL 4: THEME PICKER
-                         Desktop: theme grid left, mode toggle + hint right.
+                         PANEL 4: THEME PICKER — with fullscreen Preview Button
                          ============================================================ -->
                     <div class="wizard-panel" data-panel="4">
                         <div class="panel-header">
                             <div class="panel-icon"><i class="fas fa-palette"></i></div>
                             <div class="panel-header-text">
                                 <h3>Pick Your Vibe</h3>
-                                <p>Choose a theme — the background updates live on the side.</p>
+                                <p>Choose a theme, then preview it fullscreen.</p>
                             </div>
                         </div>
 
@@ -1663,9 +1765,16 @@
                             </div>
                             <div class="panel-theme-side">
                                 <div class="theme-preview-hint">
-                                    <i class="fas fa-eye"></i>
-                                    <span>Watch the animated background change as you tap each theme!</span>
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Select a theme, then click <strong>Preview Fullscreen</strong> to see only the animated background.</span>
                                 </div>
+
+                                <!-- ★ FULLSCREEN THEME PREVIEW BUTTON -->
+                                <button type="button" class="theme-preview-btn" onclick="openThemePreview()">
+                                    <i class="fas fa-expand"></i>
+                                    Preview Fullscreen
+                                </button>
+
                                 <div class="mode-toggle-row">
                                     <div class="mode-label">
                                         <i class="fas fa-circle-half-stroke"></i>
@@ -1686,7 +1795,6 @@
 
                     <!-- ============================================================
                          PANEL 5: VERIFICATION + REVIEW
-                         Desktop: review left, verification right.
                          ============================================================ -->
                     <div class="wizard-panel" data-panel="5">
                         <div class="panel-header">
@@ -1779,6 +1887,7 @@
 
         let currentWizardStep = 1;
         let isAnimatingPanel = false;
+        let isThemePreviewActive = false;
 
         function updateWizardStepIndicator() {
             document.querySelectorAll('.wizard-step').forEach(step => {
@@ -1841,6 +1950,57 @@
                     isAnimatingPanel = false;
                 }, 420);
             }, 320);
+        }
+
+        // ================================================================
+        // ★ FULLSCREEN THEME PREVIEW
+        // ================================================================
+        function openThemePreview() {
+            // Apply the currently selected theme first
+            applyTheme(selectedTheme);
+
+            isThemePreviewActive = true;
+
+            const overlay = document.getElementById('themePreviewOverlay');
+            const modal = document.getElementById('signupModal');
+            const container = document.querySelector('.container');
+            const bgBase = document.querySelector('.theme-bg-base');
+            const bgShapes = document.querySelector('.theme-bg-shapes');
+            const bgOverlay = document.querySelector('.theme-bg-overlay');
+
+            if (overlay) overlay.classList.add('active');
+
+            // Hide everything except background layers and the preview overlay
+            if (modal) modal.style.display = 'none';
+            if (container) container.style.display = 'none';
+
+            // Make sure the background layers are fully visible (they already are,
+            // but we ensure no stacking issues by bringing them forward)
+            if (bgBase) bgBase.style.zIndex = '1';
+            if (bgShapes) bgShapes.style.zIndex = '2';
+            if (bgOverlay) bgOverlay.style.zIndex = '3';
+        }
+
+        function closeThemePreview() {
+            isThemePreviewActive = false;
+
+            const overlay = document.getElementById('themePreviewOverlay');
+            const modal = document.getElementById('signupModal');
+            const container = document.querySelector('.container');
+            const bgBase = document.querySelector('.theme-bg-base');
+            const bgShapes = document.querySelector('.theme-bg-shapes');
+            const bgOverlay = document.querySelector('.theme-bg-overlay');
+
+            if (overlay) overlay.classList.remove('active');
+
+            // Restore visibility
+            if (modal && modal.classList.contains('active')) modal.style.display = '';
+            if (container) container.style.display = '';
+
+            // Reset z-indexes to original values
+            if (bgBase) bgBase.style.zIndex = '';
+            if (bgShapes) bgShapes.style.zIndex = '';
+            if (bgOverlay) bgOverlay.style.zIndex = '';
         }
 
         // ================================================================
@@ -2033,6 +2193,7 @@
 
         function wizardNext() {
             if (isAnimatingPanel) return;
+            if (isThemePreviewActive) return;
             const result = validatePanel(currentWizardStep);
             if (result.count > 0) return;
 
@@ -2049,6 +2210,7 @@
 
         function wizardBack() {
             if (isAnimatingPanel) return;
+            if (isThemePreviewActive) return;
             if (currentWizardStep <= 1) return;
             clearFieldErrors();
             const prevStep = currentWizardStep - 1;
@@ -2532,6 +2694,7 @@
 
             currentWizardStep = 1;
             isAnimatingPanel = false;
+            isThemePreviewActive = false;
             document.querySelectorAll('.wizard-panel').forEach(p => {
                 p.classList.remove('active', 'slide-in-right', 'slide-in-left', 'slide-out-left', 'slide-out-right');
             });
@@ -2543,6 +2706,10 @@
             document.querySelectorAll('#signupModeToggle .mode-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === selectedTheme.mode);
             });
+
+            // Ensure preview overlay is hidden
+            const overlay = document.getElementById('themePreviewOverlay');
+            if (overlay) overlay.classList.remove('active');
         }
 
         function closeSignUp() {
@@ -2550,6 +2717,15 @@
             modal.classList.remove('active');
             modal.classList.remove('theme-preview-mode');
             document.body.style.overflow = 'auto';
+
+            // Ensure preview overlay is hidden
+            const overlay = document.getElementById('themePreviewOverlay');
+            if (overlay) overlay.classList.remove('active');
+            isThemePreviewActive = false;
+
+            // Restore visibility in case preview was open
+            const container = document.querySelector('.container');
+            if (container) container.style.display = '';
 
             document.getElementById('signupForm').reset();
             selectedAvatarFile = null;
@@ -2609,6 +2785,14 @@
             const modal = document.getElementById('signupModal');
             if (!modal || !modal.classList.contains('active')) return;
 
+            // If theme preview is active, only allow Escape to close it
+            if (isThemePreviewActive) {
+                if (e.key === 'Escape') {
+                    closeThemePreview();
+                }
+                return;
+            }
+
             if (e.key === 'Enter' && e.target && e.target.tagName === 'TEXTAREA') return;
 
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -2626,8 +2810,12 @@
 
         window.onclick = function(event) {
             const signupModal = document.getElementById('signupModal');
+            const overlay = document.getElementById('themePreviewOverlay');
             if (event.target === signupModal) {
                 closeSignUp();
+            }
+            if (event.target === overlay) {
+                closeThemePreview();
             }
         };
 
