@@ -2,6 +2,7 @@
    theme.css
    TIMAWA — Shared theme background layers
    Loaded by every page. Pairs with theme.js.
+   OPTIMIZED: Sakura branch layout fixed, Sunset/Sunshine perf.
    ================================================================ */
 
 /* ================================================================
@@ -14,6 +15,7 @@
     background: var(--theme-bg);
     transition: background 0.6s ease;
     pointer-events: none;
+    contain: strict;
 }
 [data-timawa-theme="starry"] .theme-bg-base {
     background: linear-gradient(180deg, #2a1a5e 0%, #4a3a8e 50%, #6a5ab0 100%);
@@ -108,6 +110,7 @@
     z-index: -2;
     pointer-events: none;
     overflow: hidden;
+    contain: strict;
 }
 
 .theme-bg-overlay {
@@ -118,12 +121,15 @@
     background: radial-gradient(ellipse at 20% 30%, color-mix(in srgb, var(--theme-primary) 5%, transparent) 0%, transparent 70%),
                 radial-gradient(ellipse at 80% 70%, color-mix(in srgb, var(--theme-accent) 5%, transparent) 0%, transparent 70%);
     transition: background 0.6s ease;
+    contain: strict;
 }
 
 .theme-bg-shapes .shape {
     position: absolute;
     pointer-events: none;
     will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 /* ================================================================
@@ -182,7 +188,8 @@
 }
 
 /* ================================================================
-   -------- SUNSET (realistic) --------
+   -------- SUNSET — OPTIMIZED (removed blur, box-shadow animation,
+   reduced ray count, removed conic-gradient animation) --------
    ================================================================ */
 .sunset-sun {
     position: absolute;
@@ -192,12 +199,12 @@
     border-radius: 50%;
     background: radial-gradient(circle,
         #fff7d6 0%, #fde68a 20%, #fbbf24 45%, #f59e0b 70%, #ea580c 100%);
+    /* static box-shadow, no animation (perf) */
     box-shadow:
         0 0 80px 30px rgba(251, 191, 36, 0.55),
-        0 0 160px 60px rgba(249, 115, 22, 0.35),
-        0 0 280px 100px rgba(220, 38, 38, 0.2);
+        0 0 160px 60px rgba(249, 115, 22, 0.35);
     opacity: 0.95;
-    animation: sunsetSunGlow 8s ease-in-out infinite;
+    /* removed animation: sunsetSunGlow (was expensive) */
 }
 .sunset-sun-halo {
     position: absolute;
@@ -208,8 +215,8 @@
     background: radial-gradient(circle,
         rgba(251, 191, 36, 0.35) 0%, rgba(249, 115, 22, 0.18) 35%,
         rgba(220, 38, 38, 0.08) 60%, transparent 80%);
-    filter: blur(30px);
-    animation: sunsetHaloPulse 8s ease-in-out infinite;
+    /* removed filter: blur(30px) — very expensive. Use pre-blurred radial. */
+    opacity: 0.75;
 }
 .sunset-horizon {
     position: absolute;
@@ -218,7 +225,7 @@
     background: linear-gradient(to top,
         rgba(220, 38, 38, 0.35) 0%, rgba(249, 115, 22, 0.25) 30%,
         rgba(251, 191, 36, 0.15) 60%, transparent 100%);
-    filter: blur(20px);
+    /* removed blur(20px) — replaced with softer gradient stops */
 }
 .sunset-mountain {
     position: absolute;
@@ -239,40 +246,44 @@
     border-left: 500px solid transparent;
     border-right: 500px solid transparent;
     border-bottom: 160px solid rgba(122, 42, 74, 0.55);
-    filter: blur(3px);
+    /* removed blur(3px) */
 }
 .sunset-mountain-far.mf1 { left: -200px; }
 .sunset-mountain-far.mf2 { right: -200px; }
+
+/* Rays: fewer, no blur, no animation */
 .sunset-ray {
     position: absolute;
     bottom: 30%; left: 50%;
     transform-origin: 50% 100%;
-    width: 4px; height: 320px;
+    width: 3px; height: 280px;
     background: linear-gradient(to top,
-        rgba(251, 191, 36, 0.65) 0%, rgba(249, 115, 22, 0.35) 40%, transparent 100%);
-    filter: blur(3px);
-    border-radius: 4px;
-    animation: sunsetRayRotate 60s linear infinite;
+        rgba(251, 191, 36, 0.55) 0%, rgba(249, 115, 22, 0.25) 40%, transparent 100%);
+    border-radius: 3px;
+    /* removed filter: blur(3px) and animation: sunsetRayRotate */
 }
-.sunset-ray.r1 { transform: translateX(-50%) rotate(-60deg); animation-delay: 0s; }
-.sunset-ray.r2 { transform: translateX(-50%) rotate(-30deg); animation-delay: -10s; }
-.sunset-ray.r3 { transform: translateX(-50%) rotate(0deg);   animation-delay: -20s; }
-.sunset-ray.r4 { transform: translateX(-50%) rotate(30deg);  animation-delay: -30s; }
-.sunset-ray.r5 { transform: translateX(-50%) rotate(60deg);  animation-delay: -40s; }
-.sunset-ray.r6 { transform: translateX(-50%) rotate(90deg);  animation-delay: -50s; }
+.sunset-ray.r1 { transform: translateX(-50%) rotate(-60deg); }
+.sunset-ray.r2 { transform: translateX(-50%) rotate(-30deg); }
+.sunset-ray.r3 { transform: translateX(-50%) rotate(0deg);   }
+.sunset-ray.r4 { transform: translateX(-50%) rotate(30deg);  }
+.sunset-ray.r5 { transform: translateX(-50%) rotate(60deg);  }
+.sunset-ray.r6 { transform: translateX(-50%) rotate(90deg);  }
+
+/* Clouds: no blur, simpler gradient, still drifting but cheaper */
 .sunset-cloud {
     position: absolute;
     width: 220px; height: 40px;
     background: linear-gradient(90deg,
-        transparent 0%, rgba(251, 191, 36, 0.55) 25%, rgba(249, 115, 22, 0.45) 50%,
-        rgba(251, 191, 36, 0.55) 75%, transparent 100%);
+        transparent 0%, rgba(251, 191, 36, 0.45) 25%, rgba(249, 115, 22, 0.35) 50%,
+        rgba(251, 191, 36, 0.45) 75%, transparent 100%);
     border-radius: 50%;
-    filter: blur(12px);
+    /* removed filter: blur(12px) */
     animation: sunsetCloudDrift 60s linear infinite;
 }
 .sunset-cloud.c1 { top: 25%; left: -300px; }
 .sunset-cloud.c2 { top: 40%; left: -400px; animation-delay: 20s; width: 280px; height: 30px; }
 .sunset-cloud.c3 { top: 55%; left: -350px; animation-delay: 40s; width: 200px; height: 35px; }
+
 .sunset-bird { position: absolute; width: 22px; height: 10px; opacity: 0.7; }
 .sunset-bird::before,
 .sunset-bird::after {
@@ -284,6 +295,7 @@
 .sunset-bird.sb1 { top: 30%; left: 15%; animation: sunsetBirdFly 40s linear infinite; }
 .sunset-bird.sb2 { top: 22%; left: 55%; animation: sunsetBirdFly 50s linear infinite 10s; transform: scale(0.8); }
 .sunset-bird.sb3 { top: 35%; left: 75%; animation: sunsetBirdFly 45s linear infinite 20s; transform: scale(0.65); }
+
 .sunset-ground {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -293,28 +305,7 @@
         rgba(74, 26, 46, 0.3) 70%, transparent 100%);
 }
 
-@keyframes sunsetSunGlow {
-    0%, 100% {
-        box-shadow:
-            0 0 80px 30px rgba(251, 191, 36, 0.55),
-            0 0 160px 60px rgba(249, 115, 22, 0.35),
-            0 0 280px 100px rgba(220, 38, 38, 0.2);
-    }
-    50% {
-        box-shadow:
-            0 0 100px 40px rgba(251, 191, 36, 0.7),
-            0 0 200px 80px rgba(249, 115, 22, 0.5),
-            0 0 340px 130px rgba(220, 38, 38, 0.3);
-    }
-}
-@keyframes sunsetHaloPulse {
-    0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
-    50%      { opacity: 1; transform: translateX(-50%) scale(1.08); }
-}
-@keyframes sunsetRayRotate {
-    from { transform: translateX(-50%) rotate(var(--r, 0deg)); }
-    to   { transform: translateX(-50%) rotate(calc(var(--r, 0deg) + 360deg)); }
-}
+/* Removed keyframes: sunsetSunGlow, sunsetHaloPulse, sunsetRayRotate (unused) */
 @keyframes sunsetCloudDrift {
     0%   { transform: translateX(0); }
     100% { transform: translateX(calc(100vw + 500px)); }
@@ -327,11 +318,10 @@
 }
 
 /* ================================================================
-   -------- ★ SAKURA — Real cherry tree with connected blossoms ----
-   (Cherry-tree elements moved here from the old "Blossom" theme.)
+   -------- ★ SAKURA — FIXED branch layout (fan from trunk) ----
    ================================================================ */
 
-/* Tree trunk (solid, textured) */
+/* Tree trunk */
 .blossom-trunk {
     position: absolute;
     bottom: 0;
@@ -344,7 +334,7 @@
     box-shadow:
         inset -8px 0 16px rgba(0, 0, 0, 0.4),
         inset 8px 0 16px rgba(0, 0, 0, 0.2);
-    opacity: 0.85;
+    opacity: 0.9;
     transform-origin: bottom center;
     animation: blossomTrunkSway 12s ease-in-out infinite;
 }
@@ -358,34 +348,75 @@
         rgba(0, 0, 0, 0.2) 40px, rgba(0, 0, 0, 0.2) 43px);
     border-radius: inherit;
 }
+
+/* Branches — all originate from the trunk (left: calc(18% + 50px)) and fan out.
+   Bottom % controls vertical attachment. Rotation spreads them naturally. */
 .blossom-branch {
     position: absolute;
     height: 14px;
     background: linear-gradient(90deg, #3d2817 0%, #5c3d20 50%, #4a3018 100%);
     border-radius: 8px;
     transform-origin: 0% 50%;
-    opacity: 0.9;
+    opacity: 0.95;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
-.blossom-branch.br1 { bottom: 60%; left: calc(18% + 50px); width: 220px; transform: rotate(-22deg); animation: blossomBranchSway 10s ease-in-out infinite; }
-.blossom-branch.br2 { bottom: 45%; left: calc(18% + 50px); width: 260px; transform: rotate(-5deg);  animation: blossomBranchSway 11s ease-in-out infinite 1s; }
-.blossom-branch.br3 { bottom: 68%; left: calc(18% + 50px); width: 180px; transform: rotate(-42deg); animation: blossomBranchSway 9s ease-in-out infinite 2s; }
-.blossom-branch.br4 { bottom: 55%; left: calc(18% + 50px); width: 200px; transform: rotate(15deg);  animation: blossomBranchSway 13s ease-in-out infinite 0.5s; }
+/* br1: upper-left branch (steep up) */
+.blossom-branch.br1 {
+    bottom: 62%;
+    left: calc(18% + 50px);
+    width: 200px;
+    transform: rotate(-38deg);
+    animation: blossomBranchSway 10s ease-in-out infinite;
+}
+/* br2: mid-left branch (slight up) */
+.blossom-branch.br2 {
+    bottom: 50%;
+    left: calc(18% + 50px);
+    width: 240px;
+    transform: rotate(-18deg);
+    animation: blossomBranchSway 11s ease-in-out infinite 1s;
+}
+/* br3: top-left branch (very steep up) */
+.blossom-branch.br3 {
+    bottom: 70%;
+    left: calc(18% + 50px);
+    width: 160px;
+    transform: rotate(-58deg);
+    animation: blossomBranchSway 9s ease-in-out infinite 2s;
+}
+/* br4: lower-right branch (downward) */
+.blossom-branch.br4 {
+    bottom: 42%;
+    left: calc(18% + 50px);
+    width: 180px;
+    transform: rotate(28deg);
+    animation: blossomBranchSway 13s ease-in-out infinite 0.5s;
+}
+/* br5: extra upper-right branch to balance */
+.blossom-branch.br5 {
+    bottom: 58%;
+    left: calc(18% + 50px);
+    width: 170px;
+    transform: rotate(-8deg);
+    animation: blossomBranchSway 12s ease-in-out infinite 1.5s;
+}
 
+/* Twigs — attached to branch endpoints (positions adjusted) */
 .blossom-twig {
     position: absolute;
-    height: 6px; width: 80px;
+    height: 6px; width: 70px;
     background: #5c3d20;
     border-radius: 4px;
     transform-origin: 0% 50%;
-    opacity: 0.85;
+    opacity: 0.9;
 }
-.blossom-twig.tw1 { bottom: calc(60% + 80px);  left: calc(18% + 200px); transform: rotate(-35deg); }
-.blossom-twig.tw2 { bottom: calc(60% + 100px); left: calc(18% + 240px); transform: rotate(-15deg); }
-.blossom-twig.tw3 { bottom: calc(45% + 20px);  left: calc(18% + 240px); transform: rotate(25deg); }
-.blossom-twig.tw4 { bottom: calc(68% + 90px);  left: calc(18% + 160px); transform: rotate(-55deg); }
-.blossom-twig.tw5 { bottom: calc(55% + 60px);  left: calc(18% + 220px); transform: rotate(45deg); }
+.blossom-twig.tw1 { bottom: calc(62% + 100px); left: calc(18% + 190px); transform: rotate(-50deg); }
+.blossom-twig.tw2 { bottom: calc(50% + 70px);  left: calc(18% + 220px); transform: rotate(-30deg); }
+.blossom-twig.tw3 { bottom: calc(70% + 110px); left: calc(18% + 140px); transform: rotate(-70deg); }
+.blossom-twig.tw4 { bottom: calc(42% + 40px);  left: calc(18% + 200px); transform: rotate(40deg); }
+.blossom-twig.tw5 { bottom: calc(58% + 80px);  left: calc(18% + 180px); transform: rotate(10deg); }
 
+/* Blossom clusters — placed at branch tips / along branches */
 .blossom-cluster {
     position: absolute;
     width: 130px; height: 130px;
@@ -401,11 +432,11 @@
     opacity: 0.9;
     animation: blossomClusterFloat 6s ease-in-out infinite;
 }
-.blossom-cluster.bc1 { bottom: calc(60% + 40px); left: calc(18% + 180px); animation-delay: 0s; }
-.blossom-cluster.bc2 { bottom: calc(45% + 10px); left: calc(18% + 240px); width: 150px; height: 150px; animation-delay: 1.5s; }
-.blossom-cluster.bc3 { bottom: calc(68% + 60px); left: calc(18% + 110px); width: 110px; height: 110px; animation-delay: 3s; }
-.blossom-cluster.bc4 { bottom: calc(55% + 20px); left: calc(18% + 180px); width: 120px; height: 120px; animation-delay: 4.5s; }
-.blossom-cluster.bc5 { top: 8%; left: 12%; width: 140px; height: 140px; animation-delay: 2s; }
+.blossom-cluster.bc1 { bottom: calc(62% + 140px); left: calc(18% + 150px); animation-delay: 0s; }
+.blossom-cluster.bc2 { bottom: calc(50% + 140px); left: calc(18% + 210px); width: 150px; height: 150px; animation-delay: 1.5s; }
+.blossom-cluster.bc3 { bottom: calc(70% + 150px); left: calc(18% + 80px);  width: 110px; height: 110px; animation-delay: 3s; }
+.blossom-cluster.bc4 { bottom: calc(42% + 100px); left: calc(18% + 160px); width: 120px; height: 120px; animation-delay: 4.5s; }
+.blossom-cluster.bc5 { bottom: calc(58% + 160px); left: calc(18% + 120px); width: 130px; height: 130px; animation-delay: 2s; }
 
 .petal {
     position: absolute;
@@ -478,11 +509,8 @@
 }
 
 /* ================================================================
-   -------- ★ PINK / BLOSSOM — Dreamy flower meadow (NEW CONCEPT) --
-   Replaces the old cherry-tree concept with a soft meadow scene.
+   -------- ★ PINK / BLOSSOM — Dreamy flower meadow --------
    ================================================================ */
-
-/* Rolling hills in the background */
 .blossom-meadow-hill {
     position: absolute;
     bottom: 0;
@@ -518,8 +546,6 @@
         color-mix(in srgb, var(--theme-primary-dark) 85%, transparent) 100%);
     opacity: 0.7;
 }
-
-/* The soft meadow ground where flowers grow */
 .blossom-meadow-ground {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -542,8 +568,6 @@
         radial-gradient(circle 28px at 92% 35%, var(--theme-accent) 0%, transparent 70%);
     filter: blur(10px);
 }
-
-/* Tulip-style flowers, each with a stem + petal cup */
 .blossom-tulip {
     position: absolute;
     bottom: 6%;
@@ -588,8 +612,6 @@
 .blossom-tulip.t5 { left: 62%; height: 104px; animation-delay: 2.4s; }
 .blossom-tulip.t6 { left: 74%; height: 88px;  animation-delay: 3s;   transform: scale(0.8); }
 .blossom-tulip.t7 { left: 86%; height: 108px; animation-delay: 3.6s; }
-
-/* Daisy heads (round white/pale yellow) floating above the meadow */
 .blossom-daisy {
     position: absolute;
     width: 22px; height: 22px;
@@ -609,8 +631,6 @@
 .blossom-daisy.d3 { top: 35%; left: 66%; animation-delay: 1.6s; }
 .blossom-daisy.d4 { top: 55%; left: 82%; animation-delay: 2.4s; width: 16px; height: 16px; }
 .blossom-daisy.d5 { top: 25%; left: 88%; animation-delay: 3.2s; width: 20px; height: 20px; }
-
-/* Floating petals — softer and slower than Sakura's falling petals */
 .blossom-floating-petal {
     position: absolute;
     width: 16px; height: 16px;
@@ -627,8 +647,6 @@
 .blossom-floating-petal.fp5 { top: 22%; left: 86%; animation-delay: 10s;  width: 14px; height: 14px; }
 .blossom-floating-petal.fp6 { top: 55%; left: 14%; animation-delay: 12.5s; width: 15px; height: 15px; }
 .blossom-floating-petal.fp7 { top: 50%; left: 58%; animation-delay: 15s;  width: 13px; height: 13px; }
-
-/* Butterflies drifting across the meadow */
 .blossom-butterfly {
     position: absolute;
     width: 26px; height: 20px;
@@ -652,8 +670,6 @@
 .blossom-butterfly.bf1 { top: 22%; left: 5%;  animation: blossomButterflyPath 22s ease-in-out infinite; }
 .blossom-butterfly.bf2 { top: 40%; left: 30%; animation: blossomButterflyPath 28s ease-in-out infinite 6s; transform: scale(0.85); }
 .blossom-butterfly.bf3 { top: 18%; left: 62%; animation: blossomButterflyPath 25s ease-in-out infinite 12s; transform: scale(0.9); }
-
-/* Soft sun haze in the upper corner */
 .blossom-sun-haze {
     position: absolute;
     top: -80px; right: -80px;
@@ -667,7 +683,6 @@
     opacity: 0.7;
     animation: blossomSunHaze 10s ease-in-out infinite;
 }
-
 @keyframes blossomTulipSway {
     0%, 100% { transform: rotate(-3deg) scale(var(--s, 1)); }
     50%      { transform: rotate(3deg) scale(var(--s, 1)); }
@@ -700,13 +715,8 @@
 }
 
 /* ================================================================
-   -------- ★ FOREST — Layered pine silhouettes + fog + moon rays --
-   Different approach: no connected trunk/branch tree. Instead, a
-   distant pine forest with layered fog, moonlight beams, and drifting
-   spore lights.
+   -------- ★ FOREST --------
    ================================================================ */
-
-/* Moon rays from top-left */
 .forest-moon-ray {
     position: absolute;
     top: -50px;
@@ -723,8 +733,6 @@
 .forest-moon-ray.mr1 { left: 6%;  transform: rotate(-14deg); animation-delay: 0s; }
 .forest-moon-ray.mr2 { left: 28%; transform: rotate(-8deg);  animation-delay: 2s; opacity: 0.55; }
 .forest-moon-ray.mr3 { left: 52%; transform: rotate(-4deg);  animation-delay: 4s; opacity: 0.45; }
-
-/* Far pine layer (blurred, small) */
 .forest-pine-layer {
     position: absolute;
     left: -5%;
@@ -732,7 +740,6 @@
     bottom: 18%;
     height: 45%;
     background:
-        /* A row of triangular pines via repeating conic-ish trick */
         radial-gradient(ellipse 40px 90px at 4% 100%, var(--theme-primary-dark) 0%, transparent 70%),
         radial-gradient(ellipse 36px 80px at 9% 100%, var(--theme-primary) 0%, transparent 70%),
         radial-gradient(ellipse 42px 95px at 14% 100%, var(--theme-primary-dark) 0%, transparent 70%),
@@ -772,8 +779,6 @@
         radial-gradient(ellipse 60px 142px at 78% 100%, var(--theme-primary-dark) 0%, transparent 72%),
         radial-gradient(ellipse 54px 128px at 90% 100%, var(--theme-primary) 0%, transparent 72%);
 }
-
-/* Horizontal fog bands */
 .forest-fog-band {
     position: absolute;
     left: -10%; right: -10%;
@@ -791,8 +796,6 @@
 .forest-fog-band.fb1 { bottom: 42%; animation-delay: 0s; }
 .forest-fog-band.fb2 { bottom: 30%; animation-delay: 8s;  height: 70px; opacity: 0.45; }
 .forest-fog-band.fb3 { bottom: 20%; animation-delay: 16s; height: 110px; opacity: 0.6; }
-
-/* Ground */
 .forest-moss-ground {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -816,8 +819,6 @@
     filter: blur(8px);
     opacity: 0.7;
 }
-
-/* Glowing spore lights */
 .forest-spore {
     position: absolute;
     width: 6px; height: 6px;
@@ -833,7 +834,6 @@
 .forest-spore.sp3 { top: 45%; left: 55%; animation-delay: 5s; width: 5px; height: 5px; }
 .forest-spore.sp4 { top: 70%; left: 72%; animation-delay: 7.5s; }
 .forest-spore.sp5 { top: 50%; left: 88%; animation-delay: 10s; width: 7px; height: 7px; }
-
 @keyframes forestRaySway {
     0%, 100% { opacity: 0.6; transform: rotate(-14deg) translateX(0); }
     50%      { opacity: 0.9; transform: rotate(-10deg) translateX(20px); }
@@ -851,7 +851,8 @@
 }
 
 /* ================================================================
-   -------- SUNSHINE (realistic) --------
+   -------- SUNSHINE — OPTIMIZED (removed pulsing box-shadow,
+   removed conic-gradient animation, fewer rays, no blur) --------
    ================================================================ */
 .sunshine-sun {
     position: absolute;
@@ -860,22 +861,21 @@
     border-radius: 50%;
     background: radial-gradient(circle,
         #fffbeb 0%, #fef3c7 30%, #fcd34d 60%, #f59e0b 100%);
+    /* static box-shadow, no animation (perf) */
     box-shadow:
         0 0 60px 20px rgba(252, 211, 77, 0.7),
-        0 0 140px 50px rgba(251, 191, 36, 0.45),
-        0 0 260px 90px rgba(245, 158, 11, 0.25);
-    animation: sunshineSunPulse 6s ease-in-out infinite;
+        0 0 140px 50px rgba(251, 191, 36, 0.45);
 }
 .sunshine-ray {
     position: absolute;
     top: calc(8% + 70px);
     right: calc(10% + 70px);
-    width: 6px; height: 180px;
+    width: 5px; height: 150px;
     background: linear-gradient(to bottom,
-        rgba(252, 211, 77, 0.8) 0%, rgba(251, 191, 36, 0.4) 50%, transparent 100%);
-    border-radius: 6px;
+        rgba(252, 211, 77, 0.7) 0%, rgba(251, 191, 36, 0.3) 50%, transparent 100%);
+    border-radius: 5px;
     transform-origin: 50% 0%;
-    filter: blur(2px);
+    /* removed filter: blur(2px) */
 }
 .sunshine-ray.sr1 { transform: rotate(0deg); }
 .sunshine-ray.sr2 { transform: rotate(45deg); }
@@ -885,20 +885,18 @@
 .sunshine-ray.sr6 { transform: rotate(225deg); }
 .sunshine-ray.sr7 { transform: rotate(270deg); }
 .sunshine-ray.sr8 { transform: rotate(315deg); }
+
+/* Beam: replaced conic-gradient with a simpler radial highlight (no animation) */
 .sunshine-beam {
     position: absolute;
     top: 0; right: 0;
     width: 100%; height: 100%;
-    background: conic-gradient(from 200deg at 82% 22%,
-        transparent 0deg,
-        rgba(252, 211, 77, 0.18) 20deg,
-        transparent 40deg,
-        rgba(251, 191, 36, 0.14) 60deg,
-        transparent 80deg,
-        rgba(252, 211, 77, 0.16) 100deg,
-        transparent 130deg);
+    background: radial-gradient(ellipse 60% 50% at 82% 22%,
+        rgba(252, 211, 77, 0.18) 0%,
+        rgba(251, 191, 36, 0.08) 40%,
+        transparent 70%);
     pointer-events: none;
-    animation: sunshineBeamShift 12s ease-in-out infinite;
+    /* removed animation: sunshineBeamShift */
 }
 .sunshine-sunflower {
     position: absolute;
@@ -933,6 +931,7 @@
 .sunshine-sunflower.sf3 { left: 40%; animation-delay: 2s;  transform: scale(1.1); }
 .sunshine-sunflower.sf4 { right: 26%; animation-delay: 0.5s; transform: scale(0.9); }
 .sunshine-sunflower.sf5 { right: 8%;  animation-delay: 1.5s; }
+
 .sunshine-pollen {
     position: absolute;
     width: 4px; height: 4px;
@@ -948,6 +947,7 @@
 .sunshine-pollen.sp4 { top: 28%; left: 78%; animation-delay: 6s; }
 .sunshine-pollen.sp5 { top: 60%; left: 25%; animation-delay: 8s; width: 5px; height: 5px; }
 .sunshine-pollen.sp6 { top: 45%; left: 88%; animation-delay: 10s; }
+
 .sunshine-lens-flare {
     position: absolute;
     border-radius: 50%;
@@ -958,24 +958,7 @@
 .sunshine-lens-flare.lf2 { top: 50%; right: 50%; width: 18px; height: 18px; opacity: 0.7; }
 .sunshine-lens-flare.lf3 { top: 68%; right: 68%; width: 12px; height: 12px; opacity: 0.5; }
 
-@keyframes sunshineSunPulse {
-    0%, 100% {
-        box-shadow:
-            0 0 60px 20px rgba(252, 211, 77, 0.7),
-            0 0 140px 50px rgba(251, 191, 36, 0.45),
-            0 0 260px 90px rgba(245, 158, 11, 0.25);
-    }
-    50% {
-        box-shadow:
-            0 0 80px 30px rgba(252, 211, 77, 0.9),
-            0 0 180px 70px rgba(251, 191, 36, 0.6),
-            0 0 320px 120px rgba(245, 158, 11, 0.35);
-    }
-}
-@keyframes sunshineBeamShift {
-    0%, 100% { transform: rotate(0deg) scale(1); }
-    50%      { transform: rotate(4deg) scale(1.05); }
-}
+/* Removed sunshineSunPulse, sunshineBeamShift keyframes (unused) */
 @keyframes sunflowerSway {
     0%, 100% { transform: translateX(-50%) rotate(-3deg); }
     50%      { transform: translateX(-50%) rotate(3deg); }
@@ -1128,7 +1111,7 @@
 }
 
 /* ================================================================
-   -------- CAFÉ (realistic) --------
+   -------- CAFÉ --------
    ================================================================ */
 .cafe-cup {
     position: absolute;
@@ -1309,10 +1292,7 @@
 }
 
 /* ================================================================
-   -------- ★ CRIMSON — Gothic cathedral w/ rose window (NEW) ------
-   Different approach: no throne/swords/shield. Instead a gothic
-   cathedral silhouette with a stained rose window, arches, candles,
-   and drifting rose petals.
+   -------- ★ CRIMSON — Gothic cathedral w/ rose window --------
    ================================================================ */
 .crimson-vignette {
     position: absolute;
@@ -1323,8 +1303,6 @@
         rgba(15, 3, 3, 0.7) 100%);
     pointer-events: none;
 }
-
-/* Cathedral silhouette with pointed arches */
 .crimson-cathedral {
     position: absolute;
     bottom: 0; left: 50%;
@@ -1346,8 +1324,6 @@
     filter: drop-shadow(0 0 50px rgba(220, 38, 38, 0.55));
     animation: crimsonCathedralGlow 8s ease-in-out infinite;
 }
-
-/* Rose window centered on the cathedral */
 .crimson-rose-window {
     position: absolute;
     top: 20%; left: 50%;
@@ -1389,8 +1365,6 @@
     border: 2px solid rgba(255, 200, 100, 0.6);
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
 }
-
-/* Side pointed-arch windows */
 .crimson-arch-window {
     position: absolute;
     bottom: 28%;
@@ -1408,8 +1382,6 @@
 .crimson-arch-window.aw2 { left: 28%; animation-delay: 1s; height: 130px; }
 .crimson-arch-window.aw3 { right: 28%; animation-delay: 2s; height: 130px; }
 .crimson-arch-window.aw4 { right: 18%; animation-delay: 3s; }
-
-/* Drifting rose petals */
 .crimson-rose-petal {
     position: absolute;
     width: 18px; height: 14px;
@@ -1426,8 +1398,6 @@
 .crimson-rose-petal.rp4 { top: -5%; left: 62%; animation-delay: 7.5s; width: 16px; height: 12px; }
 .crimson-rose-petal.rp5 { top: -5%; left: 78%; animation-delay: 10s; width: 18px; height: 14px; }
 .crimson-rose-petal.rp6 { top: -5%; left: 92%; animation-delay: 12.5s; width: 14px; height: 11px; }
-
-/* Candle glow on the ground */
 .crimson-candle-glow {
     position: absolute;
     bottom: 8%;
@@ -1463,8 +1433,6 @@
 .crimson-candle-glow.cg2 { left: 38%; animation-delay: 0.6s; }
 .crimson-candle-glow.cg3 { right: 38%; animation-delay: 1.2s; }
 .crimson-candle-glow.cg4 { right: 24%; animation-delay: 1.8s; }
-
-/* Soft red orbs for atmospheric depth */
 .crimson-orb {
     position: absolute;
     border-radius: 50%;
@@ -1507,13 +1475,8 @@
 }
 
 /* ================================================================
-   -------- ★ MAROON — Velvet stage + chandelier + glass (NEW) -----
-   Different approach: no barrels/tap/bottle/grapes/candles. Instead
-   velvet curtain stage, hanging chandelier, floating corks and a
-   single wine glass, all lit by a warm spotlight.
+   -------- ★ MAROON — Velvet stage + chandelier + glass --------
    ================================================================ */
-
-/* Velvet curtains left & right */
 .maroon-curtain {
     position: absolute;
     top: 0;
@@ -1530,8 +1493,6 @@
 }
 .maroon-curtain.mc1 { left: 0;  border-radius: 0 0 60% 0; }
 .maroon-curtain.mc2 { right: 0; border-radius: 0 0 0 60%; animation-delay: 2s; }
-
-/* Top valance (pelmet) */
 .maroon-valance {
     position: absolute;
     top: 0; left: 0; right: 0;
@@ -1547,8 +1508,6 @@
     );
     opacity: 0.9;
 }
-
-/* Warm spotlight from above */
 .maroon-spotlight {
     position: absolute;
     top: 90px;
@@ -1564,8 +1523,6 @@
     opacity: 0.8;
     animation: maroonSpotlightPulse 8s ease-in-out infinite;
 }
-
-/* Chandelier */
 .maroon-chandelier {
     position: absolute;
     top: 6%; left: 50%;
@@ -1599,8 +1556,6 @@
         drop-shadow(0 0 30px rgba(251, 191, 36, 0.5));
     animation: maroonChandelierGlow 5s ease-in-out infinite;
 }
-
-/* Wine glass on a small pedestal */
 .maroon-glass {
     position: absolute;
     bottom: 12%; left: 50%;
@@ -1636,8 +1591,6 @@
         22px 100px 0 -1px rgba(245, 230, 211, 0.6);
     border-radius: 2px;
 }
-
-/* Floating corks */
 .maroon-cork {
     position: absolute;
     width: 26px; height: 18px;
@@ -1653,8 +1606,6 @@
 .maroon-cork.c2 { top: 60%; left: 18%; animation-delay: 4s;  transform: rotate(-15deg); }
 .maroon-cork.c3 { top: 22%; right: 10%; animation-delay: 8s; transform: rotate(20deg); }
 .maroon-cork.c4 { top: 55%; right: 22%; animation-delay: 12s; transform: rotate(-8deg); }
-
-/* Warm halo behind the glass */
 .maroon-halo {
     position: absolute;
     bottom: 6%; left: 50%;
@@ -1668,7 +1619,6 @@
     opacity: 0.75;
     animation: maroonHaloPulse 8s ease-in-out infinite;
 }
-
 @keyframes maroonCurtainSway {
     0%, 100% { transform: translateX(0); }
     50%      { transform: translateX(8px); }
@@ -1960,7 +1910,6 @@
     animation: autumnFogDrift 30s ease-in-out infinite;
 }
 .autumn-fog.af1 { bottom: 5%; left: -100px; }
-
 @keyframes autumnTornadoSpin {
     0%   { transform: translateY(0) rotate(0deg) scale(1); }
     50%  { transform: translateY(-30px) rotate(180deg) scale(1.05); }
@@ -2107,7 +2056,6 @@
 .glacier-sparkle.gk2 { top: 50%; left: 55%; animation-delay: 0.8s; }
 .glacier-sparkle.gk3 { top: 25%; left: 75%; animation-delay: 1.6s; }
 .glacier-sparkle.gk4 { top: 45%; left: 18%; animation-delay: 2.2s; }
-
 @keyframes glacierIcebergBob {
     0%, 100% { transform: translateY(0) rotate(0deg); }
     50%      { transform: translateY(-6px) rotate(0.5deg); }
@@ -2232,7 +2180,6 @@
 .tropic-bird::after  { right: 0; transform: rotate(20deg); }
 .tropic-bird.tb1 { top: 18%; left: 25%; animation: tropicBirdFly 25s linear infinite; }
 .tropic-bird.tb2 { top: 24%; left: 65%; animation: tropicBirdFly 30s linear infinite 5s; transform: scale(0.8); }
-
 @keyframes tropicTikiFlame {
     0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.9; }
     50%      { transform: translateX(-50%) scale(1.15); opacity: 1; }
@@ -2346,7 +2293,6 @@
 .moonlit-star.mls2 { top: 35%; left: 55%; animation-delay: 1s; }
 .moonlit-star.mls3 { top: 55%; left: 78%; animation-delay: 2s; width: 4px; height: 4px; }
 .moonlit-star.mls4 { top: 70%; left: 42%; animation-delay: 3s; }
-
 @keyframes moonlitLamp {
     0%, 100% { opacity: 0.85; box-shadow: 0 0 25px 10px color-mix(in srgb, #fde68a 70%, transparent); }
     50%      { opacity: 1;    box-shadow: 0 0 40px 18px color-mix(in srgb, #fde68a 95%, transparent); }
@@ -2456,7 +2402,6 @@
 }
 .aurora-snowcap.as1 { bottom: calc(22% + 240px); left: calc(30% + 200px); transform: scale(0.9); }
 .aurora-snowcap.as2 { bottom: calc(22% + 180px); right: 120px; transform: scale(0.7); }
-
 @keyframes auroraCurtainShift {
     0%, 100% { transform: translateX(0) scaleX(1); opacity: 0.5; }
     25%      { transform: translateX(20px) scaleX(1.15); opacity: 0.8; }
@@ -2474,8 +2419,6 @@
 
 /* ================================================================
    -------- SAKURA (supplementary elements: torii, koi pond, halo)
-   — The cherry tree elements are now defined under the SAKURA block
-     above; these add the remaining background accents.
    ================================================================ */
 .sakura-tree-branch {
     position: absolute;
@@ -2687,7 +2630,6 @@
 .nebula-pulse-star.nps1 { top: 25%; left: 20%; animation-delay: 0s; }
 .nebula-pulse-star.nps2 { top: 65%; left: 72%; animation-delay: 1s; }
 .nebula-pulse-star.nps3 { top: 42%; left: 48%; animation-delay: 2s; width: 7px; height: 7px; }
-
 @keyframes nebulaWormholeSpin {
     from { transform: translate(-50%, -50%) rotate(0deg); }
     to   { transform: translate(-50%, -50%) rotate(360deg); }
@@ -2780,7 +2722,6 @@
 }
 .matcha-bamboo.mb1 { left: 4%;  height: 200px; animation: matchaBambooSway 6s ease-in-out infinite; }
 .matcha-bamboo.mb2 { right: 4%; height: 240px; animation: matchaBambooSway 7s ease-in-out infinite 1s; }
-
 @keyframes matchaZenRotate {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
@@ -2806,14 +2747,7 @@
 
 /* ================================================================
    ===== LIGHT MODE OVERRIDES FOR "DARK-FIRST" THEMES =====
-   These themes (aurora, starry, nebula, ember) ship with dark
-   palettes in BOTH light and dark slots, which left UI panels
-   (forms, cards, containers) dark even when the user picked light
-   mode. The blocks below force a genuinely light surface palette
-   whenever data-timawa-mode="light" is active for them.
    ================================================================ */
-
-/* ----- AURORA · LIGHT ----- */
 [data-timawa-theme="aurora"][data-timawa-mode="light"] {
     --theme-primary: #059669;
     --theme-accent: #7c3aed;
@@ -2835,8 +2769,6 @@
     --theme-shadow-soft: rgba(124, 58, 237, 0.15);
     --theme-nav-bg: rgba(240, 253, 250, 0.98);
 }
-
-/* ----- STARRY · LIGHT ----- */
 [data-timawa-theme="starry"][data-timawa-mode="light"] {
     --theme-primary: #7c3aed;
     --theme-accent: #a78bfa;
@@ -2858,8 +2790,6 @@
     --theme-shadow-soft: rgba(167, 139, 250, 0.2);
     --theme-nav-bg: rgba(250, 248, 255, 0.98);
 }
-
-/* ----- NEBULA · LIGHT ----- */
 [data-timawa-theme="nebula"][data-timawa-mode="light"] {
     --theme-primary: #7c3aed;
     --theme-accent: #ec4899;
@@ -2881,8 +2811,6 @@
     --theme-shadow-soft: rgba(236, 72, 153, 0.18);
     --theme-nav-bg: rgba(253, 247, 255, 0.98);
 }
-
-/* ----- EMBER · LIGHT ----- */
 [data-timawa-theme="ember"][data-timawa-mode="light"] {
     --theme-primary: #ea580c;
     --theme-accent: #dc2626;

@@ -30,7 +30,7 @@
             <div class="shape ocean-fish f2"></div>
         `,
 
-        // ★ Realistic sunset with sun, rays, clouds, birds, mountains, ground
+        // ★ Realistic sunset (OPTIMIZED: fewer rays, no blur, no pulsing)
         sunset: `
             <div class="shape sunset-sun-halo"></div>
             <div class="shape sunset-sun"></div>
@@ -55,8 +55,7 @@
             <div class="shape sunset-ground"></div>
         `,
 
-        // ★ NEW: Dreamy flower meadow (Blossom / pink)
-        //   Rolling hills + tulips + daisies + butterflies + floating petals + sun haze
+        // ★ Dreamy flower meadow (Blossom / pink)
         pink: `
             <div class="shape blossom-sun-haze"></div>
             <div class="shape blossom-meadow-hill hill-far"></div>
@@ -87,7 +86,7 @@
             <div class="shape blossom-butterfly bf3"></div>
         `,
 
-        // ★ NEW: Layered pine forest silhouettes + moon rays + fog + spore lights
+        // ★ Layered pine forest silhouettes + moon rays + fog + spore lights
         forest: `
             <div class="shape forest-moon-ray mr1"></div>
             <div class="shape forest-moon-ray mr2"></div>
@@ -106,7 +105,7 @@
             <div class="shape forest-spore sp5"></div>
         `,
 
-        // ★ Realistic sunshine: sun, rays, beam, sunflowers, pollen, lens flares
+        // ★ Realistic sunshine (OPTIMIZED: no pulsing, no blur, simpler beam)
         sunshine: `
             <div class="shape sunshine-beam"></div>
             <div class="shape sunshine-sun"></div>
@@ -145,7 +144,6 @@
             <div class="shape nebula n2"></div>
         `,
 
-        // ★ Realistic café: window light, rings, steam, cup, saucer, croissant, sugar, beans
         cafe: `
             <div class="shape cafe-window-light"></div>
             <div class="shape coffee-ring cr1"></div>
@@ -168,7 +166,6 @@
             <div class="shape bean bn4"></div>
         `,
 
-        // ★ NEW: Gothic cathedral with rose window, arches, candles, drifting petals
         crimson: `
             <div class="shape crimson-vignette"></div>
             <div class="shape crimson-orb o1"></div>
@@ -191,7 +188,6 @@
             <div class="shape crimson-candle-glow cg4"></div>
         `,
 
-        // ★ NEW: Velvet stage — curtains, valance, spotlight, chandelier, glass, corks, halo
         maroon: `
             <div class="shape maroon-curtain mc1"></div>
             <div class="shape maroon-curtain mc2"></div>
@@ -206,7 +202,6 @@
             <div class="shape maroon-cork c4"></div>
         `,
 
-        // ★ Realistic ember: volcano, crater, lava flow, smoke, ash, embers, lava pool, cracks
         ember: `
             <div class="shape ember-volcano"></div>
             <div class="shape ember-crater"></div>
@@ -308,9 +303,7 @@
             <div class="shape aurora-snowcap as2"></div>
         `,
 
-        // ★ UPDATED: Sakura now includes the full cherry-tree scene
-        //   (trunk, branches, twigs, blossom clusters, petals, grass, mountain)
-        //   plus the original sakura torii / koi pond / halo accents.
+        // ★ UPDATED: Sakura — proper branch layout (all branches fan from trunk)
         sakura: `
             <div class="shape blossom-mountain"></div>
             <div class="shape blossom-trunk"></div>
@@ -318,6 +311,7 @@
             <div class="shape blossom-branch br2"></div>
             <div class="shape blossom-branch br3"></div>
             <div class="shape blossom-branch br4"></div>
+            <div class="shape blossom-branch br5"></div>
             <div class="shape blossom-twig tw1"></div>
             <div class="shape blossom-twig tw2"></div>
             <div class="shape blossom-twig tw3"></div>
