@@ -557,6 +557,62 @@
         }
         .appearance-header p { font-size: 12px; color: var(--theme-text-dim); margin: 2px 0 0; font-weight: 500; }
 
+        /* ★ THEME PREVIEW BUTTON — prominent card-style button */
+        .theme-preview-row {
+            display: block;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+        .theme-preview-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px 20px;
+            background: var(--theme-card);
+            color: var(--theme-primary);
+            border: 2px solid var(--theme-primary);
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: inherit;
+            width: 100%;
+            letter-spacing: 0.2px;
+            box-shadow: 0 6px 18px color-mix(in srgb, var(--theme-primary) 18%, transparent);
+            position: relative;
+            overflow: hidden;
+        }
+        .theme-preview-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--theme-gradient);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            z-index: 0;
+        }
+        .theme-preview-btn > * {
+            position: relative;
+            z-index: 1;
+        }
+        .theme-preview-btn i {
+            font-size: 16px;
+        }
+        .theme-preview-btn:hover {
+            transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 12px 28px color-mix(in srgb, var(--theme-primary) 45%, transparent);
+        }
+        .theme-preview-btn:hover::before {
+            opacity: 1;
+        }
+        .theme-preview-btn:active {
+            transform: translateY(0);
+        }
+
         .theme-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -850,6 +906,80 @@
         }
         .save-confirm-close:hover { background: var(--theme-primary-soft); transform: rotate(90deg); }
 
+        /* ================================================================
+           ===== ★ FULLSCREEN THEME PREVIEW OVERLAY =====
+           ================================================================ */
+        .theme-preview-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: transparent;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            pointer-events: none;
+        }
+        .theme-preview-overlay.active {
+            display: flex;
+            pointer-events: auto;
+        }
+        .theme-preview-overlay .preview-back-btn {
+            position: absolute;
+            top: 24px;
+            left: 24px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 22px;
+            background: var(--theme-card);
+            color: var(--theme-text);
+            border: 2px solid var(--theme-border-input);
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: all 0.25s ease;
+            z-index: 2001;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .theme-preview-overlay .preview-back-btn:hover {
+            background: var(--theme-primary);
+            color: white;
+            border-color: var(--theme-primary);
+            transform: translateX(-4px);
+            box-shadow: 0 12px 32px color-mix(in srgb, var(--theme-primary) 40%, transparent);
+        }
+        .theme-preview-overlay .preview-back-btn i {
+            font-size: 14px;
+        }
+        .theme-preview-overlay .preview-label {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: color-mix(in srgb, var(--theme-card) 80%, transparent);
+            color: var(--theme-text-muted);
+            border: 1px solid var(--theme-border);
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 12px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            pointer-events: none;
+        }
+        .theme-preview-overlay .preview-label i {
+            color: var(--theme-primary);
+        }
+
         @media (max-width: 1024px) {
             .profile-layout {
                 grid-template-columns: 1fr;
@@ -921,6 +1051,17 @@
             .mode-row { padding: 10px 12px; flex-wrap: wrap; }
             .mode-toggle { width: 100%; justify-content: space-between; }
             .mode-toggle .mode-btn { flex: 1; justify-content: center; }
+            .theme-preview-btn { font-size: 13px; padding: 12px 16px; }
+            .theme-preview-overlay .preview-back-btn {
+                top: 16px; left: 16px;
+                padding: 10px 18px;
+                font-size: 13px;
+            }
+            .theme-preview-overlay .preview-label {
+                bottom: 24px;
+                font-size: 11px;
+                padding: 8px 14px;
+            }
         }
         @media (max-width: 480px) {
             .profile-layout { padding: 90px 16px 30px; }
@@ -945,6 +1086,7 @@
             .theme-preset.active::after { width: 18px; height: 18px; font-size: 8px; top: 5px; right: 5px; }
             .appearance-header h3 { font-size: 15px; }
             .appearance-header p { font-size: 11px; }
+            .theme-preview-btn { font-size: 12.5px; padding: 11px 14px; }
         }
 
         ::-webkit-scrollbar { width: 6px; }
@@ -1280,6 +1422,17 @@
     <div class="theme-bg-shapes" id="themeBgShapes"><!-- Injected by JS --></div>
     <div class="theme-bg-overlay"></div>
 
+    <!-- ===== ★ FULLSCREEN THEME PREVIEW OVERLAY ===== -->
+    <div class="theme-preview-overlay" id="themePreviewOverlay">
+        <button type="button" class="preview-back-btn" onclick="closeThemePreview()">
+            <i class="fas fa-arrow-left"></i> Back to profile
+        </button>
+        <div class="preview-label">
+            <i class="fas fa-expand"></i>
+            <span id="previewLabelText">Fullscreen theme preview</span>
+        </div>
+    </div>
+
     <!-- ===== NAVIGATION ===== -->
     <nav class="navbar" id="navbar">
         <a href="index.html" class="logo">TIMAWA <span>PROFILE</span></a>
@@ -1426,7 +1579,7 @@
                 <p>Update your information so the squad can get to know you better.</p>
             </div>
 
-            <div id="message" class="message"></div>
+            <div id="message" class="message" style="display:none;"></div>
 
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
@@ -1530,7 +1683,17 @@
                             <p>Choose your vibe — applies to every page, on every device.</p>
                         </div>
                     </div>
+
+                    <!-- ★ FULLSCREEN THEME PREVIEW BUTTON (now at top of section, very visible) -->
+                    <div class="theme-preview-row">
+                        <button type="button" class="theme-preview-btn" onclick="openThemePreview()">
+                            <i class="fas fa-expand"></i>
+                            <span>Preview Fullscreen</span>
+                        </button>
+                    </div>
+
                     <div class="theme-grid" id="themeGrid"></div>
+
                     <div class="mode-row">
                         <div class="mode-label">
                             <i class="fas fa-circle-half-stroke"></i>
@@ -1802,7 +1965,6 @@
 
         // ================================================================
         // ===== LOCAL DATE HELPER (fixes UTC date rollover at 8AM PHT) =====
-        // Returns "YYYY-MM-DD" in the user's local timezone.
         // ================================================================
         function getLocalDateString(date) {
             const d = date instanceof Date ? date : new Date();
@@ -1817,14 +1979,14 @@
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
-                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
+                const today = getLocalDateString();
                 return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
             } catch (e) { return false; }
         }
 
         function markAutogenRunToday(uid, kind) {
             try {
-                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
+                const today = getLocalDateString();
                 let parsed = { date: today, kinds: {} };
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (raw) {
@@ -2115,8 +2277,6 @@
                 });
                 if (todayBirthdayUsers.length === 0) { markAutogenRunToday(currentUser.uid, 'birthdays_all'); return; }
 
-                // ✅ Use a LOCAL date-stamped referenceId for exact dedup.
-                // No timezone comparison needed — just check if today's ref exists.
                 const localDateStr = getLocalDateString();
 
                 let alreadyAnnouncedUids = new Set();
@@ -2130,7 +2290,6 @@
                     existingSnap.forEach(doc => {
                         const d = doc.data();
                         if (d.referenceId) {
-                            // referenceId format: "2026-09-23_<uid>" → extract uid
                             const parts = d.referenceId.split('_');
                             if (parts.length >= 2) alreadyAnnouncedUids.add(parts[1]);
                         }
@@ -2277,17 +2436,12 @@
         async function autoGenerateMemberAnnouncement(newUser, newUserData) {
             if (!newUser || !newUserData) return;
 
-            // ★ Claim the run IMMEDIATELY (before any async work).
-            //    This blocks multi-tab/multi-page races — the second tab
-            //    will read the flag as "already done" and bail out.
             if (hasAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid)) return;
             markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
 
             const name = newUserData.displayName || newUserData.email || 'A new member';
 
             try {
-                // ★ Dedup at the DB level too — if a race still slips through,
-                //    or if the user clears localStorage, this prevents duplicates.
                 const existing = await db.collection('announcements')
                     .where('type', '==', 'member')
                     .where('referenceId', '==', newUser.uid)
@@ -2318,8 +2472,6 @@
                 console.log('👥 Welcome notification created for', name);
             } catch (e) {
                 console.warn('welcome gen:', e.message);
-                // Note: we do NOT roll back the localStorage flag — a Firestore
-                // hiccup shouldn't cause a flood of retries on every page load.
             }
         }
 
@@ -2473,7 +2625,7 @@
                         ? new Date(profileData.createdAt.seconds * 1000)
                         : new Date(profileData.createdAt);
                     const ageSeconds = (Date.now() - created.getTime()) / 1000;
-                    if (ageSeconds < 90) {   // ★ was 5 minutes — now 90 seconds
+                    if (ageSeconds < 90) {
                         autoGenerateMemberAnnouncement(user, profileData);
                     }
                 } catch (e) {}
@@ -2649,7 +2801,7 @@
                     const avatarEl = document.getElementById('heroAvatar');
                     avatarEl.innerHTML = `<img src="${event.target.result}" alt="Profile Photo" /><label class="photo-upload-btn-overlay"><i class="fas fa-camera"></i><input type="file" id="photoInput" accept="image/*" /></label>`;
                     document.getElementById('photoInput').addEventListener('change', handlePhotoUpload);
-                    document.getElementById('message').style.display = 'none';
+                    hideMessage();
                     showToast(`Photo compressed (${Math.round(compressedFile.size / 1024)}KB). Click Save to upload.`, 'info', 3500);
                 };
                 reader.readAsDataURL(compressedFile);
@@ -2756,6 +2908,7 @@
                         showToast('Error uploading photo: ' + uploadError.message, 'error');
                         saveBtn.disabled = false;
                         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Profile';
+                        hideMessage();
                         return;
                     }
                 }
@@ -2793,6 +2946,9 @@
                 selectedFile = null;
                 document.getElementById('photoInput').value = '';
 
+                // ★ Hide the inline "Saving profile..." message
+                hideMessage();
+
                 showToast('Profile saved successfully!', 'success');
 
                 showSaveConfirmModal({
@@ -2802,10 +2958,12 @@
                 });
             } catch (error) {
                 console.error('Save error:', error);
+                hideMessage();
                 showToast('Error saving profile: ' + error.message, 'error');
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Profile';
+                hideMessage();
             }
         });
 
@@ -2814,9 +2972,18 @@
 
         function showMessage(text, type) {
             const el = document.getElementById('message');
+            if (!el) return;
             el.textContent = text;
             el.className = `message ${type}`;
             el.style.display = 'block';
+        }
+
+        function hideMessage() {
+            const el = document.getElementById('message');
+            if (!el) return;
+            el.style.display = 'none';
+            el.textContent = '';
+            el.className = 'message';
         }
 
         function toggleMobileMenu() {
@@ -2866,10 +3033,12 @@
             const announcementViewModal = document.getElementById('announcementViewModal');
             const saveConfirmModal = document.getElementById('saveConfirmModal');
             const confirmDialog = document.getElementById('confirmDialog');
+            const themePreviewOverlay = document.getElementById('themePreviewOverlay');
 
             if (event.target === announcementViewModal) closeAnnouncementView();
             if (event.target === saveConfirmModal) closeSaveConfirmModal();
             if (event.target === confirmDialog) closeConfirmDialog();
+            if (event.target === themePreviewOverlay) closeThemePreview();
 
             if (announcementPopup && announcementPopup.classList.contains('open')) {
                 if (!announcementPopup.contains(event.target) &&
@@ -2884,6 +3053,11 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
+                // If theme preview is open, close it first
+                if (isThemePreviewActive) {
+                    closeThemePreview();
+                    return;
+                }
                 const confirmDlg = document.getElementById('confirmDialog');
                 const saveModal = document.getElementById('saveConfirmModal');
                 const viewModal = document.getElementById('announcementViewModal');
@@ -2940,7 +3114,6 @@
         }
 
         function syncThemeUI() {
-            // Safety: ensure selectedTheme is a valid object
             if (!selectedTheme || !THEMES[selectedTheme.preset]) {
                 selectedTheme = readThemeFromStorage() || { ...DEFAULT_THEME };
             }
@@ -2957,7 +3130,6 @@
             showToast(`Preview: ${THEMES[key].name} — click Save Profile to apply`, 'info', 2000);
         }
 
-        // ★ ADDED: light/dark mode switcher (was missing)
         function setThemeMode(mode) {
             if (mode !== 'light' && mode !== 'dark') return;
             selectedTheme.mode = mode;
@@ -2965,6 +3137,73 @@
             applyTheme(selectedTheme);
             syncThemeModeToggle();
             showToast(`Preview: ${mode} mode — click Save Profile to apply`, 'info', 1500);
+        }
+
+        // ================================================================
+        // ===== ★ FULLSCREEN THEME PREVIEW =====
+        // ================================================================
+        let isThemePreviewActive = false;
+
+        function openThemePreview() {
+            // Make sure the preview uses the currently selected theme
+            applyTheme(selectedTheme);
+
+            isThemePreviewActive = true;
+
+            const overlay = document.getElementById('themePreviewOverlay');
+            const labelText = document.getElementById('previewLabelText');
+            const navbar = document.getElementById('navbar');
+            const profileLayout = document.querySelector('.profile-layout');
+            const footer = document.querySelector('.footer');
+            const bgBase = document.querySelector('.theme-bg-base');
+            const bgShapes = document.querySelector('.theme-bg-shapes');
+            const bgOverlay = document.querySelector('.theme-bg-overlay');
+
+            if (labelText) {
+                const themeName = THEMES[selectedTheme.preset]?.name || 'Theme';
+                const modeLabel = selectedTheme.mode === 'dark' ? 'Dark' : 'Light';
+                labelText.textContent = `${themeName} · ${modeLabel} — fullscreen preview`;
+            }
+
+            if (overlay) overlay.classList.add('active');
+
+            // Hide all page chrome so the background layers are fully visible
+            if (navbar) navbar.style.display = 'none';
+            if (profileLayout) profileLayout.style.display = 'none';
+            if (footer) footer.style.display = 'none';
+
+            // Bring background layers to a higher z-index so they sit above everything else
+            if (bgBase) bgBase.style.zIndex = '1';
+            if (bgShapes) bgShapes.style.zIndex = '2';
+            if (bgOverlay) bgOverlay.style.zIndex = '3';
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeThemePreview() {
+            isThemePreviewActive = false;
+
+            const overlay = document.getElementById('themePreviewOverlay');
+            const navbar = document.getElementById('navbar');
+            const profileLayout = document.querySelector('.profile-layout');
+            const footer = document.querySelector('.footer');
+            const bgBase = document.querySelector('.theme-bg-base');
+            const bgShapes = document.querySelector('.theme-bg-shapes');
+            const bgOverlay = document.querySelector('.theme-bg-overlay');
+
+            if (overlay) overlay.classList.remove('active');
+
+            // Restore page chrome
+            if (navbar) navbar.style.display = '';
+            if (profileLayout) profileLayout.style.display = '';
+            if (footer) footer.style.display = '';
+
+            // Reset z-indexes to their stylesheet values
+            if (bgBase) bgBase.style.zIndex = '';
+            if (bgShapes) bgShapes.style.zIndex = '';
+            if (bgOverlay) bgOverlay.style.zIndex = '';
+
+            if (!anyModalOpen()) document.body.style.overflow = 'auto';
         }
 
         // ================================================================
