@@ -5,14 +5,22 @@
 
    ★ PERFORMANCE MODE ★
    - Max 3 animated elements per theme.
-   - Everything else is static (same look, no motion).
+   - Everything else is static.
    - No filter: blur() on animated, no animated box-shadow, no animated conic-gradient.
    - will-change ONLY on animated elements.
 
-   ★ NEW CONCEPTS ★
-   - Sakura: elegant single blossom branch (no more tree consistency issues).
-   - Ocean: 3 static bubbles + 2 animated bubbles.
-   - Crimson: added a resting butterfly.
+   ★ CONTRAST FIX (LIGHT MODE) v2 ★
+   - Root cause: several themes had ONLY a dark gradient on .theme-bg-base
+     and dark decorative shapes. In light mode the bg stayed dark but the
+     text was reset to dark → unreadable.
+   - Now: every theme has an explicit [data-timawa-mode="light"] background
+     gradient, plus light-mode color overrides for its decorative shapes.
+   - Fixed: forest, sunset, crimson, maroon, moonlit, aurora, nebula, ember.
+
+   ★ EMBER PERF FIX ★
+   - Removed animated heat shimmer on the huge 55%-tall element.
+   - Removed huge radial-gradient horizon that forced full-screen repaints.
+   - Ember now uses a small static horizon band + one small animated ember.
    ================================================================ */
 
 /* ================================================================
@@ -26,84 +34,111 @@
     transition: background 0.6s ease;
     pointer-events: none;
 }
+
+/* ----- STARRY ----- */
 [data-timawa-theme="starry"] .theme-bg-base {
     background: linear-gradient(180deg, #2a1a5e 0%, #4a3a8e 50%, #6a5ab0 100%);
 }
 [data-timawa-theme="starry"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg, #06040e 0%, #100828 50%, #06040e 100%);
 }
+
+/* ----- NEBULA ----- */
 [data-timawa-theme="nebula"] .theme-bg-base {
     background: linear-gradient(180deg, #2a1a4a 0%, #4a2a6e 50%, #6a4a8e 100%);
 }
 [data-timawa-theme="nebula"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg, #06030f 0%, #10061f 50%, #06030f 100%);
 }
+[data-timawa-theme="nebula"][data-timawa-mode="light"] .theme-bg-base {
+    background: linear-gradient(180deg, #f5ebff 0%, #ede0ff 50%, #e0ccf5 100%);
+}
+
+/* ----- MOONLIT ----- */
 [data-timawa-theme="moonlit"] .theme-bg-base {
-    background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 50%, #64748b 100%);
+    background: linear-gradient(180deg, #e8eef5 0%, #c8d4e0 50%, #a8b8c8 100%);
 }
 [data-timawa-theme="moonlit"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg, #0a1020 0%, #1a2438 50%, #0a1020 100%);
 }
+
+/* ----- AURORA ----- */
 [data-timawa-theme="aurora"] .theme-bg-base {
-    background: linear-gradient(180deg, #a0e5d0 0%, #6ec5b8 50%, #4a9d8e 100%);
+    background: linear-gradient(180deg, #d0f0e6 0%, #a0d8c8 50%, #78c0aa 100%);
 }
 [data-timawa-theme="aurora"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg, #04100f 0%, #08181c 50%, #04100f 100%);
 }
+
+/* ----- EMBER ----- */
 [data-timawa-theme="ember"] .theme-bg-base {
     background: linear-gradient(180deg,
-        #2a0f08 0%, #4a1a0a 35%, #7a2a10 65%, #3a1008 100%);
+        #fde8d0 0%, #f5b878 35%, #e08040 65%, #c06028 100%);
 }
 [data-timawa-theme="ember"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg,
         #0a0402 0%, #1a0805 35%, #2a0f08 65%, #0a0402 100%);
 }
+
+/* ----- SUNSET ----- */
 [data-timawa-theme="sunset"] .theme-bg-base {
     background: linear-gradient(180deg,
-        #1a0f2e 0%, #4a1a4a 20%, #8b2a4a 40%,
-        #d4462e 62%, #f59e0b 78%, #fcd34d 90%, #fde68a 100%);
+        #fde8d0 0%, #fcd0b0 20%, #f5a890 40%,
+        #ee8070 62%, #f5b040 78%, #fcd878 90%, #fef0b0 100%);
 }
 [data-timawa-theme="sunset"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg,
         #0a0618 0%, #2a0f2e 20%, #5a1a2e 40%,
         #a02a1e 62%, #d97706 78%, #fbbf24 90%, #fde68a 100%);
 }
+
+/* ----- FOREST ----- */
 [data-timawa-theme="forest"] .theme-bg-base {
     background: linear-gradient(180deg,
-        #1a3a2a 0%, #0f2a20 40%, #081810 75%, #04100a 100%);
+        #d8efe0 0%, #b0e0c5 40%, #80c8a0 75%, #60b088 100%);
 }
 [data-timawa-theme="forest"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg,
         #0a1f14 0%, #061410 40%, #04100a 75%, #020806 100%);
 }
+
+/* ----- CAFÉ ----- */
 [data-timawa-theme="cafe"] .theme-bg-base {
     background: linear-gradient(180deg, #faf3e8 0%, #f0e0c8 50%, #e8d0b0 100%);
 }
 [data-timawa-theme="cafe"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg, #1a120b 0%, #2a1c12 50%, #1a120b 100%);
 }
+
+/* ----- MAROON ----- */
 [data-timawa-theme="maroon"] .theme-bg-base {
     background: linear-gradient(180deg,
-        #3a0808 0%, #5a0a0a 45%, #4a0808 75%, #2a0505 100%);
+        #e8c8c8 0%, #d0a8a8 45%, #b88888 75%, #9c6868 100%);
 }
 [data-timawa-theme="maroon"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg,
         #1a0404 0%, #2a0606 45%, #200404 75%, #0f0202 100%);
 }
+
+/* ----- CRIMSON ----- */
 [data-timawa-theme="crimson"] .theme-bg-base {
     background: linear-gradient(180deg,
-        #3a0810 0%, #6a0a18 40%, #8a0a20 70%, #4a0812 100%);
+        #f5d0d8 0%, #e8a8b8 40%, #d88898 70%, #c06878 100%);
 }
 [data-timawa-theme="crimson"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg,
         #1a0408 0%, #2a060c 40%, #3a0810 70%, #1a0408 100%);
 }
+
+/* ----- SUNSHINE ----- */
 [data-timawa-theme="sunshine"] .theme-bg-base {
     background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 40%, #fde68a 100%);
 }
 [data-timawa-theme="sunshine"][data-timawa-mode="dark"] .theme-bg-base {
     background: linear-gradient(180deg, #1a1408 0%, #2a2010 40%, #3a2c14 100%);
 }
+
+/* ----- SAKURA ----- */
 [data-timawa-theme="sakura"] .theme-bg-base {
     background: linear-gradient(180deg,
         #fff9fb 0%, #ffe8f0 40%, #ffd0e0 70%, #fff5f8 100%);
@@ -141,7 +176,170 @@
 }
 
 /* ================================================================
-   -------- OCEAN — 2 animated (wave, fish) + 2 rising bubbles --------
+   ===== ★ TEXT COLOR OVERRIDES FOR LIGHT MODE =====
+   Dark text on light backgrounds for readability.
+   ================================================================ */
+[data-timawa-theme="sunset"][data-timawa-mode="light"] {
+    --theme-text: #3a1418;
+    --theme-text-muted: #6b3038;
+    --theme-text-dim: #8a5560;
+    --theme-text-faint: #b08890;
+}
+[data-timawa-theme="forest"][data-timawa-mode="light"] {
+    --theme-text: #0a2418;
+    --theme-text-muted: #2a5040;
+    --theme-text-dim: #4a7a60;
+    --theme-text-faint: #7aa890;
+}
+[data-timawa-theme="crimson"][data-timawa-mode="light"] {
+    --theme-text: #3a1018;
+    --theme-text-muted: #6b2530;
+    --theme-text-dim: #8a4550;
+    --theme-text-faint: #b0808a;
+}
+[data-timawa-theme="maroon"][data-timawa-mode="light"] {
+    --theme-text: #3a1010;
+    --theme-text-muted: #6b2525;
+    --theme-text-dim: #8a4545;
+    --theme-text-faint: #b08080;
+}
+[data-timawa-theme="nebula"][data-timawa-mode="light"] {
+    --theme-text: #1e1030;
+    --theme-text-muted: #4a2a66;
+    --theme-text-dim: #6a4a86;
+    --theme-text-faint: #9a80b0;
+}
+[data-timawa-theme="moonlit"][data-timawa-mode="light"] {
+    --theme-text: #0f172a;
+    --theme-text-muted: #3a4759;
+    --theme-text-dim: #64748b;
+    --theme-text-faint: #94a3b8;
+}
+[data-timawa-theme="aurora"][data-timawa-mode="light"] {
+    --theme-text: #0a2420;
+    --theme-text-muted: #2a4a45;
+    --theme-text-dim: #4a6b62;
+    --theme-text-faint: #7a9a90;
+}
+[data-timawa-theme="ember"][data-timawa-mode="light"] {
+    --theme-text: #3a1f0f;
+    --theme-text-muted: #6b4a30;
+    --theme-text-dim: #a57852;
+    --theme-text-faint: #d4b096;
+}
+
+/* ================================================================
+   ===== ★ BACKGROUND SHAPE COLOR OVERRIDES FOR LIGHT MODE =====
+   These decorative shapes were staying dark in light mode.
+   Now they switch to a lighter, softer tone so text stays readable.
+   ================================================================ */
+
+/* FOREST pines/hill/ground in light mode */
+[data-timawa-theme="forest"][data-timawa-mode="light"] .forest-hill {
+    background: linear-gradient(180deg,
+        color-mix(in srgb, #15803d 25%, transparent) 0%,
+        color-mix(in srgb, #15803d 45%, transparent) 100%);
+    opacity: 0.4;
+}
+[data-timawa-theme="forest"][data-timawa-mode="light"] .forest-pines {
+    opacity: 0.45;
+}
+[data-timawa-theme="forest"][data-timawa-mode="light"] .forest-pines::after {
+    opacity: 0.35;
+}
+[data-timawa-theme="forest"][data-timawa-mode="light"] .forest-ground {
+    background: linear-gradient(to top,
+        color-mix(in srgb, #15803d 40%, transparent) 0%,
+        color-mix(in srgb, #15803d 18%, transparent) 60%,
+        transparent 100%);
+    opacity: 0.7;
+}
+[data-timawa-theme="forest"][data-timawa-mode="light"] .forest-fog {
+    opacity: 0.7;
+}
+
+/* SUNSET mountains/horizon/ground in light mode */
+[data-timawa-theme="sunset"][data-timawa-mode="light"] .sunset-mountain {
+    opacity: 0.7;
+}
+[data-timawa-theme="sunset"][data-timawa-mode="light"] .sunset-mountain.m1 { border-bottom-color: #8a4a5a; }
+[data-timawa-theme="sunset"][data-timawa-mode="light"] .sunset-mountain.m2 { border-bottom-color: #9a5a6a; }
+[data-timawa-theme="sunset"][data-timawa-mode="light"] .sunset-mountain.m3 { border-bottom-color: #7a3a4a; }
+[data-timawa-theme="sunset"][data-timawa-mode="light"] .sunset-ground {
+    background: linear-gradient(to top,
+        rgba(200, 120, 80, 0.5) 0%,
+        rgba(220, 140, 100, 0.28) 40%,
+        rgba(240, 160, 120, 0.15) 70%,
+        transparent 100%);
+    opacity: 0.8;
+}
+
+/* CRIMSON vignette/halo in light mode */
+[data-timawa-theme="crimson"][data-timawa-mode="light"] .crimson-vignette {
+    background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(180, 60, 80, 0.2) 75%,
+        rgba(120, 30, 50, 0.4) 100%);
+}
+[data-timawa-theme="crimson"][data-timawa-mode="light"] .crimson-ground-glow {
+    opacity: 0.5;
+}
+
+/* MAROON vignette/wall/table/spotlight in light mode */
+[data-timawa-theme="maroon"][data-timawa-mode="light"] .maroon-vignette {
+    background: radial-gradient(ellipse at center,
+        transparent 40%,
+        rgba(120, 50, 50, 0.25) 75%,
+        rgba(60, 20, 20, 0.45) 100%);
+}
+[data-timawa-theme="maroon"][data-timawa-mode="light"] .maroon-wall {
+    background:
+        repeating-linear-gradient(to right,
+            transparent 0px, transparent 80px,
+            color-mix(in srgb, #000 6%, transparent) 80px,
+            color-mix(in srgb, #000 6%, transparent) 82px);
+    opacity: 0.3;
+}
+[data-timawa-theme="maroon"][data-timawa-mode="light"] .maroon-table {
+    background: linear-gradient(to top,
+        #8a5050 0%, #b07878 40%, #c89090 70%, transparent 100%);
+    opacity: 0.7;
+}
+
+/* MOONLIT lighthouse/beam/crescent in light mode */
+[data-timawa-theme="moonlit"][data-timawa-mode="light"] .moonlit-lighthouse {
+    filter: brightness(0.9);
+}
+[data-timawa-theme="moonlit"][data-timawa-mode="light"] .moonlit-beam {
+    opacity: 0.35;
+}
+
+/* AURORA mountains in light mode */
+[data-timawa-theme="aurora"][data-timawa-mode="light"] .aurora-mountain {
+    border-bottom-color: #5a7a78;
+    opacity: 0.7;
+}
+[data-timawa-theme="aurora"][data-timawa-mode="light"] .aurora-curtain {
+    opacity: 0.5;
+}
+
+/* NEBULA planet/core adjustments in light mode */
+[data-timawa-theme="nebula"][data-timawa-mode="light"] .nebula-wormhole {
+    opacity: 0.4;
+}
+[data-timawa-theme="nebula"][data-timawa-mode="light"] .nebula-constellation-grid {
+    background-image:
+        linear-gradient(to right,  color-mix(in srgb, #7c3aed 20%, transparent) 1px, transparent 1px),
+        linear-gradient(to bottom, color-mix(in srgb, #7c3aed 20%, transparent) 1px, transparent 1px);
+    opacity: 0.4;
+}
+
+/* ================================================================
+   ===== THEME-SPECIFIC BACKGROUND ELEMENTS =====
+   ================================================================ */
+
+/* ================================================================
+   -------- OCEAN --------
    ================================================================ */
 .ocean-wave {
     position: absolute;
@@ -156,7 +354,6 @@
     bottom: -60px; height: 220px; opacity: 0.07;
     background: var(--theme-accent);
 }
-/* Static decorative bubbles */
 .ocean-bubble {
     position: absolute;
     border-radius: 50%;
@@ -168,8 +365,6 @@
 .ocean-bubble.b1 { width: 60px; height: 60px; left: 12%; bottom: 18%; opacity: 0.22; }
 .ocean-bubble.b2 { width: 40px; height: 40px; left: 32%; bottom: 32%; opacity: 0.18; }
 .ocean-bubble.b3 { width: 80px; height: 80px; left: 68%; bottom: 22%; opacity: 0.14; }
-
-/* Rising animated bubbles — lightweight (translateY + opacity only) */
 .ocean-bubble-rise {
     position: absolute;
     border-radius: 50%;
@@ -183,7 +378,6 @@
 }
 .ocean-bubble-rise.b4 { width: 30px; height: 30px; left: 22%; bottom: -40px; }
 .ocean-bubble-rise.b5 { width: 22px; height: 22px; left: 58%; bottom: -40px; animation-delay: 7s; }
-
 .ocean-fish {
     position: absolute;
     width: 60px; height: 30px; background: var(--theme-primary);
@@ -199,7 +393,6 @@
     border-left: 18px solid var(--theme-primary);
 }
 .ocean-fish.f1 { top: 40%; left: -100px; }
-
 @keyframes oceanWave {
     0%, 100% { transform: translateX(0) rotate(0deg); }
     25% { transform: translateX(-4%) rotate(2deg); }
@@ -292,11 +485,7 @@
 }
 
 /* ================================================================
-   -------- ★ NEW SAKURA — Single sweeping blossom branch --------
-   Concept: One elegant branch sweeping diagonally across the upper
-   part of the scene, with blossom clusters along it and a few petals
-   drifting down. Sun halo in the corner. No tree = no alignment issues.
-   Animated: 1 petal drift + 1 cluster breathe.
+   -------- ★ SAKURA --------
    ================================================================ */
 .sakura-sun {
     position: absolute;
@@ -319,9 +508,6 @@
         transparent 100%);
     border-radius: 50% 50% 0 0 / 30% 30% 0 0;
 }
-
-/* The branch: a wide, gently curved dark line that sweeps from top-left
-   down-right across the upper portion of the screen. */
 .sakura-branch {
     position: absolute;
     top: 8%;
@@ -340,7 +526,6 @@
     transform: rotate(6deg);
     opacity: 0.9;
 }
-/* A short secondary twig branching off downward */
 .sakura-twig {
     position: absolute;
     top: 16%;
@@ -353,7 +538,6 @@
     transform: rotate(28deg);
     opacity: 0.85;
 }
-/* Third smaller twig */
 .sakura-twig.t2 {
     top: 10%;
     left: 30%;
@@ -361,8 +545,6 @@
     height: 5px;
     transform: rotate(-22deg);
 }
-
-/* Blossom clusters sitting along the branch */
 .sakura-cluster {
     position: absolute;
     width: 130px; height: 130px;
@@ -381,7 +563,6 @@
 .sakura-cluster.c4 { top: 3%;  left: 58%; width: 140px; height: 140px; }
 .sakura-cluster.c5 { top: 10%; left: 74%; width: 120px; height: 120px; }
 .sakura-cluster.c6 { top: 22%; left: 84%; width: 110px; height: 110px; }
-
 .sakura-petal {
     position: absolute;
     width: 12px; height: 12px;
@@ -395,7 +576,6 @@
 .sakura-petal.p1 { left: 38%; }
 .sakura-petal.p2 { left: 62%; top: 12%; animation-delay: 5s; width: 10px; height: 10px; }
 .sakura-petal.p3 { left: 50%; top: 18%; animation-delay: 9s; width: 14px; height: 14px; }
-
 @keyframes sakuraClusterBreathe {
     0%, 100% { opacity: 0.85; transform: scale(1); }
     50%      { opacity: 1;    transform: scale(1.04); }
@@ -409,7 +589,7 @@
 }
 
 /* ================================================================
-   -------- PINK / BLOSSOM — 2 animated --------
+   -------- PINK / BLOSSOM --------
    ================================================================ */
 .blossom-sky-haze {
     position: absolute;
@@ -555,7 +735,7 @@
 }
 
 /* ================================================================
-   -------- FOREST — 2 animated (fog, spore) --------
+   -------- FOREST --------
    ================================================================ */
 .forest-moon {
     position: absolute;
@@ -684,7 +864,7 @@
 }
 
 /* ================================================================
-   -------- SUNSHINE — 1 animated (pollen) --------
+   -------- SUNSHINE --------
    ================================================================ */
 .sunshine-sun {
     position: absolute;
@@ -777,7 +957,7 @@
 }
 
 /* ================================================================
-   -------- STARRY — reference (unchanged) --------
+   -------- STARRY — reference --------
    ================================================================ */
 .starfield {
     position: absolute;
@@ -907,7 +1087,7 @@
 }
 
 /* ================================================================
-   -------- CAFÉ — 3 animated --------
+   -------- CAFÉ --------
    ================================================================ */
 .cafe-window-light {
     position: absolute;
@@ -1074,8 +1254,7 @@
 }
 
 /* ================================================================
-   -------- ★ CRIMSON — 3 animated (rose glow, petal, butterfly) --------
-   Added: a resting butterfly on the rose.
+   -------- CRIMSON --------
    ================================================================ */
 .crimson-vignette {
     position: absolute;
@@ -1181,7 +1360,6 @@
         transparent 80%);
     opacity: 0.9;
 }
-/* Resting butterfly on the rose — static (no animation) */
 .crimson-butterfly {
     position: absolute;
     bottom: 72%;
@@ -1235,7 +1413,7 @@
 }
 
 /* ================================================================
-   -------- MAROON — 2 animated (bubble, shimmer) --------
+   -------- MAROON --------
    ================================================================ */
 .maroon-vignette {
     position: absolute;
@@ -1445,26 +1623,29 @@
 }
 
 /* ================================================================
-   -------- EMBER — 2 animated (ember, heat) --------
+   -------- ★ EMBER (PERF FIX) --------
+   Removed: animated heat shimmer on huge area, huge radial horizon,
+            blurred smoke, animated craters.
+   Kept: small static horizon band + 5 thin cracks + 1 animated ember.
    ================================================================ */
 .ember-volcano-far {
     position: absolute;
-    bottom: 22%;
+    bottom: 25%;
     left: 50%;
     transform: translateX(-50%);
     width: 0; height: 0;
     border-left: 340px solid transparent;
     border-right: 340px solid transparent;
-    border-bottom: 220px solid #1a0805;
+    border-bottom: 200px solid #2a0f08;
     opacity: 0.85;
 }
 .ember-volcano-far::before {
     content: '';
     position: absolute;
-    bottom: -220px;
+    bottom: -200px;
     left: -30px;
     width: 60px;
-    height: 26px;
+    height: 24px;
     background: radial-gradient(ellipse at center top,
         #fbbf24 0%, #dc2626 40%, transparent 100%);
     border-radius: 50% 50% 0 0 / 100% 100% 0 0;
@@ -1473,56 +1654,41 @@
 .ember-horizon {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 45%;
-    background: radial-gradient(ellipse at 50% 100%,
-        color-mix(in srgb, var(--theme-primary) 55%, transparent) 0%,
-        color-mix(in srgb, var(--theme-primary) 25%, transparent) 40%,
-        transparent 80%);
+    height: 25%;
+    background: linear-gradient(to top,
+        rgba(251, 146, 60, 0.55) 0%,
+        rgba(220, 38, 38, 0.3) 40%,
+        rgba(180, 40, 20, 0.1) 70%,
+        transparent 100%);
     opacity: 0.9;
 }
 .ember-crack {
     position: absolute;
     bottom: 0;
-    width: 3px;
+    width: 2px;
     background: linear-gradient(to top,
         #fef3c7 0%, #f59e0b 40%, #dc2626 80%, transparent 100%);
     opacity: 0.75;
-    box-shadow: 0 0 12px 3px rgba(245, 158, 11, 0.5);
     border-radius: 2px;
 }
-.ember-crack.ec1 { left: 14%; height: 110px; transform: rotate(-6deg); }
-.ember-crack.ec2 { left: 32%; height: 140px; transform: rotate(3deg); }
-.ember-crack.ec3 { left: 50%; height: 180px; transform: rotate(2deg); }
-.ember-crack.ec4 { right: 32%; height: 130px; transform: rotate(-4deg); }
-.ember-crack.ec5 { right: 14%; height: 100px; transform: rotate(8deg); }
-.ember-heat {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 55%;
-    background: linear-gradient(to top,
-        color-mix(in srgb, #fbbf24 22%, transparent) 0%,
-        color-mix(in srgb, #dc2626 12%, transparent) 40%,
-        transparent 100%);
-    animation: emberHeatShimmer 14s ease-in-out infinite;
-    will-change: opacity;
-}
+.ember-crack.ec1 { left: 14%; height: 100px; transform: rotate(-6deg); }
+.ember-crack.ec2 { left: 32%; height: 130px; transform: rotate(3deg); }
+.ember-crack.ec3 { left: 50%; height: 170px; transform: rotate(2deg); }
+.ember-crack.ec4 { right: 32%; height: 120px; transform: rotate(-4deg); }
+.ember-crack.ec5 { right: 14%; height: 90px; transform: rotate(8deg); }
 .ember-particle {
     position: absolute;
     width: 6px; height: 6px;
     background: #fde68a;
     border-radius: 50%;
     box-shadow:
-        0 0 14px 4px #f59e0b,
-        0 0 28px 10px rgba(249, 115, 22, 0.4);
+        0 0 12px 3px #f59e0b,
+        0 0 20px 8px rgba(249, 115, 22, 0.4);
     bottom: 4%;
     left: 50%;
     opacity: 0;
     animation: emberRise 10s ease-out infinite;
     will-change: transform, opacity;
-}
-@keyframes emberHeatShimmer {
-    0%, 100% { opacity: 0.7; }
-    50%      { opacity: 1; }
 }
 @keyframes emberRise {
     0%   { transform: translate(-50%, 0) scale(0.6); opacity: 0; }
@@ -1532,7 +1698,7 @@
 }
 
 /* ================================================================
-   -------- AUTUMN — 1 animated (tornado) --------
+   -------- AUTUMN --------
    ================================================================ */
 .autumn-pumpkin {
     position: absolute;
@@ -1614,7 +1780,7 @@
 }
 
 /* ================================================================
-   -------- GLACIER — 2 animated (iceberg bob, snowflake) --------
+   -------- GLACIER --------
    ================================================================ */
 .glacier-iceberg {
     position: absolute;
@@ -1624,8 +1790,7 @@
     box-shadow:
         inset -10px 0 20px rgba(0, 0, 0, 0.15),
         inset 10px 0 20px rgba(255, 255, 255, 0.4),
-        0 10px 30px rgba(8, 145, 178, 0.3),
-        0 0 20px rgba(103, 232, 249, 0.4);
+        0 10px 30px rgba(8, 145, 178, 0.3);
     opacity: 0.9;
 }
 .glacier-iceberg.ib1 { left: 8%;  width: 200px; height: 160px;
@@ -1711,7 +1876,7 @@
 }
 
 /* ================================================================
-   -------- TROPIC — 2 animated (tiki flame, bird) --------
+   -------- TROPIC --------
    ================================================================ */
 .tropic-sunset-horizon {
     position: absolute;
@@ -1807,7 +1972,7 @@
 }
 
 /* ================================================================
-   -------- MOONLIT — 2 animated (beam, star) --------
+   -------- MOONLIT --------
    ================================================================ */
 .moonlit-lighthouse {
     position: absolute;
@@ -1907,7 +2072,7 @@
 }
 
 /* ================================================================
-   -------- AURORA — 3 animated (3 curtains) --------
+   -------- AURORA --------
    ================================================================ */
 .aurora-mountain {
     position: absolute;
@@ -1917,9 +2082,6 @@
     border-right: 300px solid transparent;
     border-bottom: 320px solid #0a1f24;
     opacity: 0.9;
-}
-[data-timawa-theme="aurora"][data-timawa-mode="light"] .aurora-mountain {
-    border-bottom-color: #2d4a48;
 }
 .aurora-mountain.am1 { left: -120px; }
 .aurora-mountain.am2 { left: 30%; border-left-width: 360px; border-right-width: 360px; border-bottom-width: 380px; }
@@ -1991,7 +2153,7 @@
 }
 
 /* ================================================================
-   -------- NEBULA — 3 animated (wormhole, core, pulse star) --------
+   -------- NEBULA --------
    ================================================================ */
 .nebula-wormhole {
     position: absolute;
@@ -2011,9 +2173,6 @@
     animation: nebulaWormholeSpin 80s linear infinite;
     will-change: transform;
 }
-[data-timawa-theme="nebula"][data-timawa-mode="light"] .nebula-wormhole {
-    opacity: 0.55;
-}
 .nebula-wormhole-core {
     position: absolute;
     top: 50%; left: 50%;
@@ -2027,10 +2186,6 @@
     box-shadow: 0 0 120px 40px color-mix(in srgb, var(--theme-primary) 60%, transparent);
     will-change: transform, opacity;
 }
-[data-timawa-theme="nebula"][data-timawa-mode="light"] .nebula-wormhole-core {
-    background: radial-gradient(circle,
-        #4a2a6e 0%, var(--theme-primary) 30%, transparent 75%);
-}
 .nebula-planet {
     position: absolute;
     top: 18%; right: 12%;
@@ -2041,9 +2196,6 @@
         inset -15px -10px 25px rgba(0, 0, 0, 0.5),
         0 0 40px 10px color-mix(in srgb, var(--theme-accent) 40%, transparent);
     opacity: 0.95;
-}
-[data-timawa-theme="nebula"][data-timawa-mode="light"] .nebula-planet {
-    background: radial-gradient(circle at 35% 30%, #f472b6 0%, #7c3aed 60%, #4a2a6e 100%);
 }
 .nebula-planet-ring {
     position: absolute;
@@ -2090,7 +2242,7 @@
 }
 
 /* ================================================================
-   -------- MATCHA — 2 animated (leaf, bamboo) --------
+   -------- MATCHA --------
    ================================================================ */
 .matcha-zen-circle {
     position: absolute;
@@ -2173,6 +2325,7 @@
 
 /* ================================================================
    ===== LIGHT MODE OVERRIDES FOR "DARK-FIRST" THEMES =====
+   ===== (variable overrides, kept from previous version) =====
    ================================================================ */
 [data-timawa-theme="aurora"][data-timawa-mode="light"] {
     --theme-primary: #059669;
@@ -2249,7 +2402,6 @@
     --theme-text: #3a1f0f;
     --theme-text-muted: #6b4a30;
     --theme-text-dim: #a57852;
-    --theme-text-daint: #d4b096;
     --theme-text-faint: #d4b096;
     --theme-border: #f5e0c8;
     --theme-border-soft: #faecd8;
