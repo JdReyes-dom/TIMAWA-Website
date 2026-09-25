@@ -3,6 +3,13 @@
    TIMAWA — Shared theme system
    Loaded SYNCHRONOUSLY in <head> after theme.css, before page render.
    Provides: applyTheme, THEMES, injectThemeShapes, BroadcastChannel sync.
+
+   PERF NOTES (matches theme.css):
+   - Sakura: single clean tree (trunk + 5 branches + 5 blossom clusters
+     + ground + sun + slow petals).
+   - Forest: one moon, three light beams, single pine silhouette line,
+     three fog bands, ground, five spore lights.
+   - No filter: blur(), no animated box-shadow, no animated conic-gradient.
    ================================================================ */
 
 (function () {
@@ -18,6 +25,7 @@
     // ===== THEME SHAPES (HTML for each preset's animated background) =====
     // ================================================================
     window.THEME_SHAPES = {
+
         // ★ Realistic ocean with waves, bubbles, fish
         ocean: `
             <div class="shape ocean-wave"></div>
@@ -25,12 +33,11 @@
             <div class="shape ocean-bubble b1"></div>
             <div class="shape ocean-bubble b2"></div>
             <div class="shape ocean-bubble b3"></div>
-            <div class="shape ocean-bubble b4"></div>
             <div class="shape ocean-fish f1"></div>
             <div class="shape ocean-fish f2"></div>
         `,
 
-        // ★ Realistic sunset (OPTIMIZED: fewer rays, no blur, no pulsing)
+        // ★ Sunset — lightweight
         sunset: `
             <div class="shape sunset-sun-halo"></div>
             <div class="shape sunset-sun"></div>
@@ -68,7 +75,6 @@
             <div class="shape blossom-tulip t4"></div>
             <div class="shape blossom-tulip t5"></div>
             <div class="shape blossom-tulip t6"></div>
-            <div class="shape blossom-tulip t7"></div>
             <div class="shape blossom-daisy d1"></div>
             <div class="shape blossom-daisy d2"></div>
             <div class="shape blossom-daisy d3"></div>
@@ -79,25 +85,22 @@
             <div class="shape blossom-floating-petal fp3"></div>
             <div class="shape blossom-floating-petal fp4"></div>
             <div class="shape blossom-floating-petal fp5"></div>
-            <div class="shape blossom-floating-petal fp6"></div>
-            <div class="shape blossom-floating-petal fp7"></div>
             <div class="shape blossom-butterfly bf1"></div>
             <div class="shape blossom-butterfly bf2"></div>
-            <div class="shape blossom-butterfly bf3"></div>
         `,
 
-        // ★ Layered pine forest silhouettes + moon rays + fog + spore lights
+        // ★ NEW FOREST — one moon, three beams, one pine line, three fog
+        //   bands, one ground, five spore lights.
         forest: `
-            <div class="shape forest-moon-ray mr1"></div>
-            <div class="shape forest-moon-ray mr2"></div>
-            <div class="shape forest-moon-ray mr3"></div>
-            <div class="shape forest-pine-layer far"></div>
-            <div class="shape forest-pine-layer"></div>
-            <div class="shape forest-pine-layer near"></div>
-            <div class="shape forest-fog-band fb1"></div>
-            <div class="shape forest-fog-band fb2"></div>
-            <div class="shape forest-fog-band fb3"></div>
-            <div class="shape forest-moss-ground"></div>
+            <div class="shape forest-moon"></div>
+            <div class="shape forest-beam b1"></div>
+            <div class="shape forest-beam b2"></div>
+            <div class="shape forest-beam b3"></div>
+            <div class="shape forest-pines"></div>
+            <div class="shape forest-fog f1"></div>
+            <div class="shape forest-fog f2"></div>
+            <div class="shape forest-fog f3"></div>
+            <div class="shape forest-ground"></div>
             <div class="shape forest-spore sp1"></div>
             <div class="shape forest-spore sp2"></div>
             <div class="shape forest-spore sp3"></div>
@@ -105,7 +108,7 @@
             <div class="shape forest-spore sp5"></div>
         `,
 
-        // ★ Realistic sunshine (OPTIMIZED: no pulsing, no blur, simpler beam)
+        // ★ Sunshine — lightweight
         sunshine: `
             <div class="shape sunshine-beam"></div>
             <div class="shape sunshine-sun"></div>
@@ -144,12 +147,12 @@
             <div class="shape nebula n2"></div>
         `,
 
+        // ★ Café — lightweight
         cafe: `
             <div class="shape cafe-window-light"></div>
             <div class="shape coffee-ring cr1"></div>
             <div class="shape coffee-ring cr2"></div>
             <div class="shape coffee-ring cr3"></div>
-            <div class="shape coffee-ring cr4"></div>
             <div class="shape cafe-steam-wisp sw1"></div>
             <div class="shape cafe-steam-wisp sw2"></div>
             <div class="shape cafe-steam-wisp sw3"></div>
@@ -166,6 +169,7 @@
             <div class="shape bean bn4"></div>
         `,
 
+        // ★ Crimson — lightweight
         crimson: `
             <div class="shape crimson-vignette"></div>
             <div class="shape crimson-orb o1"></div>
@@ -181,13 +185,13 @@
             <div class="shape crimson-rose-petal rp3"></div>
             <div class="shape crimson-rose-petal rp4"></div>
             <div class="shape crimson-rose-petal rp5"></div>
-            <div class="shape crimson-rose-petal rp6"></div>
             <div class="shape crimson-candle-glow cg1"></div>
             <div class="shape crimson-candle-glow cg2"></div>
             <div class="shape crimson-candle-glow cg3"></div>
             <div class="shape crimson-candle-glow cg4"></div>
         `,
 
+        // ★ Maroon — lightweight (no animated spotlight or chandelier glow)
         maroon: `
             <div class="shape maroon-curtain mc1"></div>
             <div class="shape maroon-curtain mc2"></div>
@@ -202,6 +206,7 @@
             <div class="shape maroon-cork c4"></div>
         `,
 
+        // ★ Ember — lightweight (fewer particles, no blur)
         ember: `
             <div class="shape ember-volcano"></div>
             <div class="shape ember-crater"></div>
@@ -213,16 +218,12 @@
             <div class="shape ember-ash as2"></div>
             <div class="shape ember-ash as3"></div>
             <div class="shape ember-ash as4"></div>
-            <div class="shape ember-ash as5"></div>
-            <div class="shape ember-ash as6"></div>
             <div class="shape ember-particle ep1"></div>
             <div class="shape ember-particle ep2"></div>
             <div class="shape ember-particle ep3"></div>
             <div class="shape ember-particle ep4"></div>
             <div class="shape ember-particle ep5"></div>
             <div class="shape ember-particle ep6"></div>
-            <div class="shape ember-particle ep7"></div>
-            <div class="shape ember-particle ep8"></div>
             <div class="shape ember-lava-pool"></div>
             <div class="shape ember-crack ec1"></div>
             <div class="shape ember-crack ec2"></div>
@@ -240,6 +241,7 @@
             <div class="shape autumn-fog af1"></div>
         `,
 
+        // ★ Glacier — lightweight
         glacier: `
             <div class="shape glacier-iceberg ib1"></div>
             <div class="shape glacier-iceberg ib2"></div>
@@ -257,14 +259,13 @@
             <div class="shape glacier-snowflake gs4"></div>
             <div class="shape glacier-snowflake gs5"></div>
             <div class="shape glacier-snowflake gs6"></div>
-            <div class="shape glacier-snowflake gs7"></div>
-            <div class="shape glacier-snowflake gs8"></div>
             <div class="shape glacier-sparkle gk1"></div>
             <div class="shape glacier-sparkle gk2"></div>
             <div class="shape glacier-sparkle gk3"></div>
             <div class="shape glacier-sparkle gk4"></div>
         `,
 
+        // ★ Tropic — lightweight
         tropic: `
             <div class="shape tropic-sunset-horizon"></div>
             <div class="shape tropic-water-band"></div>
@@ -278,6 +279,7 @@
             <div class="shape tropic-bird tb2"></div>
         `,
 
+        // ★ Moonlit — lightweight
         moonlit: `
             <div class="shape moonlit-lighthouse"></div>
             <div class="shape moonlit-beam"></div>
@@ -291,6 +293,7 @@
             <div class="shape moonlit-star mls4"></div>
         `,
 
+        // ★ Aurora — lightweight
         aurora: `
             <div class="shape aurora-mountain am1"></div>
             <div class="shape aurora-mountain am2"></div>
@@ -303,44 +306,32 @@
             <div class="shape aurora-snowcap as2"></div>
         `,
 
-        // ★ UPDATED: Sakura — proper branch layout (all branches fan from trunk)
+        // ★ NEW SAKURA — one clean tree (trunk + 5 branches from a single
+        //   origin + 5 blossom clusters at the tips) + ground + sun + petals.
         sakura: `
-            <div class="shape blossom-mountain"></div>
-            <div class="shape blossom-trunk"></div>
-            <div class="shape blossom-branch br1"></div>
-            <div class="shape blossom-branch br2"></div>
-            <div class="shape blossom-branch br3"></div>
-            <div class="shape blossom-branch br4"></div>
-            <div class="shape blossom-branch br5"></div>
-            <div class="shape blossom-twig tw1"></div>
-            <div class="shape blossom-twig tw2"></div>
-            <div class="shape blossom-twig tw3"></div>
-            <div class="shape blossom-twig tw4"></div>
-            <div class="shape blossom-twig tw5"></div>
-            <div class="shape blossom-cluster bc1"></div>
-            <div class="shape blossom-cluster bc2"></div>
-            <div class="shape blossom-cluster bc3"></div>
-            <div class="shape blossom-cluster bc4"></div>
-            <div class="shape blossom-cluster bc5"></div>
-            <div class="shape petal p1"></div>
-            <div class="shape petal p2"></div>
-            <div class="shape petal p3"></div>
-            <div class="shape petal p4"></div>
-            <div class="shape petal p5"></div>
-            <div class="shape petal p6"></div>
-            <div class="shape petal p7"></div>
-            <div class="shape petal p8"></div>
-            <div class="shape blossom-grass"></div>
-            <div class="shape sakura-torii"></div>
-            <div class="shape sakura-koi-pond"></div>
-            <div class="shape sakura-falling-petal sfp1"></div>
-            <div class="shape sakura-falling-petal sfp2"></div>
-            <div class="shape sakura-falling-petal sfp3"></div>
-            <div class="shape sakura-falling-petal sfp4"></div>
-            <div class="shape sakura-falling-petal sfp5"></div>
-            <div class="shape sakura-sun-halo"></div>
+            <div class="shape sakura-sun"></div>
+            <div class="shape sakura-ground"></div>
+            <div class="shape sakura-tree">
+                <div class="sakura-trunk"></div>
+                <div class="sakura-branch b1"></div>
+                <div class="sakura-branch b2"></div>
+                <div class="sakura-branch b3"></div>
+                <div class="sakura-branch b4"></div>
+                <div class="sakura-branch b5"></div>
+                <div class="sakura-cluster c1"></div>
+                <div class="sakura-cluster c2"></div>
+                <div class="sakura-cluster c3"></div>
+                <div class="sakura-cluster c4"></div>
+                <div class="sakura-cluster c5"></div>
+            </div>
+            <div class="shape sakura-petal p1"></div>
+            <div class="shape sakura-petal p2"></div>
+            <div class="shape sakura-petal p3"></div>
+            <div class="shape sakura-petal p4"></div>
+            <div class="shape sakura-petal p5"></div>
         `,
 
+        // ★ Nebula — lightweight
         nebula: `
             <div class="shape nebula-wormhole"></div>
             <div class="shape nebula-wormhole-core"></div>
@@ -352,6 +343,7 @@
             <div class="shape nebula-pulse-star nps3"></div>
         `,
 
+        // ★ Matcha — lightweight
         matcha: `
             <div class="shape matcha-zen-circle mzc1"></div>
             <div class="shape matcha-zen-circle mzc2"></div>
