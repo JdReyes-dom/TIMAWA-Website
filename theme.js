@@ -2,72 +2,68 @@
    theme.js
    TIMAWA — Shared theme system
    Loaded SYNCHRONOUSLY in <head> after theme.css, before page render.
-   Provides: applyTheme, THEMES, injectThemeShapes, BroadcastChannel sync.
 
-   PERF NOTES (matches theme.css):
-   - Sakura: single clean tree (trunk + 5 branches + 5 blossom clusters
-     + ground + sun + slow petals).
-   - Forest: one moon, three light beams, single pine silhouette line,
-     three fog bands, ground, five spore lights.
-   - No filter: blur(), no animated box-shadow, no animated conic-gradient.
+   ★ Matches theme.css ★
+   - Ocean: 3 static bubbles + 2 rising animated bubbles.
+   - Sakura: single sweeping blossom branch (no more tree).
+   - Crimson: added a resting butterfly.
+   Palettes, applyTheme, storage, sync: UNCHANGED.
    ================================================================ */
 
 (function () {
     'use strict';
 
-    // ================================================================
-    // ===== CONSTANTS =====
-    // ================================================================
     window.THEME_STORAGE_KEY = 'timawa_theme';
     window.THEME_EVENT = 'timawa-theme-change';
 
-    // ================================================================
-    // ===== THEME SHAPES (HTML for each preset's animated background) =====
-    // ================================================================
     window.THEME_SHAPES = {
 
-        // ★ Realistic ocean with waves, bubbles, fish
+        // ★ OCEAN — wave + fish + 2 rising bubbles animated; 3 bubbles static
         ocean: `
             <div class="shape ocean-wave"></div>
             <div class="shape ocean-wave w2"></div>
             <div class="shape ocean-bubble b1"></div>
             <div class="shape ocean-bubble b2"></div>
             <div class="shape ocean-bubble b3"></div>
+            <div class="shape ocean-bubble-rise b4"></div>
+            <div class="shape ocean-bubble-rise b5"></div>
             <div class="shape ocean-fish f1"></div>
-            <div class="shape ocean-fish f2"></div>
         `,
 
-        // ★ Sunset — lightweight
         sunset: `
-            <div class="shape sunset-sun-halo"></div>
             <div class="shape sunset-sun"></div>
-            <div class="shape sunset-ray r1"></div>
-            <div class="shape sunset-ray r2"></div>
-            <div class="shape sunset-ray r3"></div>
-            <div class="shape sunset-ray r4"></div>
-            <div class="shape sunset-ray r5"></div>
-            <div class="shape sunset-ray r6"></div>
             <div class="shape sunset-horizon"></div>
-            <div class="shape sunset-cloud c1"></div>
-            <div class="shape sunset-cloud c2"></div>
-            <div class="shape sunset-cloud c3"></div>
-            <div class="shape sunset-bird sb1"></div>
-            <div class="shape sunset-bird sb2"></div>
-            <div class="shape sunset-bird sb3"></div>
-            <div class="shape sunset-mountain-far mf1"></div>
-            <div class="shape sunset-mountain-far mf2"></div>
             <div class="shape sunset-mountain m1"></div>
             <div class="shape sunset-mountain m2"></div>
             <div class="shape sunset-mountain m3"></div>
             <div class="shape sunset-ground"></div>
+            <div class="shape sunset-cloud c1"></div>
+            <div class="shape sunset-bird sb1"></div>
         `,
 
-        // ★ Dreamy flower meadow (Blossom / pink)
+        // ★ NEW SAKURA — single sweeping blossom branch + 2 twigs +
+        //   6 clusters + 3 petals + sun + ground
+        sakura: `
+            <div class="shape sakura-sun"></div>
+            <div class="shape sakura-ground"></div>
+            <div class="shape sakura-branch"></div>
+            <div class="shape sakura-twig"></div>
+            <div class="shape sakura-twig t2"></div>
+            <div class="shape sakura-cluster c1"></div>
+            <div class="shape sakura-cluster c2"></div>
+            <div class="shape sakura-cluster c3"></div>
+            <div class="shape sakura-cluster c4"></div>
+            <div class="shape sakura-cluster c5"></div>
+            <div class="shape sakura-cluster c6"></div>
+            <div class="shape sakura-petal p1"></div>
+            <div class="shape sakura-petal p2"></div>
+            <div class="shape sakura-petal p3"></div>
+        `,
+
         pink: `
-            <div class="shape blossom-sun-haze"></div>
+            <div class="shape blossom-sky-haze"></div>
             <div class="shape blossom-meadow-hill hill-far"></div>
             <div class="shape blossom-meadow-hill"></div>
-            <div class="shape blossom-meadow-hill hill-near"></div>
             <div class="shape blossom-meadow-ground"></div>
             <div class="shape blossom-tulip t1"></div>
             <div class="shape blossom-tulip t2"></div>
@@ -78,37 +74,19 @@
             <div class="shape blossom-daisy d1"></div>
             <div class="shape blossom-daisy d2"></div>
             <div class="shape blossom-daisy d3"></div>
-            <div class="shape blossom-daisy d4"></div>
-            <div class="shape blossom-daisy d5"></div>
             <div class="shape blossom-floating-petal fp1"></div>
-            <div class="shape blossom-floating-petal fp2"></div>
-            <div class="shape blossom-floating-petal fp3"></div>
-            <div class="shape blossom-floating-petal fp4"></div>
-            <div class="shape blossom-floating-petal fp5"></div>
             <div class="shape blossom-butterfly bf1"></div>
-            <div class="shape blossom-butterfly bf2"></div>
         `,
 
-        // ★ NEW FOREST — one moon, three beams, one pine line, three fog
-        //   bands, one ground, five spore lights.
         forest: `
             <div class="shape forest-moon"></div>
-            <div class="shape forest-beam b1"></div>
-            <div class="shape forest-beam b2"></div>
-            <div class="shape forest-beam b3"></div>
+            <div class="shape forest-hill"></div>
             <div class="shape forest-pines"></div>
-            <div class="shape forest-fog f1"></div>
-            <div class="shape forest-fog f2"></div>
-            <div class="shape forest-fog f3"></div>
             <div class="shape forest-ground"></div>
+            <div class="shape forest-fog f1"></div>
             <div class="shape forest-spore sp1"></div>
-            <div class="shape forest-spore sp2"></div>
-            <div class="shape forest-spore sp3"></div>
-            <div class="shape forest-spore sp4"></div>
-            <div class="shape forest-spore sp5"></div>
         `,
 
-        // ★ Sunshine — lightweight
         sunshine: `
             <div class="shape sunshine-beam"></div>
             <div class="shape sunshine-sun"></div>
@@ -120,20 +98,12 @@
             <div class="shape sunshine-ray sr6"></div>
             <div class="shape sunshine-ray sr7"></div>
             <div class="shape sunshine-ray sr8"></div>
-            <div class="shape sunshine-lens-flare lf1"></div>
-            <div class="shape sunshine-lens-flare lf2"></div>
-            <div class="shape sunshine-lens-flare lf3"></div>
             <div class="shape sunshine-sunflower sf1"></div>
             <div class="shape sunshine-sunflower sf2"></div>
             <div class="shape sunshine-sunflower sf3"></div>
             <div class="shape sunshine-sunflower sf4"></div>
             <div class="shape sunshine-sunflower sf5"></div>
             <div class="shape sunshine-pollen sp1"></div>
-            <div class="shape sunshine-pollen sp2"></div>
-            <div class="shape sunshine-pollen sp3"></div>
-            <div class="shape sunshine-pollen sp4"></div>
-            <div class="shape sunshine-pollen sp5"></div>
-            <div class="shape sunshine-pollen sp6"></div>
         `,
 
         starry: `
@@ -147,139 +117,94 @@
             <div class="shape nebula n2"></div>
         `,
 
-        // ★ Café — lightweight
         cafe: `
             <div class="shape cafe-window-light"></div>
-            <div class="shape coffee-ring cr1"></div>
-            <div class="shape coffee-ring cr2"></div>
-            <div class="shape coffee-ring cr3"></div>
-            <div class="shape cafe-steam-wisp sw1"></div>
-            <div class="shape cafe-steam-wisp sw2"></div>
-            <div class="shape cafe-steam-wisp sw3"></div>
             <div class="shape cafe-saucer"></div>
             <div class="shape cafe-cup"></div>
             <div class="shape cafe-cup-fill"></div>
             <div class="shape cafe-croissant"></div>
             <div class="shape cafe-sugar-cube sc1"></div>
             <div class="shape cafe-sugar-cube sc2"></div>
-            <div class="shape cafe-sugar-cube sc3"></div>
+            <div class="shape coffee-ring cr1"></div>
+            <div class="shape coffee-ring cr2"></div>
+            <div class="shape cafe-steam-wisp sw1"></div>
             <div class="shape bean bn1"></div>
-            <div class="shape bean bn2"></div>
-            <div class="shape bean bn3"></div>
-            <div class="shape bean bn4"></div>
         `,
 
-        // ★ Crimson — lightweight
+        // ★ CRIMSON — halo, stem, 2 leaves, 2 dew drops, rose, butterfly, petal
         crimson: `
             <div class="shape crimson-vignette"></div>
-            <div class="shape crimson-orb o1"></div>
-            <div class="shape crimson-orb o2"></div>
-            <div class="shape crimson-cathedral"></div>
-            <div class="shape crimson-rose-window"></div>
-            <div class="shape crimson-arch-window aw1"></div>
-            <div class="shape crimson-arch-window aw2"></div>
-            <div class="shape crimson-arch-window aw3"></div>
-            <div class="shape crimson-arch-window aw4"></div>
-            <div class="shape crimson-rose-petal rp1"></div>
-            <div class="shape crimson-rose-petal rp2"></div>
-            <div class="shape crimson-rose-petal rp3"></div>
-            <div class="shape crimson-rose-petal rp4"></div>
-            <div class="shape crimson-rose-petal rp5"></div>
-            <div class="shape crimson-candle-glow cg1"></div>
-            <div class="shape crimson-candle-glow cg2"></div>
-            <div class="shape crimson-candle-glow cg3"></div>
-            <div class="shape crimson-candle-glow cg4"></div>
+            <div class="shape crimson-ground-glow"></div>
+            <div class="shape crimson-halo"></div>
+            <div class="shape crimson-stem"></div>
+            <div class="shape crimson-leaf l1"></div>
+            <div class="shape crimson-leaf l2"></div>
+            <div class="shape crimson-dew d1"></div>
+            <div class="shape crimson-dew d2"></div>
+            <div class="shape crimson-rose"></div>
+            <div class="shape crimson-butterfly"></div>
+            <div class="shape crimson-petal p1"></div>
         `,
 
-        // ★ Maroon — lightweight (no animated spotlight or chandelier glow)
         maroon: `
-            <div class="shape maroon-curtain mc1"></div>
-            <div class="shape maroon-curtain mc2"></div>
-            <div class="shape maroon-valance"></div>
+            <div class="shape maroon-vignette"></div>
+            <div class="shape maroon-wall"></div>
+            <div class="shape maroon-table"></div>
             <div class="shape maroon-spotlight"></div>
-            <div class="shape maroon-halo"></div>
-            <div class="shape maroon-chandelier"></div>
-            <div class="shape maroon-glass"></div>
-            <div class="shape maroon-cork c1"></div>
-            <div class="shape maroon-cork c2"></div>
-            <div class="shape maroon-cork c3"></div>
-            <div class="shape maroon-cork c4"></div>
+            <div class="shape maroon-plate"></div>
+            <div class="shape maroon-cork"></div>
+            <div class="shape maroon-glass">
+                <div class="maroon-glass-bowl"></div>
+                <div class="maroon-glass-stem"></div>
+                <div class="maroon-glass-base"></div>
+            </div>
+            <div class="shape maroon-wine-bubble"></div>
         `,
 
-        // ★ Ember — lightweight (fewer particles, no blur)
         ember: `
-            <div class="shape ember-volcano"></div>
-            <div class="shape ember-crater"></div>
-            <div class="shape ember-lava-flow lf1"></div>
-            <div class="shape ember-lava-flow lf2"></div>
-            <div class="shape ember-smoke"></div>
-            <div class="shape ember-smoke sm2"></div>
-            <div class="shape ember-ash as1"></div>
-            <div class="shape ember-ash as2"></div>
-            <div class="shape ember-ash as3"></div>
-            <div class="shape ember-ash as4"></div>
-            <div class="shape ember-particle ep1"></div>
-            <div class="shape ember-particle ep2"></div>
-            <div class="shape ember-particle ep3"></div>
-            <div class="shape ember-particle ep4"></div>
-            <div class="shape ember-particle ep5"></div>
-            <div class="shape ember-particle ep6"></div>
-            <div class="shape ember-lava-pool"></div>
+            <div class="shape ember-volcano-far"></div>
+            <div class="shape ember-horizon"></div>
             <div class="shape ember-crack ec1"></div>
             <div class="shape ember-crack ec2"></div>
+            <div class="shape ember-crack ec3"></div>
+            <div class="shape ember-crack ec4"></div>
+            <div class="shape ember-crack ec5"></div>
+            <div class="shape ember-heat"></div>
+            <div class="shape ember-particle"></div>
         `,
 
         autumn: `
             <div class="shape autumn-pumpkin ap1"></div>
             <div class="shape autumn-pumpkin ap2"></div>
-            <div class="shape autumn-pumpkin ap3"></div>
             <div class="shape autumn-leaf-tornado"></div>
             <div class="shape autumn-fence"></div>
             <div class="shape autumn-wheat tuft1"></div>
             <div class="shape autumn-wheat tuft2"></div>
-            <div class="shape autumn-wheat tuft3"></div>
             <div class="shape autumn-fog af1"></div>
         `,
 
-        // ★ Glacier — lightweight
         glacier: `
             <div class="shape glacier-iceberg ib1"></div>
             <div class="shape glacier-iceberg ib2"></div>
             <div class="shape glacier-iceberg ib3"></div>
-            <div class="shape glacier-iceberg-underwater iw1"></div>
-            <div class="shape glacier-iceberg-underwater iw2"></div>
-            <div class="shape glacier-iceberg-underwater iw3"></div>
             <div class="shape glacier-water-line"></div>
             <div class="shape glacier-water-surface"></div>
             <div class="shape glacier-peak pk1"></div>
             <div class="shape glacier-peak pk2"></div>
             <div class="shape glacier-snowflake gs1"></div>
-            <div class="shape glacier-snowflake gs2"></div>
-            <div class="shape glacier-snowflake gs3"></div>
-            <div class="shape glacier-snowflake gs4"></div>
-            <div class="shape glacier-snowflake gs5"></div>
-            <div class="shape glacier-snowflake gs6"></div>
             <div class="shape glacier-sparkle gk1"></div>
             <div class="shape glacier-sparkle gk2"></div>
-            <div class="shape glacier-sparkle gk3"></div>
-            <div class="shape glacier-sparkle gk4"></div>
         `,
 
-        // ★ Tropic — lightweight
         tropic: `
             <div class="shape tropic-sunset-horizon"></div>
             <div class="shape tropic-water-band"></div>
             <div class="shape tropic-tiki tki1"></div>
             <div class="shape tropic-tiki tki2"></div>
             <div class="shape tropic-driftwood"></div>
-            <div class="shape tropic-foam tf1"></div>
-            <div class="shape tropic-foam tf2"></div>
-            <div class="shape tropic-foam tf3"></div>
             <div class="shape tropic-bird tb1"></div>
-            <div class="shape tropic-bird tb2"></div>
         `,
 
-        // ★ Moonlit — lightweight
         moonlit: `
             <div class="shape moonlit-lighthouse"></div>
             <div class="shape moonlit-beam"></div>
@@ -290,10 +215,8 @@
             <div class="shape moonlit-star mls1"></div>
             <div class="shape moonlit-star mls2"></div>
             <div class="shape moonlit-star mls3"></div>
-            <div class="shape moonlit-star mls4"></div>
         `,
 
-        // ★ Aurora — lightweight
         aurora: `
             <div class="shape aurora-mountain am1"></div>
             <div class="shape aurora-mountain am2"></div>
@@ -306,32 +229,6 @@
             <div class="shape aurora-snowcap as2"></div>
         `,
 
-        // ★ NEW SAKURA — one clean tree (trunk + 5 branches from a single
-        //   origin + 5 blossom clusters at the tips) + ground + sun + petals.
-        sakura: `
-            <div class="shape sakura-sun"></div>
-            <div class="shape sakura-ground"></div>
-            <div class="shape sakura-tree">
-                <div class="sakura-trunk"></div>
-                <div class="sakura-branch b1"></div>
-                <div class="sakura-branch b2"></div>
-                <div class="sakura-branch b3"></div>
-                <div class="sakura-branch b4"></div>
-                <div class="sakura-branch b5"></div>
-                <div class="sakura-cluster c1"></div>
-                <div class="sakura-cluster c2"></div>
-                <div class="sakura-cluster c3"></div>
-                <div class="sakura-cluster c4"></div>
-                <div class="sakura-cluster c5"></div>
-            </div>
-            <div class="shape sakura-petal p1"></div>
-            <div class="shape sakura-petal p2"></div>
-            <div class="shape sakura-petal p3"></div>
-            <div class="shape sakura-petal p4"></div>
-            <div class="shape sakura-petal p5"></div>
-        `,
-
-        // ★ Nebula — lightweight
         nebula: `
             <div class="shape nebula-wormhole"></div>
             <div class="shape nebula-wormhole-core"></div>
@@ -339,11 +236,8 @@
             <div class="shape nebula-planet-ring"></div>
             <div class="shape nebula-constellation-grid"></div>
             <div class="shape nebula-pulse-star nps1"></div>
-            <div class="shape nebula-pulse-star nps2"></div>
-            <div class="shape nebula-pulse-star nps3"></div>
         `,
 
-        // ★ Matcha — lightweight
         matcha: `
             <div class="shape matcha-zen-circle mzc1"></div>
             <div class="shape matcha-zen-circle mzc2"></div>
@@ -351,10 +245,7 @@
             <div class="shape matcha-leaf ml1"></div>
             <div class="shape matcha-leaf ml2"></div>
             <div class="shape matcha-leaf ml3"></div>
-            <div class="shape matcha-leaf ml4"></div>
-            <div class="shape matcha-leaf ml5"></div>
             <div class="shape matcha-steam ms1"></div>
-            <div class="shape matcha-steam ms2"></div>
             <div class="shape matcha-shoji-grid"></div>
             <div class="shape matcha-bamboo mb1"></div>
             <div class="shape matcha-bamboo mb2"></div>
@@ -362,7 +253,7 @@
     };
 
     // ================================================================
-    // ===== THEMES (palette definitions) — UNCHANGED =====
+    // ===== THEMES (palettes) — UNCHANGED =====
     // ================================================================
     window.THEMES = {
         ocean: {
@@ -534,7 +425,7 @@
             }
         },
         crimson: {
-            name: 'Crimson', sub: 'Bold · Passion', emoji: '❤️',
+            name: 'Crimson', sub: 'Bold · Passion', emoji: '🌹',
             preview: { primary: '#dc2626', gradient: 'linear-gradient(135deg, #dc2626 0%, #f87171 100%)' },
             light: {
                 '--theme-primary': '#dc2626', '--theme-accent': '#f87171', '--theme-primary-dark': '#b91c1c',
@@ -630,7 +521,7 @@
             }
         },
         ember: {
-            name: 'Ember', sub: 'Intense · Fiery', emoji: '🌋',
+            name: 'Ember', sub: 'Intense · Fiery', emoji: '🔥',
             preview: { primary: '#f97316', gradient: 'linear-gradient(135deg, #7c2d12 0%, #f97316 50%, #dc2626 100%)' },
             light: {
                 '--theme-primary': '#f97316', '--theme-accent': '#dc2626', '--theme-primary-dark': '#ea580c',
@@ -799,24 +690,16 @@
         }
     };
 
-    // ================================================================
-    // ===== DEFAULT + GLOBAL STATE =====
-    // ================================================================
     window.DEFAULT_THEME = { preset: 'ocean', mode: 'light' };
     window.selectedTheme = { ...window.DEFAULT_THEME };
 
-    // ================================================================
-    // ===== CORE FUNCTIONS =====
-    // ================================================================
     window.injectThemeShapes = function (presetKey) {
         const container = document.getElementById('themeBgShapes');
         if (!container) return;
-
         if (!presetKey || !window.THEME_SHAPES[presetKey]) {
             console.warn('injectThemeShapes: unknown preset "' + presetKey + '"');
             return;
         }
-
         if (container.dataset.activeTheme !== presetKey) {
             container.innerHTML = window.THEME_SHAPES[presetKey];
             container.dataset.activeTheme = presetKey;
@@ -829,19 +712,15 @@
             ? safeTheme.preset
             : window.DEFAULT_THEME.preset;
         const mode = safeTheme.mode === 'dark' ? 'dark' : 'light';
-
         const preset = window.THEMES[presetKey];
         const palette = preset[mode];
-
         const root = document.documentElement;
         Object.keys(palette).forEach(key => {
             root.style.setProperty(key, palette[key]);
         });
         root.setAttribute('data-timawa-theme', presetKey);
         root.setAttribute('data-timawa-mode', mode);
-
         window.injectThemeShapes(presetKey);
-
         let meta = document.querySelector('meta[name="theme-color"]');
         if (!meta) {
             meta = document.createElement('meta');
@@ -849,7 +728,6 @@
             document.head.appendChild(meta);
         }
         meta.content = palette['--theme-bg'];
-
         window.selectedTheme = { preset: presetKey, mode };
     };
 
@@ -879,12 +757,10 @@
     window.broadcastThemeChange = function (theme) {
         if (!theme || typeof theme !== 'object') return;
         if (!theme.preset || !window.THEMES[theme.preset]) return;
-
         const safe = {
             preset: theme.preset,
             mode: theme.mode === 'dark' ? 'dark' : 'light'
         };
-
         try {
             if ('BroadcastChannel' in window) {
                 const bc = new BroadcastChannel('timawa_theme_sync');
@@ -892,24 +768,17 @@
                 bc.close();
             }
         } catch (e) { /* ignore */ }
-
         try {
             window.dispatchEvent(new CustomEvent(window.THEME_EVENT, { detail: safe }));
         } catch (e) { /* ignore */ }
     };
 
-    // ================================================================
-    // ===== BOOT: Apply cached theme IMMEDIATELY (no flash) =====
-    // ================================================================
     (function bootTheme() {
         const cached = window.readThemeFromStorage();
         if (cached) window.selectedTheme = cached;
         window.applyTheme(window.selectedTheme);
     })();
 
-    // ================================================================
-    // ===== CROSS-TAB LIVE SYNC (BroadcastChannel) =====
-    // ================================================================
     try {
         if ('BroadcastChannel' in window) {
             const bc = new BroadcastChannel('timawa_theme_sync');
@@ -930,20 +799,15 @@
         }
     } catch (e) { /* ignore */ }
 
-    // ================================================================
-    // ===== Re-inject shapes once DOM is ready =====
-    // ================================================================
     function ensureShapesInjected() {
         const container = document.getElementById('themeBgShapes');
         if (!container) return;
-
         const currentPreset = document.documentElement.getAttribute('data-timawa-theme')
             || window.selectedTheme.preset
             || window.DEFAULT_THEME.preset;
         const currentMode = document.documentElement.getAttribute('data-timawa-mode')
             || window.selectedTheme.mode
             || window.DEFAULT_THEME.mode;
-
         container.dataset.activeTheme = '';
         window.applyTheme({ preset: currentPreset, mode: currentMode });
     }
