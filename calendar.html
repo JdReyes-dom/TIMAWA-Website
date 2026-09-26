@@ -271,6 +271,10 @@
         .announcement-icon.type-member { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
         .announcement-icon.type-reply { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
         .announcement-icon.type-mention { background: linear-gradient(135deg, #fed7aa 0%, #fdba74 100%); }
+        .announcement-icon.type-chat { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+        .announcement-icon.type-reaction { background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%); }
+        .announcement-icon.type-comment { background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%); }
+        .announcement-icon.type-squad { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
         .announcement-body { flex: 1; min-width: 0; }
         .announcement-title {
             font-size: 13px; font-weight: 600; color: var(--theme-text);
@@ -2796,9 +2800,6 @@
                 });
         }
 
-        // ================================================================
-        // ===== ANNOUNCEMENTS =====
-        // ================================================================
         const ANNOUNCEMENT_TYPE_META = {
             'admin':     { icon: '📢', cls: 'type-admin',     label: 'Announcement' },
             'birthday':  { icon: '🎂', cls: 'type-birthday',  label: 'Birthday' },
@@ -2806,7 +2807,11 @@
             'highlight': { icon: '📸', cls: 'type-highlight', label: 'Highlight' },
             'member':    { icon: '👥', cls: 'type-member',    label: 'New Member' },
             'reply':     { icon: '💬', cls: 'type-reply',     label: 'Reply' },
-            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' }
+            'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' },
+            'chat':      { icon: '💬', cls: 'type-chat',      label: 'Chat' },
+            'reaction':  { icon: '👍', cls: 'type-reaction',  label: 'Reaction' },
+            'comment':   { icon: '💬', cls: 'type-comment',   label: 'Comment' },
+            'squad':     { icon: '📢', cls: 'type-squad',     label: 'Squad Alert' }
         };
 
         function getAnnouncementMeta(type) {

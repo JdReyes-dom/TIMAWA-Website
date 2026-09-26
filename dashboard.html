@@ -81,10 +81,6 @@
             position: relative;
         }
 
-        /* ================================================================
-           ===== DASHBOARD STYLES (now themed) =====
-           ================================================================ */
-
         /* ===== MODAL-OPEN STATE: HIDE TITA LAUNCHER ===== */
         body.modal-open .tita-launcher,
         body.modal-open .tita-panel {
@@ -449,6 +445,8 @@
         .announcement-icon.type-chat { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
         .announcement-icon.type-squad { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
         .announcement-icon.type-comment { background: linear-gradient(135deg, #c7d2fe 0%, #a5b4fc 100%); }
+        /* ★ NEW: reaction type icon */
+        .announcement-icon.type-reaction { background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%); }
 
         .announcement-body {
             flex: 1;
@@ -1002,6 +1000,461 @@
         .highlights-carousel-item .item-body .meta .expiry-time.urgent { color: var(--theme-danger); font-weight: 600; }
         .highlights-carousel-item .item-body .meta .expiry-time { flex-shrink: 0; }
 
+        .hl-reaction-bar {
+            display: flex;
+            align-items: center;
+            /* ★ Button FIRST, summary fills remaining space */
+            flex-direction: row;
+            gap: 8px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--theme-border-soft);
+            position: relative;
+        }
+
+        .hl-reaction-summary {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--theme-text-dim);
+            font-weight: 600;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            cursor: default;
+        }
+
+        .hl-reaction-summary .reaction-emojis {
+            display: inline-flex;
+            align-items: center;
+            gap: 0;
+        }
+
+        .hl-reaction-summary .reaction-emojis .mini-emoji {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--theme-card);
+            border: 1.5px solid var(--theme-border);
+            font-size: 11px;
+            line-height: 1;
+            margin-left: -6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .hl-reaction-summary .reaction-emojis .mini-emoji:first-child { margin-left: 0; }
+
+        /* ★ Carousel card reaction button — clearly visible */
+        .hl-reaction-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--theme-gradient);
+            border: 2px solid transparent;
+            color: white;
+            padding: 7px 16px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px -4px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+            /* ★ Prevent the browser from hijacking taps on mobile */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hl-reaction-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px -6px color-mix(in srgb, var(--theme-primary) 65%, transparent);
+        }
+
+        .hl-reaction-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* When the user has already reacted */
+        .hl-reaction-btn.reacted {
+            background: var(--theme-card);
+            color: var(--theme-primary);
+            border-color: var(--theme-primary);
+            box-shadow: 0 3px 10px -4px color-mix(in srgb, var(--theme-primary) 45%, transparent);
+        }
+
+        .hl-reaction-btn.reacted:hover {
+            background: var(--theme-primary-soft);
+        }
+
+        .hl-reaction-btn .current-reaction-emoji {
+            font-size: 15px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .hl-reaction-btn.reacted .current-reaction-emoji {
+            background: var(--theme-primary-soft);
+        }
+
+        .hl-reaction-btn .current-reaction-emoji {
+            font-size: 15px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .hl-reaction-btn .reaction-label {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        /* Hover picker (Facebook-style expansion) */
+        .hl-reaction-picker {
+            position: absolute;
+            bottom: calc(100% + 8px);
+            right: 0;
+            display: none;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 8px;
+            background: var(--theme-card);
+            border: 1px solid var(--theme-border);
+            border-radius: 50px;
+            box-shadow: 0 10px 30px -8px rgba(0,0,0,0.3),
+                        0 0 0 1px color-mix(in srgb, var(--theme-primary) 8%, transparent);
+            z-index: 30;
+            animation: reactionPickerPop 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .hl-reaction-picker.show {
+            display: inline-flex;
+        }
+
+        @keyframes reactionPickerPop {
+            from { opacity: 0; transform: translateY(6px) scale(0.85); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .hl-reaction-picker .reaction-option {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s ease, background 0.15s ease;
+            padding: 0;
+        }
+
+        .hl-reaction-picker .reaction-option:hover {
+            transform: scale(1.35) translateY(-3px);
+            background: var(--theme-primary-soft-2);
+        }
+
+        .hl-reaction-picker .reaction-option.active {
+            background: var(--theme-primary-soft);
+            box-shadow: 0 0 0 2px var(--theme-primary);
+        }
+
+        @media (max-width: 640px) {
+            .hl-reaction-picker .reaction-option {
+                width: 32px;
+                height: 32px;
+                font-size: 19px;
+            }
+            .hl-reaction-picker {
+                padding: 5px 6px;
+                gap: 1px;
+            }
+        }
+
+        .hl-detail-reactions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 0;
+            border-top: 1px solid var(--theme-border-soft);
+            border-bottom: 1px solid var(--theme-border-soft);
+            margin-bottom: 16px;
+            /* ★ The picker's containing block + above the sections that follow */
+            position: relative;
+            z-index: 30;
+            overflow: visible;
+        }
+
+        .hl-detail-reactions .reaction-summary {
+            flex: 1;
+            min-width: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: var(--theme-text-muted);
+            font-weight: 600;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            /* Push to the right of the button */
+            justify-content: flex-start;
+        }
+
+        .hl-detail-reactions .reaction-summary .reaction-emojis {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .hl-detail-reactions .reaction-summary .reaction-emojis .mini-emoji {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--theme-card);
+            border: 1.5px solid var(--theme-border);
+            font-size: 13px;
+            line-height: 1;
+            margin-left: -8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        .hl-detail-reactions .reaction-summary .reaction-emojis .mini-emoji:first-child { margin-left: 0; }
+
+        /* ★ CLEARLY VISIBLE reaction button inside the modal */
+        .hl-detail-reactions .hl-detail-reaction-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            border: 2px solid transparent;
+            background: var(--theme-gradient);
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            flex-shrink: 0;
+            box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--theme-primary) 55%, transparent);
+            /* ★ Prevent the browser from hijacking taps on mobile */
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hl-detail-reactions .hl-detail-reaction-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px -6px color-mix(in srgb, var(--theme-primary) 65%, transparent);
+        }
+
+        .hl-detail-reactions .hl-detail-reaction-btn:active {
+            transform: translateY(0);
+        }
+
+        /* When the user has already reacted, swap to a light "you reacted" pill
+        so it's still obvious but visually distinct */
+        .hl-detail-reactions .hl-detail-reaction-btn.reacted {
+            background: var(--theme-card);
+            color: var(--theme-primary);
+            border-color: var(--theme-primary);
+            box-shadow: 0 4px 14px -6px color-mix(in srgb, var(--theme-primary) 45%, transparent);
+        }
+
+        .hl-detail-reactions .hl-detail-reaction-btn.reacted:hover {
+            background: var(--theme-primary-soft);
+        }
+
+        .hl-detail-reactions .hl-detail-reaction-btn .current-reaction-emoji {
+            font-size: 20px;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .hl-detail-reactions .hl-detail-reaction-btn.reacted .current-reaction-emoji {
+            background: var(--theme-primary-soft);
+        }
+
+        /* ★ FIX: picker opens downward and sits above everything inside the modal */
+        .highlight-detail-modal .modal-content {
+            overflow-y: auto;
+            /* Don't clip child overlays horizontally */
+            overflow-x: visible;
+        }
+
+        .highlight-detail-modal .modal-body {
+            /* Don't clip the picker */
+            overflow: visible;
+        }
+
+        .hl-detail-reactions {
+            /* Establish a stacking context ABOVE the stats/comments that follow */
+            position: relative;
+            z-index: 50;
+        }
+
+        /* ★ Mobile reaction sheet — Facebook-style bottom sheet */
+        .hl-reaction-sheet-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 7000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            animation: hlSheetFadeIn 0.2s ease;
+        }
+
+        @keyframes hlSheetFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .hl-reaction-sheet {
+            width: 100%;
+            max-width: 480px;
+            background: var(--theme-card);
+            border-radius: 24px 24px 0 0;
+            padding: 10px 18px 22px;
+            box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+            animation: hlSheetSlideUp 0.28s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: var(--theme-text);
+        }
+
+        @keyframes hlSheetSlideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+
+        .hl-reaction-sheet .hl-sheet-handle {
+            width: 42px;
+            height: 4px;
+            border-radius: 4px;
+            background: var(--theme-border);
+            margin: 0 auto 14px;
+        }
+
+        .hl-reaction-sheet .hl-sheet-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--theme-text);
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+
+        .hl-reaction-sheet .hl-sheet-options {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 6px;
+            margin-bottom: 16px;
+        }
+
+        .hl-reaction-sheet .hl-sheet-reaction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 10px 4px 8px;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            background: var(--theme-bg-soft);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            color: var(--theme-text-muted);
+        }
+
+        .hl-reaction-sheet .hl-sheet-reaction:hover,
+        .hl-reaction-sheet .hl-sheet-reaction:active {
+            background: var(--theme-primary-soft);
+            transform: translateY(-2px);
+        }
+
+        .hl-reaction-sheet .hl-sheet-reaction.active {
+            background: var(--theme-primary-soft);
+            border-color: var(--theme-primary);
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 20%, transparent);
+        }
+
+        .hl-reaction-sheet .hl-sheet-reaction .emoji {
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .hl-reaction-sheet .hl-sheet-reaction .label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .hl-reaction-sheet .hl-sheet-reaction.active .label {
+            color: var(--theme-primary);
+        }
+
+        .hl-reaction-sheet .hl-sheet-cancel {
+            width: 100%;
+            padding: 13px;
+            border-radius: 14px;
+            border: none;
+            background: var(--theme-bg-soft);
+            color: var(--theme-text-muted);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s ease;
+        }
+
+        .hl-reaction-sheet .hl-sheet-cancel:hover {
+            background: var(--theme-primary-soft);
+        }
+
+        @media (max-width: 380px) {
+            .hl-reaction-sheet .hl-sheet-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Desktop: hide sheet, always show hover picker */
+        @media (min-width: 769px) {
+            .hl-reaction-sheet-backdrop { display: none !important; }
+        }
+
+        @media (max-width: 640px) {
+            .hl-detail-reactions .hl-detail-reaction-btn {
+                padding: 8px 14px;
+                font-size: 13px;
+            }
+        }
+
         .highlights-carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: color-mix(in srgb, var(--theme-card) 95%, transparent); border: 2px solid var(--theme-primary); color: var(--theme-primary); width: 48px; height: 48px; border-radius: 50%; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0,0,0,0.12); z-index: 10; font-size: 20px; display: flex; align-items: center; justify-content: center; }
         .highlights-carousel-btn:hover { background: var(--theme-primary); color: white; transform: translateY(-50%) scale(1.1); box-shadow: 0 6px 30px color-mix(in srgb, var(--theme-primary) 35%, transparent); }
         .highlights-carousel-btn:active { transform: translateY(-50%) scale(0.95); }
@@ -1205,7 +1658,6 @@
             padding: 0;
         }
 
-        /* ===== FULLSCREEN CHAT MODE ===== */
         .chat-container.fullscreen-chat {
             position: fixed;
             top: 0;
@@ -1216,10 +1668,9 @@
             border-radius: 0;
             border: none;
             max-width: 100vw;
-            /* Use dvh so mobile browser chrome doesn't hide the input */
             max-height: 100dvh;
-            height: 100vh;   /* fallback for older browsers */
-            height: 100dvh;  /* modern mobile-safe height */
+            height: 100vh;
+            height: 100dvh;
             width: 100vw;
             margin: 0;
             grid-template-columns: 320px 1fr;
@@ -1231,13 +1682,6 @@
             border-right: 1px solid var(--theme-border);
         }
 
-        .chat-container.fullscreen-chat .chat-fullscreen-btn i {
-            /* Use an "exit fullscreen" icon */
-        }
-
-        /* ★ HARD SCROLL LOCK — prevents background scroll bleed in fullscreen.
-           Uses position:fixed trick because iOS Safari ignores overflow:hidden on body.
-           .fullscreen-scroll-lock is applied by JS with the saved scroll position. */
         body.chat-fullscreen-active {
             position: fixed;
             top: 0;
@@ -1250,7 +1694,6 @@
             overscroll-behavior: none;
         }
 
-        /* Re-enable touch scrolling inside the chat panels themselves */
         body.chat-fullscreen-active .chat-container.fullscreen-chat,
         body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-sidebar,
         body.chat-fullscreen-active .chat-container.fullscreen-chat .chat-main,
@@ -1261,7 +1704,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* ★ Hide navbar, Tita launcher, and Tita panel when chat is fullscreen */
         body.chat-fullscreen-active .navbar,
         body.chat-fullscreen-active .tita-launcher,
         body.chat-fullscreen-active .tita-panel,
@@ -1701,15 +2143,12 @@
             background: var(--theme-bg-soft);
         }
 
-        /* ★ Reserve space on each side so out-of-bubble actions
-           never clip off the chat body edge. Only on hover/selected does
-           the space get used, but reserving it always keeps layout stable. */
         .chat-msg:not(.mine) {
-            margin-right: 40px; /* room for actions on the right */
+            margin-right: 40px;
         }
 
         .chat-msg.mine {
-            margin-left: 40px; /* room for actions on the left */
+            margin-left: 40px;
         }
 
         .chat-load-more-wrap {
@@ -1746,7 +2185,6 @@
             max-width: 78%;
             animation: chatMsgIn 0.25s ease-out;
             position: relative;
-            /* Ensure the picker never causes a horizontal scrollbar */
             min-width: 0;
             max-width: 78%;
         }
@@ -1792,6 +2230,7 @@
             position: relative;
             max-width: 100%;
         }
+
         .chat-msg .chat-msg-author {
             font-size: 10px;
             font-weight: 700;
@@ -1804,7 +2243,6 @@
             text-align: right;
         }
 
-        /* ===== REPLY PREVIEW INSIDE BUBBLE ===== */
         .chat-msg-reply-preview {
             background: color-mix(in srgb, var(--theme-primary) 8%, var(--theme-card));
             border-left: 3px solid var(--theme-primary);
@@ -1874,7 +2312,6 @@
             border: none;
         }
 
-        /* ★ Meta row: timestamp + reaction chip share one line */
         .chat-msg .chat-msg-meta-row {
             display: flex;
             align-items: center;
@@ -1884,24 +2321,20 @@
             min-width: 0;
         }
 
-        /* Own messages: chip first (left), date second (right) */
         .chat-msg.mine .chat-msg-meta-row {
             flex-direction: row;
             justify-content: flex-end;
         }
 
-        /* Received messages: date first (left), chip second */
         .chat-msg:not(.mine) .chat-msg-meta-row {
             flex-direction: row;
             justify-content: flex-start;
         }
 
-        /* ===== REACTION DISPLAY (inline with the date, no overlap) ===== */
         .chat-msg-reactions {
             display: flex;
             flex-wrap: nowrap;
             gap: 2px;
-            /* ★ No negative margin — chip sits cleanly in the meta row */
             margin-top: 0;
             position: relative;
             z-index: 5;
@@ -1909,12 +2342,10 @@
             flex-shrink: 0;
         }
 
-        /* Own messages: the chip sits to the LEFT of the date */
         .chat-msg.mine .chat-msg-reactions {
             order: 1;
         }
 
-        /* Received messages: the chip sits to the RIGHT of the date */
         .chat-msg:not(.mine) .chat-msg-reactions {
             order: 2;
         }
@@ -1933,7 +2364,7 @@
             transition: all 0.15s ease;
             box-shadow: 0 2px 6px rgba(0,0,0,0.12);
             user-select: none;
-            pointer-events: auto; /* re-enable taps on the chip itself */
+            pointer-events: auto;
         }
 
         .chat-reaction-chip:hover {
@@ -1965,22 +2396,18 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
-        /* ★ Kill any empty/blank reaction chip artifact */
         .chat-reaction-chip:empty {
             display: none;
         }
 
-        /* ===== REACTION PICKER (Instagram-style, overlaid on the bubble top) ===== */
         .chat-msg-bubble {
-            position: relative; /* ★ anchor for the reaction picker */
+            position: relative;
         }
 
         .chat-reaction-picker {
             position: absolute;
             bottom: 100%;
             left: 50%;
-            /* ★ Overlay: negative translateY pulls the picker DOWN so it overlaps
-            the top of the bubble by ~8px, making it feel attached. */
             transform: translateX(-50%) translateY(8px);
             background: var(--theme-card);
             border: 1px solid var(--theme-border);
@@ -2007,7 +2434,6 @@
             display: flex;
         }
 
-        /* On narrow screens: keep the picker inside the bubble horizontally */
         @media (max-width: 480px) {
             .chat-reaction-picker {
                 left: 0;
@@ -2018,11 +2444,6 @@
                 left: auto;
                 right: 0;
             }
-        }
-
-        @keyframes reactionPickerPop {
-            from { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.85); }
-            to   { opacity: 1; transform: translateX(-50%) translateY(8px) scale(1); }
         }
 
         .chat-reaction-picker .reaction-pick {
@@ -2078,7 +2499,6 @@
         .chat-msg .chat-msg-time {
             font-size: 10px;
             color: var(--theme-text-faint);
-            /* ★ No top margin — it now lives in the meta row */
             margin: 0;
             padding: 0;
             font-weight: 600;
@@ -2086,16 +2506,13 @@
             z-index: 1;
             flex-shrink: 0;
             line-height: 1;
-            /* ★ Nudge the date down slightly so it centers with the chip */
             align-self: center;
         }
 
-        /* Own messages: date is on the right of the chip */
         .chat-msg.mine .chat-msg-time {
             order: 2;
         }
 
-        /* Received messages: date is on the left of the chip */
         .chat-msg:not(.mine) .chat-msg-time {
             order: 1;
         }
@@ -2150,7 +2567,6 @@
             letter-spacing: 0.6px;
         }
 
-        /* ===== CHAT INPUT ===== */
         .chat-input-wrap {
             padding: 12px 16px;
             border-top: 1px solid var(--theme-border);
@@ -2193,7 +2609,6 @@
             box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 10%, transparent);
         }
 
-        /* ===== REPLY BANNER IN CHAT INPUT ===== */
         .chat-reply-banner {
             display: none;
             align-items: center;
@@ -2268,7 +2683,6 @@
             transform: none;
         }
 
-        /* ===== SIDEBAR TOGGLE ===== */
         .chat-sidebar-toggle {
             display: flex;
             align-items: center;
@@ -2291,7 +2705,6 @@
             background: var(--theme-primary-soft-2);
         }
 
-        /* ★ Sidebar header action group (fullscreen + sidebar toggle) */
         .chat-sidebar-header-actions {
             display: inline-flex;
             align-items: center;
@@ -2299,7 +2712,6 @@
             flex-shrink: 0;
         }
 
-        /* Fullscreen button variant sized for the sidebar header */
         .chat-fullscreen-btn-sidebar {
             width: 32px;
             height: 32px;
@@ -2324,7 +2736,6 @@
             transform: scale(1.05);
         }
 
-        /* Slightly larger tap target on mobile for the sidebar fullscreen button */
         @media (max-width: 768px) {
             .chat-fullscreen-btn-sidebar {
                 width: 36px;
@@ -2333,7 +2744,6 @@
             }
         }
 
-        /* ===== MOBILE CHAT BACK ===== */
         .chat-mobile-back {
             display: none;
             align-items: center;
@@ -2359,7 +2769,6 @@
             font-size: 14px;
         }
 
-        /* ===== MENTION DROPDOWN ===== */
         .mention-dropdown {
             position: absolute;
             bottom: 100%;
@@ -3578,6 +3987,16 @@
             transform: scale(1.1);
         }
 
+        /* ★ NEW: per-image Full View button in gallery */
+        .gallery-item .item-actions .gallery-fullview {
+            background: rgba(139, 92, 246, 0.95);
+        }
+
+        .gallery-item .item-actions .gallery-fullview:hover {
+            background: rgba(124, 58, 237, 1);
+            transform: scale(1.1);
+        }
+
         .gallery-item .image-index {
             position: absolute;
             bottom: 8px;
@@ -3596,9 +4015,32 @@
             color: var(--theme-text-dim);
         }
 
-        /* ===== HIGHLIGHT DETAIL ===== */
-        .highlight-detail-modal .modal-content { background: var(--theme-card); border-radius: 24px; padding: 0; max-width: 720px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); color: var(--theme-text); }
-        .highlight-detail-modal .modal-header { position: relative; width: 100%; height: 360px; background: linear-gradient(135deg, var(--theme-primary-soft) 0%, var(--theme-primary-soft-2) 100%); overflow: hidden; border-radius: 24px 24px 0 0; }
+        .highlight-detail-modal .modal-content {
+            background: var(--theme-card);
+            border-radius: 24px;
+            padding: 0;
+            max-width: 720px;
+            width: 100%;
+            max-height: 92vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+            color: var(--theme-text);
+            /* ★ Stack the modal above the backdrop so the inline picker is not clipped */
+            position: relative;
+            z-index: 2001;
+        }
+
+        .highlight-detail-modal .modal-header {
+            position: relative;
+            z-index: 1; /* ★ below the reaction picker */
+            width: 100%;
+            height: 360px;
+            background: linear-gradient(135deg, var(--theme-primary-soft) 0%, var(--theme-primary-soft-2) 100%);
+            overflow: hidden;
+            border-radius: 24px 24px 0 0;
+        }
+
         .highlight-detail-modal .modal-header img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .highlight-detail-modal .modal-header .hl-multi-badge { position: absolute; bottom: 14px; left: 14px; background: rgba(0,0,0,0.7); color: white; padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
         .highlight-detail-modal .modal-body { padding: 26px 30px 30px; }
@@ -3621,6 +4063,22 @@
         .highlight-detail-modal .hl-actions-row {
             padding-top: 20px;
             border-top: 1px solid var(--theme-border-soft);
+        }
+
+        /* ★ Keep the sections that follow the reaction bar BELOW the picker */
+        .highlight-detail-modal .hl-stats,
+        .highlight-detail-modal .hl-comments-wrap,
+        .highlight-detail-modal .hl-actions-row {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ★ Keep the sections that follow the reaction bar BELOW the picker */
+        .highlight-detail-modal .hl-stats,
+        .highlight-detail-modal .hl-comments-wrap,
+        .highlight-detail-modal .hl-actions-row {
+            position: relative;
+            z-index: 1;
         }
 
         .highlight-detail-modal .modal-close {
@@ -5167,7 +5625,6 @@
                 grid-template-columns: 1fr;
             }
 
-            /* Fullscreen on mobile: flex column so the input is always visible */
             .chat-container.fullscreen-chat {
                 display: flex;
                 flex-direction: column;
@@ -5179,15 +5636,14 @@
                 z-index: 6000;
                 border-radius: 0;
                 border: none;
-                height: 100vh;   /* fallback */
-                height: 100dvh;  /* mobile-safe height */
+                height: 100vh;
+                height: 100dvh;
                 max-height: 100dvh;
                 width: 100vw;
                 overflow: hidden;
                 overscroll-behavior: contain;
             }
 
-            /* Ensure the chat main column is a flex column inside fullscreen */
             .chat-container.fullscreen-chat .chat-main {
                 display: flex;
                 flex-direction: column;
@@ -5285,7 +5741,6 @@
                 font-size: 14px;
             }
 
-            /* Chat body: fills the space between header and input */
             .chat-body {
                 padding: 10px 12px;
                 flex: 1 1 auto;
@@ -5294,10 +5749,6 @@
                 min-height: 0;
             }
 
-            /* ---- Message layout: real-world mobile chat bubbles ---- */
-            /* Row: [avatar] [bubble-wrap] [actions]
-               The bubble grows to fill the row minus avatar/actions,
-               and text wraps at the row's natural width — no early breaks. */
             .chat-msg {
                 max-width: 88%;
                 align-items: flex-end;
@@ -5320,9 +5771,6 @@
                 align-items: flex-end;
             }
 
-            /* The bubble is a plain block that fills available width.
-               Text wraps only when it truly exceeds the row width.
-               No fit-content, no inline-block, no shrink-to-word games. */
             .chat-msg .chat-msg-bubble {
                 display: block;
                 width: auto;
@@ -5331,7 +5779,6 @@
                 overflow-wrap: break-word;
                 word-break: normal;
                 hyphens: none;
-                /* Prevent Android flex from collapsing the box */
                 flex: 0 1 auto;
                 box-sizing: border-box;
             }
@@ -5340,7 +5787,6 @@
                 margin-left: auto;
             }
 
-            /* Meta lines align with the bubble side */
             .chat-msg .chat-msg-time,
             .chat-msg .chat-msg-author {
                 align-self: flex-start;
@@ -5351,8 +5797,6 @@
                 align-self: flex-end;
             }
 
-            /* Actions are now shown via a floating sheet on long-press.
-               Remove the old inline column styling entirely. */
             .chat-msg .chat-msg-actions {
                 display: none !important;
             }
@@ -5491,8 +5935,6 @@
         }
 
         @media (max-width: 480px) {
-
-            /* Reaction picker: tighter on small phones */
             .chat-reaction-picker {
                 padding: 5px 8px;
                 gap: 3px;
@@ -5751,11 +6193,9 @@
         }
 
         /* ================================================================
-           ===== ★ NEW: TOASTS, CONFIRM DIALOG, LOADING OVERLAY =====
-           These are additive — they don't affect existing layout.
+           ===== TOASTS, CONFIRM DIALOG, LOADING OVERLAY =====
            ================================================================ */
 
-        /* ===== TOAST STACK ===== */
         .toast-stack {
             position: fixed;
             top: 90px;
@@ -5807,7 +6247,6 @@
         .toast.info .toast-icon { background: var(--theme-gradient); }
         .toast.warn .toast-icon { background: linear-gradient(135deg, #d97706, #f59e0b); }
 
-        /* ===== CONFIRM DIALOG ===== */
         .confirm-dialog {
             display: none;
             position: fixed;
@@ -5888,7 +6327,6 @@
         }
         .confirm-actions .confirm-ok:hover { transform: translateY(-1px); }
 
-        /* ===== LOADING OVERLAY ===== */
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -5909,7 +6347,6 @@
             pointer-events: auto;
         }
         .loading-overlay .pl {
-            /* The Uiverse spinner uses currentColor-scaled --hue; override stroke via CSS vars */
             width: 6em;
             height: 6em;
             filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--theme-primary) 35%, transparent));
@@ -5931,7 +6368,6 @@
             50%      { opacity: 1; }
         }
 
-        /* Uiverse.io spinner by PhilibertGentien */
         .pl,
         .pl__worm {
             animation-duration: 4s;
@@ -5963,7 +6399,6 @@
             to   { stroke-dashoffset: 1165; }
         }
 
-        /* The spinner SVG uses a linearGradient with hard-coded colors; override via CSS */
         .pl__grad-stop-1 { stop-color: var(--theme-primary); }
         .pl__grad-stop-2 { stop-color: var(--theme-accent); }
 
@@ -6308,7 +6743,6 @@
             to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Row of reaction emojis */
         .msg-action-sheet .mas-reactions {
             display: flex;
             gap: 4px;
@@ -6346,7 +6780,6 @@
             transform: scale(0.95);
         }
 
-        /* Action buttons (Reply / Customize / Delete) */
         .msg-action-sheet .mas-action {
             display: flex;
             align-items: center;
@@ -6388,7 +6821,6 @@
             background: var(--theme-danger-soft);
         }
 
-        /* Backdrop to catch taps outside the sheet */
         .msg-action-backdrop {
             position: fixed;
             inset: 0;
@@ -6405,18 +6837,12 @@
             pointer-events: auto;
         }
 
-        /* Highlight the message being acted on */
         .chat-msg.long-press-active .chat-msg-bubble {
             box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-primary) 35%, transparent);
         }
 
-        /* ================================================================
-           ===== ★ DESKTOP: hover-triggered "⋯" button =====
-           The button is rendered inside the bubble-wrap (added by JS)
-           and only shown on hover for non-touch devices.
-           ================================================================ */
         .chat-msg-more-btn {
-            display: none; /* shown only on hover-capable devices */
+            display: none;
             position: absolute;
             top: 50%;
             transform: translateY(-50%);
@@ -6444,7 +6870,6 @@
             transform: translateY(-50%) scale(1.08);
         }
 
-        /* Show the button only on hover-capable (desktop) devices */
         @media (hover: hover) and (pointer: fine) {
             .chat-msg-more-btn {
                 display: flex;
@@ -6452,14 +6877,11 @@
             .chat-msg:hover .chat-msg-more-btn {
                 opacity: 1;
             }
-            /* Keep the hover state while the sheet is open */
             .chat-msg.long-press-active .chat-msg-more-btn {
                 opacity: 1;
             }
         }
 
-        /* Positioning: incoming messages → button on the right of the wrap;
-           own messages → button on the left of the wrap. */
         .chat-msg:not(.mine) .chat-msg-more-btn {
             left: calc(100% + 6px);
         }
@@ -6467,7 +6889,6 @@
             right: calc(100% + 6px);
         }
 
-        /* Reserve horizontal room on desktop so the button doesn't clip */
         @media (hover: hover) and (pointer: fine) {
             .chat-msg:not(.mine) {
                 margin-right: 40px;
@@ -6477,10 +6898,28 @@
             }
         }
 
+        /* ★ MODAL PICKER — placed at the very end of the stylesheet so it
+        beats every other .hl-reaction-picker rule regardless of order. */
+        .hl-reaction-picker.hl-reaction-picker--modal {
+            position: fixed !important;
+            z-index: 9999 !important;
+            pointer-events: auto !important;
+            transition: none !important;
+            contain: none !important;
+            overflow: visible !important;
+            /* NO top/left/right/bottom/inset here — JS sets them inline. */
+        }
+
+        /* Keep the picker visible when the marker class is applied.
+        (`.show` alone already works, but this is explicit.) */
+        .hl-reaction-picker.hl-reaction-picker--modal.show {
+            display: inline-flex !important;
+        }
+
     </style>
 </head>
 <body>
-    <!-- ===== LOADING OVERLAY (shown until content is ready) ===== -->
+    <!-- ===== LOADING OVERLAY ===== -->
     <div class="loading-overlay active" id="loadingOverlay" aria-hidden="false">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="pl" aria-hidden="true">
             <defs>
@@ -6662,9 +7101,6 @@
             </div>
         </section>
 
-        <!-- ================================================================
-             ===== SOCIAL SECTION WITH TABS: MEMBERS / CHATS / ACTIVITY =====
-             ================================================================ -->
         <section class="social-section" id="socialSection">
             <div class="section-header">
                 <div class="tab-pills" role="tablist">
@@ -6686,7 +7122,6 @@
                 <span class="count" id="memberCountLabel">(0)</span>
             </div>
 
-            <!-- ===== MEMBERS PANEL ===== -->
             <div class="panel-view active" id="panel-members">
                 <div class="members-grid" id="membersGrid">
                     <div class="empty-state">
@@ -6697,7 +7132,6 @@
                 </div>
             </div>
 
-            <!-- ===== CHATS PANEL ===== -->
             <div class="panel-view" id="panel-chats">
                 <div id="chatFeatureStatus">
                     <!-- Rendered dynamically based on settings/features.chatEnabled -->
@@ -6769,7 +7203,6 @@
                 </div>
             </div>
 
-            <!-- ===== ACTIVITY TRACKER PANEL ===== -->
             <div class="panel-view" id="panel-activity">
                 <div class="activity-panel">
                     <div class="activity-toolbar">
@@ -6855,17 +7288,19 @@
                     </div>
                 </div>
                 <div class="hl-caption" id="hlDetailCaption">No caption</div>
+
+                <!-- ★ NEW: Reaction bar in the detail modal -->
+                <div class="hl-detail-reactions" id="hlDetailReactionsBar"></div>
+
                 <div class="hl-stats">
                     <div class="stat" id="hlDetailPhotoCount"><i class="fas fa-images"></i> <span>1 photo</span></div>
                     <div class="stat" id="hlDetailExpiry"><i class="fas fa-clock"></i> <span>X days left</span></div>
                 </div>
 
-                <!-- ===== HIGHLIGHT COMMENTS SECTION (ABOVE ACTIONS) ===== -->
                 <div class="hl-comments-wrap">
                     <div class="highlight-comments-section" id="highlightCommentsSection"></div>
                 </div>
 
-                <!-- ===== ACTION BUTTONS (BELOW COMMENTS) ===== -->
                 <div class="hl-actions-row">
                     <div class="modal-actions" id="hlDetailActions">
                         <button class="btn-primary" id="hlDetailDownloadBtn" onclick="downloadCurrentHighlightDetail()">
@@ -7261,6 +7696,26 @@
         const CHAT_POLL_INTERVAL_MS = 5000;
         const LAST_VISIT_THROTTLE_MS = 5 * 60 * 1000;
 
+        // ★ NEW: Facebook-style highlight reactions
+        // Each user can have at most ONE reaction per highlight.
+        // Stored in subcollection: highlights/{highlightId}/reactions/{uid}
+        const HIGHLIGHT_REACTION_TYPES = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
+        const HIGHLIGHT_REACTION_EMOJI = {
+            like: '👍',
+            love: '❤️',
+            haha: '😂',
+            wow: '😮',
+            sad: '😢',
+            angry: '😡'
+        };
+        // Display order for the mini emoji chips summary
+        const HIGHLIGHT_REACTION_ORDER = ['like', 'love', 'haha', 'wow', 'sad', 'angry'];
+
+        // Cache: { [highlightId]: { counts: { like: 2, love: 1, ... }, mine: 'like' | null, byType: { like: [uid,...] } } }
+        let highlightReactionsCache = {};
+        // Listeners: { [highlightId]: unsubscribe fn }
+        let highlightReactionUnsubscribes = {};
+
         // ===== REACTION SYSTEM (6 fixed slots, each replaceable) =====
         const DEFAULT_REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🔥'];
         const REACTIONS_STORAGE_KEY = 'timawa_chat_reactions';
@@ -7273,7 +7728,6 @@
                 if (raw) {
                     const parsed = JSON.parse(raw);
                     if (Array.isArray(parsed)) {
-                        // Always normalize to exactly 6 slots
                         const padded = parsed.slice(0, REACTION_SLOT_COUNT);
                         while (padded.length < REACTION_SLOT_COUNT) {
                             padded.push(DEFAULT_REACTIONS[padded.length] || '👍');
@@ -7297,17 +7751,15 @@
             saveChatReactions();
         }
 
-        // Replace the emoji in a specific slot (0-5). Returns true on success.
         function setReactionAtSlot(index, emoji) {
             if (index < 0 || index >= REACTION_SLOT_COUNT) return false;
-            const trimmed = (emoji || '').trim().slice(0, 4); // allow multi-codepoint emoji
+            const trimmed = (emoji || '').trim().slice(0, 4);
             if (!trimmed) return false;
             chatReactions[index] = trimmed;
             saveChatReactions();
             return true;
         }
 
-        // Reset a single slot back to its default emoji
         function resetReactionSlot(index) {
             if (index < 0 || index >= REACTION_SLOT_COUNT) return false;
             chatReactions[index] = DEFAULT_REACTIONS[index];
@@ -7373,7 +7825,6 @@
         let mentionDropdownOpen = false;
         let mentionAnchorStart = -1;
 
-        // ★ HIGHLIGHT MENTION STATE (separate)
         let highlightPendingMentions = new Map();
         let highlightMentionCandidates = [];
         let highlightMentionDropdownOpen = false;
@@ -7384,7 +7835,7 @@
         let chatFeatureUnsubscribe = null;
         let activeChatUid = null;
         let activeChatIsGroup = false;
-        let chatMessagesUnsubscribe = null;  // kept for compatibility, used as poll interval holder
+        let chatMessagesUnsubscribe = null;
         let chatMessages = [];
         let chatMessagesSignatureCache = '';
         let chatAllMessagesCount = 0;
@@ -7402,7 +7853,7 @@
         let chatTotalUnread = 0;
 
         let chatLastMessages = {};
-        let chatConversationsUnsubscribe = null;  // kept for compatibility
+        let chatConversationsUnsubscribe = null;
 
         let newMsgSearchTerm = '';
         let newMsgModalOpen = false;
@@ -7413,14 +7864,11 @@
         let chatMentionDropdownOpen = false;
         let chatSquadMentionPending = false;
 
-        // ===== ★ REAL-TIME CHAT LISTENER STATE (replaces polling) =====
-        let chatMessagesListener = null;      // Active onSnapshot() unsubscribe function
+        let chatMessagesListener = null;
         let chatMessagesInitialLoadDone = false;
 
-        // ===== ★ NEW: CHAT REPLY STATE =====
-        let chatReplyTo = null; // { id, authorName, text }
+        let chatReplyTo = null;
 
-        // ===== ★ NEW: CHAT REACTION STATE =====
         let activeReactionPickerMsgId = null;
 
         // ===== ACTIVITY TRACKER STATE =====
@@ -7602,7 +8050,7 @@
         }
 
         // ================================================================
-        // ===== ★ TOASTS & CONFIRM DIALOG & LOADING OVERLAY =====
+        // ===== TOASTS & CONFIRM DIALOG & LOADING OVERLAY =====
         // ================================================================
         function showToast(message, type = 'info', duration = 3200) {
             const stack = document.getElementById('toastStack');
@@ -7627,7 +8075,7 @@
         }
 
         // ================================================================
-        // ===== ★ TITA TIMA SAVE CONFIRMATION POPUP =====
+        // ===== TITA TIMA SAVE CONFIRMATION POPUP =====
         // ================================================================
         function showTitaSaveConfirmModal({ title, message, type }) {
             const modal = document.getElementById('titaSaveConfirmModal');
@@ -7685,7 +8133,6 @@
             _confirmCallback = null;
         }
 
-        // ===== LOADING OVERLAY CONTROL =====
         let _loadingHideTimer = null;
         function showLoadingOverlay(text) {
             const overlay = document.getElementById('loadingOverlay');
@@ -7710,12 +8157,10 @@
             }, Math.max(0, delay));
         }
 
-        // Auto-hide the overlay once everything is settled
         function hideLoadingOverlayWhenReady() {
             hideLoadingOverlay(420);
         }
 
-        // Wire up confirm OK button once DOM is ready (script is at end of body so this is safe)
         (function initConfirmBtn() {
             const okBtn = document.getElementById('confirmOkBtn');
             if (okBtn) {
@@ -7727,8 +8172,46 @@
             }
         })();
 
+        // ★ Reposition the modal reaction picker on scroll/resize so it follows
+        //   the React button. The picker is position: fixed, so its viewport
+        //   coordinates must be recomputed when the button moves.
+        (function attachModalPickerReposition() {
+            let rafToken = 0;
+
+            function repositionOpenModalPicker() {
+                const picker = document.querySelector('.highlight-detail-modal .hl-reaction-picker.show, .hl-reaction-picker--modal.show');
+                if (!picker) return;
+                // Re-run the positioning function (it reads the button rect fresh)
+                positionModalReactionPicker(picker, null);
+            }
+
+            function scheduleReposition() {
+                // Coalesce scroll events into one rAF per frame
+                if (rafToken) return;
+                rafToken = requestAnimationFrame(() => {
+                    rafToken = 0;
+                    repositionOpenModalPicker();
+                });
+            }
+
+            // Listen on any scrollable container (capture phase)
+            document.addEventListener('scroll', function(e) {
+                const target = e.target;
+                if (target && target.classList && (
+                    target.classList.contains('modal-body') ||
+                    target.classList.contains('modal-content') ||
+                    target.classList.contains('highlight-detail-modal')
+                )) {
+                    scheduleReposition();
+                }
+            }, true);
+
+            window.addEventListener('resize', scheduleReposition);
+            window.addEventListener('orientationchange', scheduleReposition);
+        })();
+
         // ================================================================
-        // ===== ★ MODAL-OPEN STATE MANAGER =====
+        // ===== MODAL-OPEN STATE MANAGER =====
         // ================================================================
         function syncModalOpenState() {
             const anyOpen = anyModalOpen();
@@ -7796,7 +8279,7 @@
         }
 
         // ================================================================
-        // ===== SOCIAL TABS (Members / Chats / Activity) =====
+        // ===== SOCIAL TABS =====
         // ================================================================
         function switchSocialTab(tab) {
             const pills = document.querySelectorAll('.social-section .tab-pill');
@@ -7843,7 +8326,6 @@
         }
 
         function detachChatListeners() {
-            // Tear down the real-time message listener
             detachChatMessagesListener();
 
             if (chatMessagesUnsubscribe) {
@@ -7873,7 +8355,7 @@
         }
 
         // ================================================================
-        // ===== ★ ACTIVITY TRACKER =====
+        // ===== ACTIVITY TRACKER =====
         // ================================================================
         function loadActivityTracker(forceRefresh) {
             const listEl = document.getElementById('activityList');
@@ -7976,7 +8458,7 @@
             const now = Date.now();
             let html = '';
 
-                        rows.forEach(row => {
+            rows.forEach(row => {
                 const initials = row.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                 const avatarContent = row.photoUrl
                     ? `<img src="${cloudinaryAvatar(row.photoUrl, 100)}" alt="${escapeAttr(row.name)}" loading="lazy" />`
@@ -8020,13 +8502,13 @@
         }
 
         // ================================================================
-        // ===== ★ CLEANUP INACTIVE USERS =====
+        // ===== CLEANUP INACTIVE USERS =====
         // ================================================================
         async function clearInactiveActivityRecords(userIds) {
             if (!userIds || userIds.length === 0) return { cleared: 0 };
 
             try {
-                const batchSize = INACTIVE_USER_CLEANUP_BATCH; // 50
+                const batchSize = INACTIVE_USER_CLEANUP_BATCH;
                 let totalCleared = 0;
 
                 for (let i = 0; i < userIds.length; i += batchSize) {
@@ -8035,10 +8517,8 @@
                     let queued = 0;
 
                     batchIds.forEach(uid => {
-                        // Safety: don't touch the currently signed-in user's activity
                         if (currentUser && uid === currentUser.uid) return;
 
-                        // ✅ UPDATE instead of DELETE — only wipe activity fields
                         batch.update(db.collection('users').doc(uid), {
                             lastVisit: firebase.firestore.FieldValue.delete(),
                             lastVisitPage: firebase.firestore.FieldValue.delete(),
@@ -8109,7 +8589,6 @@
                 snapshot.forEach(doc => {
                     if (currentUser && doc.id === currentUser.uid) return;
 
-                    // ✅ Only clear the activity fields
                     batch.update(doc.ref, {
                         lastVisit: firebase.firestore.FieldValue.delete(),
                         lastVisitPage: firebase.firestore.FieldValue.delete(),
@@ -8135,7 +8614,7 @@
         }
 
         // ================================================================
-        // ===== ★ OPTIMIZATION 5: ONE-SHOT CONVERSATION SUMMARIES =====
+        // ===== ONE-SHOT CONVERSATION SUMMARIES =====
         // ================================================================
         function loadChatConversationsSummary() {
             if (!chatFeatureEnabled || !currentUser) return;
@@ -8237,7 +8716,7 @@
         }
 
         // ================================================================
-        // ===== ★ CHAT FULLSCREEN (with hard scroll lock) =====
+        // ===== CHAT FULLSCREEN =====
         // ================================================================
         let _fullscreenScrollY = 0;
 
@@ -8251,12 +8730,10 @@
             const body = document.body;
 
             if (isFullscreen) {
-                // Save current scroll position, then hard-lock the body.
                 _fullscreenScrollY = window.scrollY || window.pageYOffset || 0;
                 body.style.top = `-${_fullscreenScrollY}px`;
                 body.classList.add('chat-fullscreen-active');
             } else {
-                // Unlock and restore the exact scroll position.
                 body.classList.remove('chat-fullscreen-active');
                 body.style.top = '';
                 window.scrollTo(0, _fullscreenScrollY);
@@ -8278,7 +8755,6 @@
                 if (isMobile() && activeChatUid) {
                     hideChatSidebar();
                 }
-                // Reset chat body scroll to bottom so latest messages show
                 setTimeout(() => {
                     const chatBody = document.getElementById('chatBody');
                     if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
@@ -8620,12 +9096,9 @@
         // ================================================================
         // ===== CHAT: OPEN CONVERSATION =====
         // ================================================================
-
         function chatMessagesSignature(messages) {
             if (!messages || messages.length === 0) return '';
 
-            // Include reactions in the signature so reaction-only updates
-            // (add/remove) trigger a re-render from the listener.
             let reactionHash = '';
             for (const msg of messages) {
                 if (msg.reactions && typeof msg.reactions === 'object') {
@@ -8785,12 +9258,9 @@
         }
 
         // ================================================================
-        // ===== ★ REAL-TIME CHAT LISTENER (replaces polling) =====
-        // Uses Firestore onSnapshot() to receive messages instantly.
-        // Cost model: 0 reads when idle, 1 read per new/changed message.
+        // ===== REAL-TIME CHAT LISTENER =====
         // ================================================================
         function attachChatMessagesListener() {
-            // Tear down any previous listener first
             detachChatMessagesListener();
 
             if (!activeChatUid || !currentUser) return;
@@ -8839,7 +9309,6 @@
                 (err) => {
                     console.warn('Chat listener error:', err.message);
                     showToast('Chat connection lost. Retrying…', 'warn', 3000);
-                    // Firestore auto-retries internally; nothing more to do here
                 }
             );
         }
@@ -8852,19 +9321,16 @@
             chatMessagesInitialLoadDone = false;
         }
 
-        // ---- Backwards-compatible shims so old call sites keep working ----
         function stopChatPolling() {
             detachChatMessagesListener();
         }
 
         function fetchChatMessagesOnce() {
-            // No-op now. The listener already delivers every change instantly.
-            // Kept so any existing calls (e.g. from sendChatMessage, toggleReaction)
-            // don't break.
+            // No-op — listener handles everything
         }
 
         function startChatPolling() {
-            // No-op — listener handles everything. Kept for compatibility.
+            // No-op — listener handles everything
         }
 
         async function markChatReadFrom(uid) {
@@ -8903,9 +9369,6 @@
         }
 
         async function loadOlderChatMessages() {
-            // "Load older" uses a one-time get() because we're paginating
-            // through history, not listening to live changes. This is fine
-            // and still cheaper than the old polling loop.
             if (!chatHasMoreOlder || !chatOldestDoc || !activeChatUid || !currentUser) return;
             if (chatMessages.length === 0) return;
 
@@ -8941,7 +9404,6 @@
                 chatHasMoreOlder = snap.size === CHAT_PAGE_SIZE;
                 chatMessages = [...chatMessages, ...older];
 
-                // Force a re-render since the listener won't fire (no new data)
                 chatMessagesSignatureCache = '';
                 renderChatMessages();
             } catch (e) {
@@ -9017,7 +9479,6 @@
 
                 const showAuthor = activeChatIsGroup ? !isMine : !isMine;
 
-                // ★ REPLY PREVIEW
                 let replyPreviewHtml = '';
                 if (msg.replyToId) {
                     const replyAuthor = msg.replyToAuthorName || 'Someone';
@@ -9030,7 +9491,6 @@
                     `;
                 }
 
-                // ★ REACTIONS
                 let reactionsHtml = '';
                 if (msg.reactions && typeof msg.reactions === 'object') {
                     const entries = Object.entries(msg.reactions).filter(([, uids]) => Array.isArray(uids) && uids.length > 0);
@@ -9050,7 +9510,6 @@
                     }
                 }
 
-                // ★ ACTION BUTTONS
                 const replyBtn = `<button onclick="startChatReply('${escapeAttr(msg.id)}')" title="Reply"><i class="fas fa-reply"></i></button>`;
                 const reactBtn = `<button onclick="openReactionPicker('${escapeAttr(msg.id)}')" title="React"><i class="fas fa-smile"></i></button>`;
                 const deleteBtn = isMine
@@ -9079,10 +9538,8 @@
             body.innerHTML = html;
             body.scrollTop = body.scrollHeight;
 
-            // ★ Re-bind long-press handlers after every render
             attachChatMsgLongPress();
 
-            // ★ Close any open action sheet if its target message is gone
             if (_actionSheetMsgId) {
                 const stillThere = body.querySelector(`[data-msg-id="${CSS.escape(_actionSheetMsgId)}"]`);
                 if (!stillThere) closeMsgActionSheet();
@@ -9090,7 +9547,7 @@
         }
 
         // ================================================================
-        // ===== ★ LONG-PRESS ACTION SHEET =====
+        // ===== LONG-PRESS ACTION SHEET =====
         // ================================================================
         let _actionSheetMsgId = null;
         let _actionSheetEl = null;
@@ -9124,11 +9581,9 @@
                 if (msgEl.dataset.lpBound === '1') return;
                 msgEl.dataset.lpBound = '1';
 
-                // ---- Touch (mobile) ----
                 msgEl.addEventListener('touchstart', function(e) {
                     const touch = e.touches[0];
                     if (!touch) return;
-                    // Ignore if touching a picker / link
                     if (e.target.closest('.chat-reaction-picker')) return;
                     if (e.target.closest('a')) return;
                     if (e.target.closest('.mention-chip')) return;
@@ -9141,7 +9596,6 @@
                     _longPressTimer = setTimeout(() => {
                         if (!_longPressMoved) {
                             openMsgActionSheet(this.dataset.msgId);
-                            // Haptic feedback if supported
                             if (navigator.vibrate) { try { navigator.vibrate(15); } catch (err) {} }
                         }
                         _longPressTimer = null;
@@ -9167,14 +9621,12 @@
                     if (_longPressTimer) { clearTimeout(_longPressTimer); _longPressTimer = null; }
                 });
 
-                // ---- Mouse (desktop): right-click opens the sheet ----
                 msgEl.addEventListener('contextmenu', function(e) {
                     if (e.target.closest('a')) return;
                     e.preventDefault();
                     openMsgActionSheet(this.dataset.msgId);
                 });
 
-                // ---- Desktop: "⋯" button opens the sheet ----
                 const moreBtn = msgEl.querySelector('.chat-msg-more-btn');
                 if (moreBtn && moreBtn.dataset.bound !== '1') {
                     moreBtn.dataset.bound = '1';
@@ -9195,10 +9647,8 @@
 
             ensureActionSheetEls();
 
-            // Hide any old picker
             closeChatReactionPicker();
 
-            // Remove highlight from any previous target
             document.querySelectorAll('.chat-msg.long-press-active').forEach(el => el.classList.remove('long-press-active'));
 
             const msgEl = document.querySelector(`[data-msg-id="${CSS.escape(msgId)}"]`);
@@ -9207,7 +9657,6 @@
 
             const isMine = currentUser && msg.senderUid === currentUser.uid;
 
-            // Build the sheet content
             let reactionRow = '<div class="mas-reactions">';
             for (let i = 0; i < REACTION_SLOT_COUNT; i++) {
                 const emoji = chatReactions[i] || DEFAULT_REACTIONS[i];
@@ -9239,7 +9688,6 @@
 
             _actionSheetEl.innerHTML = reactionRow + actionsHtml;
 
-            // Wire up reactions
             _actionSheetEl.querySelectorAll('.mas-reaction').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -9251,7 +9699,6 @@
                 });
             });
 
-            // Wire up action buttons
             _actionSheetEl.querySelectorAll('.mas-action').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -9265,21 +9712,17 @@
                     } else if (action === 'customize') {
                         const savedId = msgId;
                         closeMsgActionSheet();
-                        // Slight delay so the sheet finishes closing before the modal appears
                         setTimeout(() => openReactionCustomizeModal(savedId), 120);
                     }
                 });
             });
 
-            // Position: measure the sheet and the target message, then choose
-            // above or below based on available space.
             _actionSheetEl.style.visibility = 'hidden';
             _actionSheetEl.classList.add('show');
             _actionSheetBackdrop.classList.add('show');
 
             _actionSheetMsgId = msgId;
 
-            // Defer measurement one frame so the sheet has layout
             requestAnimationFrame(() => {
                 positionActionSheet(msgEl);
                 _actionSheetEl.style.visibility = '';
@@ -9300,18 +9743,14 @@
 
             let top;
             if (spaceBelow >= sheetRect.height + gap || spaceBelow >= spaceAbove) {
-                // Place below the message
                 top = rect.bottom + gap;
             } else {
-                // Place above
                 top = rect.top - sheetRect.height - gap;
             }
 
-            // Clamp to viewport
             if (top + sheetRect.height > vh - margin) top = vh - sheetRect.height - margin;
             if (top < margin) top = margin;
 
-            // Horizontal: center on the message, clamp to viewport
             let left = rect.left + (rect.width / 2) - (sheetRect.width / 2);
             if (left < margin) left = margin;
             if (left + sheetRect.width > vw - margin) left = vw - sheetRect.width - margin;
@@ -9332,16 +9771,12 @@
             _actionSheetMsgId = null;
         }
 
-        // ================================================================
-        // ===== (Removed) tap-to-select — replaced by long-press sheet =====
-        // Kept as no-ops so any leftover calls don't error.
-        // ================================================================
         function clearSelectedChatMsg() { /* no-op */ }
         function selectChatMsg() { /* no-op */ }
         function attachChatMsgTapHandlers() { /* no-op */ }
 
         // ================================================================
-        // ===== ★ CHAT: REPLY FUNCTIONS =====
+        // ===== CHAT: REPLY =====
         // ================================================================
         function startChatReply(msgId) {
             const msg = chatMessages.find(m => m.id === msgId);
@@ -9395,17 +9830,14 @@
         }
 
         // ================================================================
-        // ===== ★ CHAT: REACTION FUNCTIONS =====
+        // ===== CHAT: REACTION =====
         // ================================================================
         function openReactionPicker(msgId) {
-            // Close any existing picker first
             closeChatReactionPicker();
 
-            // Find the message element
             const msgEl = document.querySelector(`[data-msg-id="${CSS.escape(msgId)}"]`);
             if (!msgEl) return;
 
-            // Remove any existing picker in this message
             const existing = msgEl.querySelector('.chat-reaction-picker');
             if (existing) existing.remove();
 
@@ -9414,7 +9846,6 @@
             picker.id = 'activeReactionPicker';
 
             let pickerHtml = '';
-            // Always render exactly REACTION_SLOT_COUNT slots
             for (let i = 0; i < REACTION_SLOT_COUNT; i++) {
                 const emoji = chatReactions[i] || DEFAULT_REACTIONS[i];
                 pickerHtml += `<button class="reaction-pick" data-emoji="${escapeAttr(emoji)}" data-slot="${i}" title="React with ${emoji}">${emoji}</button>`;
@@ -9424,20 +9855,16 @@
 
             picker.innerHTML = pickerHtml;
 
-            // ★ Anchor the picker to the BUBBLE itself (not the whole row),
-            // so it hugs the bubble like Instagram does.
             const bubble = msgEl.querySelector('.chat-msg-bubble');
             if (bubble) {
                 bubble.appendChild(picker);
             } else {
-                // Fallback: if no bubble, use the wrap
                 const bubbleWrap = msgEl.querySelector('.chat-msg-bubble-wrap');
                 (bubbleWrap || msgEl).appendChild(picker);
             }
 
             activeReactionPickerMsgId = msgId;
 
-            // Wire up click handlers for the 6 reaction slots
             picker.querySelectorAll('.reaction-pick:not(.customize-reaction)').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -9448,8 +9875,6 @@
                     }
                 });
             });
-
-            // Close on outside click (handled globally)
         }
 
         function closeChatReactionPicker() {
@@ -9475,7 +9900,6 @@
                 uids.splice(idx, 1);
             }
 
-            // Build the updated reactions object
             const newReactions = { ...reactions };
             if (uids.length > 0) {
                 newReactions[emoji] = uids;
@@ -9483,11 +9907,10 @@
                 delete newReactions[emoji];
             }
 
-            // Optimistic local update
             const msgIndex = chatMessages.findIndex(m => m.id === msgId);
             if (msgIndex !== -1) {
                 chatMessages[msgIndex] = { ...chatMessages[msgIndex], reactions: newReactions };
-                chatMessagesSignatureCache = ''; // force re-render
+                chatMessagesSignatureCache = '';
                 renderChatMessages();
             }
 
@@ -9495,25 +9918,21 @@
                 await db.collection('chatMessages').doc(msgId).update({
                     reactions: newReactions
                 });
-                // The live listener will push the updated reactions to all clients.
             } catch (err) {
                 console.warn('toggleReaction error:', err);
                 showToast('Could not save reaction: ' + err.message, 'error');
-                // Revert the optimistic update by forcing a re-render from
-                // the last known server state (the listener will also correct it).
                 chatMessagesSignatureCache = '';
                 renderChatMessages();
             }
         }
 
         // ================================================================
-        // ===== ★ REACTION CUSTOMIZE MODAL (pick a slot, replace emoji) =====
+        // ===== REACTION CUSTOMIZE MODAL =====
         // ================================================================
         let _reactionCustomizeMsgId = null;
         let _reactionCustomizeSelectedSlot = 0;
 
         function openReactionCustomizeModal(msgId) {
-            // Close the picker first so it doesn't overlap the modal
             closeChatReactionPicker();
 
             _reactionCustomizeMsgId = msgId;
@@ -9528,7 +9947,6 @@
             modal.classList.add('active');
             syncModalOpenState();
 
-            // Focus the input so the user can type immediately
             setTimeout(() => {
                 const inp = document.getElementById('reactionCustomizeInput');
                 if (inp) inp.focus();
@@ -9625,11 +10043,9 @@
 
             showToast(`Slot ${slot + 1}: ${oldEmoji} → ${val}`, 'success');
 
-            // Re-render the slot grid
             renderReactionCustomizeSlots();
             updateReactionCustomizeInput();
 
-            // Close the modal and re-open the picker on the same message
             const msgId = _reactionCustomizeMsgId;
             closeReactionCustomizeModal();
             if (msgId) {
@@ -9706,7 +10122,6 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // ★ REPLY DATA
                 if (chatReplyTo) {
                     msgData.replyToId = chatReplyTo.id;
                     msgData.replyToAuthorName = chatReplyTo.authorName;
@@ -9761,8 +10176,6 @@
 
                 loadChatConversationsSummary();
 
-                // The live listener will push the new message to all clients
-                // automatically — no manual re-fetch needed.
                 chatMessagesSignatureCache = '';
             } catch (e) {
                 console.error('sendChatMessage error:', e);
@@ -9783,7 +10196,6 @@
                     try {
                         await db.collection('chatMessages').doc(id).delete();
                         chatMessagesSignatureCache = '';
-                        // The listener will remove the message from the UI automatically.
                         showToast('Message deleted', 'success', 2000);
                     } catch (e) {
                         showToast('Could not delete message: ' + e.message, 'error');
@@ -9793,7 +10205,7 @@
         }
 
         // ================================================================
-        // ===== ★ OPTIMIZED: DIRECT MESSAGE NOTIFICATIONS (ONE PER CONVO) =====
+        // ===== DIRECT MESSAGE NOTIFICATIONS =====
         // ================================================================
         async function createDirectMessageNotification({
             receiverUid,
@@ -9805,8 +10217,6 @@
             if (receiverUid === senderUid) return;
 
             try {
-                // Check if there's already an unread chat notification from this sender
-                // If so, just update the message preview and timestamp instead of creating a new one
                 const existingSnap = await db.collection('announcements')
                     .where('type', '==', 'chat')
                     .where('targetUid', '==', receiverUid)
@@ -9818,16 +10228,14 @@
                 const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
                 if (!existingSnap.empty) {
-                    // Update existing notification — just refresh the message and timestamp
                     const docRef = existingSnap.docs[0].ref;
                     await docRef.update({
                         message: `"${snippet}"`,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         expiresAt: expiresAt,
-                        readBy: [] // mark as unread again
+                        readBy: []
                     });
                 } else {
-                    // Create a new notification
                     await db.collection('announcements').add({
                         type: 'chat',
                         title: `💬 ${senderName} has a new message for you`,
@@ -9971,7 +10379,7 @@
         }
 
         // ================================================================
-        // ===== CHAT: MENTION AUTOCOMPLETE (GROUP ONLY) =====
+        // ===== CHAT: MENTION AUTOCOMPLETE =====
         // ================================================================
         function resolveChatMentions(text) {
             if (!activeChatIsGroup) return [];
@@ -10008,25 +10416,19 @@
             input.style.height = Math.min(input.scrollHeight, 120) + 'px';
         }
 
-        // ★ Keep the chat input visible when the mobile keyboard opens
         function ensureChatInputVisible() {
             const input = document.getElementById('chatInput');
             const body = document.getElementById('chatBody');
             if (!input || !body) return;
 
-            // Scroll the chat body to the bottom so the latest message is visible
             body.scrollTop = body.scrollHeight;
 
-            // Then nudge the input into view — some browsers need this
-            // because the visual viewport shrinks when the keyboard opens.
             try {
                 input.scrollIntoView({ block: 'end', behavior: 'auto' });
             } catch (e) {
-                // Older browsers don't support options object
                 input.scrollIntoView(false);
             }
 
-            // Second pass after layout settles (Android often needs this)
             setTimeout(() => {
                 body.scrollTop = body.scrollHeight;
                 try {
@@ -10303,9 +10705,6 @@
             }
         }
 
-        // ================================================================
-        // ===== ★ OPTIMIZATION 3: CONSOLIDATED @SQUAD NOTIFICATIONS =====
-        // ================================================================
         async function createSquadMentionNotifications({ senderUid, senderName, text, groupName }) {
             try {
                 const expiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
@@ -10706,7 +11105,7 @@
         }
 
         // ================================================================
-        // ===== ★ HIGHLIGHT MENTION AUTOCOMPLETE =====
+        // ===== HIGHLIGHT MENTION AUTOCOMPLETE =====
         // ================================================================
         function handleHighlightCommentInput(e) {
             updateHighlightCommentCharCount();
@@ -11124,7 +11523,7 @@
         }
 
         // ================================================================
-        // ===== HIGHLIGHT COMMENT NOTIFICATIONS (with mentions) =====
+        // ===== HIGHLIGHT COMMENT NOTIFICATIONS =====
         // ================================================================
         async function createHighlightCommentNotification({
             highlightId, highlightOwnerUid, highlightOwnerName, highlightCaption,
@@ -11294,6 +11693,644 @@
                     });
                 highlightCommentCountUnsubscribes.push(unsub);
             });
+        }
+
+        // ================================================================
+        // ===== ★ HIGHLIGHT REACTIONS (Facebook-style) =====
+        // ================================================================
+        // Each user has at most ONE reaction per highlight, stored in
+        // subcollection highlights/{highlightId}/reactions/{uid}.
+        //
+        // Cache shape:
+        // highlightReactionsCache[highlightId] = {
+        //     counts: { like: 2, love: 1, ... },
+        //     mine: 'like' | null,
+        //     byType: { like: [uid, uid], ... }
+        // }
+
+        function ensureHighlightReactionCache(highlightId) {
+            if (!highlightReactionsCache[highlightId]) {
+                highlightReactionsCache[highlightId] = {
+                    counts: {},
+                    mine: null,
+                    byType: {}
+                };
+            }
+            return highlightReactionsCache[highlightId];
+        }
+
+        function attachHighlightReactionsListener(highlightId) {
+            if (!highlightId) return;
+            // Don't attach twice
+            if (highlightReactionUnsubscribes[highlightId]) return;
+
+            const unsub = db.collection('highlights').doc(highlightId).collection('reactions')
+                .onSnapshot((snap) => {
+                    const cache = ensureHighlightReactionCache(highlightId);
+                    const counts = {};
+                    const byType = {};
+                    let mine = null;
+                    const myUid = currentUser ? currentUser.uid : null;
+
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        const type = data.type;
+                        if (!type || !HIGHLIGHT_REACTION_EMOJI[type]) return;
+
+                        counts[type] = (counts[type] || 0) + 1;
+                        if (!byType[type]) byType[type] = [];
+                        byType[type].push(doc.id);
+
+                        if (myUid && doc.id === myUid) mine = type;
+                    });
+
+                    cache.counts = counts;
+                    cache.byType = byType;
+                    cache.mine = mine;
+
+                    // Re-render any visible surfaces for this highlight
+                    rerenderHighlightReactionSurfaces(highlightId);
+                }, (err) => {
+                    console.warn('Highlight reactions listener error:', err.message);
+                });
+
+            highlightReactionUnsubscribes[highlightId] = unsub;
+        }
+
+        function detachHighlightReactionsListener(highlightId) {
+            if (highlightReactionUnsubscribes[highlightId]) {
+                try { highlightReactionUnsubscribes[highlightId](); } catch (e) {}
+                delete highlightReactionUnsubscribes[highlightId];
+            }
+        }
+
+        function detachAllHighlightReactionsListeners() {
+            Object.keys(highlightReactionUnsubscribes).forEach(id => {
+                detachHighlightReactionsListener(id);
+            });
+        }
+
+        function rerenderHighlightReactionSurfaces(highlightId) {
+            // Carousel card summary/button
+            const card = document.querySelector(`.highlights-carousel-item[data-highlight-id="${CSS.escape(highlightId)}"]`);
+            if (card) {
+                const bar = card.querySelector('.hl-reaction-bar');
+                if (bar) {
+                    bar.outerHTML = renderHighlightReactionBar(highlightId);
+                }
+            }
+            // Detail modal reaction bar
+            if (currentHighlightDetailId === highlightId) {
+                const detailBar = document.getElementById('hlDetailReactionsBar');
+                if (detailBar) {
+                    detailBar.outerHTML = renderHighlightDetailReactionBar(highlightId);
+                }
+            }
+        }
+
+        function getReactionSummaryHtml(highlightId, size = 'small') {
+            const cache = highlightReactionsCache[highlightId];
+            if (!cache) return '';
+
+            const total = Object.values(cache.counts).reduce((a, b) => a + b, 0);
+            if (total === 0) return '';
+
+            const emojiSize = size === 'large' ? 24 : 20;
+            const emojiFontSize = size === 'large' ? 13 : 11;
+
+            // Top emojis in FB order
+            const topEmojis = HIGHLIGHT_REACTION_ORDER
+                .filter(t => cache.counts[t] > 0)
+                .slice(0, 3);
+
+            let chipsHtml = '';
+            topEmojis.forEach((type, i) => {
+                const emoji = HIGHLIGHT_REACTION_EMOJI[type];
+                chipsHtml += `<span class="mini-emoji" style="width:${emojiSize}px;height:${emojiSize}px;font-size:${emojiFontSize}px;z-index:${10 - i};">${emoji}</span>`;
+            });
+
+            return `
+                <div class="reaction-emojis">${chipsHtml}</div>
+                <span>${total}</span>
+            `;
+        }
+
+        function renderHighlightReactionBar(highlightId) {
+            const cache = highlightReactionsCache[highlightId] || { counts: {}, mine: null };
+            const summaryHtml = getReactionSummaryHtml(highlightId, 'small');
+            const mine = cache.mine;
+            const mineEmoji = mine ? HIGHLIGHT_REACTION_EMOJI[mine] : '';
+            const label = mine ? '' : 'React';
+
+            // Build picker options
+            let pickerHtml = '';
+            HIGHLIGHT_REACTION_TYPES.forEach(type => {
+                const emoji = HIGHLIGHT_REACTION_EMOJI[type];
+                const isActive = mine === type ? 'active' : '';
+                pickerHtml += `
+                    <button type="button"
+                            class="reaction-option ${isActive}"
+                            data-reaction-type="${type}"
+                            title="${type}"
+                            onclick="event.stopPropagation(); pickHighlightReaction('${escapeAttr(highlightId)}', '${type}')">
+                        ${emoji}
+                    </button>
+                `;
+            });
+
+            const btnClass = mine ? 'hl-reaction-btn reacted' : 'hl-reaction-btn';
+            const btnContent = mine
+                ? `<span class="current-reaction-emoji">${mineEmoji}</span>`
+                : `<i class="fas fa-thumbs-up"></i><span class="reaction-label">React</span>`;
+
+            return `
+                <div class="hl-reaction-bar" data-reaction-bar-for="${escapeAttr(highlightId)}">
+                    <button type="button"
+                            class="${btnClass}"
+                            onclick="event.stopPropagation(); toggleHighlightReactionPicker(event, '${escapeAttr(highlightId)}')"
+                            ontouchend="event.stopPropagation(); event.preventDefault(); toggleHighlightReactionPicker(event, '${escapeAttr(highlightId)}')"
+                            onmouseenter="event.stopPropagation(); showHighlightReactionPicker(event, '${escapeAttr(highlightId)}')"
+                            onmouseleave="event.stopPropagation(); scheduleHideHighlightReactionPicker()">
+                        ${btnContent}
+                    </button>
+                    <span class="hl-reaction-summary">${summaryHtml}</span>
+                    <div class="hl-reaction-picker" data-picker-for="${escapeAttr(highlightId)}"
+                        onmouseenter="event.stopPropagation(); cancelHideHighlightReactionPicker()"
+                        onmouseleave="event.stopPropagation(); scheduleHideHighlightReactionPicker()">
+                        ${pickerHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHighlightDetailReactionBar(highlightId) {
+            const cache = highlightReactionsCache[highlightId] || { counts: {}, mine: null };
+            const summaryHtml = getReactionSummaryHtml(highlightId, 'large');
+            const mine = cache.mine;
+            const mineEmoji = mine ? HIGHLIGHT_REACTION_EMOJI[mine] : '';
+
+            let pickerHtml = '';
+            HIGHLIGHT_REACTION_TYPES.forEach(type => {
+                const emoji = HIGHLIGHT_REACTION_EMOJI[type];
+                const isActive = mine === type ? 'active' : '';
+                pickerHtml += `
+                    <button type="button"
+                            class="reaction-option ${isActive}"
+                            data-reaction-type="${type}"
+                            title="${type}"
+                            onclick="event.stopPropagation(); pickHighlightReaction('${escapeAttr(highlightId)}', '${type}')">
+                        ${emoji}
+                    </button>
+                `;
+            });
+
+            const btnClass = mine ? 'hl-detail-reaction-btn reacted' : 'hl-detail-reaction-btn';
+            const btnContent = mine
+                ? `<span class="current-reaction-emoji">${mineEmoji}</span>`
+                : `<i class="fas fa-thumbs-up"></i><span>React</span>`;
+
+            return `
+                <div class="hl-detail-reactions" id="hlDetailReactionsBar" data-reaction-bar-for="${escapeAttr(highlightId)}">
+                    <button type="button"
+                            class="${btnClass}"
+                            onclick="event.stopPropagation(); toggleHighlightReactionPicker(event, '${escapeAttr(highlightId)}')"
+                            ontouchend="event.stopPropagation(); event.preventDefault(); toggleHighlightReactionPicker(event, '${escapeAttr(highlightId)}')">
+                        ${btnContent}
+                    </button>
+                    <span class="reaction-summary">${summaryHtml}</span>
+                    <div class="hl-reaction-picker" data-picker-for="${escapeAttr(highlightId)}">
+                        ${pickerHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ★ NEW: Mobile-friendly bottom-sheet reaction picker for highlights
+        function openHighlightReactionSheet(highlightId) {
+            if (!currentUser) {
+                showToast('Please sign in to react.', 'warn');
+                return;
+            }
+
+            // Remove any existing sheet
+            const existing = document.getElementById('hlReactionSheet');
+            if (existing) existing.remove();
+
+            const cache = highlightReactionsCache[highlightId] || { counts: {}, mine: null };
+            const mine = cache.mine;
+
+            let optionsHtml = '';
+            HIGHLIGHT_REACTION_TYPES.forEach(type => {
+                const emoji = HIGHLIGHT_REACTION_EMOJI[type];
+                const isActive = mine === type ? 'active' : '';
+                optionsHtml += `
+                    <button type="button"
+                            class="hl-sheet-reaction ${isActive}"
+                            data-reaction-type="${type}"
+                            data-highlight-id="${escapeAttr(highlightId)}">
+                        <span class="emoji">${emoji}</span>
+                        <span class="label">${type}</span>
+                    </button>
+                `;
+            });
+
+            const sheet = document.createElement('div');
+            sheet.id = 'hlReactionSheet';
+            sheet.className = 'hl-reaction-sheet-backdrop';
+            sheet.innerHTML = `
+                <div class="hl-reaction-sheet" role="dialog" aria-label="React to highlight">
+                    <div class="hl-sheet-handle"></div>
+                    <div class="hl-sheet-title">React to this highlight</div>
+                    <div class="hl-sheet-options">${optionsHtml}</div>
+                    <button type="button" class="hl-sheet-cancel" id="hlSheetCancel">Cancel</button>
+                </div>
+            `;
+
+            document.body.appendChild(sheet);
+
+            // Backdrop click closes
+            sheet.addEventListener('click', (e) => {
+                if (e.target === sheet) closeHighlightReactionSheet();
+            });
+
+            document.getElementById('hlSheetCancel').addEventListener('click', closeHighlightReactionSheet);
+
+            // Reaction buttons
+            sheet.querySelectorAll('.hl-sheet-reaction').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const type = btn.dataset.reactionType;
+                    const hid = btn.dataset.highlightId;
+                    closeHighlightReactionSheet();
+                    if (type && hid) pickHighlightReaction(hid, type);
+                });
+            });
+
+            // Prevent body scroll while open
+            document.body.classList.add('modal-open');
+        }
+
+        function closeHighlightReactionSheet() {
+            const sheet = document.getElementById('hlReactionSheet');
+            if (sheet) sheet.remove();
+            if (!anyModalOpen()) {
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        let _highlightPickerHideTimer = null;
+
+        function showHighlightReactionPicker(event, highlightId) {
+            if (event) event.stopPropagation();
+            // ★ Don't trigger on touch/mobile
+            if (window.innerWidth <= 768) return;
+            if (_highlightPickerHideTimer) {
+                clearTimeout(_highlightPickerHideTimer);
+                _highlightPickerHideTimer = null;
+            }
+            const picker = document.querySelector(`.hl-reaction-picker[data-picker-for="${CSS.escape(highlightId)}"]`);
+            if (picker) picker.classList.add('show');
+        }
+
+        function scheduleHideHighlightReactionPicker() {
+            if (_highlightPickerHideTimer) clearTimeout(_highlightPickerHideTimer);
+            _highlightPickerHideTimer = setTimeout(() => {
+                document.querySelectorAll('.hl-reaction-picker.show').forEach(p => p.classList.remove('show'));
+                _highlightPickerHideTimer = null;
+            }, 350);
+        }
+
+        function cancelHideHighlightReactionPicker() {
+            if (_highlightPickerHideTimer) {
+                clearTimeout(_highlightPickerHideTimer);
+                _highlightPickerHideTimer = null;
+            }
+        }
+
+        function toggleHighlightReactionPicker(event, highlightId) {
+            if (event) event.stopPropagation();
+
+            // ★ Mobile: use bottom sheet instead of inline picker
+            if (window.innerWidth <= 768) {
+                openHighlightReactionSheet(highlightId);
+                return;
+            }
+
+            // ★ CRITICAL FIX: scope the picker search to the SAME container as the
+            //   button that triggered it. The same highlight can exist BOTH on the
+            //   carousel card AND in the modal, and document.querySelector() would
+            //   only ever find the carousel one — so the modal picker never opened.
+            let scope = document;
+
+            // Try to find the button that fired this event
+            let btn = null;
+            if (event && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('hl-detail-reaction-btn')) {
+                btn = event.currentTarget;
+            } else if (event && event.target && event.target.closest) {
+                btn = event.target.closest('.hl-detail-reaction-btn') || event.target.closest('.hl-reaction-btn');
+            }
+            // Fallback: query whichever button matches the highlightId
+            if (!btn) {
+                btn = document.querySelector(`.hl-detail-reaction-btn`) ||
+                    document.querySelector(`.hl-reaction-btn`);
+            }
+
+            // If the button is inside the highlight detail modal, search inside the modal.
+            // Otherwise, search inside the carousel card for this highlight.
+            if (btn && btn.closest('.highlight-detail-modal')) {
+                scope = btn.closest('.highlight-detail-modal');
+            } else if (btn && btn.closest('.highlights-carousel-item')) {
+                scope = btn.closest('.highlights-carousel-item');
+            }
+
+            const picker = scope.querySelector(`.hl-reaction-picker[data-picker-for="${CSS.escape(highlightId)}"]`);
+            if (!picker) {
+                console.warn('[toggleHighlightReactionPicker] picker not found for', highlightId, 'in scope', scope.tagName + '.' + scope.className);
+                return;
+            }
+
+            const isOpen = picker.classList.toggle('show');
+
+            if (isOpen) {
+                // Close all other pickers first
+                document.querySelectorAll('.hl-reaction-picker.show').forEach(p => {
+                    if (p !== picker) p.classList.remove('show');
+                });
+
+                // ★ If this picker belongs to the modal, position it with JS
+                const inModal = picker.closest('.highlight-detail-modal') !== null;
+                if (inModal) {
+                    positionModalReactionPicker(picker, event);
+                }
+            }
+        }
+
+        function positionModalReactionPicker(picker, event) {
+            if (!picker) return;
+
+            // ★ Do NOT reparent the picker. It stays inside .hl-detail-reactions,
+            //   which means reopening after close always works via scoped querySelector.
+            //   position: fixed escapes any scroll/overflow container anyway, as long
+            //   as no ancestor has transform/filter/contain — which we've verified.
+
+            picker.classList.add('hl-reaction-picker--modal');
+
+            // Find the anchor button (React button in the modal)
+            let anchor = null;
+            if (event && event.currentTarget && event.currentTarget.classList && event.currentTarget.classList.contains('hl-detail-reaction-btn')) {
+                anchor = event.currentTarget;
+            } else if (event && event.target && event.target.closest) {
+                anchor = event.target.closest('.hl-detail-reaction-btn');
+            }
+            if (!anchor) {
+                anchor = picker.closest('.hl-detail-reactions')?.querySelector('.hl-detail-reaction-btn')
+                    || document.querySelector('.highlight-detail-modal .hl-detail-reaction-btn');
+            }
+            if (!anchor) return;
+
+            // ★ Find the modal-content element to center the picker within it
+            const modalContent = anchor.closest('.modal-content') || anchor.closest('.highlight-detail-modal');
+            if (!modalContent) return;
+
+            // Ensure the picker has layout before measuring
+            // (its rect may be 0x0 the first frame after .show is added)
+            const pickerRect = picker.getBoundingClientRect();
+            if (pickerRect.width === 0 && pickerRect.height === 0) {
+                // Retry next frame
+                requestAnimationFrame(() => positionModalReactionPicker(picker, event));
+                return;
+            }
+
+            const anchorRect = anchor.getBoundingClientRect();
+            const modalRect = modalContent.getBoundingClientRect();
+
+            const margin = 8;
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+
+            // ★ Vertical: below the button by default, above if it doesn't fit
+            let top = anchorRect.bottom + margin;
+            if (top + pickerRect.height > vh - margin) {
+                const above = anchorRect.top - pickerRect.height - margin;
+                if (above >= margin) {
+                    top = above;
+                } else {
+                    top = Math.max(margin, vh - pickerRect.height - margin);
+                }
+            }
+            if (top < margin) top = margin;
+
+            // ★ Horizontal: center of the MODAL (not the button, not the viewport)
+            let left = modalRect.left + (modalRect.width - pickerRect.width) / 2;
+            // Clamp to the viewport so it never goes off-screen on narrow windows
+            if (left + pickerRect.width > vw - margin) {
+                left = vw - pickerRect.width - margin;
+            }
+            if (left < margin) left = margin;
+
+            // Apply as fixed-position coordinates
+            picker.style.position = 'fixed';
+            picker.style.top = top + 'px';
+            picker.style.left = left + 'px';
+            picker.style.right = 'auto';
+            picker.style.bottom = 'auto';
+            picker.style.transform = 'none';
+            picker.style.zIndex = '9999';
+        }
+
+        document.addEventListener('click', function(e) {
+            // If clicking on the picker itself or a trigger button, do nothing
+            if (e.target.closest('.hl-reaction-picker')) return;
+            if (e.target.closest('.hl-reaction-btn')) return;
+            if (e.target.closest('.hl-detail-reaction-btn')) return;
+
+            // ★ If the click is inside the highlight detail modal, KEEP the picker open.
+            //   Only close the picker when the user clicks OUTSIDE the modal (backdrop, other UI).
+            const inModal = e.target.closest('.highlight-detail-modal') !== null;
+
+            if (inModal) {
+                // Clicking anywhere inside the modal body — don't close the picker.
+                return;
+            }
+
+            // Outside the modal — close all pickers and reset inline styles
+            document.querySelectorAll('.hl-reaction-picker.show').forEach(p => {
+                p.classList.remove('show');
+                p.classList.remove('hl-reaction-picker--modal');
+                p.style.position = '';
+                p.style.top = '';
+                p.style.left = '';
+                p.style.right = '';
+                p.style.bottom = '';
+                p.style.transform = '';
+                p.style.zIndex = '';
+            });
+        });
+
+        async function pickHighlightReaction(highlightId, reactionType) {
+            if (!currentUser) {
+                showToast('Please sign in to react.', 'warn');
+                return;
+            }
+            if (!HIGHLIGHT_REACTION_EMOJI[reactionType]) return;
+
+            const uid = currentUser.uid;
+            const cache = ensureHighlightReactionCache(highlightId);
+            const previousMine = cache.mine;
+
+            // Close all pickers
+            document.querySelectorAll('.hl-reaction-picker.show').forEach(p => p.classList.remove('show'));
+
+            // Optimistic local update
+            if (previousMine && cache.counts[previousMine]) {
+                cache.counts[previousMine] = Math.max(0, cache.counts[previousMine] - 1);
+                if (cache.counts[previousMine] === 0) delete cache.counts[previousMine];
+            }
+            cache.counts[reactionType] = (cache.counts[reactionType] || 0) + 1;
+            cache.mine = reactionType;
+
+            rerenderHighlightReactionSurfaces(highlightId);
+
+            try {
+                const reactionRef = db.collection('highlights').doc(highlightId)
+                    .collection('reactions').doc(uid);
+
+                if (previousMine === reactionType) {
+                    // Same reaction → toggle off (remove)
+                    await reactionRef.delete();
+                    // Update cache after success
+                    cache.counts[reactionType] = Math.max(0, cache.counts[reactionType] - 1);
+                    if (cache.counts[reactionType] === 0) delete cache.counts[reactionType];
+                    cache.mine = null;
+                } else {
+                    // New reaction (or different from previous) → set/replace
+                    await reactionRef.set({
+                        type: reactionType,
+                        uid,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    cache.mine = reactionType;
+                }
+
+                rerenderHighlightReactionSurfaces(highlightId);
+
+                // Fire notification (only if it's a NEW reaction, not a toggle-off)
+                if (reactionType && previousMine !== reactionType) {
+                    createHighlightReactionNotification({
+                        highlightId,
+                        reactionType,
+                        reactorUid: uid
+                    });
+                }
+            } catch (err) {
+                console.warn('pickHighlightReaction error:', err);
+                showToast('Could not save reaction: ' + err.message, 'error');
+                // Revert UI to server state by re-fetching one-shot
+                refreshHighlightReactionCacheFromServer(highlightId);
+            }
+        }
+
+        async function refreshHighlightReactionCacheFromServer(highlightId) {
+            try {
+                const snap = await db.collection('highlights').doc(highlightId).collection('reactions').get();
+                const cache = ensureHighlightReactionCache(highlightId);
+                const counts = {};
+                const byType = {};
+                let mine = null;
+                const myUid = currentUser ? currentUser.uid : null;
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    const type = data.type;
+                    if (!type || !HIGHLIGHT_REACTION_EMOJI[type]) return;
+                    counts[type] = (counts[type] || 0) + 1;
+                    if (!byType[type]) byType[type] = [];
+                    byType[type].push(doc.id);
+                    if (myUid && doc.id === myUid) mine = type;
+                });
+                cache.counts = counts;
+                cache.byType = byType;
+                cache.mine = mine;
+                rerenderHighlightReactionSurfaces(highlightId);
+            } catch (e) {
+                console.warn('refreshHighlightReactionCacheFromServer error:', e);
+            }
+        }
+
+        // ================================================================
+        // ===== ★ HIGHLIGHT REACTION NOTIFICATION =====
+        // ================================================================
+        // Throttled: only one notification per (highlight, reactor) per 24h.
+        // Skips if the reactor IS the highlight owner.
+        async function createHighlightReactionNotification({ highlightId, reactionType, reactorUid }) {
+            if (!highlightId || !reactionType || !reactorUid) return;
+
+            try {
+                // Load the highlight doc to find the owner
+                const hlDoc = await db.collection('highlights').doc(highlightId).get();
+                if (!hlDoc.exists) return;
+                const hlData = hlDoc.data();
+                const ownerUid = hlData.authorUid;
+                if (!ownerUid) return;
+                if (ownerUid === reactorUid) return; // don't notify yourself
+
+                // Dedup: skip if a reaction notification from this reactor
+                // for this highlight already exists within 24h
+                const referenceId = `reaction_${highlightId}_${reactorUid}`;
+                const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+                const existingSnap = await db.collection('announcements')
+                    .where('type', '==', 'reaction')
+                    .where('referenceId', '==', referenceId)
+                    .limit(1)
+                    .get();
+
+                if (!existingSnap.empty) {
+                    // Already notified recently — skip
+                    return;
+                }
+
+                // Get reactor's display name
+                let reactorName = 'Someone';
+                const reactorProfile = userProfileCache[reactorUid];
+                if (reactorProfile && reactorProfile.displayName) {
+                    reactorName = reactorProfile.displayName;
+                } else {
+                    try {
+                        const uDoc = await db.collection('users').doc(reactorUid).get();
+                        if (uDoc.exists) {
+                            const u = uDoc.data();
+                            reactorName = u.displayName || u.email || 'Someone';
+                            userProfileCache[reactorUid] = { id: reactorUid, ...u };
+                        }
+                    } catch (e) { /* ignore */ }
+                }
+
+                const emoji = HIGHLIGHT_REACTION_EMOJI[reactionType] || '👍';
+                const captionSnippet = (hlData.caption || '').slice(0, 60) + ((hlData.caption || '').length > 60 ? '...' : '');
+                const messageText = captionSnippet
+                    ? `${reactorName} reacted ${emoji} to your highlight: "${captionSnippet}"`
+                    : `${reactorName} reacted ${emoji} to your highlight.`;
+
+                await db.collection('announcements').add({
+                    type: 'reaction',
+                    title: `${emoji} ${reactorName} reacted to your highlight`,
+                    message: messageText,
+                    icon: emoji,
+                    priority: 'info',
+                    link: 'index.html#highlights',
+                    linkLabel: 'View Highlight',
+                    targetUid: ownerUid,
+                    referenceId,
+                    readBy: [],
+                    createdBy: 'system',
+                    createdByName: 'System',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    expiresAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                });
+
+                console.log(`🎉 Reaction notification sent to ${ownerUid} for highlight ${highlightId}`);
+            } catch (err) {
+                console.warn('createHighlightReactionNotification error:', err);
+            }
         }
 
         // ================================================================
@@ -11536,7 +12573,6 @@
             else if (len > NOTE_COMMENT_MAX_LEN * 0.7) counter.classList.add('warn');
         }
 
-        // ===== NOTES: MENTION AUTOCOMPLETE =====
         function handleCommentInput(e) {
             updateCommentCharCount();
             detectMentionQuery(e.target);
@@ -11986,7 +13022,8 @@
             'mention':   { icon: '📣', cls: 'type-mention',   label: 'Mention' },
             'chat':      { icon: '💬', cls: 'type-chat',      label: 'Chat' },
             'squad':     { icon: '📢', cls: 'type-squad',     label: 'Squad Alert' },
-            'comment':   { icon: '💬', cls: 'type-comment',   label: 'Comment' }
+            'comment':   { icon: '💬', cls: 'type-comment',   label: 'Comment' },
+            'reaction':  { icon: '👍', cls: 'type-reaction',  label: 'Reaction' }
         };
 
         function getAnnouncementMeta(type) {
@@ -12029,8 +13066,7 @@
         }
 
         // ================================================================
-        // ===== LOCAL DATE HELPER (fixes UTC date rollover at 8AM PHT) =====
-        // Returns "YYYY-MM-DD" in the user's local timezone.
+        // ===== LOCAL DATE HELPER =====
         // ================================================================
         function getLocalDateString(date) {
             const d = date instanceof Date ? date : new Date();
@@ -12045,14 +13081,14 @@
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (!raw) return false;
                 const parsed = JSON.parse(raw);
-                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
+                const today = getLocalDateString();
                 return parsed && parsed.date === today && parsed.kinds && parsed.kinds[kind] === true;
             } catch (e) { return false; }
         }
 
         function markAutogenRunToday(uid, kind) {
             try {
-                const today = getLocalDateString();  // ✅ LOCAL date (PHT)
+                const today = getLocalDateString();
                 let parsed = { date: today, kinds: {} };
                 const raw = localStorage.getItem(ANNOUNCEMENT_AUTOGEN_KEY + uid);
                 if (raw) {
@@ -12375,8 +13411,6 @@
                     return;
                 }
 
-                // ✅ Use a LOCAL date-stamped referenceId for exact dedup.
-                // No timezone comparison needed — just check if today's ref exists.
                 const localDateStr = getLocalDateString();
 
                 let alreadyAnnouncedUids = new Set();
@@ -12390,7 +13424,6 @@
                     existingSnap.forEach(doc => {
                         const d = doc.data();
                         if (d.referenceId) {
-                            // referenceId format: "2026-09-23_<uid>" → extract uid
                             const parts = d.referenceId.split('_');
                             if (parts.length >= 2) alreadyAnnouncedUids.add(parts[1]);
                         }
@@ -12513,7 +13546,7 @@
         }
 
         async function autoGenerateHighlightAnnouncements(user) {
-                    if (hasAutogenRunToday(user.uid, 'highlights')) return;
+            if (hasAutogenRunToday(user.uid, 'highlights')) return;
             try {
                 const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
@@ -12588,18 +13621,12 @@
 
         async function autoGenerateMemberAnnouncement(newUser, newUserData) {
             if (!newUser || !newUserData) return;
-
-            // ★ Claim the run IMMEDIATELY (before any async work).
-            //    This blocks multi-tab/multi-page races — the second tab
-            //    will read the flag as "already done" and bail out.
             if (hasAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid)) return;
             markAutogenRunToday(newUser.uid, 'welcome_' + newUser.uid);
 
             const name = newUserData.displayName || newUserData.email || 'A new member';
 
             try {
-                // ★ Dedup at the DB level too — if a race still slips through,
-                //    or if the user clears localStorage, this prevents duplicates.
                 const existing = await db.collection('announcements')
                     .where('type', '==', 'member')
                     .where('referenceId', '==', newUser.uid)
@@ -12630,8 +13657,6 @@
                 console.log('👥 Welcome notification created for', name);
             } catch (e) {
                 console.warn('welcome gen:', e.message);
-                // Note: we do NOT roll back the localStorage flag — a Firestore
-                // hiccup shouldn't cause a flood of retries on every page load.
             }
         }
 
@@ -12687,7 +13712,7 @@
         }
 
         // ================================================================
-        // ===== ★ OPTIMIZATION 2: THROTTLE lastVisit WRITES =====
+        // ===== THROTTLE lastVisit WRITES =====
         // ================================================================
         async function updateLastVisitThrottled(user) {
             if (!user) return;
@@ -12729,7 +13754,6 @@
             currentUser = user;
             titaCurrentUser = user;
 
-            // Show loading overlay as soon as we know there's a user
             showLoadingOverlay('Loading dashboard…');
 
             try {
@@ -12775,7 +13799,6 @@
 
             restoreActiveSocialTab();
 
-            // All content is now in (or listeners attached) — hide the loading overlay
             hideLoadingOverlayWhenReady();
         });
 
@@ -12786,10 +13809,11 @@
             detachChatListeners();
             detachHighlightCommentsListener();
             detachHighlightCommentCountListeners();
+            detachAllHighlightReactionsListeners();
+            closeHighlightReactionSheet(); // ★ clean up mobile sheet
             if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
             if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
             if (activityUnsubscribe) { try { activityUnsubscribe(); } catch (e) {} activityUnsubscribe = null; }
-            // ★ Safety: remove scroll lock if user leaves the page while fullscreen
             document.body.classList.remove('chat-fullscreen-active');
             document.body.style.top = '';
         });
@@ -12868,6 +13892,18 @@
                                 await batch.commit();
                             }
                         } catch (e) {}
+                        // Cleanup reactions subcollection
+                        try {
+                            const reactionsSnap = await db.collection('highlights').doc(id)
+                                .collection('reactions').get();
+                            if (!reactionsSnap.empty) {
+                                const batch = db.batch();
+                                reactionsSnap.forEach(doc => batch.delete(doc.ref));
+                                await batch.commit();
+                            }
+                        } catch (e) {}
+                        detachHighlightReactionsListener(id);
+                        delete highlightReactionsCache[id];
                         selectedHighlights.delete(id);
                         updateSelectionUI();
                         showToast('Highlight deleted successfully!', 'success');
@@ -12895,6 +13931,17 @@
                         await batch.commit();
                     }
                 } catch (e) {}
+                try {
+                    const reactionsSnap = await db.collection('highlights').doc(id)
+                        .collection('reactions').get();
+                    if (!reactionsSnap.empty) {
+                        const batch = db.batch();
+                        reactionsSnap.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    }
+                } catch (e) {}
+                detachHighlightReactionsListener(id);
+                delete highlightReactionsCache[id];
             } catch (e) {}
         }
 
@@ -13052,6 +14099,10 @@
                         const visibleIds = validHighlights.map(h => h.id);
                         attachHighlightCommentCountListeners(visibleIds);
 
+                        // Attach reaction listeners for each visible highlight
+                        detachAllHighlightReactionsListeners();
+                        visibleIds.forEach(hid => attachHighlightReactionsListener(hid));
+
                         if (expiredItems.length) {
                             setTimeout(() => {
                                 expiredItems.forEach(item => deleteHighlightSilent(item.id, item.imageURLs, item.imagePublicIds));
@@ -13167,6 +14218,7 @@
                                         <span data-hl-comment-count="${safeId}" style="display:${commentCount > 0 ? 'inline-flex' : 'none'}; font-weight:700; color:var(--theme-primary);">${commentCount}</span>
                                     </span>
                                 </div>
+                                ${renderHighlightReactionBar(item.id)}
                             </div>
                         </div>
                     `;
@@ -13179,6 +14231,9 @@
             track.querySelectorAll('.highlights-carousel-item').forEach(card => {
                 card.addEventListener('click', function(e) {
                     if (e.target.closest('.hl-actions')) return;
+                    if (e.target.closest('.hl-reaction-bar')) return;
+                    if (e.target.closest('.hl-reaction-btn')) return;
+                    if (e.target.closest('.hl-reaction-picker')) return;
                     openHighlightDetail(this.dataset.highlightId);
                 });
             });
@@ -13286,6 +14341,12 @@
                 document.getElementById('hlDetailTime').textContent = createdAt ? `Posted ${formatRelativeTime(createdAt)}` : 'Posted recently';
                 document.getElementById('hlDetailCaption').textContent = caption || 'No caption';
 
+                // Render reactions bar in the detail modal
+                const detailBarHost = document.getElementById('hlDetailReactionsBar');
+                if (detailBarHost) {
+                    detailBarHost.outerHTML = renderHighlightDetailReactionBar(highlightId);
+                }
+
                 document.getElementById('hlDetailPhotoCount').innerHTML =
                     `<i class="fas fa-images"></i> <span>${imageUrls.length} photo${imageUrls.length !== 1 ? 's' : ''}</span>`;
                 const expiryEl = document.getElementById('hlDetailExpiry');
@@ -13338,6 +14399,19 @@
         function closeHighlightDetail() {
             detachHighlightCommentsListener();
             currentHighlightReplyTo = null;
+            // ★ Close any open reaction picker inside the modal + reset inline styles
+            document.querySelectorAll('.highlight-detail-modal .hl-reaction-picker.show, .hl-reaction-picker--modal.show')
+                .forEach(p => {
+                    p.classList.remove('show');
+                    p.classList.remove('hl-reaction-picker--modal');
+                    p.style.position = '';
+                    p.style.top = '';
+                    p.style.left = '';
+                    p.style.right = '';
+                    p.style.bottom = '';
+                    p.style.transform = '';
+                    p.style.zIndex = '';
+                });
             document.getElementById('highlightDetailModal').classList.remove('active');
             if (!anyModalOpen()) document.body.style.overflow = 'auto';
             document.getElementById('hlDetailImage').src = '';
@@ -13449,6 +14523,9 @@
                              onclick="openLightbox('${escapeJs(url)}', ${index})" />
                         <span class="image-index">${index + 1}</span>
                         <div class="item-actions">
+                            <button class="gallery-fullview" title="View full" onclick="event.stopPropagation(); fullViewGalleryImage(${index})">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
                             <button class="gallery-download" title="Download" onclick="event.stopPropagation(); downloadGalleryImage(${index})">
                                 <i class="fas fa-download"></i>
                             </button>
@@ -13460,6 +14537,15 @@
                 `;
             });
             grid.innerHTML = html;
+        }
+
+        // ★ NEW: Full view for a specific gallery image (fixes the missing per-image "View Full")
+        function fullViewGalleryImage(index) {
+            const url = currentGalleryImages[index];
+            if (!url) return;
+            const safeAuthor = sanitizeFilename(currentGalleryAuthor);
+            const ext = extFromUrl(url);
+            openFullView(url, `TIMAWA_${safeAuthor}_photo_${index + 1}.${ext}`);
         }
 
         function closeGallery() {
@@ -13665,6 +14751,17 @@
                                     await batch.commit();
                                 }
                             } catch (e) {}
+                            try {
+                                const reactionsSnap = await db.collection('highlights').doc(id)
+                                    .collection('reactions').get();
+                                if (!reactionsSnap.empty) {
+                                    const batch = db.batch();
+                                    reactionsSnap.forEach(d => batch.delete(d.ref));
+                                    await batch.commit();
+                                }
+                            } catch (e) {}
+                            detachHighlightReactionsListener(id);
+                            delete highlightReactionsCache[id];
                             selectedHighlights.delete(id);
                             deletedCount++;
                         }
@@ -14142,6 +15239,9 @@
         }
 
         function anyModalOpen() {
+            // ★ Count the mobile reaction sheet as an open modal
+            if (document.getElementById('hlReactionSheet')) return true;
+
             return ['uploadModal', 'galleryModal', 'lightboxModal', 'fullViewModal', 'highlightDetailModal', 'memberDetailModal', 'noteModal', 'announcementViewModal', 'newMessageModal', 'reactionCustomizeModal', 'titaSaveConfirmModal']
                 .some(id => {
                     const el = document.getElementById(id);
@@ -14165,7 +15265,7 @@
         });
 
         // ================================================================
-        // ===== LOGOUT (with confirmation) =====
+        // ===== LOGOUT =====
         // ================================================================
         function logout() {
             showConfirm({
@@ -14181,6 +15281,8 @@
                         detachChatListeners();
                         detachHighlightCommentsListener();
                         detachHighlightCommentCountListeners();
+                        detachAllHighlightReactionsListeners();
+                        closeHighlightReactionSheet(); // ★ clean up mobile sheet
                         if (activeCommentsUnsubscribe) { activeCommentsUnsubscribe(); activeCommentsUnsubscribe = null; }
                         if (chatFeatureUnsubscribe) { chatFeatureUnsubscribe(); chatFeatureUnsubscribe = null; }
                         if (activityUnsubscribe) { try { activityUnsubscribe(); } catch (e) {} activityUnsubscribe = null; }
@@ -14241,7 +15343,6 @@
             }
         }
 
-        // Close reaction picker when clicking outside
         if (activeReactionPickerMsgId) {
             const picker = document.getElementById('activeReactionPicker');
             if (picker && !picker.contains(event.target) && !event.target.closest('[onclick*="openReactionPicker"]')) {
@@ -14252,7 +15353,9 @@
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
-                if (document.getElementById('reactionCustomizeModal').classList.contains('active')) closeReactionCustomizeModal();
+                // ★ Close the mobile reaction sheet first
+                if (document.getElementById('hlReactionSheet')) closeHighlightReactionSheet();
+                else if (document.getElementById('reactionCustomizeModal').classList.contains('active')) closeReactionCustomizeModal();
                 else if (_actionSheetMsgId) closeMsgActionSheet();
                 else if (document.body.classList.contains('chat-fullscreen-active')) toggleChatFullscreen();
                 else if (document.getElementById('confirmDialog').classList.contains('active')) closeConfirmDialog();
@@ -14269,7 +15372,6 @@
                 else if (document.getElementById('announcementPopup').classList.contains('open')) closeAnnouncementPopup();
                 else if (document.getElementById('titaSaveConfirmModal').classList.contains('active')) closeTitaSaveConfirmModal();
                 else if (activeReactionPickerMsgId) closeChatReactionPicker();
-                
             }
         });
 
@@ -14299,7 +15401,6 @@
             panel.classList.add('open');
             populateTitaFields();
             document.getElementById('titaBadge').classList.remove('show');
-            // Do NOT auto-focus any input — prevents mobile keyboard from popping up
         }
 
         function closeTitaPanel() {
@@ -14446,13 +15547,8 @@
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 };
 
-                // ★ NOTE: We deliberately do NOT write theme here.
-                // Only profile.html is allowed to change the theme.
                 await db.collection('users').doc(titaCurrentUser.uid).set(updateData, { merge: true });
 
-                // ============================================================
-                // ★ NOTE HANDLING — only touch the note doc if the TEXT changed
-                // ============================================================
                 const noteText = document.getElementById('titaNote').value.trim().slice(0, 60);
                 const noteRef = db.collection('notes').doc(titaCurrentUser.uid);
                 const existingNote = notesCache[titaCurrentUser.uid];
@@ -14462,15 +15558,11 @@
                 const willHaveNote = !!noteText;
 
                 if (textChanged) {
-                    // Only purge comments when the note TEXT actually changed
                     if (hadNote) {
                         await purgeCommentsForNote(titaCurrentUser.uid);
                     }
 
                     if (willHaveNote) {
-                        // ★ Always reset the 24h countdown when the note text changes.
-                        // Editing other profile fields (without touching the note) never
-                        // reaches this block, so their remaining time is preserved.
                         const expireAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
                         await noteRef.set({
@@ -14485,12 +15577,9 @@
                             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
                     } else {
-                        // Note text was cleared — remove the note doc
                         try { await noteRef.delete(); } catch (e) { /* ignore */ }
                     }
                 }
-                // If textChanged === false, do nothing to the note doc at all.
-                // The note keeps its original createdAt/expireAt and comments stay intact.
 
                 titaUserData = { ...titaUserData, ...updateData };
                 userProfileCache[titaCurrentUser.uid] = { id: titaCurrentUser.uid, ...titaUserData };
@@ -14518,7 +15607,6 @@
                     message: 'Anong susunod, \'nak? Your profile has been updated.',
                     type: 'success'
                 });
-
 
             } catch (err) {
                 console.error('Tita save error:', err);
@@ -14548,21 +15636,16 @@
                     setTimeout(closeChatMentionDropdown, 180);
                 });
 
-                // ★ Fix: when keyboard opens the first time, scroll input + body into view
                 chatInput.addEventListener('focus', () => {
-                    // Immediate attempt
                     ensureChatInputVisible();
-                    // And again after the keyboard finishes animating in
                     setTimeout(ensureChatInputVisible, 250);
                     setTimeout(ensureChatInputVisible, 500);
                 });
             }
 
-            // ★ Fix: visualViewport resize fires when the mobile keyboard opens/closes
             if (window.visualViewport) {
                 let _vvTimer = null;
                 window.visualViewport.addEventListener('resize', () => {
-                    // Only act if the chat input is focused
                     const active = document.activeElement;
                     if (!active || active.id !== 'chatInput') return;
                     if (_vvTimer) clearTimeout(_vvTimer);
@@ -14612,6 +15695,7 @@
             if (!highlightCard) return;
             if (!selectionMode) return;
             if (e.target.closest('.hl-actions')) return;
+            if (e.target.closest('.hl-reaction-bar')) return;
 
             e.stopPropagation();
             const id = highlightCard.dataset.highlightId;
